@@ -1,0 +1,20 @@
+services:
+  dashboard:
+    image: flat_dashboard_local
+    restart: always
+    build:
+      context: ./
+      dockerfile: ./docker/dev.Dockerfile
+    container_name: dashboard-local
+    env_file:
+      - .env.dev
+    volumes:
+      - ./app:/app
+    ports:
+      - "5173:5173"
+    networks:
+      - dashboard-network
+
+networks:
+  dashboard-network:
+    driver: bridge
