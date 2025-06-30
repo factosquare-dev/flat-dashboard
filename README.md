@@ -1,6 +1,6 @@
-# Flat Dashboard
+# FLAT Dashboard
 
-React-based frontend dashboard for the Flat business management platform.
+Modern React-based frontend dashboard for the FLAT (Factory Lifecycle and Tracking) business management platform.
 
 ## Overview
 
@@ -21,33 +21,54 @@ This dashboard provides a modern web interface for managing business operations 
 - **Language**: TypeScript 5.8.3
 - **Styling**: CSS3 with modern features
 - **Linting**: ESLint 9.25.0
+- **Testing**: Vitest + Playwright
 - **Package Manager**: npm
+- **State Management**: React Context API
+- **HTTP Client**: Fetch API with custom service layer
 
 ## Project Structure
 
 ```
-app/
-├── public/             # Static assets
-│   └── vite.svg       # Vite logo
-├── src/
-│   ├── assets/        # Images, icons, etc.
-│   │   └── react.svg  # React logo
-│   ├── components/    # Reusable UI components
-│   ├── pages/         # Route components
-│   ├── hooks/         # Custom React hooks
-│   ├── services/      # API calls and external services
-│   ├── utils/         # Utility functions
-│   ├── types/         # TypeScript type definitions
-│   ├── App.tsx        # Main application component
-│   ├── App.css        # Application styles
-│   ├── main.tsx       # Application entry point
-│   ├── index.css      # Global styles
-│   └── vite-env.d.ts  # Vite type definitions
-├── docker/            # Docker configurations
-├── eslint.config.js   # ESLint configuration
-├── tsconfig.json      # TypeScript configuration
-├── vite.config.ts     # Vite configuration
-└── package.json       # Project dependencies
+dashboard/
+├── flat/                      # React application
+│   ├── public/              # Static assets
+│   │   └── vite.svg        # Vite logo
+│   ├── src/
+│   │   ├── assets/         # Images, icons, etc.
+│   │   │   └── react.svg   # React logo
+│   │   ├── components/     # Reusable UI components
+│   │   │   └── ErrorBoundary.tsx
+│   │   ├── pages/          # Route components
+│   │   ├── hooks/          # Custom React hooks
+│   │   │   └── useLogging.ts
+│   │   ├── services/       # API integration
+│   │   │   └── api.ts      # API client
+│   │   ├── utils/          # Utility functions
+│   │   │   └── logger.ts   # Logging utility
+│   │   ├── types/          # TypeScript definitions
+│   │   ├── App.tsx         # Main app component
+│   │   ├── App.css         # App styles
+│   │   ├── main.tsx        # Entry point
+│   │   ├── index.css       # Global styles
+│   │   └── vite-env.d.ts   # Vite types
+│   ├── tests/               # Test suites
+│   │   ├── e2e/            # End-to-end tests
+│   │   ├── integration/    # Integration tests
+│   │   ├── unit/           # Unit tests
+│   │   └── mocks/          # Test mocks
+│   ├── eslint.config.js     # ESLint config
+│   ├── tsconfig.json        # TypeScript config
+│   ├── vite.config.ts       # Vite config
+│   ├── vitest.config.ts     # Vitest config
+│   └── package.json         # Dependencies
+├── docker/                   # Docker configurations
+│   ├── dev.Dockerfile       # Development image
+│   ├── staging.Dockerfile   # Staging image
+│   └── prod.Dockerfile      # Production image
+├── nginx.conf               # Nginx configuration
+├── docker-compose.yml       # Docker compose config
+├── Makefile                 # Make commands
+└── README.md                # This file
 ```
 
 ## Environment Setup
@@ -58,59 +79,83 @@ app/
 - npm 8+ or yarn 1.22+
 - Docker (optional)
 
+### Quick Start with Make
+
+```bash
+# Start development environment
+make dev
+
+# Run tests
+make test
+
+# Build for production
+make build
+
+# View logs
+make logs
+```
+
 ### Local Development
 
-1. **Clone the repository**
+1. **Clone the repository (with submodules)**
    ```bash
-   git clone git@github.com:FactosquareDev/flat-dashboard.git
-   cd flat-dashboard
+   git clone --recurse-submodules git@github.com:FactosquareDev/flat.git
+   cd flat/dashboard
    ```
 
-2. **Navigate to app directory**
+2. **Navigate to React app directory**
    ```bash
-   cd app
+   cd flat
    ```
 
 3. **Install dependencies**
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
 4. **Environment configuration**
    ```bash
    # Create environment file
    cp .env.example .env
-   # Edit .env with your API endpoints and settings
+   # Edit .env with your API endpoints
    ```
 
 5. **Start development server**
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
    The application will be available at `http://localhost:5173`
 
 ### Docker Development
 
-1. **Using Docker Compose**
+1. **Using Make commands (recommended)**
    ```bash
-   # Development environment
-   docker-compose up --build
+   # Start dashboard with backend
+   make dev
    
-   # The dashboard will be available at http://localhost:3000
+   # Build dashboard only
+   make build SERVICE=dashboard
+   
+   # View dashboard logs
+   make logs SERVICE=dashboard
    ```
 
-2. **Individual Docker commands**
+2. **Using Docker Compose**
+   ```bash
+   # Development environment
+   docker-compose up --build dashboard
+   
+   # The dashboard will be available at http://localhost:5173
+   ```
+
+3. **Individual Docker commands**
    ```bash
    # Build development image
    docker build -f docker/dev.Dockerfile -t flat-dashboard-dev .
    
-   # Run container
-   docker run -p 3000:3000 flat-dashboard-dev
+   # Run container with hot reload
+   docker run -p 5173:5173 -v $(pwd)/flat:/app flat-dashboard-dev
    ```
 
 ## Environment Variables
@@ -143,15 +188,18 @@ VITE_LOG_LEVEL=debug
 
 ## Available Scripts
 
-In the `app/` directory, you can run:
+In the `flat/` directory, you can run:
 
 ### Development
 ```bash
 # Start development server with hot reload
 npm run dev
 
-# Start development server with custom host
-npm run dev -- --host 0.0.0.0 --port 3000
+# Start development server accessible from network
+npm run dev -- --host 0.0.0.0
+
+# Start with custom port
+npm run dev -- --port 3000
 ```
 
 ### Building
@@ -177,17 +225,13 @@ npm run type-check
 
 ## Testing
 
-### Setup Testing Framework
+### Test Configuration
 
-```bash
-# Install testing dependencies
-npm install --save-dev @testing-library/react @testing-library/jest-dom @testing-library/user-event vitest jsdom
-
-# Add test script to package.json
-"test": "vitest",
-"test:ui": "vitest --ui",
-"test:coverage": "vitest --coverage"
-```
+Testing is already configured with:
+- **Vitest**: Fast unit test runner
+- **Playwright**: E2E testing
+- **React Testing Library**: Component testing
+- **MSW**: API mocking
 
 ### Running Tests
 
@@ -208,14 +252,16 @@ npm test -- --watch
 ### Test Structure
 
 ```
-src/
-├── __tests__/          # Test files
-│   ├── components/     # Component tests
-│   ├── pages/          # Page tests
-│   ├── hooks/          # Hook tests
-│   └── utils/          # Utility tests
-├── __mocks__/          # Mock files
-└── test-utils.tsx      # Test utilities and setup
+tests/
+├── e2e/                # End-to-end tests (Playwright)
+├── integration/        # Integration tests
+│   ├── auth-flow.test.tsx
+│   ├── permission-caching.test.tsx
+│   └── real-time-cache-sync.test.tsx
+├── unit/               # Unit tests
+├── mocks/              # Mock handlers
+│   └── handlers.ts    # MSW request handlers
+└── setup.ts            # Test setup and utilities
 ```
 
 ## Code Organization
@@ -371,6 +417,9 @@ export const useAuth = () => {
 # Build optimized production bundle
 npm run build
 
+# Preview production build locally
+npm run preview
+
 # The built files will be in dist/ directory
 ```
 
@@ -378,10 +427,26 @@ npm run build
 
 ```bash
 # Build production image
+make build SERVICE=dashboard ENV=prod
+
+# Or using Docker directly
 docker build -f docker/prod.Dockerfile -t flat-dashboard-prod .
 
-# Run production container
+# Run production container with Nginx
 docker run -p 80:80 flat-dashboard-prod
+```
+
+### Environment-Specific Builds
+
+```bash
+# Development (with hot reload)
+make dev
+
+# Staging environment
+make build SERVICE=dashboard ENV=staging
+
+# Production (optimized)
+make build SERVICE=dashboard ENV=prod
 ```
 
 ### Static Hosting
@@ -486,17 +551,77 @@ npm install --save-dev rollup-plugin-analyzer
 - Configure your editor with TypeScript and ESLint extensions
 - Use the browser's Network tab to debug API calls
 
+## Integration with Backend
+
+### API Configuration
+
+The dashboard connects to the FLAT backend API:
+
+```typescript
+// src/services/api.ts
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+```
+
+### Authentication Flow
+
+1. **Login**: POST to `/api/v1/auth/login`
+2. **Token Storage**: JWT stored in localStorage
+3. **Token Refresh**: Automatic refresh before expiry
+4. **Logout**: Token blacklisted on backend
+
+### Real-time Features
+
+- **WebSocket**: For notifications and updates
+- **Server-Sent Events**: For dashboard metrics
+- **Polling**: Fallback for older browsers
+
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Make your changes and add tests
-4. Ensure all tests pass: `npm test`
-5. Lint your code: `npm run lint`
-6. Build the project: `npm run build`
-7. Commit your changes: `git commit -m "feat: add new feature"`
-8. Push to the branch: `git push origin feature/new-feature`
-9. Create a Pull Request
+### Development Workflow
+
+1. Create feature branch from `dev`
+   ```bash
+   git checkout -b feature/FLAT-XXX-description
+   ```
+
+2. Make changes following code standards:
+   - TypeScript for all new code
+   - ESLint rules must pass
+   - Components must have tests
+   - Follow existing patterns
+
+3. Run quality checks:
+   ```bash
+   npm run lint
+   npm run type-check
+   npm test
+   npm run build
+   ```
+
+4. Commit with conventional format:
+   ```bash
+   git commit -m "feat(dashboard): add user profile [FLAT-123]"
+   ```
+
+5. Create PR to `dev` branch
+
+## Performance Optimization
+
+### Build Optimizations
+
+- **Code Splitting**: Automatic route-based splitting
+- **Tree Shaking**: Remove unused code
+- **Minification**: Terser for production builds
+- **Compression**: Gzip/Brotli in production
+- **Asset Optimization**: Image compression
+
+### Runtime Performance
+
+- **React.memo**: Prevent unnecessary re-renders
+- **useMemo/useCallback**: Optimize expensive operations
+- **Virtual Scrolling**: For large lists
+- **Lazy Loading**: Components and images
+- **Service Worker**: Offline support (PWA)
 
 ## Browser Support
 
@@ -504,6 +629,14 @@ npm install --save-dev rollup-plugin-analyzer
 - Firefox (latest 2 versions)
 - Safari (latest 2 versions)
 - Edge (latest 2 versions)
+- Mobile browsers (iOS Safari, Chrome Android)
+
+## Support
+
+- **Documentation**: Check main project `/docs`
+- **API Reference**: http://localhost:8000/docs
+- **Issues**: GitHub Issues in main repo
+- **Team Contact**: team.software@factosquare.com
 
 ## License
 

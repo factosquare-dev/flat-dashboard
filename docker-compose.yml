@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        - NODE_ENV=${NODE_ENV:-development}
+    image: flat_dashboard_${ENV:-dev}
+    container_name: dashboard-${ENV:-dev}
+    restart: always
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+      - ./index.html:/app/index.html:ro
+      - ./vite.config.ts:/app/vite.config.ts:ro
+    networks:
+      - frontend_network
+    command: npm run dev -- --host 0.0.0.0
+
+  # Production build
+  dashboard-prod:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+    image: flat_dashboard_prod
+    container_name: dashboard-prod
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - frontend_network
+    profiles:
+      - prod
+
+networks:
+  frontend_network:
+    driver: bridge
