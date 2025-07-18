@@ -4,9 +4,7 @@ services:
   dashboard:
     build:
       context: .
-      dockerfile: docker/Dockerfile
-      args:
-        - NODE_ENV=${NODE_ENV:-development}
+      dockerfile: docker/dev.Dockerfile
     image: flat_dashboard_${ENV:-dev}
     container_name: dashboard-${ENV:-dev}
     restart: always
@@ -16,10 +14,7 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./src:/app/src:ro
-      - ./public:/app/public:ro
-      - ./index.html:/app/index.html:ro
-      - ./vite.config.ts:/app/vite.config.ts:ro
+      - ./flat:/flat
     networks:
       - frontend_network
     command: npm run dev -- --host 0.0.0.0

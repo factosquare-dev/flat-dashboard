@@ -1,0 +1,347 @@
+/* Shared Tailwind CSS classes for consistent design across all components */
+
+/* Component Base Classes */
+.component {
+  @apply select-none;
+}
+
+.component-interactive {
+  @apply cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.component-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Buttons - Legacy support (prefer using ui/Button component) */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500;
+}
+
+.btn-secondary {
+  @apply bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+.btn-sm {
+  @apply px-3 py-1.5 text-sm;
+}
+
+.btn-md {
+  @apply px-4 py-2 text-sm;
+}
+
+.btn-lg {
+  @apply px-6 py-2.5 text-base;
+}
+
+/* Cards */
+.card {
+  @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+}
+
+.card-hover {
+  @apply hover:shadow-md transition-shadow duration-200;
+}
+
+.card-padded {
+  @apply p-5;
+}
+
+.card-header {
+  @apply text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2;
+}
+
+.card-body {
+  @apply p-5;
+}
+
+.card-footer {
+  @apply px-5 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl;
+}
+
+/* Forms */
+.form-input {
+  @apply w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
+}
+
+.form-input-sm {
+  @apply px-3 py-2 text-sm;
+}
+
+.form-input-lg {
+  @apply px-5 py-3 text-base;
+}
+
+.form-input-error {
+  @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+}
+
+.form-select {
+  @apply w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer appearance-none;
+}
+
+.form-select-error {
+  @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-label-required::after {
+  @apply content-['*'] text-red-500 ml-1;
+}
+
+.form-textarea {
+  @apply w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none;
+}
+
+.form-textarea-error {
+  @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+}
+
+.form-error {
+  @apply text-sm text-red-600 mt-1;
+}
+
+.form-help {
+  @apply text-sm text-gray-500 mt-1;
+}
+
+/* Custom animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoom-in-95 {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-in {
+  animation-duration: 200ms;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fade-in;
+}
+
+.zoom-in-95 {
+  animation-name: zoom-in-95;
+}
+
+/* Modals - Legacy support (prefer using ui/Modal component) */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200;
+}
+
+.modal-content {
+  @apply bg-white rounded-2xl shadow-xl w-full overflow-hidden border border-gray-200 animate-in zoom-in-95 duration-200;
+}
+
+.modal-header {
+  @apply flex items-center justify-between p-6 border-b border-gray-200;
+}
+
+.modal-title {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.modal-description {
+  @apply text-sm text-gray-600 mt-1;
+}
+
+.modal-body {
+  @apply p-6 overflow-y-auto;
+}
+
+.modal-footer {
+  @apply flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50;
+}
+
+/* Icons */
+.icon-sm {
+  @apply w-4 h-4;
+}
+
+.icon-md {
+  @apply w-5 h-5;
+}
+
+.icon-lg {
+  @apply w-6 h-6;
+}
+
+/* Tables */
+.table {
+  @apply w-full border-collapse;
+}
+
+.table-header {
+  @apply bg-gray-50 border-b border-gray-200;
+}
+
+.table-header-cell {
+  @apply px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap select-none;
+}
+
+.table-header-cell-sortable {
+  @apply cursor-pointer hover:bg-gray-100 transition-colors duration-200;
+}
+
+.table-row {
+  @apply border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200;
+}
+
+.table-row-selected {
+  @apply bg-blue-50 border-blue-200;
+}
+
+.table-cell {
+  @apply px-4 py-3 text-sm text-gray-900;
+}
+
+.table-cell-numeric {
+  @apply text-right tabular-nums;
+}
+
+.table-cell-center {
+  @apply text-center;
+}
+
+.table-empty {
+  @apply text-center py-8 text-gray-500;
+}
+
+.table-loading {
+  @apply text-center py-8 text-gray-400;
+}
+
+/* Status badges */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-sm {
+  @apply px-2 py-0.5 text-xs;
+}
+
+.badge-md {
+  @apply px-2.5 py-0.5 text-xs;
+}
+
+.badge-lg {
+  @apply px-3 py-1 text-sm;
+}
+
+.badge-success {
+  @apply text-green-800 bg-green-100 border border-green-200;
+}
+
+.badge-warning {
+  @apply text-amber-800 bg-amber-100 border border-amber-200;
+}
+
+.badge-error {
+  @apply text-red-800 bg-red-100 border border-red-200;
+}
+
+.badge-info {
+  @apply text-blue-800 bg-blue-100 border border-blue-200;
+}
+
+.badge-default {
+  @apply text-gray-800 bg-gray-100 border border-gray-200;
+}
+
+/* Container */
+.container-main {
+  @apply max-w-[1920px] mx-auto;
+}
+
+/* Section */
+.section {
+  @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+}
+
+.section-header {
+  @apply p-5 border-b border-gray-200;
+}
+
+.section-body {
+  @apply p-5;
+}
+
+.section-footer {
+  @apply p-5 border-t border-gray-200 bg-gray-50;
+}
+
+/* Loading states */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-gray-300 border-t-blue-600;
+}
+
+.loading-pulse {
+  @apply animate-pulse bg-gray-300 rounded;
+}
+
+.loading-skeleton {
+  @apply bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 bg-[length:400%_100%] animate-[skeleton_1.5s_ease-in-out_infinite];
+}
+
+/* Transitions */
+.transition-standard {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+.transition-fast {
+  @apply transition-all duration-100 ease-in-out;
+}
+
+.transition-slow {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Hover effects for dropdowns */
+.hover-trigger:hover .hover-show {
+  opacity: 1 !important;
+}
+
+/* Utility classes */
+.text-truncate {
+  @apply truncate;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.visually-hidden {
+  @apply sr-only;
+}
+
+.focus-visible {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Animation keyframes */
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

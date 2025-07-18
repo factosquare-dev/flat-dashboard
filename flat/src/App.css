@@ -1,3 +1,5 @@
+@import './styles/shared.css';
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -66,9 +68,7 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
+/* Card styles now handled in shared.css */
 
 .debug-actions {
   margin: 2rem 0;
