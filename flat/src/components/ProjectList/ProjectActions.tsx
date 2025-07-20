@@ -38,27 +38,8 @@ const ProjectActions: React.FC<ProjectActionsProps> = ({
 }) => {
   return (
     <div className="w-full max-w-full">
-      {/* 상단 헤더 영역 */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 border-b border-gray-200 rounded-lg shadow-sm mb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-gray-900">프로젝트 관리</h1>
-            <span className="text-sm text-gray-600">전체 {totalProjects}개</span>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={onSendEmail}
-              className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-all shadow-sm hover:shadow flex items-center gap-2 font-medium text-sm"
-            >
-              <Mail className="w-4 h-4" />
-              메일 보내기
-            </button>
-          </div>
-        </div>
-      </div>
-      
       {/* 검색 및 필터 영역 */}
-      <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-3">
+      <div className="bg-white">
         <ProjectFilters
           selectedPriority={selectedPriority}
           selectedServiceType={selectedServiceType}

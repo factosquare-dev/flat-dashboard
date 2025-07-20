@@ -140,11 +140,15 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
   const allRows = [...projects, addFactoryProject];
 
   return (
-    <div className="bg-white flex h-full overflow-hidden relative">
+    <div 
+      className="bg-white flex h-full overflow-hidden relative"
+      onMouseMove={props.onMouseMove}
+      onMouseUp={props.onMouseUp}
+    >
       {/* Fixed left column - Project names */}
-      <div className="w-72 bg-white border-r border-gray-200 flex-shrink-0">
+      <div className="w-72 bg-white border-r border-gray-100 flex-shrink-0">
         {/* Combined header - matching timeline header total height (24px + 28px + 2px border) */}
-        <div className="border-b-2 border-gray-300 bg-white flex items-center justify-center" style={{ height: '54px' }}>
+        <div className="border-b border-gray-200 bg-gray-50/50 flex items-center justify-center" style={{ height: '52px' }}>
           <span className="text-xs font-medium text-gray-600">공장</span>
         </div>
         
@@ -213,7 +217,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
       >
         <div className="min-w-max relative">
           {/* Timeline header with border */}
-          <div className="border-b-2 border-gray-300">
+          <div className="border-b border-gray-200">
             <TimelineHeader days={days} cellWidth={cellWidth} />
           </div>
           

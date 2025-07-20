@@ -37,10 +37,10 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
 
   return (
     <tr 
-      className="group hover:bg-gray-50/50 transition-all duration-200 cursor-pointer border-b border-gray-100"
+      className="group hover:bg-gray-50/30 transition-all duration-200 cursor-pointer border-b border-gray-50"
       onClick={handleRowClick}
     >
-      <td className="px-2 py-4">
+      <td className="px-1 py-1.5">
         <div className="flex items-center justify-center">
           <input
             type="checkbox"
@@ -50,20 +50,20 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               onSelect(e.target.checked);
             }}
             onClick={(e) => e.stopPropagation()}
-            className="w-5 h-5 rounded-md border-2 border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all hover:border-blue-400"
+            className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
           />
         </div>
       </td>
-      <td className="px-2 py-4 text-sm text-gray-900 truncate" title={project.productType}>
+      <td className="px-1.5 py-1.5 text-xs text-gray-900 truncate" title={project.productType}>
         {project.productType}
       </td>
-      <td className="px-2 py-4">
+      <td className="px-1.5 py-1.5">
         <ServiceTypeDropdown
           value={project.serviceType}
           onChange={(value) => onUpdateField(project.id, 'serviceType', value)}
         />
       </td>
-      <td className="px-2 py-4">
+      <td className="px-1.5 py-1.5">
         <div className="flex flex-wrap gap-1">
           {project.currentStage.length > 0 ? (
             project.currentStage.map((stage, index) => (
@@ -79,13 +79,13 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           )}
         </div>
       </td>
-      <td className="px-2 py-4">
+      <td className="px-1.5 py-1.5">
         <StatusDropdown
           value={project.status}
           onChange={(value) => onUpdateField(project.id, 'status', value)}
         />
       </td>
-      <td className="px-2 py-4">
+      <td className="px-1.5 py-1.5">
         <ProgressBar progress={project.progress} />
       </td>
       <EditableCell
@@ -144,13 +144,13 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         editableCell={editableCell}
         onUpdate={onUpdateField}
       />
-      <td className="px-2 py-4">
+      <td className="px-1.5 py-1.5">
         <PriorityDropdown 
           value={project.priority}
           onChange={(value) => onUpdateField(project.id, 'priority', value)}
         />
       </td>
-      <td className="px-3 py-4 text-center">
+      <td className="px-1.5 py-1.5 text-center">
         <div className="relative inline-block">
           <button 
             onClick={(e) => {
@@ -162,7 +162,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                 left: buttonRect.right - dropdownWidth
               });
             }}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors options-menu-button"
           >
             <MoreVertical className="icon-sm text-gray-600" />
           </button>

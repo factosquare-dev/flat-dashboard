@@ -36,13 +36,21 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   const handleSort = filters?.handleSort || (() => {});
 
   useEffect(() => {
-    const handleClickOutside = () => {
-      setShowOptionsMenu(null);
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const isOptionsMenu = target.closest('.options-menu-dropdown');
+      
+      if (!isOptionsMenu) {
+        setShowOptionsMenu(null);
+        setDropdownPosition(null);
+      }
     };
     
     if (showOptionsMenu) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
+      // Add event listener immediately to capture all clicks
+      document.addEventListener('click', handleClickOutside, true);
+      
+      return () => document.removeEventListener('click', handleClickOutside, true);
     }
   }, [showOptionsMenu]);
 
@@ -63,8 +71,13 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
 
   const handleShowOptionsMenu = (projectId: string, position: { top: number; left: number }) => {
-    setDropdownPosition(position);
-    setShowOptionsMenu(showOptionsMenu === projectId ? null : projectId);
+    if (showOptionsMenu === projectId) {
+      setShowOptionsMenu(null);
+      setDropdownPosition(null);
+    } else {
+      setDropdownPosition(position);
+      setShowOptionsMenu(projectId);
+    }
   };
 
   const handleEditProject = (projectId: string) => {

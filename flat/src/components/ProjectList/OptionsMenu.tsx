@@ -16,7 +16,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   onClose
 }) => {
   return (
-    <div className="fixed z-50" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+    <div className="fixed z-50 options-menu-dropdown" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
       <div className="bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[160px]">
         <button
           onClick={(e) => {

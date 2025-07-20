@@ -30,7 +30,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
 }) => {
   return (
     <div
-      className={`border-b border-gray-200 flex items-center transition-all hover:bg-gray-50 ${
+      className={`border-b border-gray-100 flex items-center transition-all hover:bg-gray-50/50 ${
         isDropTarget ? 'bg-blue-50/50' : ''
       } ${isDragging ? 'opacity-50' : ''}`}
       style={{ height: `${projectHeight}px`, minHeight: '50px' }}

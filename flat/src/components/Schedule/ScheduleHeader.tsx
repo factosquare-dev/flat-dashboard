@@ -21,7 +21,7 @@ const ScheduleHeader: React.FC<ScheduleHeaderProps> = ({
   projectName
 }) => {
   return (
-    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-white to-gray-50 rounded-lg shadow-sm border border-gray-200 relative z-20">
+    <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         {onBack && (
           <button
@@ -39,20 +39,6 @@ const ScheduleHeader: React.FC<ScheduleHeaderProps> = ({
         )}
       </div>
       <div className="flex items-center gap-2">
-        <button
-          onClick={onAddProject}
-          className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 rounded-md border border-gray-200 transition-all hover:shadow-sm flex items-center gap-1 text-sm"
-        >
-          <FileEdit className="w-4 h-4" />
-          <span className="font-medium">의뢰서 편집</span>
-        </button>
-        <button
-          onClick={onOpenEmail}
-          className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 rounded-md border border-gray-200 transition-all hover:shadow-sm flex items-center gap-1 text-sm"
-        >
-          <Mail className="w-4 h-4" />
-          <span className="font-medium">메일</span>
-        </button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Mail } from 'lucide-react';
 import ProjectActions from '../ProjectActions';
 import type { Priority, ServiceType, ProjectStatus } from '../../../types/project';
 
@@ -41,9 +41,9 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
   onDateRangeChange
 }) => {
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 overflow-hidden">
+    <div className="fixed inset-0 bg-gray-50 overflow-hidden">
       <div 
-        className="absolute bg-white overflow-hidden p-6"
+        className="absolute bg-white overflow-hidden"
         style={{
           top: containerStyle.top,
           left: containerStyle.left,
@@ -53,7 +53,7 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
           flexDirection: 'column'
         }}
       >
-        <div className="flex-shrink-0 mb-3 w-full">
+        <div className="flex-shrink-0 px-4 pt-2 pb-2 w-full border-b border-gray-100">
           <ProjectActions 
             selectedPriority={selectedPriority || 'all'}
             selectedServiceType={selectedServiceType || 'all'}
@@ -71,17 +71,28 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
           />
         </div>
 
-        <div className="flex-1 min-h-0 flex flex-col w-full">
-          <div className="flex-1 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden w-full">
-            {children}
-          </div>
+        <div className="flex-1 min-h-0 w-full overflow-hidden">
+          {children}
         </div>
       </div>
       
-      {/* Floating Action Button */}
+      {/* Floating Mail Button */}
+      <button
+        onClick={onSendEmail}
+        className="fixed bottom-24 right-8 bg-white text-gray-700 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center overflow-hidden border border-gray-200 z-50 group"
+      >
+        <div className="flex items-center gap-0 group-hover:gap-2 transition-all duration-300 px-4 py-4 group-hover:pr-5">
+          <Mail className="w-5 h-5 flex-shrink-0" />
+          <span className="max-w-0 group-hover:max-w-[80px] overflow-hidden whitespace-nowrap transition-all duration-300 font-medium text-sm">
+            메일 보내기
+          </span>
+        </div>
+      </button>
+      
+      {/* Floating Create Project Button */}
       <button
         onClick={onCreateProject}
-        className="fixed bottom-8 right-8 bg-blue-600 text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center group z-50 overflow-hidden"
+        className="fixed bottom-8 right-8 bg-blue-600 text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center overflow-hidden z-50 group"
       >
         <div className="flex items-center gap-0 group-hover:gap-2 transition-all duration-300 px-4 py-4 group-hover:pr-6">
           <Plus className="w-6 h-6 flex-shrink-0" />

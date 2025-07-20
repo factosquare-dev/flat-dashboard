@@ -1,4 +1,5 @@
 import React from 'react';
+import { Mail, FileEdit } from 'lucide-react';
 import ScheduleHeader from '../ScheduleHeader';
 import Button from '../../common/Button';
 
@@ -25,9 +26,9 @@ const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
 }) => {
   return (
     <>
-      <div className="fixed inset-0 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 overflow-hidden">
+      <div className="fixed inset-0 bg-gray-50 overflow-hidden">
         <div 
-          className="absolute bg-white overflow-hidden p-4"
+          className="absolute bg-white overflow-hidden"
           style={{
             top: containerStyle.top,
             left: containerStyle.left,
@@ -37,7 +38,7 @@ const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
             flexDirection: 'column'
           }}
         >
-          <div className="flex-shrink-0 mb-3 w-full">
+          <div className="flex-shrink-0 px-4 pt-2 pb-2 w-full border-b border-gray-100">
             <ScheduleHeader
               onAddProject={onAddProject}
               onOpenWorkflow={onOpenWorkflow}
@@ -47,16 +48,40 @@ const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
             />
           </div>
 
-          <div className="flex-1 min-h-0 flex flex-col w-full">
-            <div className="flex-1 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden w-full">
-              {children}
-            </div>
+          <div className="flex-1 min-h-0 w-full overflow-hidden">
+            {children}
           </div>
 
+          {/* Floating Edit Request Button */}
+          <button
+            onClick={onAddProject}
+            className="fixed bottom-40 right-8 bg-white text-gray-700 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center overflow-hidden border border-gray-200 z-50 group"
+          >
+            <div className="flex items-center gap-0 group-hover:gap-2 transition-all duration-300 px-4 py-4 group-hover:pr-5">
+              <FileEdit className="w-5 h-5 flex-shrink-0" />
+              <span className="max-w-0 group-hover:max-w-[80px] overflow-hidden whitespace-nowrap transition-all duration-300 font-medium text-sm">
+                의뢰서 편집
+              </span>
+            </div>
+          </button>
+          
+          {/* Floating Mail Button */}
+          <button
+            onClick={onOpenEmail}
+            className="fixed bottom-24 right-8 bg-white text-gray-700 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center overflow-hidden border border-gray-200 z-50 group"
+          >
+            <div className="flex items-center gap-0 group-hover:gap-2 transition-all duration-300 px-4 py-4 group-hover:pr-5">
+              <Mail className="w-5 h-5 flex-shrink-0" />
+              <span className="max-w-0 group-hover:max-w-[50px] overflow-hidden whitespace-nowrap transition-all duration-300 font-medium text-sm">
+                메일
+              </span>
+            </div>
+          </button>
+          
           {/* Floating Add Task Button */}
           <button
             onClick={onAddTask}
-            className="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-full transition-all duration-300 hover:shadow-xl shadow-lg flex items-center justify-center cursor-move group z-50 overflow-hidden"
+            className="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-full transition-all duration-300 hover:shadow-xl shadow-lg flex items-center justify-center cursor-move overflow-hidden z-50 group"
             draggable
             onDragStart={(e) => {
               e.dataTransfer.effectAllowed = 'copy';

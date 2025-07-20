@@ -36,7 +36,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
     const searchList = field === 'client' ? allClients : allFactories;
     
     return (
-      <td className="px-2 py-4 relative js-inline-edit">
+      <td className="px-1.5 py-1.5 relative js-inline-edit">
         <div className="relative w-full">
           <input
             type="text"
@@ -56,7 +56,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
               }
             }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full px-2 py-1.5 bg-white border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-2 py-1 bg-white border border-blue-500 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
             autoFocus
           />
           {showSuggestions && searchSuggestions.length > 0 && (
@@ -83,7 +83,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   
   if (type === 'date' && editing) {
     return (
-      <td className="px-2 py-4 js-inline-edit">
+      <td className="px-1.5 py-1.5 js-inline-edit text-center">
         <input
           type="date"
           defaultValue={value as string}
@@ -105,7 +105,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
             e.stopPropagation();
             (e.target as HTMLInputElement).showPicker?.();
           }}
-          className="w-full px-2 py-1.5 bg-white border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-2 py-1 bg-white border border-blue-500 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
           autoFocus
         />
       </td>
@@ -114,7 +114,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   
   if (type === 'currency' && editing) {
     return (
-      <td className="px-2 py-4 js-inline-edit">
+      <td className="px-1.5 py-1.5 js-inline-edit text-center">
         <input
           type="number"
           defaultValue={value}
@@ -131,7 +131,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
             }
           }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full px-2 py-1.5 bg-white border border-blue-500 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-full px-2 py-1 bg-white border border-blue-500 rounded text-xs text-right focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           autoFocus
         />
       </td>
@@ -141,13 +141,15 @@ const EditableCell: React.FC<EditableCellProps> = ({
   // Display mode
   return (
     <td 
-      className="px-2 py-4 text-sm text-gray-700 cursor-pointer group js-inline-edit"
+      className={`px-2 py-2 text-xs text-gray-700 cursor-pointer group js-inline-edit ${
+        type === 'currency' ? 'text-right' : type === 'date' ? 'text-center' : ''
+      }`}
       onClick={(e) => {
         e.stopPropagation();
         startEditing(project.id, field);
       }}
     >
-      <div className={`relative ${type === 'currency' ? 'text-right' : ''}`}>
+      <div className="relative">
         <div className={`${type === 'currency' ? 'tabular-nums' : 'truncate max-w-[140px]'} group-hover:text-gray-900 transition-colors`} title={value as string}>
           {type === 'currency' ? formatCurrency(parseInt(value as string)) : 
            type === 'date' ? new Date(value as string).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' }).replace(/\. /g, '-').replace('.', '') :

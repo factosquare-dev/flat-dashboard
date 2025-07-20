@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, Mail } from 'lucide-react';
 import type { Priority, ServiceType, ProjectStatus } from '../../types/project';
 
 interface ProjectFiltersProps {
@@ -28,7 +28,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
   onDateRangeChange
 }) => {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* 검색 영역 */}
       <div className="relative">
         <input

@@ -196,7 +196,7 @@
 }
 
 .table-header-cell {
-  @apply px-2 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap select-none;
+  @apply px-1 py-1.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wide whitespace-nowrap select-none;
 }
 
 .table-header-cell-sortable {

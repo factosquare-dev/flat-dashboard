@@ -124,6 +124,7 @@ body {
   .space-lg { margin: var(--spacing-lg); }
   .space-xl { margin: var(--spacing-xl); }
   .space-2xl { margin: var(--spacing-2xl); }
+  
 }
 
 /* Custom scrollbar styles */

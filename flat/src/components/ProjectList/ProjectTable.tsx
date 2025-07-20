@@ -30,23 +30,23 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
 }) => {
   return (
     <table className="w-full min-w-[1800px] table-fixed">
-      <thead className="sticky top-0 z-10 bg-white border-b-2 border-gray-200">
+      <thead className="sticky top-0 z-10 bg-gray-50/50 border-b border-gray-100">
           <tr>
-              <th className="w-12 px-2 py-3 text-left">
+              <th className="w-8 px-1 py-1.5 text-left">
                 <div className="flex items-center justify-center">
                   <input
                     type="checkbox"
                     checked={selectedRows?.length === projects?.length && projects?.length > 0}
                     onChange={(e) => onSelectAll(e.target.checked)}
-                    className="w-5 h-5 rounded-md border-2 border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all hover:border-blue-400"
+                    className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
                   />
                 </div>
               </th>
               <th className="table-header-cell">제품타입</th>
-              <th className="table-header-cell">서비스 유형</th>
-              <th className="table-header-cell">현재 단계</th>
-              <th className="table-header-cell">상태</th>
-              <th className="table-header-cell">진행률</th>
+              <th className="table-header-cell text-center">서비스 유형</th>
+              <th className="table-header-cell text-center">현재 단계</th>
+              <th className="table-header-cell text-center">상태</th>
+              <th className="table-header-cell text-center">진행률</th>
               <th 
                 className="table-header-cell table-header-cell-sortable"
                 onClick={() => onSort('client')}
@@ -61,10 +61,10 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
                 </div>
               </th>
               <th 
-                className="table-header-cell table-header-cell-sortable"
+                className="table-header-cell table-header-cell-sortable text-center"
                 onClick={() => onSort('startDate')}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-center">
                   <span>시작일</span>
                   {sortField === 'startDate' && (
                     <span className="text-blue-600">
@@ -74,10 +74,10 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
                 </div>
               </th>
               <th 
-                className="table-header-cell table-header-cell-sortable"
+                className="table-header-cell table-header-cell-sortable text-center"
                 onClick={() => onSort('endDate')}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-center">
                   <span>마감일</span>
                   {sortField === 'endDate' && (
                     <span className="text-blue-600">
@@ -89,13 +89,13 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
               <th className="table-header-cell">제조</th>
               <th className="table-header-cell">용기</th>
               <th className="table-header-cell">포장</th>
-              <th className="table-header-cell">매출</th>
-              <th className="table-header-cell">매입</th>
+              <th className="table-header-cell text-right">매출</th>
+              <th className="table-header-cell text-right">매입</th>
               <th 
-                className="table-header-cell table-header-cell-sortable"
+                className="table-header-cell table-header-cell-sortable text-center"
                 onClick={() => onSort('priority')}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-center">
                   <span>우선순위</span>
                   {sortField === 'priority' && (
                     <span className="text-blue-600">

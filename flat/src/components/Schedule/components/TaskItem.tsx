@@ -70,16 +70,20 @@ const TaskItem: React.FC<TaskItemProps> = ({
     >
       <div className="truncate font-medium">{task.title}</div>
       
-      {/* Resize handles */}
+      {/* Resize handles - smaller for short tasks */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-blue-400 hover:bg-opacity-50 z-10 transition-colors"
+        className={`absolute left-0 top-0 bottom-0 cursor-ew-resize hover:bg-blue-400 hover:bg-opacity-50 z-10 transition-colors group-hover:bg-blue-300 group-hover:bg-opacity-30 ${
+          width < 60 ? 'w-1' : 'w-2'
+        }`}
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'start');
         }}
       />
       <div
-        className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-blue-400 hover:bg-opacity-50 z-10 transition-colors"
+        className={`absolute right-0 top-0 bottom-0 cursor-ew-resize hover:bg-blue-400 hover:bg-opacity-50 z-10 transition-colors group-hover:bg-blue-300 group-hover:bg-opacity-30 ${
+          width < 60 ? 'w-1' : 'w-2'
+        }`}
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'end');
