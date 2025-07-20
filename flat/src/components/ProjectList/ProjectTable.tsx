@@ -29,54 +29,86 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
   onShowOptionsMenu
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-      <table className="w-full min-w-[1800px]">
-          <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-            <tr>
-              <th className="px-4 py-4 text-left">
-                <input
-                  type="checkbox"
-                  checked={selectedRows.length === projects.length && projects.length > 0}
-                  onChange={(e) => onSelectAll(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
+    <table className="w-full min-w-[1800px] table-fixed">
+      <thead className="sticky top-0 z-10 bg-white border-b-2 border-gray-200">
+          <tr>
+              <th className="w-12 px-2 py-5 text-left">
+                <div className="flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.length === projects.length && projects.length > 0}
+                    onChange={(e) => onSelectAll(e.target.checked)}
+                    className="w-5 h-5 rounded-md border-2 border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all hover:border-blue-400"
+                  />
+                </div>
               </th>
+              <th className="table-header-cell">제품타입</th>
+              <th className="table-header-cell">서비스 유형</th>
+              <th className="table-header-cell">현재 단계</th>
+              <th className="table-header-cell">상태</th>
+              <th className="table-header-cell">진행률</th>
               <th 
-                className="table-header-cell cursor-pointer hover:text-gray-900 transition-colors"
-                onClick={() => onSort('priority')}
-              >
-                우선순위 {sortField === 'priority' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th 
-                className="table-header-cell cursor-pointer hover:text-gray-900 transition-colors"
+                className="table-header-cell table-header-cell-sortable"
                 onClick={() => onSort('client')}
               >
-                고객명 {sortField === 'client' && (sortDirection === 'asc' ? '↑' : '↓')}
+                <div className="flex items-center justify-between">
+                  <span>고객명</span>
+                  {sortField === 'client' && (
+                    <span className="text-blue-600">
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="table-header-cell">담당자</th>
-              <th className="table-header-cell">제품유형</th>
+              <th 
+                className="table-header-cell table-header-cell-sortable"
+                onClick={() => onSort('startDate')}
+              >
+                <div className="flex items-center justify-between">
+                  <span>시작일</span>
+                  {sortField === 'startDate' && (
+                    <span className="text-blue-600">
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
+              </th>
+              <th 
+                className="table-header-cell table-header-cell-sortable"
+                onClick={() => onSort('endDate')}
+              >
+                <div className="flex items-center justify-between">
+                  <span>마감일</span>
+                  {sortField === 'endDate' && (
+                    <span className="text-blue-600">
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
+              </th>
               <th className="table-header-cell">제조</th>
               <th className="table-header-cell">용기</th>
               <th className="table-header-cell">포장</th>
-              <th className="table-header-cell">서비스유형</th>
-              <th className="table-header-cell">현재단계</th>
-              <th className="table-header-cell">진행률</th>
-              <th className="table-header-cell">상태</th>
-              <th 
-                className="table-header-cell cursor-pointer hover:text-gray-900 transition-colors"
-                onClick={() => onSort('startDate')}
-              >
-                시작일 {sortField === 'startDate' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th 
-                className="table-header-cell cursor-pointer hover:text-gray-900 transition-colors"
-                onClick={() => onSort('endDate')}
-              >
-                마감일 {sortField === 'endDate' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
               <th className="table-header-cell">매출</th>
               <th className="table-header-cell">매입</th>
-              <th className="table-header-cell text-center">작업</th>
+              <th 
+                className="table-header-cell table-header-cell-sortable"
+                onClick={() => onSort('priority')}
+              >
+                <div className="flex items-center justify-between">
+                  <span>우선순위</span>
+                  {sortField === 'priority' && (
+                    <span className="text-blue-600">
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
+              </th>
+              <th className="table-header-cell text-center w-12">
+                <svg className="w-4 h-4 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                </svg>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -93,7 +125,6 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
             ))}
           </tbody>
         </table>
-    </div>
   );
 };
 

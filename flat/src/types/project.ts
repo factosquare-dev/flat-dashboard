@@ -20,6 +20,7 @@ export interface Project {
   sales: string;
   purchase: string;
   priority: Priority;
+  scheduleId?: string; // 스케줄 ID 추가
 }
 
 export interface ProjectFactory {

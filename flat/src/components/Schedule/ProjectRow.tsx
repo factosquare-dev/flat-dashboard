@@ -1,6 +1,7 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
 import type { Participant, Task } from '../../types/schedule';
+import { isWeekend } from '../../utils/dateUtils';
 import TaskItem from './TaskItem';
 
 interface ProjectRowProps {
@@ -80,10 +81,10 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
       </div>
       <div className="flex-1 relative bg-white" style={{ minHeight: '80px' }}>
         <div className="absolute inset-0 flex">
-          {days.map((_, index) => (
+          {days.map((day, index) => (
             <div
               key={index}
-              className="border-r border-gray-100"
+              className={`${isWeekend(day) ? 'bg-gray-100' : ''}`}
               style={{ width: `${cellWidth}px` }}
             />
           ))}

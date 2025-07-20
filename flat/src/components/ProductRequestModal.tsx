@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, FileText, Calendar, Building2, Mail } from 'lucide-react';
+import EmailModal from './EmailModal';
 
 interface ProductRequestModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ interface ProductRequestData {
 }
 
 const ProductRequestModal: React.FC<ProductRequestModalProps> = ({ isOpen, onClose, onSave, onSendEmail, availableFactories }) => {
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [formData, setFormData] = useState<ProductRequestData>({
     brandName: '',
     targetProduct: '',
@@ -68,7 +70,25 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({ isOpen, onClo
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  // ESC key handler
+  React.useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (showEmailModal) {
+          setShowEmailModal(false);
+        } else if (isOpen) {
+          onClose();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [isOpen, showEmailModal, onClose]);
+
+  if (!isOpen && !showEmailModal) return null;
 
   const handleSave = () => {
     if (onSave) {
@@ -86,6 +106,15 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({ isOpen, onClo
       }
     }
     
+    onClose(); // ProductRequestModal 닫기
+    setTimeout(() => {
+      setShowEmailModal(true);
+    }, 100);
+  };
+  
+  const handleEmailSend = (emailData: any) => {
+    console.log('Email sent:', emailData);
+    setShowEmailModal(false);
     if (onSendEmail) {
       onSendEmail(formData);
     }
@@ -112,8 +141,10 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({ isOpen, onClo
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <>
+    {isOpen && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -370,6 +401,19 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({ isOpen, onClo
         </div>
       </div>
     </div>
+    )}
+    
+    {/* Email Modal */}
+    <EmailModal
+      isOpen={showEmailModal}
+      onClose={() => setShowEmailModal(false)}
+      onSend={handleEmailSend}
+      showBackButton={true}
+      onBack={() => setShowEmailModal(false)}
+      defaultRecipients=""
+      availableFactories={availableFactories}
+    />
+    </>
   );
 };
 

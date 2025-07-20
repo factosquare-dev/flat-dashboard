@@ -4,14 +4,19 @@ import EmailModal from '../EmailModal';
 import WorkflowModal from '../WorkflowModal';
 import TaskEditModal from '../TaskEditModal';
 import ProductRequestModal from '../ProductRequestModal';
+import TaskCreateModal from '../TaskCreateModal';
+import { factories } from '../../data/factories';
 
 interface ModalState {
   showEmailModal: boolean;
   showWorkflowModal: boolean;
   showTaskEditModal: boolean;
   showProductRequestModal: boolean;
+  showTaskModal: boolean;
   selectedTask: Task | null;
   selectedFactories: string[];
+  selectedProjectId: string | null;
+  selectedDate: string | null;
   hoveredTaskId: number | null;
   draggedProjectIndex: number | null;
   dragOverProjectIndex: number | null;
@@ -28,6 +33,7 @@ interface ScheduleModalsProps {
   projects: Participant[];
   onTaskSave: (task: Task) => void;
   onTaskDelete: () => void;
+  onTaskCreate: (task: { factory: string; taskType: string; startDate: string; endDate: string }) => void;
 }
 
 const ScheduleModals: React.FC<ScheduleModalsProps> = ({
@@ -35,7 +41,8 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
   setModalState,
   projects,
   onTaskSave,
-  onTaskDelete
+  onTaskDelete,
+  onTaskCreate
 }) => {
   const handleEmailSend = (data: any) => {
     console.log('Email sent:', data);
@@ -55,13 +62,34 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
     setModalState(prev => ({ ...prev, showProductRequestModal: false }));
   };
 
+  const handleTaskCreate = (task: { factory: string; taskType: string; startDate: string; endDate: string }) => {
+    onTaskCreate(task);
+    setModalState(prev => ({ ...prev, showTaskModal: false }));
+  };
+
   return (
     <>
       <EmailModal
         isOpen={modalState.showEmailModal}
         onClose={() => setModalState(prev => ({ ...prev, showEmailModal: false }))}
         onSend={handleEmailSend}
-        availableFactories={projects.map(p => p.name)}
+        defaultRecipients={modalState.selectedFactories.length > 0 ? modalState.selectedFactories.join(', ') : ''}
+        availableFactories={modalState.selectedFactories.length > 0 ? 
+          modalState.selectedFactories.map(name => {
+            const factory = factories.find(f => f.name === name);
+            return {
+              name,
+              color: factory?.type === '제조' ? 'bg-blue-500' : 
+                     factory?.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+              type: factory?.type || '공장'
+            };
+          }) : factories.map(f => ({
+            name: f.name,
+            color: f.type === '제조' ? 'bg-blue-500' : 
+                   f.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+            type: f.type
+          }))
+        }
       />
 
       <WorkflowModal
@@ -83,6 +111,16 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
         isOpen={modalState.showProductRequestModal}
         onClose={() => setModalState(prev => ({ ...prev, showProductRequestModal: false }))}
         onSave={handleProductRequestSave}
+      />
+
+      <TaskCreateModal
+        isOpen={modalState.showTaskModal}
+        onClose={() => setModalState(prev => ({ ...prev, showTaskModal: false, selectedProjectId: null, selectedDate: null, selectedFactory: null }))}
+        onSave={handleTaskCreate}
+        availableFactories={projects.map(p => p.name)}
+        initialDate={modalState.selectedDate || undefined}
+        projectId={modalState.selectedProjectId || undefined}
+        selectedFactory={modalState.selectedFactory || undefined}
       />
     </>
   );

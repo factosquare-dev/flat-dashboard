@@ -39,7 +39,6 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
 }) => {
   const [showOptionsMenu, setShowOptionsMenu] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{top: number, left: number} | null>(null);
-  
   const { observerRef } = useInfiniteScroll({
     hasMore,
     isLoading,
@@ -82,39 +81,41 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <ProjectTable
-        projects={projects}
-        selectedRows={selectedRows}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        onSort={onSort}
-        onSelectAll={handleSelectAllProjects}
-        onSelectRow={onSelectRow}
-        onSelectProject={onSelectProject}
-        onUpdateProject={onUpdateProject}
-        onShowOptionsMenu={handleShowOptionsMenu}
-      />
-      
-      {/* Loading indicator */}
-      {isLoading && (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-gray-600">Loading more projects...</span>
-        </div>
-      )}
-      
-      {/* Infinite scroll trigger */}
-      {hasMore && !isLoading && (
-        <div ref={observerRef} className="h-4" />
-      )}
-      
-      {/* End message */}
-      {!hasMore && (
-        <div className="text-center py-8 text-gray-500">
-          No more projects to load
-        </div>
-      )}
+    <div className="h-full flex flex-col">
+      <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+        <ProjectTable
+          projects={projects}
+          selectedRows={selectedRows}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSort={onSort}
+          onSelectAll={handleSelectAllProjects}
+          onSelectRow={onSelectRow}
+          onSelectProject={onSelectProject}
+          onUpdateProject={onUpdateProject}
+          onShowOptionsMenu={handleShowOptionsMenu}
+        />
+        
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading more projects...</span>
+          </div>
+        )}
+        
+        {/* Infinite scroll trigger */}
+        {hasMore && !isLoading && (
+          <div ref={observerRef} className="h-4" />
+        )}
+        
+        {/* End message */}
+        {!hasMore && (
+          <div className="text-center py-8 text-gray-500">
+            No more projects to load
+          </div>
+        )}
+      </div>
       
       {showOptionsMenu && dropdownPosition && (
         <OptionsMenu

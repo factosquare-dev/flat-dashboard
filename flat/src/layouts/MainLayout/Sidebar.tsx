@@ -10,6 +10,7 @@ import {
 
 interface SidebarProps {
   isOpen: boolean;
+  onToggle?: () => void;
 }
 
 interface NavItem {
@@ -25,7 +26,7 @@ const navigation: NavItem[] = [
   { name: 'Users', path: '/users', icon: Users },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
   const toggleExpanded = (name: string) => {
@@ -58,22 +59,46 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             }`
           }
         >
-          <item.icon
-            className={`mr-3 h-5 w-5 flex-shrink-0 ${
-              isOpen ? '' : 'mr-0'
-            }`}
-          />
-          {isOpen && (
+          {({ isActive }) => (
             <>
-              <span className="flex-1">{item.name}</span>
-              {hasChildren && (
-                <span className="ml-auto">
-                  {isExpanded ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
+              <item.icon
+                onClick={(e) => {
+                  // 현재 활성화된 메뉴 아이템의 아이콘을 클릭했을 때만 토글
+                  if (isActive && onToggle && !hasChildren) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onToggle();
+                  }
+                }}
+                className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                  isOpen ? '' : 'mr-0'
+                } ${isActive ? 'cursor-pointer' : ''}`}
+              />
+              {isOpen && (
+                <>
+                  <span 
+                    onClick={(e) => {
+                      // 현재 활성화된 메뉴 아이템의 텍스트를 클릭했을 때만 토글
+                      if (isActive && onToggle && !hasChildren) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onToggle();
+                      }
+                    }}
+                    className={`flex-1 ${isActive ? 'cursor-pointer' : ''}`}
+                  >
+                    {item.name}
+                  </span>
+                  {hasChildren && (
+                    <span className="ml-auto">
+                      {isExpanded ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                    </span>
                   )}
-                </span>
+                </>
               )}
             </>
           )}
@@ -90,11 +115,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
 
   return (
     <div
-      className={`fixed top-16 bottom-0 left-0 z-30 flex flex-col bg-white border-r border-gray-200 transition-all duration-300 ${
+      className={`flex-shrink-0 flex flex-col bg-white border-r border-gray-200 transition-all duration-300 h-full cursor-pointer ${
         isOpen ? 'w-64' : 'w-16'
       }`}
+      onClick={(e) => {
+        // 사이드바의 빈 공간을 클릭했을 때만 토글
+        if (e.target === e.currentTarget || e.target.classList.contains('sidebar-content')) {
+          onToggle?.();
+        }
+      }}
     >
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      <div className="flex-1 flex flex-col overflow-y-auto sidebar-content" data-sidebar="true">
         <nav className="flex-1 px-2 py-4 space-y-1">
           {navigation.map(item => renderNavItem(item))}
         </nav>

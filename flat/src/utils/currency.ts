@@ -1,59 +1,69 @@
 export const formatCurrency = (value: number): string => {
   if (value === 0) return '0원';
   
-  const eok = Math.floor(value / 100000000);
+  const jo = Math.floor(value / 1000000000000);
+  const eok = Math.floor((value % 1000000000000) / 100000000);
   const man = Math.floor((value % 100000000) / 10000);
-  const remainder = value % 10000;
+  const won = value % 10000;
   
   let result = '';
-  if (eok > 0) result += `${eok}억`;
+  
+  // 조 단위
+  if (jo > 0) {
+    result += `${jo.toLocaleString()}조`;
+  }
+  
+  // 억 단위
+  if (eok > 0) {
+    if (result) result += ' ';
+    result += `${eok.toLocaleString()}억`;
+  }
+  
+  // 만 단위
   if (man > 0) {
     if (result) result += ' ';
-    if (man >= 1000) {
-      const cheonman = Math.floor(man / 1000);
-      const baekman = Math.floor((man % 1000) / 100);
-      const restMan = man % 100;
-      result += `${cheonman}천`;
-      if (baekman > 0) result += `${baekman}백`;
-      if (restMan > 0) result += `${restMan}`;
-      result += '만';
-    } else if (man >= 100) {
-      const baekman = Math.floor(man / 100);
-      const restMan = man % 100;
-      result += `${baekman}백`;
-      if (restMan > 0) result += `${restMan}`;
-      result += '만';
-    } else {
-      result += `${man}만`;
-    }
+    result += `${man.toLocaleString()}만`;
   }
-  if (remainder > 0 && eok === 0 && man === 0) {
-    result += `${remainder}`;
+  
+  // 원 단위 (조, 억, 만이 모두 없을 때만 표시)
+  if (!result && won > 0) {
+    result = won.toLocaleString();
   }
+  
   return result + '원';
 };
 
 export const parseCurrency = (str: string): number => {
-  str = str.replace(/[^0-9억천백만]/g, '');
+  // 숫자와 한국 단위만 남기고 제거
+  str = str.replace(/[^0-9조억만,]/g, '');
   let total = 0;
   
-  const eokMatch = str.match(/(\d+)억/);
-  if (eokMatch) total += parseInt(eokMatch[1]) * 100000000;
-  
-  const cheonmanMatch = str.match(/(\d+)천(?=만|$)/);
-  if (cheonmanMatch && str.includes('만')) total += parseInt(cheonmanMatch[1]) * 10000000;
-  
-  const baekmanMatch = str.match(/(\d+)백(?=만|$)/);
-  if (baekmanMatch && str.includes('만')) total += parseInt(baekmanMatch[1]) * 1000000;
-  
-  const manMatch = str.match(/(\d+)만/);
-  if (manMatch && !str.includes('천') && !str.includes('백')) {
-    total += parseInt(manMatch[1]) * 10000;
+  // 조 단위 처리
+  const joMatch = str.match(/(\d+[\d,]*)조/);
+  if (joMatch) {
+    const joValue = parseInt(joMatch[1].replace(/,/g, ''));
+    total += joValue * 1000000000000;
   }
   
-  const remainderMatch = str.match(/(\d+)$/);
-  if (remainderMatch && !str.includes('만') && !str.includes('억')) {
-    total += parseInt(remainderMatch[1]);
+  // 억 단위 처리
+  const eokMatch = str.match(/(\d+[\d,]*)억/);
+  if (eokMatch) {
+    const eokValue = parseInt(eokMatch[1].replace(/,/g, ''));
+    total += eokValue * 100000000;
+  }
+  
+  // 만 단위 처리
+  const manMatch = str.match(/(\d+[\d,]*)만/);
+  if (manMatch) {
+    const manValue = parseInt(manMatch[1].replace(/,/g, ''));
+    total += manValue * 10000;
+  }
+  
+  // 원 단위 처리 (단위가 없는 마지막 숫자)
+  const wonMatch = str.match(/(\d+[\d,]*)$/);
+  if (wonMatch && !str.includes('조') && !str.includes('억') && !str.includes('만')) {
+    const wonValue = parseInt(wonMatch[1].replace(/,/g, ''));
+    total += wonValue;
   }
   
   return total;

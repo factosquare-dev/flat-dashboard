@@ -7,6 +7,7 @@ export const useProjectFilters = () => {
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceType | 'all'>('all');
   const [sortField, setSortField] = useState<keyof Project | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [searchValue, setSearchValue] = useState('');
 
   const handleSort = (field: keyof Project) => {
     if (sortField === field) {
@@ -22,7 +23,13 @@ export const useProjectFilters = () => {
       const matchesStatus = statusFilters.includes(project.status);
       const matchesPriority = selectedPriority === 'all' || project.priority === selectedPriority;
       const matchesServiceType = selectedServiceType === 'all' || project.serviceType === selectedServiceType;
-      return matchesStatus && matchesPriority && matchesServiceType;
+      const matchesSearch = searchValue === '' || 
+        project.client.toLowerCase().includes(searchValue.toLowerCase()) ||
+        project.manager.toLowerCase().includes(searchValue.toLowerCase()) ||
+        project.manufacturer.toLowerCase().includes(searchValue.toLowerCase()) ||
+        project.container.toLowerCase().includes(searchValue.toLowerCase()) ||
+        project.packaging.toLowerCase().includes(searchValue.toLowerCase());
+      return matchesStatus && matchesPriority && matchesServiceType && matchesSearch;
     });
   };
 
@@ -67,6 +74,8 @@ export const useProjectFilters = () => {
     setSelectedServiceType,
     sortField,
     sortDirection,
+    searchValue,
+    setSearchValue,
     handleSort,
     getFilteredAndSortedProjects,
     handleStatusFilterToggle

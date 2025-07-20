@@ -3,14 +3,19 @@ import type { Participant, Task } from '../../../types/schedule';
 import { getDaysArray, formatDate } from '../../../utils/dateUtils';
 import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
 import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
+import { factories } from '../../../data/factories';
 
 interface ModalState {
   showEmailModal: boolean;
   showWorkflowModal: boolean;
   showTaskEditModal: boolean;
   showProductRequestModal: boolean;
+  showTaskModal: boolean;
   selectedTask: Task | null;
   selectedFactories: string[];
+  selectedProjectId: string | null;
+  selectedDate: string | null;
+  selectedFactory: string | null;
   hoveredTaskId: number | null;
   draggedProjectIndex: number | null;
   dragOverProjectIndex: number | null;
@@ -31,25 +36,36 @@ interface DateRange {
 export const useScheduleState = (
   participants: Participant[],
   projectStartDate: string,
-  projectEndDate: string
+  projectEndDate: string,
+  gridWidth: number
 ) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const startDate = projectStartDate ? new Date(projectStartDate) : new Date(today);
-  if (!projectStartDate) {
-    startDate.setDate(startDate.getDate() - 7);
-  }
+  // 프로젝트 시작일과 종료일 설정
+  let startDate: Date;
+  let endDate: Date;
   
-  const endDate = projectEndDate ? new Date(projectEndDate) : new Date(today);
-  if (!projectEndDate) {
-    endDate.setMonth(endDate.getMonth() + 3);
+  if (projectStartDate && projectEndDate) {
+    // 프로젝트 날짜가 제공된 경우, 앞뒤로 4일씩 여유 추가
+    startDate = new Date(projectStartDate);
+    startDate.setDate(startDate.getDate() - 4);
+    
+    endDate = new Date(projectEndDate);
+    endDate.setDate(endDate.getDate() + 4);
   } else {
-    endDate.setDate(endDate.getDate() + 30);
+    // 날짜가 제공되지 않은 경우 기본값 사용 - 더 긴 기간으로 설정
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 30);
+    
+    endDate = new Date(today);
+    endDate.setMonth(endDate.getMonth() + 6);
   }
 
-  const cellWidth = 40;
   const days = getDaysArray(startDate, endDate);
+  
+  // cellWidth를 고정값으로 설정
+  const cellWidth = 50; // 고정 너비로 설정하여 스크롤 보장
 
   const dateRange: DateRange = {
     startDate,
@@ -58,34 +74,32 @@ export const useScheduleState = (
     cellWidth
   };
 
-  const initialProjects = participants && participants.length > 0 ? participants : [
-    {
-      id: 'project-1',
-      name: "큐셀시스템",
-      period: `${formatDate(today)} ~ ${formatDate(new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000))}`,
-      color: "bg-blue-500",
-    },
-    {
-      id: 'project-2',
-      name: "(주)연우",
-      period: `${formatDate(new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000))} ~ ${formatDate(new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000))}`, 
-      color: "bg-red-500",
-    },
-    {
-      id: 'project-3',
-      name: "(주)네트모베이지",
-      period: `${formatDate(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000))} ~ ${formatDate(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000))}`,
-      color: "bg-yellow-500", 
-    },
-    {
-      id: 'project-4',
-      name: "주식회사 코스모로스",
-      period: `${formatDate(new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000))} ~ ${formatDate(new Date(today.getTime() + 75 * 24 * 60 * 60 * 1000))}`,
-      color: "bg-cyan-500",
-    }
+  // 색상 배열 정의
+  const colors = [
+    "bg-blue-500",
+    "bg-red-500", 
+    "bg-green-500",
+    "bg-yellow-500",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-indigo-500",
+    "bg-orange-500",
+    "bg-teal-500",
+    "bg-cyan-500"
   ];
 
+  // 공장 데이터를 기반으로 초기 프로젝트 생성
+  const initialProjects = participants && participants.length > 0 ? participants : 
+    factories.slice(0, 10).map((factory, index) => ({
+      id: factory.id,
+      name: factory.name,
+      type: factory.type,
+      period: `${formatDate(new Date(today.getTime() + (index - 5) * 7 * 24 * 60 * 60 * 1000))} ~ ${formatDate(new Date(today.getTime() + ((index - 5) * 7 + 30 + index * 10) * 24 * 60 * 60 * 1000))}`,
+      color: colors[index % colors.length],
+    }));
+
   const [projects, setProjects] = useState<Participant[]>(initialProjects);
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [sliderValue, setSliderValue] = useState(0);
   
   const [modalState, setModalState] = useState<ModalState>({
@@ -93,8 +107,12 @@ export const useScheduleState = (
     showWorkflowModal: false,
     showTaskEditModal: false,
     showProductRequestModal: false,
+    showTaskModal: false,
     selectedTask: null,
     selectedFactories: [],
+    selectedProjectId: null,
+    selectedDate: null,
+    selectedFactory: null,
     hoveredTaskId: null,
     draggedProjectIndex: null,
     dragOverProjectIndex: null,
@@ -108,16 +126,35 @@ export const useScheduleState = (
   const dragControls = useScheduleDrag();
   const taskControls = useScheduleTasks(projects, startDate, endDate);
 
+  const handleProjectSelect = (projectId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedProjects(prev => [...prev, projectId]);
+    } else {
+      setSelectedProjects(prev => prev.filter(id => id !== projectId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedProjects(projects.map(p => p.id));
+    } else {
+      setSelectedProjects([]);
+    }
+  };
+
   return {
     dateRange,
     projects,
     setProjects,
+    selectedProjects,
     tasks: taskControls.tasks,
     taskControls,
     dragControls,
     modalState,
     setModalState,
     sliderValue,
-    setSliderValue
+    setSliderValue,
+    handleProjectSelect,
+    handleSelectAll
   };
 };

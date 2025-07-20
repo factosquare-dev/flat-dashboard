@@ -20,42 +20,56 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({ days, cellWidth }) => {
   return (
     <>
       {/* Month row */}
-      <div className="flex border-b border-gray-300 bg-gray-50">
-        <div className="w-64 px-4 py-2 font-semibold text-gray-700 bg-gray-100 border-r border-gray-300">
-          프로젝트
-        </div>
+      <div className="flex border-b border-gray-200 bg-white" style={{ height: '32px' }}>
         <div className="flex">
           {Object.values(monthGroups).map((group, index) => (
             <div
               key={index}
-              className="text-center font-semibold text-gray-700 border-r border-gray-200 bg-gray-50"
-              style={{ width: `${group.count * cellWidth}px` }}
+              className="text-center text-xs font-medium text-gray-600 border-r border-gray-100 flex items-center justify-center px-2"
+              style={{ 
+                width: `${group.count * cellWidth}px`, 
+                height: '32px',
+                minWidth: '80px' // Ensure month name doesn't get cut off
+              }}
             >
-              {group.month.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
+              {group.month.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short' }).replace(' ', '.')}
             </div>
           ))}
         </div>
       </div>
 
       {/* Date row */}
-      <div className="flex border-b border-gray-300">
-        <div className="w-64 px-4 py-2 bg-gray-100 border-r border-gray-300"></div>
+      <div className="flex border-b border-gray-200" style={{ height: '36px' }}>
         <div className="flex">
-          {days.map((day, index) => (
-            <div
-              key={index}
-              className={`text-center text-xs border-r border-gray-200 py-2 ${
-                isToday(day) ? 'bg-blue-100 font-bold' : 
-                isWeekend(day) ? 'bg-gray-100' : 'bg-white'
-              }`}
-              style={{ width: `${cellWidth}px` }}
-            >
-              <div>{formatDate(day)}</div>
-              <div className="text-gray-500">
-                {day.toLocaleDateString('ko-KR', { weekday: 'short' })}
+          {days.map((day, index) => {
+            const isFirstOfMonth = day.getDate() === 1;
+            return (
+              <div
+                key={index}
+                className={`text-center text-xs flex items-center justify-center border-r border-gray-100 transition-colors relative ${
+                  isWeekend(day) ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-700 hover:bg-gray-50'
+                } ${isFirstOfMonth ? 'pl-3' : ''}`}
+                style={{ 
+                  width: `${cellWidth}px`, 
+                  height: '36px',
+                  paddingLeft: isFirstOfMonth ? '12px' : '0' // Add padding for first day of month
+                }}
+              >
+                <div className="flex flex-col items-center">
+                  <div className={`text-[9px] ${isToday(day) ? 'text-blue-600 font-semibold' : 'text-gray-400'}`}>
+                    {day.toLocaleDateString('ko-KR', { weekday: 'short' })}
+                  </div>
+                  <div className={`font-medium flex items-center justify-center ${
+                    isToday(day) 
+                      ? 'bg-blue-500 text-white w-5 h-5 rounded-full text-xs' 
+                      : 'text-sm text-gray-700'
+                  }`}>
+                    {day.getDate()}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </>

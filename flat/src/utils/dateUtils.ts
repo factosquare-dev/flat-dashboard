@@ -1,8 +1,5 @@
 export const formatDate = (date: Date): string => {
-  return date.toLocaleDateString('ko-KR', {
-    month: '2-digit',
-    day: '2-digit'
-  }).replace(/\. /g, '/').replace('.', '');
+  return date.getDate().toString();
 };
 
 export const formatDateRange = (start: Date, end: Date): string => {

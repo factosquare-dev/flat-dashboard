@@ -9,6 +9,7 @@ export const useScheduleEffects = (
 ) => {
   const cellWidth = 40;
 
+  // 스크롤 이벤트 핸들러만 설정
   useEffect(() => {
     const handleScroll = () => {
       if (scrollRef.current) {
@@ -22,16 +23,26 @@ export const useScheduleEffects = (
     const scrollElement = scrollRef.current;
     if (scrollElement) {
       scrollElement.addEventListener('scroll', handleScroll);
-      
-      const todayIndex = days.findIndex(day => isToday(day));
-      if (todayIndex >= 0) {
-        const scrollPosition = Math.max(0, todayIndex * cellWidth - 200);
-        scrollElement.scrollLeft = scrollPosition;
-      }
-      
       return () => scrollElement.removeEventListener('scroll', handleScroll);
     }
-  }, [days, cellWidth, scrollRef, setSliderValue]);
+  }, [scrollRef, setSliderValue]);
+
+  // 초기 로드 시에만 오늘 날짜로 스크롤
+  useEffect(() => {
+    const scrollElement = scrollRef.current;
+    if (scrollElement && days.length > 0) {
+      const todayIndex = days.findIndex(day => isToday(day));
+      if (todayIndex >= 0) {
+        // setTimeout으로 초기 렌더링 후 스크롤
+        setTimeout(() => {
+          const scrollPosition = Math.max(0, todayIndex * cellWidth - 200);
+          if (scrollRef.current) {
+            scrollRef.current.scrollLeft = scrollPosition;
+          }
+        }, 100);
+      }
+    }
+  }, []); // 빈 배열로 초기 로드 시에만 실행
 
   const handleSliderChange = (value: number) => {
     setSliderValue(value);

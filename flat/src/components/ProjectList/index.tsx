@@ -28,6 +28,7 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
         participants={participants}
         startDate={selectedProject.startDate}
         endDate={selectedProject.endDate}
+        onBack={() => setSelectedProject(null)}
       />
     );
   }

@@ -1,11 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Project } from '../types/project';
+import { factories } from '../data/factories';
+import { scheduleApi } from '../api/scheduleApi';
+import { getCurrentStagesFromTasks } from '../utils/scheduleUtils';
+import type { Schedule } from '../types/schedule';
 
 // Helper function to get date relative to today
 const getRelativeDate = (daysFromToday: number): string => {
   const date = new Date();
   date.setDate(date.getDate() + daysFromToday);
   return date.toISOString().split('T')[0];
+};
+
+// 랜덤 공장 선택 헬퍼 함수
+const getRandomFactory = (type: '제조' | '용기' | '포장') => {
+  const factoriesOfType = factories.filter(f => f.type === type);
+  return factoriesOfType[Math.floor(Math.random() * factoriesOfType.length)];
 };
 
 // Initial projects data
@@ -19,11 +29,11 @@ const initialProjects: Project[] = [
     currentStage: ['샘플 제작', '품질 검사'],
     status: '진행중',
     progress: 65,
-    startDate: getRelativeDate(7),
+    startDate: getRelativeDate(-7),
     endDate: getRelativeDate(45),
-    manufacturer: '큐셀시스템',
-    container: '(주)연우',
-    packaging: '(주)네트모베이지',
+    manufacturer: getRandomFactory('제조').name,
+    container: getRandomFactory('용기').name,
+    packaging: getRandomFactory('포장').name,
     sales: '1200000000',
     purchase: '800000000',
     priority: '보통'
@@ -37,11 +47,11 @@ const initialProjects: Project[] = [
     currentStage: ['디자인 검토'],
     status: '진행중',
     progress: 30,
-    startDate: getRelativeDate(15),
+    startDate: getRelativeDate(-15),
     endDate: getRelativeDate(60),
-    manufacturer: '(주)연우',
-    container: '큐셀시스템',
-    packaging: '주식회사 코스모로스',
+    manufacturer: getRandomFactory('제조').name,
+    container: getRandomFactory('용기').name,
+    packaging: getRandomFactory('포장').name,
     sales: '500000000',
     purchase: '300000000',
     priority: '낮음'
@@ -55,11 +65,11 @@ const initialProjects: Project[] = [
     currentStage: ['최종 승인 대기'],
     status: '진행중',
     progress: 90,
-    startDate: getRelativeDate(3),
+    startDate: getRelativeDate(-3),
     endDate: getRelativeDate(25),
-    manufacturer: '주식회사 코스모로스',
-    container: '(주)네트모베이지',
-    packaging: '(주)연우',
+    manufacturer: getRandomFactory('제조').name,
+    container: getRandomFactory('용기').name,
+    packaging: getRandomFactory('포장').name,
     sales: '800000000',
     purchase: '500000000',
     priority: '높음'
@@ -75,9 +85,9 @@ const initialProjects: Project[] = [
     progress: 0,
     startDate: getRelativeDate(30),
     endDate: getRelativeDate(90),
-    manufacturer: '(주)네트모베이지',
-    container: '주식회사 코스모로스',
-    packaging: '큐셀시스템',
+    manufacturer: getRandomFactory('제조').name,
+    container: getRandomFactory('용기').name,
+    packaging: getRandomFactory('포장').name,
     sales: '300000000',
     purchase: '200000000',
     priority: '낮음'
@@ -91,11 +101,11 @@ const initialProjects: Project[] = [
     currentStage: [],
     status: '완료',
     progress: 100,
-    startDate: getRelativeDate(2),
-    endDate: getRelativeDate(15),
-    manufacturer: '큐셀시스템',
-    container: '(주)연우',
-    packaging: '주식회사 코스모로스',
+    startDate: getRelativeDate(-30),
+    endDate: getRelativeDate(-15),
+    manufacturer: getRandomFactory('제조').name,
+    container: getRandomFactory('용기').name,
+    packaging: getRandomFactory('포장').name,
     sales: '1500000000',
     purchase: '1000000000',
     priority: '높음'
@@ -108,6 +118,52 @@ export const useProjects = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  const [schedules, setSchedules] = useState<Map<string, Schedule>>(new Map());
+
+  // Fetch schedules for all projects and update current stages
+  useEffect(() => {
+    // Skip if no projects
+    if (projects.length === 0) return;
+    
+    const fetchSchedules = async () => {
+      // TODO: Uncomment when API is ready
+      // const newSchedules = new Map<string, Schedule>();
+      // const updatedProjects = [...projects];
+      
+      // for (const project of projects) {
+      //   try {
+      //     const schedule = await scheduleApi.getScheduleByProjectId(project.id);
+      //     if (schedule) {
+      //       newSchedules.set(project.id, schedule);
+      //       
+      //       // Calculate current stages from tasks
+      //       const currentStages = getCurrentStagesFromTasks(schedule.tasks);
+      //       const projectIndex = updatedProjects.findIndex(p => p.id === project.id);
+      //       if (projectIndex !== -1) {
+      //         updatedProjects[projectIndex] = {
+      //           ...updatedProjects[projectIndex],
+      //           currentStage: currentStages
+      //         };
+      //       }
+      //     }
+      //   } catch (error) {
+      //     console.error(`Failed to fetch schedule for project ${project.id}:`, error);
+      //   }
+      // }
+      
+      // setSchedules(newSchedules);
+      // // Only update if we actually fetched some schedules
+      // if (newSchedules.size > 0) {
+      //   setProjects(updatedProjects);
+      // }
+    };
+    
+    // Simulate API call for development
+    // In production, replace with actual API call
+    setTimeout(() => {
+      fetchSchedules();
+    }, 100);
+  }, []); // Run only on mount
 
   const updateProject = (projectId: string, field: keyof Project, value: any) => {
     setProjects(projects.map(p => 
@@ -142,16 +198,55 @@ export const useProjects = () => {
   };
 
   const getSelectedFactories = () => {
-    const factories = new Set<string>();
+    // 프로젝트가 선택되지 않았으면 모든 공장을 반환
+    if (selectedRows.length === 0) {
+      return factories.map(f => ({
+        name: f.name,
+        color: f.type === '제조' ? 'bg-blue-500' : 
+               f.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+        type: f.type
+      }));
+    }
+    
+    // 프로젝트가 선택되었으면 해당 프로젝트의 공장만 반환
+    const factoryMap = new Map<string, { name: string; color: string; type: string }>();
+    
     selectedRows.forEach(projectId => {
       const project = projects.find(p => p.id === projectId);
       if (project) {
-        factories.add(project.manufacturer);
-        factories.add(project.container);
-        factories.add(project.packaging);
+        // 제조 공장
+        const manufactory = factories.find(f => f.name === project.manufacturer);
+        if (manufactory && !factoryMap.has(manufactory.name)) {
+          factoryMap.set(manufactory.name, { 
+            name: manufactory.name, 
+            color: 'bg-blue-500',
+            type: manufactory.type 
+          });
+        }
+        
+        // 용기 공장
+        const containerFactory = factories.find(f => f.name === project.container);
+        if (containerFactory && !factoryMap.has(containerFactory.name)) {
+          factoryMap.set(containerFactory.name, { 
+            name: containerFactory.name, 
+            color: 'bg-red-500',
+            type: containerFactory.type 
+          });
+        }
+        
+        // 포장 공장
+        const packagingFactory = factories.find(f => f.name === project.packaging);
+        if (packagingFactory && !factoryMap.has(packagingFactory.name)) {
+          factoryMap.set(packagingFactory.name, { 
+            name: packagingFactory.name, 
+            color: 'bg-yellow-500',
+            type: packagingFactory.type 
+          });
+        }
       }
     });
-    return Array.from(factories);
+    
+    return Array.from(factoryMap.values());
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -188,11 +283,11 @@ export const useProjects = () => {
       currentStage: ['샘플 제작', '품질 검사'],
       status: ['진행중', '시작전', '완료'][index % 3] as any,
       progress: Math.floor(Math.random() * 100),
-      startDate: getRelativeDate(Math.floor(Math.random() * 30)),
+      startDate: getRelativeDate(Math.floor(Math.random() * 30) - 15),
       endDate: getRelativeDate(Math.floor(Math.random() * 90) + 30),
-      manufacturer: ['큐셀시스템', '(주)연우', '주식회사 코스모로스'][index % 3],
-      container: ['(주)연우', '큐셀시스템', '(주)네트모베이지'][index % 3],
-      packaging: ['(주)네트모베이지', '주식회사 코스모로스', '큐셀시스템'][index % 3],
+      manufacturer: getRandomFactory('제조').name,
+      container: getRandomFactory('용기').name,
+      packaging: getRandomFactory('포장').name,
       sales: `${Math.floor(Math.random() * 1000000000) + 100000000}`,
       purchase: `${Math.floor(Math.random() * 500000000) + 50000000}`,
       priority: ['높음', '보통', '낮음'][index % 3] as any
@@ -202,8 +297,8 @@ export const useProjects = () => {
     setPage(prev => prev + 1);
     setIsLoading(false);
     
-    // Stop loading after 5 pages for demo
-    if (page >= 5) {
+    // Stop loading after 2 pages for demo
+    if (page >= 2) {
       setHasMore(false);
     }
   };

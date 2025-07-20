@@ -6,7 +6,7 @@ interface EmailModalProps {
   onClose: () => void;
   onSend?: (emailData: EmailData) => void;
   defaultRecipients?: string;
-  availableFactories?: Array<{ name: string; color: string }>;
+  availableFactories?: Array<{ name: string; color: string; type: string }>;
   onBack?: () => void;
   showBackButton?: boolean;
 }
@@ -30,6 +30,8 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, onSend, defaul
     attachments: []
   });
   const [selectedFactories, setSelectedFactories] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
 
   // Update recipient when defaultRecipients changes
   React.useEffect(() => {
@@ -41,6 +43,20 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, onSend, defaul
       }
     }
   }, [defaultRecipients]);
+
+  // ESC key handler
+  React.useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [isOpen, onClose]);
 
   const handleSend = () => {
     if (onSend) {
@@ -73,7 +89,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, onSend, defaul
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b">
@@ -121,37 +137,91 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, onSend, defaul
             <label className="block text-sm font-medium text-gray-700 mb-1">
               받는 공장
             </label>
-            {availableFactories && availableFactories.length > 0 ? (
-              <div className="space-y-2">
-                {availableFactories.map((factory) => (
-                  <label key={factory.name} className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedFactories.includes(factory.name)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedFactories([...selectedFactories, factory.name]);
-                        } else {
-                          setSelectedFactories(selectedFactories.filter(f => f !== factory.name));
-                        }
-                      }}
-                      className="mr-3 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                    />
-                    <div className={`w-3 h-3 rounded-full ${factory.color} mr-2`}></div>
-                    <span className="text-sm">{factory.name}</span>
-                  </label>
-                ))}
+            {/* 프로젝트가 선택된 경우 */}
+            {defaultRecipients && defaultRecipients.length > 0 && availableFactories && availableFactories.length > 0 ? (
+              <div>
+                <p className="text-sm text-gray-500 mb-2">선택된 프로젝트의 공장들</p>
+                {/* 선택된 프로젝트의 공장들을 바로 표시 (검색 없음) */}
+                <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                  {availableFactories.map((factory) => (
+                    <label key={factory.name} className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedFactories.includes(factory.name)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedFactories([...selectedFactories, factory.name]);
+                          } else {
+                            setSelectedFactories(selectedFactories.filter(f => f !== factory.name));
+                          }
+                        }}
+                        className="mr-3 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                      />
+                      <div className={`w-3 h-3 rounded-full ${factory.color} mr-2`}></div>
+                      <span className="text-sm">{factory.name}</span>
+                      <span className="ml-auto text-xs text-gray-500">{factory.type}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="relative">
-                <input 
-                  type="text" 
-                  value={emailData.recipient}
-                  onChange={(e) => setEmailData({...emailData, recipient: e.target.value})}
-                  placeholder="공장을 검색하세요"
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <Search className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
+              /* 프로젝트가 선택되지 않은 경우 - 검색으로만 추가 */
+              <div>
+                <div className="relative mb-3">
+                  <input 
+                    type="text" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="공장을 검색하세요"
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <Search className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
+                </div>
+                {searchQuery.length > 0 && (
+                  <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                    {availableFactories && availableFactories.length > 0 && availableFactories
+                      .filter(factory => factory.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                      .map((factory) => (
+                      <button
+                        key={factory.name}
+                        onClick={() => {
+                          if (!selectedFactories.includes(factory.name)) {
+                            setSelectedFactories([...selectedFactories, factory.name]);
+                          }
+                          setSearchQuery('');
+                        }}
+                        className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+                      >
+                        <div className={`w-3 h-3 rounded-full ${factory.color} mr-2`}></div>
+                        <span className="text-sm">{factory.name}</span>
+                        <span className="ml-auto text-xs text-gray-500">{factory.type}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* 선택된 공장 표시 */}
+            {selectedFactories.length > 0 && (
+              <div className="mt-3">
+                <p className="text-sm text-gray-600 mb-2">{selectedFactories.length}개 공장 선택됨</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedFactories.map((factoryName) => {
+                    const factory = availableFactories?.find(f => f.name === factoryName);
+                    return (
+                      <div key={factoryName} className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm">
+                        {factory && <div className={`w-2 h-2 rounded-full ${factory.color}`}></div>}
+                        <span>{factoryName}</span>
+                        <button
+                          onClick={() => setSelectedFactories(selectedFactories.filter(f => f !== factoryName))}
+                          className="ml-1 text-gray-500 hover:text-gray-700"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
