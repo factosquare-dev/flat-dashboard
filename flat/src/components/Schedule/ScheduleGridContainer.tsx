@@ -59,6 +59,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   const {
     resizePreview,
     hoveredDateIndex,
+    snapIndicatorX,
     handleTaskMouseDown,
     handleMouseMove,
     handleMouseUp
@@ -146,6 +147,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
         dragTooltip={dragTooltip}
         resizePreview={resizePreview}
         hoveredDateIndex={hoveredDateIndex}
+        snapIndicatorX={snapIndicatorX}
         dragPreview={dragPreview}
         draggedTask={modalState.draggedTask}
         selectedProjects={selectedProjects}

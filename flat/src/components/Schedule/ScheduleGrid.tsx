@@ -10,6 +10,7 @@ import TaskItem from './components/TaskItem';
 import DragPreview from './components/DragPreview';
 import DragTooltipComponent from './components/DragTooltip';
 import ResizePreviewComponent from './components/ResizePreview';
+import ResizeIndicator from './components/ResizeIndicator';
 
 interface ScheduleGridProps {
   projects: Participant[];
@@ -24,6 +25,7 @@ interface ScheduleGridProps {
   dragTooltip: DragTooltip | null;
   resizePreview: ResizePreview | null;
   hoveredDateIndex: number | null;
+  snapIndicatorX: number | null;
   dragPreview: { projectId: string; startDate: string; endDate: string } | null;
   draggedTask: Task | null;
   selectedProjects: string[];
@@ -67,6 +69,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
     dragTooltip,
     resizePreview,
     hoveredDateIndex,
+    snapIndicatorX,
     dragPreview,
     draggedTask,
     selectedProjects,
@@ -149,8 +152,8 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
     >
       {/* Fixed left column - Project names */}
       <div className="w-72 bg-white border-r border-gray-100 flex-shrink-0">
-        {/* Combined header - matching timeline header total height (24px + 28px + 2px border) */}
-        <div className="border-b border-gray-200 bg-gray-50/50 flex items-center justify-center" style={{ height: '52px' }}>
+        {/* Combined header - matching timeline header total height (24px + 28px + 1px border) */}
+        <div className="border-b border-gray-200 bg-gray-50/50 flex items-center justify-center" style={{ height: '53px' }}>
           <span className="text-xs font-medium text-gray-600">공장</span>
         </div>
         
@@ -245,7 +248,6 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
                         cellWidth={cellWidth}
                         projectId={project.id}
                         isAddFactoryRow={isAddFactoryRow}
-                        isHoveredForResize={modalState.isResizingTask && hoveredDateIndex === dayIndex}
                         onClick={!isAddFactoryRow ? (e) => {
                           e.stopPropagation();
                           const clickedDate = day.toISOString().split('T')[0];
@@ -359,6 +361,14 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
       
       {resizePreview && (
         <ResizePreviewComponent preview={resizePreview} />
+      )}
+      
+      {modalState.isResizingTask && snapIndicatorX !== null && (
+        <ResizeIndicator 
+          x={snapIndicatorX}
+          height={projects.length * 40 + 120} // Approximate height based on number of projects
+          isEndResize={modalState.resizeDirection === 'end'}
+        />
       )}
     </div>
   );

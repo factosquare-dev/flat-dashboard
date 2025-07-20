@@ -151,13 +151,31 @@ export const useTaskDrag = (
           date: `${formatDate(startDate)} ~ ${formatDate(endDate)} (${taskDuration + 1}일)`
         });
         
-        // Update preview based on last valid project
-        if (lastValidProjectId && dragPreview) {
+        // Always maintain preview with last valid project during drag
+        if (lastValidProjectId) {
           setDragPreview({
             projectId: lastValidProjectId,
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0]
           });
+        } else if (modalState.draggedTask && projects.length > 0) {
+          // If no last valid project yet, use the first compatible project
+          const draggedTaskFactory = modalState.draggedTask.factory;
+          const draggedFactory = factories.find(f => f.name === draggedTaskFactory);
+          
+          const compatibleProject = projects.find(p => {
+            const targetFactory = factories.find(f => f.name === p.name);
+            return !draggedFactory || !targetFactory || draggedFactory.type === targetFactory.type;
+          });
+          
+          if (compatibleProject) {
+            setLastValidProjectId(compatibleProject.id);
+            setDragPreview({
+              projectId: compatibleProject.id,
+              startDate: startDate.toISOString().split('T')[0],
+              endDate: endDate.toISOString().split('T')[0]
+            });
+          }
         }
       }
     };
@@ -207,16 +225,55 @@ export const useTaskDrag = (
         date: `${formatDate(startDate)} ~ ${formatDate(endDate)} (${taskDuration + 1}일)`
       });
       
-      // Find target project - search up the DOM tree
+      // Find target project - more robust approach
       let element: HTMLElement | null = e.target as HTMLElement;
       let projectRow: HTMLElement | null = null;
+      let searchDepth = 0;
+      const maxSearchDepth = 20; // Prevent infinite loops
       
       // Keep searching up until we find a project row
-      while (element && !projectRow) {
+      while (element && !projectRow && searchDepth < maxSearchDepth) {
         if (element.hasAttribute('data-project-id')) {
           projectRow = element;
+          break;
         }
         element = element.parentElement;
+        searchDepth++;
+      }
+      
+      // If we couldn't find a project row by traversing up, try to find the closest one based on mouse Y position
+      if (!projectRow && scrollRef.current) {
+        const rect = scrollRef.current.getBoundingClientRect();
+        const relativeY = e.clientY - rect.top;
+        
+        // Find all project rows
+        const allProjectRows = scrollRef.current.querySelectorAll('[data-project-id]');
+        let closestRow: HTMLElement | null = null;
+        let closestDistance = Infinity;
+        
+        allProjectRows.forEach((row) => {
+          const rowRect = row.getBoundingClientRect();
+          const rowTop = rowRect.top - rect.top;
+          const rowBottom = rowRect.bottom - rect.top;
+          
+          // Check if mouse is within this row's Y bounds
+          if (relativeY >= rowTop && relativeY <= rowBottom) {
+            closestRow = row as HTMLElement;
+            closestDistance = 0;
+          } else {
+            // Calculate distance to row
+            const distance = Math.min(
+              Math.abs(relativeY - rowTop),
+              Math.abs(relativeY - rowBottom)
+            );
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestRow = row as HTMLElement;
+            }
+          }
+        });
+        
+        projectRow = closestRow;
       }
       
       if (projectRow) {
@@ -229,7 +286,14 @@ export const useTaskDrag = (
           
           // Check factory type compatibility
           if (draggedFactory && targetFactory && draggedFactory.type !== targetFactory.type) {
-            setDragPreview(null);
+            // Don't clear preview immediately, just don't update it
+            if (lastValidProjectId) {
+              setDragPreview({
+                projectId: lastValidProjectId,
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: endDate.toISOString().split('T')[0]
+              });
+            }
           } else {
             setLastValidProjectId(projectId);
             setDragPreview({
@@ -238,11 +302,9 @@ export const useTaskDrag = (
               endDate: endDate.toISOString().split('T')[0]
             });
           }
-        } else {
-          setDragPreview(null);
         }
       } else {
-        // If no project row found, keep last valid preview
+        // Always keep last valid preview when no project found
         if (lastValidProjectId) {
           setDragPreview({
             projectId: lastValidProjectId,

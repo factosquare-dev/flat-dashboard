@@ -51,6 +51,12 @@ export const useProjects = () => {
       p.id === projectId ? { ...p, [field]: value } : p
     ));
   };
+  
+  const updateProjectBatch = (projectId: string, updates: Partial<Project>) => {
+    setProjects(projects.map(p => 
+      p.id === projectId ? { ...p, ...updates } : p
+    ));
+  };
 
   const deleteProject = (projectId: string) => {
     setProjects(projects.filter(p => p.id !== projectId));
@@ -193,6 +199,7 @@ export const useProjects = () => {
     isLoading,
     hasMore,
     updateProject,
+    updateProjectBatch,
     deleteProject,
     addProject,
     getSelectedFactories,

@@ -60,7 +60,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject, className = 
           onDelete={handleDeleteProject}
           onDuplicate={handleDuplicateProject}
           onSelectProject={onSelectProject}
-          onUpdateProject={projectsHook.updateProject}
+          onUpdateProject={projectsHook.updateProjectBatch}
           loadMoreRef={projectsHook.loadMoreRef}
         />
       </ProjectListLayout>

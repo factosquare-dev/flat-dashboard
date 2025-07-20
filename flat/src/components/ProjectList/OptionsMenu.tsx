@@ -5,6 +5,7 @@ interface OptionsMenuProps {
   position: { top: number; left: number };
   onEdit: (projectId: string) => void;
   onDelete: (projectId: string) => void;
+  onDuplicate: (projectId: string) => void;
   onClose: () => void;
 }
 
@@ -13,6 +14,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   position,
   onEdit,
   onDelete,
+  onDuplicate,
   onClose
 }) => {
   return (
@@ -31,9 +33,17 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            if (confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) {
-              onDelete(projectId);
-            }
+            onDuplicate(projectId);
+            onClose();
+          }}
+          className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+        >
+          복사
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(projectId);
             onClose();
           }}
           className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
