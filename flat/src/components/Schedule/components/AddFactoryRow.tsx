@@ -2,13 +2,15 @@ import React from 'react';
 
 interface AddFactoryRowProps {
   height: number;
+  onAddFactory?: () => void;
 }
 
-const AddFactoryRow: React.FC<AddFactoryRowProps> = ({ height }) => {
+const AddFactoryRow: React.FC<AddFactoryRowProps> = ({ height, onAddFactory }) => {
   return (
     <div
-      className="border-b border-gray-200 flex items-center transition-all opacity-50 cursor-not-allowed"
+      className={`border-b border-gray-200 flex items-center transition-all ${onAddFactory ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
       style={{ height: `${height}px`, minHeight: '50px' }}
+      onClick={onAddFactory}
     >
       <div className="flex items-center justify-center px-4 py-2 w-full">
         <div className="flex items-center text-gray-500 group-hover:text-blue-600 transition-colors">
