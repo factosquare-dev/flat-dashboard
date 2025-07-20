@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Project } from '../../types/project';
-import EmailModal from '../EmailModal';
-import ProjectModal from '../ProjectModal';
+import EmailModal from '../EmailModal/index';
+import ProjectModal from '../ProjectModal/index';
 
 interface ProjectModalsProps {
   showEmailModal: boolean;

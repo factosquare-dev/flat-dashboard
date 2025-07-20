@@ -6,9 +6,39 @@ const generateTaskColor = (index: number): string => {
   return 'bg-blue-500';
 };
 
-export const useScheduleTasks = (participants: Participant[], startDate: Date, endDate: Date) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [nextTaskId, setNextTaskId] = useState(1);
+export const useScheduleTasks = (participants: Participant[], startDate: Date, endDate: Date, initialTasks?: Task[]) => {
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    if (initialTasks && initialTasks.length > 0) {
+      // 초기 태스크가 있으면 위치 계산 후 설정
+      return initialTasks.map(task => {
+        const taskStartDate = new Date(task.startDate);
+        const taskEndDate = new Date(task.endDate);
+        const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        const daysSinceStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        const taskDuration = Math.ceil((taskEndDate.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        
+        const cellWidth = 40;
+        const x = daysSinceStart * cellWidth;
+        const width = Math.max(cellWidth, taskDuration * cellWidth);
+        
+        return {
+          ...task,
+          x,
+          width,
+          color: task.color || 'bg-blue-500',
+          originalStartDate: task.startDate,
+          originalEndDate: task.endDate
+        };
+      });
+    }
+    return [];
+  });
+  const [nextTaskId, setNextTaskId] = useState(() => {
+    if (initialTasks && initialTasks.length > 0) {
+      return Math.max(...initialTasks.map(t => t.id)) + 1;
+    }
+    return 1;
+  });
 
   const calculateTaskPosition = (taskStartDate: Date, taskEndDate: Date) => {
     const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));

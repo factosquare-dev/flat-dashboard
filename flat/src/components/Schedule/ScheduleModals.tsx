@@ -1,9 +1,9 @@
 import React from 'react';
 import type { Participant, Task } from '../../types/schedule';
-import EmailModal from '../EmailModal';
+import EmailModal from '../EmailModal/index';
 import WorkflowModal from '../WorkflowModal';
 import TaskEditModal from '../TaskEditModal';
-import ProductRequestModal from '../ProductRequestModal';
+import ProductRequestModal from '../ProductRequestModal/index';
 import TaskCreateModal from '../TaskCreateModal';
 import { factories } from '../../data/factories';
 
@@ -95,6 +95,7 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
       <WorkflowModal
         isOpen={modalState.showWorkflowModal}
         onClose={handleWorkflowClose}
+        factories={factories}
       />
 
       {modalState.selectedTask && (

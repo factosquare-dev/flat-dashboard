@@ -2,12 +2,13 @@ import { useState } from 'react';
 import type { Project, ProjectStatus, ServiceType, Priority } from '../types/project';
 
 export const useProjectFilters = () => {
-  const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>(['시작전', '진행중', '완료']);
+  const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>(['시작전', '진행중', '완료', '중단']);
   const [selectedPriority, setSelectedPriority] = useState<Priority | 'all'>('all');
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceType | 'all'>('all');
   const [sortField, setSortField] = useState<keyof Project | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [searchValue, setSearchValue] = useState('');
+  const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({ start: null, end: null });
 
   const handleSort = (field: keyof Project) => {
     if (sortField === field) {
@@ -29,7 +30,34 @@ export const useProjectFilters = () => {
         project.manufacturer.toLowerCase().includes(searchValue.toLowerCase()) ||
         project.container.toLowerCase().includes(searchValue.toLowerCase()) ||
         project.packaging.toLowerCase().includes(searchValue.toLowerCase());
-      return matchesStatus && matchesPriority && matchesServiceType && matchesSearch;
+      
+      // 날짜 필터링 로직
+      let matchesDateRange = true;
+      if (dateRange.start || dateRange.end) {
+        const filterStart = dateRange.start ? new Date(dateRange.start) : null;
+        const filterEnd = dateRange.end ? new Date(dateRange.end) : null;
+        
+        if (project.startDate || project.deadline) {
+          const projectStart = project.startDate ? new Date(project.startDate) : null;
+          const projectEnd = project.deadline ? new Date(project.deadline) : null;
+          
+          // 프로젝트 기간이 필터 기간과 겹치는지 확인
+          matchesDateRange = false;
+          
+          if (filterStart && filterEnd && projectStart && projectEnd) {
+            // 프로젝트가 필터 기간과 하루라도 겹치는 경우
+            matchesDateRange = projectStart <= filterEnd && projectEnd >= filterStart;
+          } else if (filterStart && !filterEnd) {
+            // 시작일만 설정된 경우
+            matchesDateRange = projectEnd ? projectEnd >= filterStart : true;
+          } else if (!filterStart && filterEnd) {
+            // 종료일만 설정된 경우
+            matchesDateRange = projectStart ? projectStart <= filterEnd : true;
+          }
+        }
+      }
+      
+      return matchesStatus && matchesPriority && matchesServiceType && matchesSearch && matchesDateRange;
     });
   };
 
@@ -76,6 +104,8 @@ export const useProjectFilters = () => {
     sortDirection,
     searchValue,
     setSearchValue,
+    dateRange,
+    setDateRange,
     handleSort,
     getFilteredAndSortedProjects,
     handleStatusFilterToggle

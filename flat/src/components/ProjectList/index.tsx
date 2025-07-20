@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Project } from '../../types/project';
-import { projectFactories } from '../../data/mockData';
+import type { Schedule as ScheduleType } from '../../types/schedule';
+import { scheduleApi } from '../../api/scheduleApi';
 import Schedule from '../Schedule';
 import ProjectListView from './ProjectList';
 
@@ -10,25 +11,37 @@ interface ProjectListContainerProps {
 
 const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className = '' }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [projectSchedule, setProjectSchedule] = useState<ScheduleType | null>(null);
+  const [isLoadingSchedule, setIsLoadingSchedule] = useState(false);
   
-  if (selectedProject) {
-    const participants = projectFactories[selectedProject.id]?.map(factory => ({
-      id: factory.name,
-      name: factory.name,
-      period: `${selectedProject.startDate} ~ ${selectedProject.endDate}`,
-      color: factory.color.replace('bg-', '').replace('-500', '')
-    })) || [
-      { id: selectedProject.manufacturer, name: selectedProject.manufacturer, period: `${selectedProject.startDate} ~ ${selectedProject.endDate}`, color: 'blue' },
-      { id: selectedProject.container, name: selectedProject.container, period: `${selectedProject.startDate} ~ ${selectedProject.endDate}`, color: 'red' },
-      { id: selectedProject.packaging, name: selectedProject.packaging, period: `${selectedProject.startDate} ~ ${selectedProject.endDate}`, color: 'yellow' }
-    ];
-    
+  useEffect(() => {
+    if (selectedProject) {
+      setIsLoadingSchedule(true);
+      scheduleApi.getOrCreateScheduleForProject(selectedProject)
+        .then(schedule => {
+          setProjectSchedule(schedule);
+        })
+        .catch(error => {
+          console.error('Failed to load schedule:', error);
+        })
+        .finally(() => {
+          setIsLoadingSchedule(false);
+        });
+    } else {
+      setProjectSchedule(null);
+    }
+  }, [selectedProject]);
+  
+  if (selectedProject && projectSchedule) {
     return (
       <Schedule
-        participants={participants}
-        startDate={selectedProject.startDate}
-        endDate={selectedProject.endDate}
+        participants={projectSchedule.participants}
+        tasks={projectSchedule.tasks}
+        startDate={projectSchedule.startDate}
+        endDate={projectSchedule.endDate}
+        projectName={`${selectedProject.client} - ${selectedProject.productType}`}
         onBack={() => setSelectedProject(null)}
+        isLoading={isLoadingSchedule}
       />
     );
   }

@@ -20,16 +20,16 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({ days, cellWidth }) => {
   return (
     <>
       {/* Month row */}
-      <div className="flex border-b border-gray-200 bg-white" style={{ height: '32px' }}>
+      <div className="flex border-b border-gray-200 bg-white" style={{ height: '24px' }}>
         <div className="flex">
           {Object.values(monthGroups).map((group, index) => (
             <div
               key={index}
-              className="text-center text-xs font-medium text-gray-600 border-r border-gray-100 flex items-center justify-center px-2"
+              className="text-center text-[10px] font-medium text-gray-600 border-r border-gray-100 flex items-center justify-center px-1"
               style={{ 
                 width: `${group.count * cellWidth}px`, 
-                height: '32px',
-                minWidth: '80px' // Ensure month name doesn't get cut off
+                height: '24px',
+                minWidth: '60px' // Ensure month name doesn't get cut off
               }}
             >
               {group.month.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short' }).replace(' ', '.')}
@@ -39,24 +39,24 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({ days, cellWidth }) => {
       </div>
 
       {/* Date row */}
-      <div className="flex border-b border-gray-200" style={{ height: '36px' }}>
+      <div className="flex border-b border-gray-200" style={{ height: '28px' }}>
         <div className="flex">
           {days.map((day, index) => {
             const isFirstOfMonth = day.getDate() === 1;
             return (
               <div
                 key={index}
-                className={`text-center text-xs flex items-center justify-center border-r border-gray-100 transition-colors relative ${
+                className={`text-center text-[10px] flex items-center justify-center border-r border-gray-100 transition-colors relative ${
                   isWeekend(day) ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-700 hover:bg-gray-50'
-                } ${isFirstOfMonth ? 'pl-3' : ''}`}
+                } ${isFirstOfMonth ? 'pl-2' : ''}`}
                 style={{ 
                   width: `${cellWidth}px`, 
-                  height: '36px',
-                  paddingLeft: isFirstOfMonth ? '12px' : '0' // Add padding for first day of month
+                  height: '28px',
+                  paddingLeft: isFirstOfMonth ? '8px' : '0' // Add padding for first day of month
                 }}
               >
-                <div className="flex flex-col items-center">
-                  <div className={`text-[9px] ${isToday(day) ? 'text-blue-600 font-semibold' : 'text-gray-400'}`}>
+                <div className="flex flex-col items-center gap-0.5">
+                  <div className={`text-[9px] leading-tight ${isToday(day) ? 'text-blue-600 font-semibold' : 'text-gray-400'}`}>
                     {day.toLocaleDateString('ko-KR', { weekday: 'short' })}
                   </div>
                   <div className={`font-medium flex items-center justify-center ${

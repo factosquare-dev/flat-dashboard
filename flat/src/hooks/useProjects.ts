@@ -2,115 +2,11 @@ import { useState, useEffect } from 'react';
 import type { Project } from '../types/project';
 import { factories } from '../data/factories';
 import { scheduleApi } from '../api/scheduleApi';
-import { getCurrentStagesFromTasks } from '../utils/scheduleUtils';
+import { extractProjectFromSchedule } from '../data/mockSchedules';
 import type { Schedule } from '../types/schedule';
+// 스케줄에서 프로젝트 데이터를 가져오기 위한 빈 초기 데이터
+const initialProjects: Project[] = [];  // 빈 배열로 시작
 
-// Helper function to get date relative to today
-const getRelativeDate = (daysFromToday: number): string => {
-  const date = new Date();
-  date.setDate(date.getDate() + daysFromToday);
-  return date.toISOString().split('T')[0];
-};
-
-// 랜덤 공장 선택 헬퍼 함수
-const getRandomFactory = (type: '제조' | '용기' | '포장') => {
-  const factoriesOfType = factories.filter(f => f.type === type);
-  return factoriesOfType[Math.floor(Math.random() * factoriesOfType.length)];
-};
-
-// Initial projects data
-const initialProjects: Project[] = [
-  {
-    id: '1',
-    client: '(주)뷰티코리아',
-    manager: '김철수',
-    productType: '스킨케어',
-    serviceType: 'OEM',
-    currentStage: ['샘플 제작', '품질 검사'],
-    status: '진행중',
-    progress: 65,
-    startDate: getRelativeDate(-7),
-    endDate: getRelativeDate(45),
-    manufacturer: getRandomFactory('제조').name,
-    container: getRandomFactory('용기').name,
-    packaging: getRandomFactory('포장').name,
-    sales: '1200000000',
-    purchase: '800000000',
-    priority: '보통'
-  },
-  {
-    id: '2',
-    client: '글로벌코스메틱',
-    manager: '이영희',
-    productType: '메이크업',
-    serviceType: 'ODM',
-    currentStage: ['디자인 검토'],
-    status: '진행중',
-    progress: 30,
-    startDate: getRelativeDate(-15),
-    endDate: getRelativeDate(60),
-    manufacturer: getRandomFactory('제조').name,
-    container: getRandomFactory('용기').name,
-    packaging: getRandomFactory('포장').name,
-    sales: '500000000',
-    purchase: '300000000',
-    priority: '낮음'
-  },
-  {
-    id: '3',
-    client: '네이처바이오',
-    manager: '박민수',
-    productType: '헤어케어',
-    serviceType: 'OBM',
-    currentStage: ['최종 승인 대기'],
-    status: '진행중',
-    progress: 90,
-    startDate: getRelativeDate(-3),
-    endDate: getRelativeDate(25),
-    manufacturer: getRandomFactory('제조').name,
-    container: getRandomFactory('용기').name,
-    packaging: getRandomFactory('포장').name,
-    sales: '800000000',
-    purchase: '500000000',
-    priority: '높음'
-  },
-  {
-    id: '4',
-    client: '프리미엄뷰티',
-    manager: '정수진',
-    productType: '바디케어',
-    serviceType: 'Private Label',
-    currentStage: [],
-    status: '시작전',
-    progress: 0,
-    startDate: getRelativeDate(30),
-    endDate: getRelativeDate(90),
-    manufacturer: getRandomFactory('제조').name,
-    container: getRandomFactory('용기').name,
-    packaging: getRandomFactory('포장').name,
-    sales: '300000000',
-    purchase: '200000000',
-    priority: '낮음'
-  },
-  {
-    id: '5',
-    client: '클린뷰티랩',
-    manager: '최지훈',
-    productType: '선케어',
-    serviceType: 'White Label',
-    currentStage: [],
-    status: '완료',
-    progress: 100,
-    startDate: getRelativeDate(-30),
-    endDate: getRelativeDate(-15),
-    manufacturer: getRandomFactory('제조').name,
-    container: getRandomFactory('용기').name,
-    packaging: getRandomFactory('포장').name,
-    sales: '1500000000',
-    purchase: '1000000000',
-    priority: '높음'
-  }
-];
 
 export const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
@@ -120,50 +16,35 @@ export const useProjects = () => {
   const [page, setPage] = useState(1);
   const [schedules, setSchedules] = useState<Map<string, Schedule>>(new Map());
 
-  // Fetch schedules for all projects and update current stages
+  // 스케줄에서 프로젝트 데이터 가져오기
   useEffect(() => {
-    // Skip if no projects
-    if (projects.length === 0) return;
-    
-    const fetchSchedules = async () => {
-      // TODO: Uncomment when API is ready
-      // const newSchedules = new Map<string, Schedule>();
-      // const updatedProjects = [...projects];
-      
-      // for (const project of projects) {
-      //   try {
-      //     const schedule = await scheduleApi.getScheduleByProjectId(project.id);
-      //     if (schedule) {
-      //       newSchedules.set(project.id, schedule);
-      //       
-      //       // Calculate current stages from tasks
-      //       const currentStages = getCurrentStagesFromTasks(schedule.tasks);
-      //       const projectIndex = updatedProjects.findIndex(p => p.id === project.id);
-      //       if (projectIndex !== -1) {
-      //         updatedProjects[projectIndex] = {
-      //           ...updatedProjects[projectIndex],
-      //           currentStage: currentStages
-      //         };
-      //       }
-      //     }
-      //   } catch (error) {
-      //     console.error(`Failed to fetch schedule for project ${project.id}:`, error);
-      //   }
-      // }
-      
-      // setSchedules(newSchedules);
-      // // Only update if we actually fetched some schedules
-      // if (newSchedules.size > 0) {
-      //   setProjects(updatedProjects);
-      // }
+    const fetchSchedulesAndProjects = async () => {
+      try {
+        // 모든 스케줄 가져오기
+        const allSchedules = await scheduleApi.getAllSchedules();
+        console.log('모든 스케줄 데이터:', allSchedules);
+        
+        const newProjects: Project[] = [];
+        const newSchedules = new Map<string, Schedule>();
+        
+        // 각 스케줄에서 프로젝트 정보 추출
+        allSchedules.forEach(schedule => {
+          const projectData = extractProjectFromSchedule(schedule);
+          newProjects.push(projectData as Project);
+          newSchedules.set(projectData.id, schedule);
+        });
+        
+        console.log('스케줄에서 추출한 프로젝트:', newProjects);
+        
+        setProjects(newProjects);
+        setSchedules(newSchedules);
+      } catch (error) {
+        console.error('스케줄 데이터 가져오기 실패:', error);
+      }
     };
     
-    // Simulate API call for development
-    // In production, replace with actual API call
-    setTimeout(() => {
-      fetchSchedules();
-    }, 100);
-  }, []); // Run only on mount
+    fetchSchedulesAndProjects();
+  }, []); // 마운트 시 한 번만 실행
 
   const updateProject = (projectId: string, field: keyof Project, value: any) => {
     setProjects(projects.map(p => 
@@ -306,6 +187,7 @@ export const useProjects = () => {
   return {
     projects,
     setProjects,
+    schedules,
     selectedRows,
     setSelectedRows,
     isLoading,
@@ -316,6 +198,7 @@ export const useProjects = () => {
     getSelectedFactories,
     handleSelectAll,
     handleSelectRow,
-    loadMoreProjects
+    loadMoreProjects,
+    getProjectSchedule: (projectId: string) => schedules.get(projectId) || null
   };
 };

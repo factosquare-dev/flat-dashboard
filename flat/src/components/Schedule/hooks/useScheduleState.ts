@@ -37,7 +37,8 @@ export const useScheduleState = (
   participants: Participant[],
   projectStartDate: string,
   projectEndDate: string,
-  gridWidth: number
+  gridWidth: number,
+  initialTasks?: Task[]
 ) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -124,7 +125,7 @@ export const useScheduleState = (
   });
 
   const dragControls = useScheduleDrag();
-  const taskControls = useScheduleTasks(projects, startDate, endDate);
+  const taskControls = useScheduleTasks(projects, startDate, endDate, initialTasks);
 
   const handleProjectSelect = (projectId: string, checked: boolean) => {
     if (checked) {

@@ -32,11 +32,11 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
     <table className="w-full min-w-[1800px] table-fixed">
       <thead className="sticky top-0 z-10 bg-white border-b-2 border-gray-200">
           <tr>
-              <th className="w-12 px-2 py-5 text-left">
+              <th className="w-12 px-2 py-3 text-left">
                 <div className="flex items-center justify-center">
                   <input
                     type="checkbox"
-                    checked={selectedRows.length === projects.length && projects.length > 0}
+                    checked={selectedRows?.length === projects?.length && projects?.length > 0}
                     onChange={(e) => onSelectAll(e.target.checked)}
                     className="w-5 h-5 rounded-md border-2 border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all hover:border-blue-400"
                   />
@@ -112,11 +112,11 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {projects.map((project) => (
+            {projects?.map((project) => (
               <ProjectTableRow
                 key={project.id}
                 project={project}
-                isSelected={selectedRows.includes(project.id)}
+                isSelected={selectedRows?.includes(project.id) || false}
                 onSelect={(checked) => onSelectRow(project.id, checked)}
                 onRowClick={onSelectProject}
                 onUpdateField={onUpdateProject}

@@ -2,10 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Base sizes for 1920x1080 */
+  --base-font-size: 16px;
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+  --icon-size-xl: 32px;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  /* Modal sizes */
+  --modal-sm: 400px;
+  --modal-md: 600px;
+  --modal-lg: 800px;
+  --modal-xl: 1200px;
+  --modal-full: calc(100vw - 64px);
+  
+  /* Container max-width */
+  --container-max: 1920px;
+  --content-max: 1600px;
+  
+  /* Header height */
+  --header-height: 64px;
+  --sidebar-width: 256px;
+  --sidebar-collapsed: 64px;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  font-size: var(--base-font-size);
 }
 
 html, body {
@@ -17,11 +54,76 @@ html, body {
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: var(--base-font-size);
+  line-height: 1.5;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+/* Responsive font sizing */
+@media (max-width: 1536px) {
+  :root {
+    --base-font-size: 15px;
+  }
+}
+
+@media (max-width: 1280px) {
+  :root {
+    --base-font-size: 14px;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --base-font-size: 14px;
+    --modal-sm: 350px;
+    --modal-md: 500px;
+    --modal-lg: 700px;
+    --modal-xl: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --base-font-size: 14px;
+    --modal-sm: 90vw;
+    --modal-md: 90vw;
+    --modal-lg: 95vw;
+    --modal-xl: 95vw;
+    --header-height: 56px;
+  }
+}
+
+/* Icon size utilities */
+.icon-xs { width: var(--icon-size-sm); height: var(--icon-size-sm); }
+.icon-sm { width: var(--icon-size-sm); height: var(--icon-size-sm); }
+.icon-md { width: var(--icon-size-md); height: var(--icon-size-md); }
+.icon-lg { width: var(--icon-size-lg); height: var(--icon-size-lg); }
+.icon-xl { width: var(--icon-size-xl); height: var(--icon-size-xl); }
+
+/* Typography utilities for 1920x1080 optimization */
+@layer utilities {
+  .text-xs { font-size: 0.75rem; line-height: 1rem; }
+  .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+  .text-base { font-size: 1rem; line-height: 1.5rem; }
+  .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+  .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+  .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+  .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+  .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+  
+  /* Spacing utilities */
+  .space-xs { margin: var(--spacing-xs); }
+  .space-sm { margin: var(--spacing-sm); }
+  .space-md { margin: var(--spacing-md); }
+  .space-lg { margin: var(--spacing-lg); }
+  .space-xl { margin: var(--spacing-xl); }
+  .space-2xl { margin: var(--spacing-2xl); }
 }
 
 /* Custom scrollbar styles */

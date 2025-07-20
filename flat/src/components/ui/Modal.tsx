@@ -3,15 +3,15 @@ import { X } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const modalVariants = cva(
-  'relative bg-white rounded-lg shadow-xl',
+  'relative bg-white rounded-lg shadow-xl w-full',
   {
     variants: {
       size: {
-        sm: 'max-w-md',
-        md: 'max-w-lg',
-        lg: 'max-w-2xl',
-        xl: 'max-w-4xl',
-        full: 'max-w-full m-4',
+        sm: 'max-w-[var(--modal-sm)]',
+        md: 'max-w-[var(--modal-md)]',
+        lg: 'max-w-[var(--modal-lg)]',
+        xl: 'max-w-[var(--modal-xl)]',
+        full: 'max-w-[var(--modal-full)]',
       },
     },
     defaultVariants: {
@@ -98,34 +98,34 @@ const Modal: React.FC<ModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {header || (title || showCloseButton) && (
-          <div className="flex items-start justify-between p-4 border-b border-gray-200">
+          <div className="flex items-start justify-between p-6 border-b border-gray-200">
             {header || (
               <div>
                 {title && (
-                  <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+                  <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
                 )}
                 {description && (
-                  <p className="mt-1 text-sm text-gray-500">{description}</p>
+                  <p className="mt-2 text-base text-gray-500">{description}</p>
                 )}
               </div>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="ml-4 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md"
+                className="ml-4 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md p-1"
               >
-                <X className="h-5 w-5" />
+                <X className="w-6 h-6" />
               </button>
             )}
           </div>
         )}
         
-        <div className="p-4">
+        <div className="p-6 max-h-[calc(90vh-200px)] overflow-y-auto">
           {children}
         </div>
 
         {footer && (
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-6 border-t border-gray-200">
             {footer}
           </div>
         )}
@@ -147,7 +147,7 @@ const ModalFooter: React.FC<{ children: React.ReactNode; className?: string }> =
   children, 
   className = '' 
 }) => (
-  <div className={`flex items-center justify-end space-x-2 pt-4 border-t border-gray-200 ${className}`}>
+  <div className={`flex items-center justify-end gap-3 ${className}`}>
     {children}
   </div>
 );

@@ -6,45 +6,34 @@ import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 
 interface ProjectTableSectionProps {
   projects: Project[];
-  selectedRows: string[];
-  sortField: keyof Project | null;
-  sortDirection: 'asc' | 'desc';
   isLoading: boolean;
   hasMore: boolean;
-  onSort: (field: keyof Project) => void;
-  onSelectAll: (checked: boolean) => void;
-  onSelectRow: (projectId: string, checked: boolean) => void;
+  filters: any;
+  onEdit: (projectId: string) => void;
+  onDelete: (projectId: string) => void;
+  onDuplicate: (projectId: string) => void;
   onSelectProject: (project: Project) => void;
-  onUpdateProject: (projectId: string, field: keyof Project, value: any) => void;
-  onEditProject: (projectId: string) => void;
-  onDeleteProject: (projectId: string) => void;
-  onLoadMore: () => void;
+  loadMoreRef: any;
 }
 
 const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   projects,
-  selectedRows,
-  sortField,
-  sortDirection,
   isLoading,
   hasMore,
-  onSort,
-  onSelectAll,
-  onSelectRow,
+  filters,
+  onEdit,
+  onDelete,
+  onDuplicate,
   onSelectProject,
-  onUpdateProject,
-  onEditProject,
-  onDeleteProject,
-  onLoadMore
+  loadMoreRef
 }) => {
   const [showOptionsMenu, setShowOptionsMenu] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{top: number, left: number} | null>(null);
-  const { observerRef } = useInfiniteScroll({
-    hasMore,
-    isLoading,
-    onLoadMore,
-    threshold: 300
-  });
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  
+  const sortField = filters?.sortField || null;
+  const sortDirection = filters?.sortDirection || 'asc';
+  const handleSort = filters?.handleSort || (() => {});
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -59,9 +48,17 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
 
   const handleSelectAllProjects = (checked: boolean) => {
     if (checked) {
-      onSelectAll(true);
+      setSelectedRows(projects?.map(p => p.id) || []);
     } else {
-      onSelectAll(false);
+      setSelectedRows([]);
+    }
+  };
+  
+  const handleSelectRow = (projectId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedRows(prev => [...prev, projectId]);
+    } else {
+      setSelectedRows(prev => prev.filter(id => id !== projectId));
     }
   };
 
@@ -71,28 +68,38 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
 
   const handleEditProject = (projectId: string) => {
-    onEditProject(projectId);
+    onEdit(projectId);
     setShowOptionsMenu(null);
   };
 
   const handleDeleteProject = (projectId: string) => {
-    onDeleteProject(projectId);
+    onDelete(projectId);
     setShowOptionsMenu(null);
+  };
+  
+  const handleDuplicateProject = (projectId: string) => {
+    onDuplicate(projectId);
+    setShowOptionsMenu(null);
+  };
+  
+  const handleUpdateProject = (projectId: string, field: keyof Project, value: any) => {
+    // TODO: Implement update logic
+    console.log('Update project:', projectId, field, value);
   };
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
         <ProjectTable
-          projects={projects}
+          projects={projects || []}
           selectedRows={selectedRows}
           sortField={sortField}
           sortDirection={sortDirection}
-          onSort={onSort}
+          onSort={handleSort}
           onSelectAll={handleSelectAllProjects}
-          onSelectRow={onSelectRow}
+          onSelectRow={handleSelectRow}
           onSelectProject={onSelectProject}
-          onUpdateProject={onUpdateProject}
+          onUpdateProject={handleUpdateProject}
           onShowOptionsMenu={handleShowOptionsMenu}
         />
         
@@ -106,7 +113,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
         
         {/* Infinite scroll trigger */}
         {hasMore && !isLoading && (
-          <div ref={observerRef} className="h-4" />
+          <div ref={loadMoreRef} className="h-4" />
         )}
         
         {/* End message */}
@@ -123,6 +130,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           position={dropdownPosition}
           onEdit={handleEditProject}
           onDelete={handleDeleteProject}
+          onDuplicate={handleDuplicateProject}
           onClose={() => setShowOptionsMenu(null)}
         />
       )}

@@ -1,3 +1,24 @@
+// 공장 인증 타입
+export type CertificationType = 
+  | 'ISO 22716'  // 화장품 GMP
+  | 'CGMP'       // 화장품 우수제조관리기준
+  | 'ISO 9001'   // 품질경영시스템
+  | 'ISO 14001'  // 환경경영시스템
+  | 'ISO 45001'  // 안전보건경영시스템
+  | 'FSC'        // 산림관리협의회 인증
+  | 'VEGAN'      // 비건 인증
+  | 'HALAL'      // 할랄 인증
+  | 'EWG'        // EWG 인증
+  | 'COSMOS'     // 유기농 화장품 인증
+  | 'ECOCERT';   // 에코서트 인증
+
+export interface FactoryManager {
+  name: string;
+  email: string;
+  phone: string;
+  position: string; // 직책/직함
+}
+
 export interface Factory {
   id: string;
   name: string;
@@ -6,7 +27,8 @@ export interface Factory {
   contact: string;
   email: string;
   capacity: string;
-  certifications: string[];
+  certifications: CertificationType[];
+  managers?: FactoryManager[]; // 공장 담당자들 (복수)
 }
 
 export const factories: Factory[] = [
@@ -19,7 +41,21 @@ export const factories: Factory[] = [
     contact: '031-737-3000',
     email: 'info@qcellsystem.com',
     capacity: '월 100톤',
-    certifications: ['ISO 22716', 'CGMP', 'ISO 9001']
+    certifications: ['ISO 22716', 'CGMP', 'ISO 9001'],
+    managers: [
+      {
+        name: '김철수',
+        email: 'kim@qcellsystem.com',
+        phone: '010-1234-5678',
+        position: '공장장'
+      },
+      {
+        name: '이영희',
+        email: 'lee@qcellsystem.com',
+        phone: '010-2345-6789',
+        position: '품질관리 팀장'
+      }
+    ]
   },
   {
     id: 'mfg-2',

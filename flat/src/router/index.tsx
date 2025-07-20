@@ -8,6 +8,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Projects = lazy(() => import('../pages/Projects'));
 const Users = lazy(() => import('../pages/Users'));
+const Factories = lazy(() => import('../pages/Factories'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 const router = createBrowserRouter([
@@ -37,6 +38,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingScreen />}>
             <Users />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'factories',
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <Factories />
           </Suspense>
         ),
       },

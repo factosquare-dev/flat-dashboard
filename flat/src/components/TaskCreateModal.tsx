@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
 import { factories, taskTypesByFactoryType, getFactoryByName } from '../data/factories';
+import BaseModal from './common/BaseModal';
+import FormInput from './common/FormInput';
+import FormSelect from './common/FormSelect';
+import Button from './common/Button';
 
 interface TaskCreateModalProps {
   isOpen: boolean;
@@ -49,20 +52,6 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     }
   }, [selectedFactory, projectId, isOpen]);
 
-  // ESC key handler
-  React.useEffect(() => {
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-    };
-  }, [isOpen, onClose]);
-
   // 사용 가능한 공장 목록 필터링
   const availableFactoryList = availableFactories.length > 0 
     ? factories.filter(f => availableFactories.includes(f.name))
@@ -100,112 +89,79 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     setTaskType(''); // 공장 변경 시 태스크 타입 초기화
   };
 
-  if (!isOpen) return null;
+
+  const factoryOptions = availableFactoryList.map(f => ({
+    value: f.name,
+    label: `${f.name} (${f.type})`
+  }));
+
+  const taskTypeOptions = availableTaskTypes.map(type => ({
+    value: type,
+    label: type
+  }));
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">태스크 추가</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              공장 선택
-            </label>
-            <select
-              value={factory}
-              onChange={(e) => handleFactoryChange(e.target.value)}
-              className={`w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                !!selectedFactory ? 'bg-gray-100 cursor-not-allowed' : ''
-              }`}
-              disabled={!!selectedFactory}
-            >
-              <option value="">공장을 선택하세요</option>
-              {availableFactoryList.map((f) => (
-                <option key={f.id} value={f.name}>
-                  {f.name} ({f.type})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              태스크 유형
-            </label>
-            <select
-              value={taskType}
-              onChange={(e) => setTaskType(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              disabled={!factory}
-            >
-              <option value="">
-                {!factory ? '먼저 공장을 선택하세요' : '태스크 유형을 선택하세요'}
-              </option>
-              {availableTaskTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              시작일
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => {
-                const newStartDate = e.target.value;
-                setStartDate(newStartDate);
-                // 시작일을 변경하면 종료일도 같은 날로 자동 설정 (1일짜리)
-                if (!endDate || endDate < newStartDate) {
-                  setEndDate(newStartDate);
-                }
-              }}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              종료일
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end space-x-2 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
+    <BaseModal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="태스크 추가"
+      size="sm"
+      footer={
+        <div className="flex justify-end gap-2">
+          <Button variant="secondary" onClick={onClose}>
             취소
-          </button>
-          <button
+          </Button>
+          <Button 
+            variant="primary" 
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            disabled={!factory || !taskType || !startDate || !endDate}
           >
             추가
-          </button>
+          </Button>
         </div>
+      }
+    >
+      <div className="space-y-4">
+        <FormSelect
+          label="공장 선택"
+          value={factory}
+          onChange={(e) => handleFactoryChange(e.target.value)}
+          options={factoryOptions}
+          placeholder="공장을 선택하세요"
+          disabled={!!selectedFactory}
+        />
+
+        <FormSelect
+          label="태스크 유형"
+          value={taskType}
+          onChange={(e) => setTaskType(e.target.value)}
+          options={taskTypeOptions}
+          placeholder={!factory ? '먼저 공장을 선택하세요' : '태스크 유형을 선택하세요'}
+          disabled={!factory}
+        />
+
+        <FormInput
+          type="date"
+          label="시작일"
+          value={startDate}
+          onChange={(e) => {
+            const newStartDate = e.target.value;
+            setStartDate(newStartDate);
+            if (!endDate || endDate < newStartDate) {
+              setEndDate(newStartDate);
+            }
+          }}
+        />
+
+        <FormInput
+          type="date"
+          label="종료일"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          min={startDate}
+        />
       </div>
-    </div>
+    </BaseModal>
   );
 };
 

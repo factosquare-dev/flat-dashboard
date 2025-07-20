@@ -12,6 +12,11 @@ export const getCurrentStagesFromTasks = (tasks: Task[]): string[] => {
   todayEnd.setHours(23, 59, 59, 999);
   const todayEndTime = todayEnd.getTime();
   
+  console.log('getCurrentStagesFromTasks 호출됨:', {
+    totalTasks: tasks.length,
+    today: today.toISOString().split('T')[0]
+  });
+  
   // 오늘 날짜에 걸쳐있는 태스크 필터링
   const currentTasks = tasks.filter(task => {
     const startTime = new Date(task.startDate).getTime();
@@ -21,7 +26,16 @@ export const getCurrentStagesFromTasks = (tasks: Task[]): string[] => {
     const isInTodayRange = (startTime <= todayEndTime && endTime >= todayTime);
     
     // 진행 중이거나 대기 중인 태스크만 포함 (완료되거나 승인된 것은 제외)
-    const isActive = !task.status || task.status === 'in_progress' || task.status === 'pending';
+    const isActive = !task.status || task.status === 'in-progress' || task.status === 'pending';
+    
+    console.log('태스크 검사:', {
+      taskType: task.taskType,
+      status: task.status,
+      dates: `${task.startDate} ~ ${task.endDate}`,
+      isInTodayRange,
+      isActive,
+      willInclude: isInTodayRange && isActive && task.status === 'in-progress'
+    });
     
     // 의존성 체크 - 선행 작업이 있는 경우
     if (task.dependsOn && task.dependsOn.length > 0) {
@@ -37,11 +51,17 @@ export const getCurrentStagesFromTasks = (tasks: Task[]): string[] => {
       }
     }
     
-    return isInTodayRange && isActive;
+    // 진행중인 태스크만 현재 단계로 표시
+    return isInTodayRange && task.status === 'in-progress';
   });
   
-  // 중복 제거하여 태스크 제목(단계) 반환
-  return [...new Set(currentTasks.map(task => task.title))];
+  console.log('현재 진행중인 태스크:', currentTasks.map(t => ({
+    taskType: t.taskType,
+    status: t.status
+  })));
+  
+  // 중복 제거하여 태스크 타입(단계) 반환
+  return [...new Set(currentTasks.map(task => task.taskType || task.title || ''))];
 };
 
 /**
@@ -75,6 +95,43 @@ export const updateDependentTasks = (completedTaskId: number, allTasks: Task[]):
     }
     return task;
   });
+};
+
+/**
+ * 태스크 목록에서 프로젝트 진행률을 계산합니다.
+ */
+export const calculateProjectProgress = (tasks: Task[]): number => {
+  if (!tasks || tasks.length === 0) return 0;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  let completedWeight = 0;
+  let totalWeight = 0;
+  
+  tasks.forEach(task => {
+    const startDate = new Date(task.startDate);
+    const endDate = new Date(task.endDate);
+    const duration = Math.max(1, (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1);
+    
+    totalWeight += duration;
+    
+    if (task.status === 'completed') {
+      completedWeight += duration;
+    } else if (task.status === 'in-progress') {
+      // 진행 중인 태스크는 시작일부터 오늘까지의 진행률 계산
+      if (today >= startDate && today <= endDate) {
+        const elapsed = (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+        const progress = Math.min(1, elapsed / duration);
+        completedWeight += duration * progress;
+      } else if (today > endDate) {
+        // 기한이 지난 진행중 태스크는 90%로 계산
+        completedWeight += duration * 0.9;
+      }
+    }
+  });
+  
+  return totalWeight > 0 ? Math.round((completedWeight / totalWeight) * 100) : 0;
 };
 
 /**
@@ -172,6 +229,38 @@ export const calculateEstimatedEndDate = (tasks: Task[]): string | null => {
   }
   
   return latestEndDate.toISOString().split('T')[0];
+};
+
+/**
+ * 태스크 목록에서 프로젝트 상태를 계산합니다.
+ */
+export const calculateProjectStatus = (tasks: Task[]): '시작전' | '진행중' | '완료' => {
+  if (!tasks || tasks.length === 0) return '시작전';
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // 모든 태스크가 완료되었는지 확인
+  const allCompleted = tasks.every(task => task.status === 'completed');
+  if (allCompleted) return '완료';
+  
+  // 진행 중인 태스크가 있는지 확인
+  const hasInProgress = tasks.some(task => task.status === 'in-progress');
+  if (hasInProgress) return '진행중';
+  
+  // 시작된 태스크가 있는지 확인 (오늘 날짜가 태스크 기간 내에 있는 경우)
+  const hasStarted = tasks.some(task => {
+    const startDate = new Date(task.startDate);
+    const endDate = new Date(task.endDate);
+    return today >= startDate && today <= endDate;
+  });
+  if (hasStarted) return '진행중';
+  
+  // 완료된 태스크가 하나라도 있는지 확인
+  const hasCompleted = tasks.some(task => task.status === 'completed');
+  if (hasCompleted) return '진행중';
+  
+  return '시작전';
 };
 
 /**
