@@ -10,20 +10,26 @@ import ProgressBar from './ProgressBar';
 
 interface ProjectTableRowProps {
   project: Project;
+  index?: number;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
   onRowClick: (project: Project) => void;
   onUpdateField: (projectId: string, field: keyof Project, value: any) => void;
   onShowOptionsMenu: (projectId: string, position: { top: number; left: number }) => void;
+  onMouseEnter?: () => void;
+  isDragging?: boolean;
 }
 
 const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   project,
+  index,
   isSelected,
   onSelect,
   onRowClick,
   onUpdateField,
-  onShowOptionsMenu
+  onShowOptionsMenu,
+  onMouseEnter,
+  isDragging
 }) => {
   const editableCell = useEditableCell();
 
@@ -37,8 +43,10 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
 
   return (
     <tr 
+      data-id={project.id}
       className="group hover:bg-gray-50/30 transition-all duration-200 cursor-pointer border-b border-gray-50"
       onClick={handleRowClick}
+      onMouseEnter={onMouseEnter}
     >
       <td className="px-1 py-1.5">
         <div className="flex items-center justify-center">
@@ -49,8 +57,21 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               e.stopPropagation();
               onSelect(e.target.checked);
             }}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              if (!isSelected) {
+                onSelect(true);
+              }
+            }}
+            onMouseEnter={(e) => {
+              if (isDragging && e.buttons === 1) {
+                e.stopPropagation();
+                onSelect(true);
+              }
+            }}
             onClick={(e) => e.stopPropagation()}
             className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
+            style={{ userSelect: 'none' }}
           />
         </div>
       </td>

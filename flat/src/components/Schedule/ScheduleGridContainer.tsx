@@ -128,7 +128,6 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   const handleProjectDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
     if (modalState.draggedProjectIndex !== null && modalState.draggedProjectIndex !== dropIndex) {
-      console.log('Project drop not implemented yet');
     }
   };
 

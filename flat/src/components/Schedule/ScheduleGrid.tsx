@@ -172,14 +172,6 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
       {resizePreview && (
         <ResizePreviewComponent preview={resizePreview} />
       )}
-      
-      {modalState.isResizingTask && snapIndicatorX !== null && (
-        <ResizeIndicator 
-          x={snapIndicatorX}
-          height={projects.length * 40 + 120} // Approximate height based on number of projects
-          isEndResize={modalState.resizeDirection === 'end'}
-        />
-      )}
     </div>
   );
 };

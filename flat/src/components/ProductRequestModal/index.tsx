@@ -106,7 +106,6 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({
   };
   
   const handleEmailSend = (emailData: any) => {
-    console.log('Email sent:', emailData);
     setShowEmailModal(false);
     if (onSendEmail) {
       onSendEmail(formData);

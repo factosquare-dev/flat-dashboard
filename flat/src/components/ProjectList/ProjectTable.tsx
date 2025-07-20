@@ -10,10 +10,12 @@ interface ProjectTableProps {
   sortDirection: 'asc' | 'desc';
   onSort: (field: keyof Project) => void;
   onSelectAll: (checked: boolean) => void;
-  onSelectRow: (projectId: string, checked: boolean) => void;
+  onSelectRow: (projectId: string, checked: boolean, index?: number) => void;
   onSelectProject: (project: Project) => void;
   onUpdateProject: (projectId: string, field: keyof Project, value: any) => void;
   onShowOptionsMenu: (projectId: string, position: { top: number; left: number }) => void;
+  onMouseEnterRow?: (index: number) => void;
+  isDragging?: boolean;
 }
 
 const ProjectTable: React.FC<ProjectTableProps> = ({
@@ -26,20 +28,17 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
   onSelectRow,
   onSelectProject,
   onUpdateProject,
-  onShowOptionsMenu
+  onShowOptionsMenu,
+  onMouseEnterRow,
+  isDragging
 }) => {
   return (
     <table className="w-full min-w-[1800px] table-fixed">
-      <thead className="sticky top-0 z-10 bg-gray-50/50 border-b border-gray-100">
+      <thead className="sticky top-0 z-10 bg-gray-50 border-b border-gray-100">
           <tr>
               <th className="w-8 px-1 py-1.5 text-left">
                 <div className="flex items-center justify-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedRows?.length === projects?.length && projects?.length > 0}
-                    onChange={(e) => onSelectAll(e.target.checked)}
-                    className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
-                  />
+                  {/* 체크박스 제거 - 레이아웃 유지용 빈 공간 */}
                 </div>
               </th>
               <th className="table-header-cell">제품타입</th>
@@ -112,15 +111,18 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {projects?.map((project) => (
+            {projects?.map((project, index) => (
               <ProjectTableRow
                 key={project.id}
                 project={project}
+                index={index}
                 isSelected={selectedRows?.includes(project.id) || false}
-                onSelect={(checked) => onSelectRow(project.id, checked)}
+                onSelect={(checked) => onSelectRow(project.id, checked, index)}
                 onRowClick={onSelectProject}
                 onUpdateField={onUpdateProject}
                 onShowOptionsMenu={onShowOptionsMenu}
+                onMouseEnter={() => onMouseEnterRow?.(index)}
+                isDragging={isDragging}
               />
             ))}
           </tbody>

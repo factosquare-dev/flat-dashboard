@@ -27,7 +27,6 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   onSendEmail
 }) => {
   const handleEmailSend = (emailData: any) => {
-    console.log('Email sent:', emailData);
     onSendEmail();
   };
 

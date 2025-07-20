@@ -4,8 +4,21 @@ import { factories } from '../data/factories';
 import { scheduleApi } from '../api/scheduleApi';
 import { extractProjectFromSchedule } from '../data/mockSchedules';
 import type { Schedule } from '../types/schedule';
+import { useInfiniteScroll } from './useInfiniteScroll';
 // 스케줄에서 프로젝트 데이터를 가져오기 위한 빈 초기 데이터
 const initialProjects: Project[] = [];  // 빈 배열로 시작
+
+// 헬퍼 함수들
+const getRelativeDate = (daysOffset: number): string => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysOffset);
+  return date.toISOString().split('T')[0];
+};
+
+const getRandomFactory = (type: string) => {
+  const filteredFactories = factories.filter(f => f.type === type);
+  return filteredFactories[Math.floor(Math.random() * filteredFactories.length)];
+};
 
 
 export const useProjects = () => {
@@ -15,6 +28,11 @@ export const useProjects = () => {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [schedules, setSchedules] = useState<Map<string, Schedule>>(new Map());
+  
+  // 윈도우 방식 무한 스크롤을 위한 상태
+  const [totalCount, setTotalCount] = useState(0);
+  const ITEMS_PER_PAGE = 50; // 한 번에 로드할 아이템 수
+  const PREFETCH_THRESHOLD = 0.7; // 70% 스크롤 시 미리 로드
 
   // 스케줄에서 프로젝트 데이터 가져오기
   useEffect(() => {
@@ -22,7 +40,6 @@ export const useProjects = () => {
       try {
         // 모든 스케줄 가져오기
         const allSchedules = await scheduleApi.getAllSchedules();
-        console.log('모든 스케줄 데이터:', allSchedules);
         
         const newProjects: Project[] = [];
         const newSchedules = new Map<string, Schedule>();
@@ -34,12 +51,10 @@ export const useProjects = () => {
           newSchedules.set(projectData.id, schedule);
         });
         
-        console.log('스케줄에서 추출한 프로젝트:', newProjects);
         
         setProjects(newProjects);
         setSchedules(newSchedules);
       } catch (error) {
-        console.error('스케줄 데이터 가져오기 실패:', error);
       }
     };
     
@@ -157,38 +172,80 @@ export const useProjects = () => {
     
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Generate more projects
-    const newProjects = Array.from({ length: 10 }, (_, index) => ({
-      id: `${Date.now()}-${index}`,
-      client: `클라이언트 ${page * 10 + index + 1}`,
-      manager: `매니저 ${page * 10 + index + 1}`,
-      productType: ['스킨케어', '메이크업', '헤어케어', '바디케어'][index % 4],
-      serviceType: ['OEM', 'ODM', 'OBM', 'Private Label'][index % 4] as any,
-      currentStage: ['샘플 제작', '품질 검사'],
-      status: ['진행중', '시작전', '완료'][index % 3] as any,
-      progress: Math.floor(Math.random() * 100),
-      startDate: getRelativeDate(Math.floor(Math.random() * 30) - 15),
-      endDate: getRelativeDate(Math.floor(Math.random() * 90) + 30),
-      manufacturer: getRandomFactory('제조').name,
-      container: getRandomFactory('용기').name,
-      packaging: getRandomFactory('포장').name,
-      sales: `${Math.floor(Math.random() * 1000000000) + 100000000}`,
-      purchase: `${Math.floor(Math.random() * 500000000) + 50000000}`,
-      priority: ['높음', '보통', '낮음'][index % 3] as any
-    }));
-    
-    setProjects(prev => [...prev, ...newProjects]);
-    setPage(prev => prev + 1);
-    setIsLoading(false);
-    
-    // Stop loading after 2 pages for demo
-    if (page >= 2) {
-      setHasMore(false);
+    try {
+      // 실제 API 호출 시뮬레이션
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // 실제로는 API에서 total count를 받아옴
+      const simulatedTotalCount = 500; // 예시: 전체 500개 항목
+      setTotalCount(simulatedTotalCount);
+      
+      // 현재 페이지의 프로젝트 생성
+      const startIndex = (page - 1) * ITEMS_PER_PAGE;
+      const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, simulatedTotalCount);
+      
+      const newProjects = Array.from({ length: endIndex - startIndex }, (_, index) => ({
+        id: `${startIndex + index + 1}`,
+        client: `클라이언트 ${startIndex + index + 1}`,
+        manager: `매니저 ${startIndex + index + 1}`,
+        productType: ['스킨케어', '메이크업', '헤어케어', '바디케어'][index % 4],
+        serviceType: ['OEM', 'ODM', 'OBM', 'Private Label'][index % 4] as any,
+        currentStage: ['샘플 제작', '품질 검사'],
+        status: ['진행중', '시작전', '완료'][index % 3] as any,
+        progress: Math.floor(Math.random() * 100),
+        startDate: getRelativeDate(Math.floor(Math.random() * 30) - 15),
+        endDate: getRelativeDate(Math.floor(Math.random() * 90) + 30),
+        manufacturer: getRandomFactory('제조').name,
+        container: getRandomFactory('용기').name,
+        packaging: getRandomFactory('포장').name,
+        sales: `${Math.floor(Math.random() * 1000000000) + 100000000}`,
+        purchase: `${Math.floor(Math.random() * 500000000) + 50000000}`,
+        priority: ['높음', '보통', '낮음'][index % 3] as any
+      }));
+      
+      setProjects(prev => [...prev, ...newProjects]);
+      setPage(prev => prev + 1);
+      
+      // 더 이상 로드할 데이터가 없는지 확인
+      if (projects.length + newProjects.length >= simulatedTotalCount) {
+        setHasMore(false);
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  // 스크롤 위치 기반 프리페칭
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollContainer = document.querySelector('.project-table-container');
+      if (!scrollContainer) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+      
+      // 70% 스크롤 시 다음 페이지 미리 로드
+      if (scrollPercentage > PREFETCH_THRESHOLD && hasMore && !isLoading) {
+        loadMoreProjects();
+      }
+    };
+    
+    const scrollContainer = document.querySelector('.project-table-container');
+    scrollContainer?.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      scrollContainer?.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasMore, isLoading, projects.length]);
+
+  // 무한 스크롤 설정 (폴백용)
+  const { observerRef: loadMoreRef } = useInfiniteScroll({
+    hasMore,
+    isLoading,
+    onLoadMore: loadMoreProjects,
+    threshold: 500 // 더 일찍 트리거
+  });
 
   return {
     projects,
@@ -206,6 +263,7 @@ export const useProjects = () => {
     handleSelectAll,
     handleSelectRow,
     loadMoreProjects,
+    loadMoreRef,
     getProjectSchedule: (projectId: string) => schedules.get(projectId) || null
   };
 };

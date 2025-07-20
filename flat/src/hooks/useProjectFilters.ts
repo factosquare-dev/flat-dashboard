@@ -37,9 +37,9 @@ export const useProjectFilters = () => {
         const filterStart = dateRange.start ? new Date(dateRange.start) : null;
         const filterEnd = dateRange.end ? new Date(dateRange.end) : null;
         
-        if (project.startDate || project.deadline) {
+        if (project.startDate || project.endDate) {
           const projectStart = project.startDate ? new Date(project.startDate) : null;
-          const projectEnd = project.deadline ? new Date(project.deadline) : null;
+          const projectEnd = project.endDate ? new Date(project.endDate) : null;
           
           // 프로젝트 기간이 필터 기간과 겹치는지 확인
           matchesDateRange = false;

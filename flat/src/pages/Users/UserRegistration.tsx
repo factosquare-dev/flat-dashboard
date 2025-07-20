@@ -34,7 +34,6 @@ const UserRegistration: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: API 연동 시 실제 저장 로직 구현
-    console.log('User data:', formData);
     navigate('/users');
   };
 

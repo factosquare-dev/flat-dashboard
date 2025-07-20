@@ -23,7 +23,6 @@ const FactoriesPage: React.FC = () => {
 
   const handleSaveFactory = (factoryData: FactoryFormData) => {
     // TODO: API 연동 시 실제 저장 로직 구현
-    console.log('Factory data:', factoryData);
   };
 
   const getTypeButtonClass = (type: '제조' | '용기' | '포장') => {

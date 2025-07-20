@@ -140,27 +140,30 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
                   <div className="relative h-full flex items-center pointer-events-none">
                     {/* Drag preview */}
                     {dragPreview && dragPreview.projectId === project.id && (
-                      <DragPreview preview={dragPreview} cellWidth={cellWidth} days={days} />
+                      <DragPreview
+                        projectId={dragPreview.projectId}
+                        startDate={dragPreview.startDate}
+                        endDate={dragPreview.endDate}
+                        draggedTask={draggedTask}
+                        days={days}
+                        cellWidth={cellWidth}
+                      />
                     )}
                     
                     {/* Tasks */}
-                    {assignTaskRows(projectTasks, project.id).map((task, taskIndex) => {
-                      const isResizing = resizePreview && resizePreview.taskId === task.id;
-                      const startDate = isResizing ? new Date(resizePreview.startDate) : new Date(task.startDate);
-                      const endDate = isResizing ? new Date(resizePreview.endDate) : new Date(task.endDate);
+                    {(() => {
+                      const taskRows = assignTaskRows(projectTasks);
                       
-                      const startIndex = days.findIndex(day => 
-                        day.toISOString().split('T')[0] === startDate.toISOString().split('T')[0]
-                      );
-                      const endIndex = days.findIndex(day => 
-                        day.toISOString().split('T')[0] === endDate.toISOString().split('T')[0]
-                      );
+                      return projectTasks.map((task, taskIndex) => {
+                        const isResizing = resizePreview && resizePreview.taskId === task.id;
+                        const startDate = isResizing ? new Date(resizePreview.startDate) : new Date(task.startDate);
+                        const endDate = isResizing ? new Date(resizePreview.endDate) : new Date(task.endDate);
+                        const taskRow = taskRows.get(task.id) || 0;
                       
-                      if (startIndex === -1 || endIndex === -1) return null;
-                      
-                      const left = startIndex * cellWidth;
-                      const width = (endIndex - startIndex + 1) * cellWidth;
-                      const top = 10 + (task.row || 0) * 40;
+                      const left = (startDate.getTime() - days[0].getTime()) / (1000 * 60 * 60 * 24) * cellWidth;
+                      const width = Math.max(cellWidth, ((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1) * cellWidth);
+                      // Center task vertically: 10px base padding + row * 40px + 5px to center 30px task in 40px row
+                      const top = 10 + taskRow * 40 + 5;
                       
                       return (
                         <TaskItem
@@ -171,24 +174,25 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
                           left={left}
                           width={width}
                           top={top}
-                          isDragging={isDraggingTask && draggedTask?.id === task.id}
-                          isResizing={modalState.isResizingTask && modalState.resizingTask?.id === task.id}
+                          isDragging={!!draggedTask && draggedTask.id === task.id}
+                          isResizing={!!isResizing}
                           isHovered={hoveredTaskId === task.id}
                           onDragStart={(e) => onTaskDragStart(e, task, taskIndex)}
                           onDragEnd={onTaskDragEnd}
-                          onDragOver={(e) => {
-                            e.preventDefault();
-                            onTaskDragOver(e);
-                          }}
+                          onDragOver={onTaskDragOver}
                           onDrop={(e) => onTaskDrop(e, project.id, taskIndex)}
-                          onClick={(e) => onTaskClick(task)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onTaskClick(task);
+                          }}
                           onMouseEnter={() => onTaskHover(task.id)}
                           onMouseLeave={() => onTaskHover(null)}
-                          onResizeStart={onTaskMouseDown}
+                          onResizeStart={(e, direction) => onTaskMouseDown(e, task, direction)}
                           onDelete={onTaskDelete ? () => onTaskDelete(task.id) : undefined}
                         />
                       );
-                    })}
+                    });
+                    })()}
                   </div>
                 )}
               </div>
@@ -196,17 +200,6 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
           );
         })}
         
-        {/* Today line */}
-        {todayIndex !== -1 && (
-          <div
-            className="absolute top-0 bottom-0 w-px bg-red-500 pointer-events-none z-20"
-            style={{ left: `${todayPosition + cellWidth / 2}px` }}
-          >
-            <div className="absolute -top-1 -left-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 bg-white rounded-full" />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -22,7 +22,6 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
           setProjectSchedule(schedule);
         })
         .catch(error => {
-          console.error('Failed to load schedule:', error);
         })
         .finally(() => {
           setIsLoadingSchedule(false);

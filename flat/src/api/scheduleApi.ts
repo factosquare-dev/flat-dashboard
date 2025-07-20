@@ -15,7 +15,6 @@ const initializeMockSchedules = () => {
   testSchedules.forEach(schedule => {
     mockSchedules.set(schedule.id, schedule);
   });
-  console.log('테스트 스케줄 데이터 로드됨:', testSchedules.length, '개');
 };
 
 // 초기화
@@ -121,7 +120,6 @@ export const scheduleApi = {
           });
         });
         
-        console.log(`프로젝트 ${project.id}에 진행중 태스크 추가:`, inProgressTasks);
         newSchedule.tasks = [...newSchedule.tasks, ...inProgressTasks];
       }
     }

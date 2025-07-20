@@ -12,10 +12,6 @@ export const getCurrentStagesFromTasks = (tasks: Task[]): string[] => {
   todayEnd.setHours(23, 59, 59, 999);
   const todayEndTime = todayEnd.getTime();
   
-  console.log('getCurrentStagesFromTasks 호출됨:', {
-    totalTasks: tasks.length,
-    today: today.toISOString().split('T')[0]
-  });
   
   // 오늘 날짜에 걸쳐있는 태스크 필터링
   const currentTasks = tasks.filter(task => {
@@ -28,14 +24,6 @@ export const getCurrentStagesFromTasks = (tasks: Task[]): string[] => {
     // 진행 중이거나 대기 중인 태스크만 포함 (완료되거나 승인된 것은 제외)
     const isActive = !task.status || task.status === 'in-progress' || task.status === 'pending';
     
-    console.log('태스크 검사:', {
-      taskType: task.taskType,
-      status: task.status,
-      dates: `${task.startDate} ~ ${task.endDate}`,
-      isInTodayRange,
-      isActive,
-      willInclude: isInTodayRange && isActive && task.status === 'in-progress'
-    });
     
     // 의존성 체크 - 선행 작업이 있는 경우
     if (task.dependsOn && task.dependsOn.length > 0) {
@@ -55,10 +43,6 @@ export const getCurrentStagesFromTasks = (tasks: Task[]): string[] => {
     return isInTodayRange && task.status === 'in-progress';
   });
   
-  console.log('현재 진행중인 태스크:', currentTasks.map(t => ({
-    taskType: t.taskType,
-    status: t.status
-  })));
   
   // 중복 제거하여 태스크 타입(단계) 반환
   return [...new Set(currentTasks.map(task => task.taskType || task.title || ''))];

@@ -90,7 +90,6 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
     
     // 특정 공장에 특화된 태스크가 있으면 사용, 없으면 타입별 태스크 사용
     const factoryTasks = FACTORY_TASKS[factory.name] || FACTORY_TYPE_TASKS[factoryType] || FACTORY_TYPE_TASKS['default'];
-    console.log(`공장 ${factory.name} (타입: ${factoryType})의 태스크 목록:`, factoryTasks);
     
     let taskStartDate = new Date(projectStartDate);
     
@@ -115,7 +114,6 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
         } else if (taskStartDate <= today && taskEndDate >= today) {
           // 오늘 날짜가 태스크 기간에 포함되면 진행중
           status = 'in-progress';
-          console.log(`진행중 태스크 발견: ${taskType} (${formatDate(taskStartDate)} ~ ${formatDate(taskEndDate)})`);
         } else {
           status = 'pending';
         }
@@ -148,7 +146,6 @@ export const createScheduleFromProject = (project: Project): Schedule => {
     { name: project.packaging, color: 'bg-yellow-500' }
   ];
   
-  console.log(`프로젝트 ${project.id} - ${project.client}의 공장들:`, factories.map(f => f.name));
   
   const participants: Participant[] = factories.map(factory => ({
     id: factory.name,
@@ -159,11 +156,6 @@ export const createScheduleFromProject = (project: Project): Schedule => {
   
   const tasks = generateTasksForProject(project, factories);
   
-  // 진행중인 태스크 로깅
-  const inProgressTasks = tasks.filter(t => t.status === 'in-progress');
-  if (inProgressTasks.length > 0) {
-    console.log(`프로젝트 ${project.id} - ${project.client}의 진행중인 태스크:`, inProgressTasks);
-  }
   
   // 고유한 스케줄 ID 생성
   const scheduleId = `schedule-${project.id}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;

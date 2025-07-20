@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { Project } from '../../types/project';
 import ProjectTable from './ProjectTable';
 import OptionsMenu from './OptionsMenu';
@@ -32,6 +32,10 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   const [showOptionsMenu, setShowOptionsMenu] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{top: number, left: number} | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartIndex, setDragStartIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   const sortField = filters?.sortField || null;
   const sortDirection = filters?.sortDirection || 'asc';
@@ -64,13 +68,96 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     }
   };
   
-  const handleSelectRow = (projectId: string, checked: boolean) => {
+  const handleSelectRow = (projectId: string, checked: boolean, index?: number) => {
+    // 드래그 시작
+    if (checked && !isDragging && index !== undefined) {
+      setIsDragging(true);
+      setDragStartIndex(index);
+    }
+
     if (checked) {
       setSelectedRows(prev => [...prev, projectId]);
     } else {
       setSelectedRows(prev => prev.filter(id => id !== projectId));
     }
   };
+
+  const handleMouseEnterRow = (index: number) => {
+    if (isDragging && dragStartIndex !== null) {
+      const start = Math.min(dragStartIndex, index);
+      const end = Math.max(dragStartIndex, index);
+      
+      const newSelection = new Set<string>();
+      for (let i = start; i <= end; i++) {
+        if (projects[i]) {
+          newSelection.add(projects[i].id);
+        }
+      }
+      
+      setSelectedRows(Array.from(newSelection));
+    }
+  };
+
+  // 자동 스크롤 기능
+  useEffect(() => {
+    if (!isDragging) {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+        autoScrollIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      const mouseY = e.clientY;
+      const scrollThreshold = 80; // 가장자리로부터의 거리
+      const maxScrollSpeed = 15; // 최대 스크롤 속도
+
+      // 자동 스크롤 인터벌 초기화
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+        autoScrollIntervalRef.current = null;
+      }
+
+      // 상단 근처
+      if (mouseY < rect.top + scrollThreshold) {
+        const distance = rect.top + scrollThreshold - mouseY;
+        const scrollSpeed = Math.min(maxScrollSpeed, (distance / scrollThreshold) * maxScrollSpeed);
+        
+        autoScrollIntervalRef.current = setInterval(() => {
+          if (container.scrollTop > 0) {
+            container.scrollTop = Math.max(0, container.scrollTop - scrollSpeed);
+          }
+        }, 16); // 약 60fps
+      }
+      // 하단 근처
+      else if (mouseY > rect.bottom - scrollThreshold) {
+        const distance = mouseY - (rect.bottom - scrollThreshold);
+        const scrollSpeed = Math.min(maxScrollSpeed, (distance / scrollThreshold) * maxScrollSpeed);
+        
+        autoScrollIntervalRef.current = setInterval(() => {
+          const maxScroll = container.scrollHeight - container.clientHeight;
+          if (container.scrollTop < maxScroll) {
+            container.scrollTop = Math.min(maxScroll, container.scrollTop + scrollSpeed);
+          }
+        }, 16);
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+        autoScrollIntervalRef.current = null;
+      }
+    };
+  }, [isDragging]);
 
   const handleShowOptionsMenu = (projectId: string, position: { top: number; left: number }) => {
     if (showOptionsMenu === projectId) {
@@ -111,7 +198,26 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+      <div 
+        ref={containerRef}
+        className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 project-table-container"
+        onMouseUp={() => {
+          setIsDragging(false);
+          setDragStartIndex(null);
+          if (autoScrollIntervalRef.current) {
+            clearInterval(autoScrollIntervalRef.current);
+            autoScrollIntervalRef.current = null;
+          }
+        }}
+        onMouseLeave={() => {
+          setIsDragging(false);
+          setDragStartIndex(null);
+          if (autoScrollIntervalRef.current) {
+            clearInterval(autoScrollIntervalRef.current);
+            autoScrollIntervalRef.current = null;
+          }
+        }}
+      >
         <ProjectTable
           projects={projects || []}
           selectedRows={selectedRows}
@@ -123,6 +229,8 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           onSelectProject={onSelectProject}
           onUpdateProject={handleUpdateProject}
           onShowOptionsMenu={handleShowOptionsMenu}
+          onMouseEnterRow={handleMouseEnterRow}
+          isDragging={isDragging}
         />
         
         {/* Loading indicator */}

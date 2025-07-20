@@ -84,7 +84,6 @@ const FactoryRegistration: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: API 연동 시 실제 저장 로직 구현
-    console.log('Factory data:', formData);
     navigate('/factories');
   };
 

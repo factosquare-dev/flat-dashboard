@@ -45,7 +45,6 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
   onTaskCreate
 }) => {
   const handleEmailSend = (data: any) => {
-    console.log('Email sent:', data);
     setModalState(prev => ({ ...prev, showEmailModal: false }));
   };
 
@@ -58,7 +57,6 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
   };
 
   const handleProductRequestSave = (data: any) => {
-    console.log('Product request:', data);
     setModalState(prev => ({ ...prev, showProductRequestModal: false }));
   };
 

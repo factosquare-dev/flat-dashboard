@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar, Mail } from 'lucide-react';
 import type { Priority, ServiceType, ProjectStatus } from '../../types/project';
+import DateRangeFilter from './DateRangeFilter';
 
 interface ProjectFiltersProps {
   selectedPriority: Priority | 'all';
@@ -107,35 +108,10 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
         <div className="h-4 w-px bg-gray-300" />
         
         {/* 날짜 필터 */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4 text-gray-500" />
-            <span className="text-xs font-medium text-gray-700">기간:</span>
-          </div>
-          <input
-            type="date"
-            value={dateRange.start || ''}
-            onChange={(e) => onDateRangeChange({ ...dateRange, start: e.target.value || null })}
-            className="px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-xs text-gray-700 hover:bg-gray-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="시작일"
-          />
-          <span className="text-xs text-gray-500">~</span>
-          <input
-            type="date"
-            value={dateRange.end || ''}
-            onChange={(e) => onDateRangeChange({ ...dateRange, end: e.target.value || null })}
-            className="px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-xs text-gray-700 hover:bg-gray-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="종료일"
-          />
-          {(dateRange.start || dateRange.end) && (
-            <button
-              onClick={() => onDateRangeChange({ start: null, end: null })}
-              className="px-2 py-1 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-all"
-            >
-              초기화
-            </button>
-          )}
-        </div>
+        <DateRangeFilter
+          value={{ startDate: dateRange.start, endDate: dateRange.end }}
+          onChange={(range) => onDateRangeChange({ start: range.startDate, end: range.endDate })}
+        />
       </div>
     </div>
   );
