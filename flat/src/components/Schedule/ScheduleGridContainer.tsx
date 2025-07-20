@@ -53,11 +53,12 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     handleTaskDragEnd,
     handleTaskDragOver,
     handleTaskDrop
-  } = useTaskDrag(projects, days, cellWidth, scrollRef, taskControls, setModalState);
+  } = useTaskDrag(projects, days, cellWidth, scrollRef, taskControls, setModalState, modalState);
 
   // Task resize hooks  
   const {
     resizePreview,
+    hoveredDateIndex,
     handleTaskMouseDown,
     handleMouseMove,
     handleMouseUp
@@ -144,6 +145,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
         isDraggingTask={modalState.isDraggingTask}
         dragTooltip={dragTooltip}
         resizePreview={resizePreview}
+        hoveredDateIndex={hoveredDateIndex}
         dragPreview={dragPreview}
         draggedTask={modalState.draggedTask}
         selectedProjects={selectedProjects}

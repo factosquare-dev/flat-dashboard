@@ -9,10 +9,11 @@ interface ProjectTableSectionProps {
   isLoading: boolean;
   hasMore: boolean;
   filters: any;
-  onEdit: (projectId: string) => void;
+  onEdit: (project: Project) => void;
   onDelete: (projectId: string) => void;
-  onDuplicate: (projectId: string) => void;
+  onDuplicate: (project: Project) => void;
   onSelectProject: (project: Project) => void;
+  onUpdateProject?: (projectId: string, updates: Partial<Project>) => void;
   loadMoreRef: any;
 }
 
@@ -25,6 +26,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   onDelete,
   onDuplicate,
   onSelectProject,
+  onUpdateProject,
   loadMoreRef
 }) => {
   const [showOptionsMenu, setShowOptionsMenu] = useState<string | null>(null);
@@ -81,8 +83,11 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
 
   const handleEditProject = (projectId: string) => {
-    onEdit(projectId);
-    setShowOptionsMenu(null);
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      onEdit(project);
+      setShowOptionsMenu(null);
+    }
   };
 
   const handleDeleteProject = (projectId: string) => {
@@ -91,13 +96,17 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
   
   const handleDuplicateProject = (projectId: string) => {
-    onDuplicate(projectId);
-    setShowOptionsMenu(null);
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      onDuplicate(project);
+      setShowOptionsMenu(null);
+    }
   };
   
   const handleUpdateProject = (projectId: string, field: keyof Project, value: any) => {
-    // TODO: Implement update logic
-    console.log('Update project:', projectId, field, value);
+    if (onUpdateProject) {
+      onUpdateProject(projectId, { [field]: value });
+    }
   };
 
   return (

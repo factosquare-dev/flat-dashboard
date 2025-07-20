@@ -37,20 +37,19 @@ export const useProjectListState = () => {
       name: `${project.name} (복사본)`,
       createdAt: new Date().toISOString()
     };
-    projectsHook.createProject(newProject);
+    projectsHook.addProject(newProject);
   };
 
   const handleSaveProject = (projectData: Partial<Project>) => {
     if (modalMode === 'edit' && editingProject) {
       projectsHook.updateProject(editingProject.id, projectData);
     } else {
-      projectsHook.createProject(projectData as Omit<Project, 'id'>);
+      projectsHook.addProject(projectData as Omit<Project, 'id'>);
     }
     setShowProjectModal(false);
   };
 
   const handleRefresh = () => {
-    console.log('Refreshing projects...');
     // Add refresh logic here if needed
   };
 
@@ -59,7 +58,7 @@ export const useProjectListState = () => {
   };
 
   const handleSearch = (query: string) => {
-    filtersHook.setSearchQuery(query);
+    filtersHook.setSearchValue(query);
   };
 
   return {

@@ -32,9 +32,10 @@ const DragPreview: React.FC<DragPreviewProps> = ({
         height: '30px'
       }}
     >
-      <div className="relative h-full rounded-md overflow-hidden bg-blue-100/30 border-2 border-blue-400 border-dashed">
+      <div className="relative h-full rounded-md overflow-hidden bg-blue-100/40 border-2 border-blue-500 border-dashed animate-pulse">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-200/20 to-transparent animate-slide" />
         <div className="relative h-full px-2 flex items-center">
-          <span className="text-xs text-blue-700 font-medium truncate">
+          <span className="text-xs text-blue-700 font-semibold truncate">
             {draggedTask?.title || '새 태스크'}
           </span>
         </div>

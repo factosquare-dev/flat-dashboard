@@ -23,6 +23,7 @@ interface ScheduleGridProps {
   isDraggingTask: boolean;
   dragTooltip: DragTooltip | null;
   resizePreview: ResizePreview | null;
+  hoveredDateIndex: number | null;
   dragPreview: { projectId: string; startDate: string; endDate: string } | null;
   draggedTask: Task | null;
   selectedProjects: string[];
@@ -65,6 +66,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
     isDraggingTask,
     dragTooltip,
     resizePreview,
+    hoveredDateIndex,
     dragPreview,
     draggedTask,
     selectedProjects,
@@ -243,6 +245,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
                         cellWidth={cellWidth}
                         projectId={project.id}
                         isAddFactoryRow={isAddFactoryRow}
+                        isHoveredForResize={modalState.isResizingTask && hoveredDateIndex === dayIndex}
                         onClick={!isAddFactoryRow ? (e) => {
                           e.stopPropagation();
                           const clickedDate = day.toISOString().split('T')[0];
@@ -265,12 +268,8 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
                           if (dragData === 'new-task') {
                             const factory = projects.find(p => p.id === project.id);
                             if (factory) {
-                              onTaskCreate && onTaskCreate({
-                                projectId: project.id,
-                                factory: factory.name,
-                                startDate: clickedDate,
-                                endDate: clickedDate
-                              });
+                              // Pass factory info when showing modal
+                              props.onGridClick(e, project.id, clickedDate);
                             }
                           } else if (taskId) {
                             e.stopPropagation();

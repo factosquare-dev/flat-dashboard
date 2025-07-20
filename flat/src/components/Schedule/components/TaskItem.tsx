@@ -46,9 +46,9 @@ const TaskItem: React.FC<TaskItemProps> = ({
   
   return (
     <div
-      className={`absolute px-3 py-1.5 rounded-lg text-xs cursor-move transition-all pointer-events-auto group shadow-sm hover:shadow-lg hover:scale-[1.02] ${
+      className={`absolute px-3 py-1.5 rounded-lg text-xs transition-all pointer-events-auto group shadow-sm hover:shadow-lg hover:scale-[1.02] whitespace-nowrap ${
         isHovered ? 'ring-2 ring-blue-400 ring-offset-2' : ''
-      } ${isResizing ? 'opacity-70' : ''} ${isDragging ? 'opacity-50 cursor-grabbing' : ''} ${
+      } ${isResizing ? 'opacity-70 cursor-ew-resize' : isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'} ${
         isCompleted
           ? 'bg-blue-500 text-white' 
           : 'bg-white border-2 border-blue-500 text-blue-600'
@@ -68,35 +68,37 @@ const TaskItem: React.FC<TaskItemProps> = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="truncate font-medium">{task.title}</div>
+      <div className="truncate font-medium whitespace-nowrap">{task.title}</div>
       
-      {/* Resize handles - smaller for short tasks */}
+      {/* Resize handles - same size for all tasks */}
       <div
-        className={`absolute left-0 top-0 bottom-0 cursor-ew-resize hover:bg-blue-400 hover:bg-opacity-50 z-10 transition-colors group-hover:bg-blue-300 group-hover:bg-opacity-30 ${
-          width < 60 ? 'w-1' : 'w-2'
-        }`}
+        className="absolute left-0 top-0 bottom-0 w-2 hover:bg-blue-400 hover:bg-opacity-50 z-10 transition-colors group-hover:bg-blue-300 group-hover:bg-opacity-30"
+        style={{ cursor: 'ew-resize' }}
         onMouseDown={(e) => {
           e.stopPropagation();
+          e.preventDefault();
           onResizeStart(e, 'start');
         }}
+        onMouseEnter={(e) => e.stopPropagation()}
       />
       <div
-        className={`absolute right-0 top-0 bottom-0 cursor-ew-resize hover:bg-blue-400 hover:bg-opacity-50 z-10 transition-colors group-hover:bg-blue-300 group-hover:bg-opacity-30 ${
-          width < 60 ? 'w-1' : 'w-2'
-        }`}
+        className="absolute right-0 top-0 bottom-0 w-2 hover:bg-blue-400 hover:bg-opacity-50 z-10 transition-colors group-hover:bg-blue-300 group-hover:bg-opacity-30"
+        style={{ cursor: 'ew-resize' }}
         onMouseDown={(e) => {
           e.stopPropagation();
+          e.preventDefault();
           onResizeStart(e, 'end');
         }}
+        onMouseEnter={(e) => e.stopPropagation()}
       />
       
       {/* Delete button */}
       {isHovered && onDelete && (
         <button
-          className="absolute w-4 h-4 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg z-20 transform translate-x-1/2 -translate-y-1/2 transition-all"
+          className="absolute w-4 h-4 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg z-20 transition-all"
           style={{
-            top: '0',
-            right: '0'
+            top: '-8px',
+            right: '-8px'
           }}
           onClick={(e) => {
             e.stopPropagation();

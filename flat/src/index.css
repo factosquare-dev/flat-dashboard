@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animation for drag preview */
+@keyframes slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-slide {
+  animation: slide 1.5s ease-in-out infinite;
+}
+
 :root {
   /* Base sizes for 1920x1080 */
   --base-font-size: 16px;
