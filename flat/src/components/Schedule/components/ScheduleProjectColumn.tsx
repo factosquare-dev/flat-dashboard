@@ -21,6 +21,7 @@ interface ScheduleProjectColumnProps {
   onProjectMouseDown: (index: number) => void;
   onProjectMouseEnter: (index: number) => void;
   onAddFactory?: () => void;
+  isDragSelecting?: boolean;
 }
 
 const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
@@ -39,7 +40,8 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
   onProjectDrop,
   onProjectMouseDown,
   onProjectMouseEnter,
-  onAddFactory
+  onAddFactory,
+  isDragSelecting
 }) => {
   // Add a dummy project for the "Add Factory" row
   const addFactoryProject: Participant = {
@@ -53,21 +55,17 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
   const allRows = [...projects, addFactoryProject];
 
   return (
-    <div className="w-72 bg-white border-r border-gray-100 flex-shrink-0">
+    <div className="w-72 bg-white flex-shrink-0 relative">
       {/* Combined header - matching timeline header total height (24px + 28px + 1px border) */}
-      <div className="border-b border-gray-200 bg-gray-50/50 flex items-center justify-center" style={{ height: '53px' }}>
+      <div className="border-b border-gray-200 border-r border-gray-100 bg-gray-50/50 flex items-center justify-center" style={{ height: '53px' }}>
         <span className="text-xs font-medium text-gray-600">공장</span>
       </div>
       
-      {/* Project names */}
-      {allRows.map((project, index) => {
-        const isAddFactoryRow = project.id === 'ADD_FACTORY_ROW_ID';
-        const rowCount = isAddFactoryRow ? 1 : getProjectRowCount(project.id, tasks);
-        const projectHeight = isAddFactoryRow ? 50 : Math.max(50, rowCount * 40 + 20);
-        
-        if (isAddFactoryRow) {
-          return <AddFactoryRow key={project.id} height={projectHeight} onAddFactory={onAddFactory} />;
-        }
+      {/* Project names with right border only for actual projects */}
+      <div className="border-r border-gray-100">
+        {projects.map((project, index) => {
+        const rowCount = getProjectRowCount(project.id, tasks);
+        const projectHeight = Math.max(50, rowCount * 40 + 20);
         
         return (
           <div key={project.id} 
@@ -96,10 +94,23 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
               onDragEnd={onProjectDragEnd}
               onDelete={() => onDeleteProject(project.id)}
               onMouseEnter={() => onProjectMouseEnter(index)}
+              onCheckboxMouseDown={() => onProjectMouseDown(index)}
+              isDragSelecting={isDragSelecting}
             />
           </div>
         );
-      })}
+        })}
+      </div>
+      
+      {/* Add Factory Row - without right border */}
+      <AddFactoryRow 
+        key={addFactoryProject.id} 
+        height={50} 
+        onAddFactory={onAddFactory} 
+      />
+      
+      {/* 공장 추가 행 아래 경계선 - 오른쪽 경계선 없음 */}
+      <div className="border-b border-gray-200" style={{ height: '1px' }}></div>
     </div>
   );
 };

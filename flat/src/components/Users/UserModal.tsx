@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
 import type { UserRole } from '../../store/slices/userSlice';
+import BaseModal, { ModalFooter } from '../common/BaseModal';
 
 interface UserModalProps {
   isOpen: boolean;
@@ -58,24 +58,33 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">
-            {editData ? '사용자 수정' : '사용자 추가'}
-          </h2>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editData ? '사용자 수정' : '사용자 등록'}
+      description="사용자 정보를 입력해주세요"
+      size="md"
+      footer={
+        <ModalFooter>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-lg"
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium transition-colors"
           >
-            <X className="w-5 h-5" />
+            취소
           </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-4">
+          <button
+            type="submit"
+            form="user-form"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm"
+          >
+            {editData ? '수정' : '등록'}
+          </button>
+        </ModalFooter>
+      }
+    >
+      <form id="user-form" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -183,25 +192,8 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData
               />
             </div>
           </div>
-
-          <div className="flex justify-end gap-2 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            >
-              저장
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+    </BaseModal>
   );
 };
 

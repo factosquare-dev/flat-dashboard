@@ -18,6 +18,7 @@ interface ScheduleTimelineGridProps {
   dragPreview: { projectId: string; startDate: string; endDate: string } | null;
   draggedTask: Task | null;
   modalState: any;
+  scrollRef: React.RefObject<HTMLDivElement>;
   onGridClick: (e: React.MouseEvent, projectId: string, date: string) => void;
   onTaskClick: (task: Task) => void;
   onTaskDragStart: (e: React.DragEvent, task: Task, index: number) => void;
@@ -42,6 +43,7 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
     dragPreview,
     draggedTask,
     modalState,
+    scrollRef,
     onGridClick,
     onTaskClick,
     onTaskDragStart,
@@ -70,7 +72,7 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
   const allRows = [...projects, addFactoryProject];
 
   return (
-    <div className="flex-1 overflow-x-auto" style={{ overflowY: 'hidden', backgroundColor: 'rgba(249, 250, 251, 0.3)' }}>
+    <div ref={scrollRef} className="w-full overflow-x-auto" style={{ overflowY: 'hidden', backgroundColor: 'rgba(249, 250, 251, 0.3)' }}>
       <div className="min-w-max relative">
         {/* Timeline header with border */}
         <div className="border-b border-gray-200">
@@ -87,7 +89,7 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
           return (
             <div
               key={project.id}
-              className={`relative flex ${isAddFactoryRow ? '' : 'border-b border-gray-200'}`}
+              className={`relative flex ${isAddFactoryRow ? 'bg-white border-b border-gray-200' : 'border-b border-gray-200'}`}
               style={{ height: `${projectHeight}px`, minHeight: '50px' }}
             >
               <div className="flex-1 relative bg-white/50" data-project-id={project.id}>
@@ -199,6 +201,9 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
             </div>
           );
         })}
+        
+        {/* 공장 추가 행 아래 경계선 */}
+        <div className="border-b border-gray-200" style={{ height: '1px' }}></div>
         
       </div>
     </div>

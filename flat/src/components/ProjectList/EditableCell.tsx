@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Project } from '../../types/project';
 import { formatCurrency, parseCurrency } from '../../utils/currency';
-import { allClients, allFactories } from '../../data/mockData';
+import { factoriesByType } from '../../data/mockData';
 
 interface EditableCellProps {
   project: Project;
@@ -32,8 +32,16 @@ const EditableCell: React.FC<EditableCellProps> = ({
   const value = project[field];
   const editing = isEditing(project.id, field);
 
-  if (type === 'search' && editing) {
-    const searchList = field === 'client' ? allClients : allFactories;
+  if (type === 'search' && editing && field !== 'client') {
+    // 필드에 따라 다른 공장 리스트 사용
+    let searchList: string[] = [];
+    if (field === 'manufacturer') {
+      searchList = factoriesByType.manufacturing.map(f => f.name);
+    } else if (field === 'container') {
+      searchList = factoriesByType.container.map(f => f.name);
+    } else if (field === 'packaging') {
+      searchList = factoriesByType.packaging.map(f => f.name);
+    }
     
     return (
       <td className="px-1.5 py-1.5 relative js-inline-edit">

@@ -23,9 +23,12 @@ export interface Project {
   scheduleId?: string; // 스케줄 ID 추가
 }
 
+export type FactoryType = 'manufacturing' | 'container' | 'packaging';
+
 export interface ProjectFactory {
   name: string;
   color: string;
+  type?: FactoryType;
 }
 
 export interface EditingCell {

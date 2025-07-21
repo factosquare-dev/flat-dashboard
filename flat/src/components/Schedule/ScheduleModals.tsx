@@ -5,6 +5,7 @@ import WorkflowModal from '../WorkflowModal';
 import TaskEditModal from '../TaskEditModal';
 import ProductRequestModal from '../ProductRequestModal/index';
 import TaskCreateModal from '../TaskCreateModal';
+import FactorySelectionModal from './FactorySelectionModal';
 import { factories } from '../../data/factories';
 
 interface ModalState {
@@ -13,10 +14,12 @@ interface ModalState {
   showTaskEditModal: boolean;
   showProductRequestModal: boolean;
   showTaskModal: boolean;
+  showFactoryModal: boolean;
   selectedTask: Task | null;
   selectedFactories: string[];
   selectedProjectId: string | null;
   selectedDate: string | null;
+  selectedFactory: string | null;
   hoveredTaskId: number | null;
   draggedProjectIndex: number | null;
   dragOverProjectIndex: number | null;
@@ -34,6 +37,7 @@ interface ScheduleModalsProps {
   onTaskSave: (task: Task) => void;
   onTaskDelete: () => void;
   onTaskCreate: (task: { factory: string; taskType: string; startDate: string; endDate: string }) => void;
+  onFactoryAdd?: (factory: { id: string; name: string; type: string }) => void;
 }
 
 const ScheduleModals: React.FC<ScheduleModalsProps> = ({
@@ -42,7 +46,8 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
   projects,
   onTaskSave,
   onTaskDelete,
-  onTaskCreate
+  onTaskCreate,
+  onFactoryAdd
 }) => {
   const handleEmailSend = (data: any) => {
     setModalState(prev => ({ ...prev, showEmailModal: false }));
@@ -65,6 +70,16 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
     setModalState(prev => ({ ...prev, showTaskModal: false }));
   };
 
+  const handleFactoriesSelect = (selectedFactories: Array<{ id: string; name: string; type: string }>) => {
+    if (onFactoryAdd) {
+      // 선택된 각 공장을 추가
+      selectedFactories.forEach(factory => {
+        onFactoryAdd(factory);
+      });
+    }
+    setModalState(prev => ({ ...prev, showFactoryModal: false }));
+  };
+
   return (
     <>
       <EmailModal
@@ -72,21 +87,25 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
         onClose={() => setModalState(prev => ({ ...prev, showEmailModal: false }))}
         onSend={handleEmailSend}
         defaultRecipients={modalState.selectedFactories.length > 0 ? modalState.selectedFactories.join(', ') : ''}
-        availableFactories={modalState.selectedFactories.length > 0 ? 
-          modalState.selectedFactories.map(name => {
-            const factory = factories.find(f => f.name === name);
-            return {
-              name,
-              color: factory?.type === '제조' ? 'bg-blue-500' : 
-                     factory?.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
-              type: factory?.type || '공장'
-            };
-          }) : factories.map(f => ({
-            name: f.name,
-            color: f.type === '제조' ? 'bg-blue-500' : 
-                   f.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
-            type: f.type
-          }))
+        availableFactories={
+          modalState.selectedFactories.length > 0 ? 
+            // 선택된 공장들만 표시
+            modalState.selectedFactories.map(name => {
+              const factory = factories.find(f => f.name === name);
+              return {
+                name,
+                color: factory?.type === '제조' ? 'bg-blue-500' : 
+                       factory?.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+                type: factory?.type || '공장'
+              };
+            }) : 
+            // 선택된 것이 없으면 현재 간트차트에 표시된 프로젝트(공장)들만 보여줌
+            projects.map(project => ({
+              name: project.name,
+              color: project.type === '제조' ? 'bg-blue-500' : 
+                     project.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+              type: project.type || '공장'
+            }))
         }
       />
 
@@ -120,6 +139,12 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
         initialDate={modalState.selectedDate || undefined}
         projectId={modalState.selectedProjectId || undefined}
         selectedFactory={modalState.selectedFactory || undefined}
+      />
+
+      <FactorySelectionModal
+        isOpen={modalState.showFactoryModal}
+        onClose={() => setModalState(prev => ({ ...prev, showFactoryModal: false }))}
+        onSelectFactories={handleFactoriesSelect}
       />
     </>
   );

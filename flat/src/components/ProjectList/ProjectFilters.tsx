@@ -82,7 +82,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
         <select 
           value={selectedPriority}
           onChange={(e) => onPriorityChange(e.target.value as Priority | 'all')}
-          className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md font-medium text-xs text-gray-700 hover:bg-gray-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg font-medium text-xs text-gray-700 hover:bg-gray-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="all">모든 우선순위</option>
         <option value="높음">높음</option>
@@ -94,7 +94,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
         <select 
           value={selectedServiceType}
           onChange={(e) => onServiceTypeChange(e.target.value as ServiceType | 'all')}
-          className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md font-medium text-xs text-gray-700 hover:bg-gray-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg font-medium text-xs text-gray-700 hover:bg-gray-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="all">모든 서비스 유형</option>
         <option value="OEM">OEM</option>

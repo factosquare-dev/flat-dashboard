@@ -16,6 +16,7 @@ interface ProjectTableProps {
   onShowOptionsMenu: (projectId: string, position: { top: number; left: number }) => void;
   onMouseEnterRow?: (index: number) => void;
   isDragging?: boolean;
+  onStartDrag?: (index: number) => void;
 }
 
 const ProjectTable: React.FC<ProjectTableProps> = ({
@@ -30,7 +31,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
   onUpdateProject,
   onShowOptionsMenu,
   onMouseEnterRow,
-  isDragging
+  isDragging,
+  onStartDrag
 }) => {
   return (
     <table className="w-full min-w-[1800px] table-fixed">
@@ -123,6 +125,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
                 onShowOptionsMenu={onShowOptionsMenu}
                 onMouseEnter={() => onMouseEnterRow?.(index)}
                 isDragging={isDragging}
+                onStartDrag={onStartDrag}
               />
             ))}
           </tbody>

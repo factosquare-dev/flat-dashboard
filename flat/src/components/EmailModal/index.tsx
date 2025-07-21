@@ -50,10 +50,8 @@ const EmailModal: React.FC<EmailModalProps> = ({
   React.useEffect(() => {
     if (defaultRecipients !== undefined) {
       setEmailData(prev => ({ ...prev, recipient: defaultRecipients }));
-      // 기본 선택된 공장들을 배열로 변환
-      if (defaultRecipients) {
-        setSelectedFactories(defaultRecipients.split(', ').filter(Boolean));
-      }
+      // Schedule 페이지에서는 기본적으로 체크 해제된 상태로 시작
+      setSelectedFactories([]);
     }
   }, [defaultRecipients]);
 

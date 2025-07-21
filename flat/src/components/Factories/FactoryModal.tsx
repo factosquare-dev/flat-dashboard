@@ -1,10 +1,10 @@
 import React from 'react';
-import { X } from 'lucide-react';
 import type { CertificationType } from '../../data/factories';
 import { useFactoryForm, type FactoryFormData } from './hooks/useFactoryForm';
 import FormField from './components/FormField';
 import ManagerSection from './components/ManagerSection';
 import CertificationSection from './components/CertificationSection';
+import BaseModal, { ModalFooter } from '../common/BaseModal';
 
 interface FactoryModalProps {
   isOpen: boolean;
@@ -39,24 +39,33 @@ const FactoryModal: React.FC<FactoryModalProps> = ({ isOpen, onClose, onSave, ed
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white">
-          <h2 className="text-lg font-semibold">
-            {editData ? '공장 수정' : '공장 추가'}
-          </h2>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editData ? '공장 수정' : '공장 등록'}
+      description="공장 정보를 입력해주세요"
+      size="xl"
+      footer={
+        <ModalFooter>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-lg"
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium transition-colors"
           >
-            <X className="w-5 h-5" />
+            취소
           </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6">
+          <button
+            type="submit"
+            form="factory-form"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm"
+          >
+            {editData ? '수정' : '등록'}
+          </button>
+        </ModalFooter>
+      }
+    >
+      <form id="factory-form" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-6">
             {/* 왼쪽 컬럼 */}
             <div className="space-y-4">
@@ -163,25 +172,8 @@ const FactoryModal: React.FC<FactoryModalProps> = ({ isOpen, onClose, onSave, ed
               />
             </div>
           </div>
-
-          <div className="flex justify-end gap-2 mt-6 pt-6 border-t">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            >
-              저장
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+    </BaseModal>
   );
 };
 

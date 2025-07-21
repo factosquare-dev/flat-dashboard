@@ -3,6 +3,7 @@ import type { Project } from '../../types/project';
 import { MoreVertical } from 'lucide-react';
 import { useEditableCell } from '../../hooks/useEditableCell';
 import EditableCell from './EditableCell';
+import CustomerCell from './CustomerCell';
 import PriorityDropdown from './PriorityDropdown';
 import ServiceTypeDropdown from './ServiceTypeDropdown';
 import StatusDropdown from './StatusDropdown';
@@ -10,26 +11,32 @@ import ProgressBar from './ProgressBar';
 
 interface ProjectTableRowProps {
   project: Project;
+  index?: number;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
   onRowClick: (project: Project) => void;
   onUpdateField: (projectId: string, field: keyof Project, value: any) => void;
   onShowOptionsMenu: (projectId: string, position: { top: number; left: number }) => void;
+  onMouseEnter?: () => void;
+  isDragging?: boolean;
 }
 
 const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   project,
+  index,
   isSelected,
   onSelect,
   onRowClick,
   onUpdateField,
-  onShowOptionsMenu
+  onShowOptionsMenu,
+  onMouseEnter,
+  isDragging
 }) => {
   const editableCell = useEditableCell();
 
   const handleRowClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    const isInteractive = target.closest('button, input, select, a, .js-inline-edit');
+    const isInteractive = target.closest('button, input, select, a, .js-inline-edit, .js-customer-search');
     if (!isInteractive) {
       onRowClick(project);
     }
@@ -37,10 +44,12 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
 
   return (
     <tr 
+      data-id={project.id}
       className="group hover:bg-gray-50/30 transition-all duration-200 cursor-pointer border-b border-gray-50"
       onClick={handleRowClick}
+      onMouseEnter={onMouseEnter}
     >
-      <td className="px-1 py-1.5">
+      <td className="px-1 py-1.5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-center">
           <input
             type="checkbox"
@@ -49,8 +58,23 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               e.stopPropagation();
               onSelect(e.target.checked);
             }}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              if (!isSelected) {
+                onSelect(true);
+              } else {
+                onSelect(false);
+              }
+            }}
+            onMouseEnter={(e) => {
+              if (isDragging && e.buttons === 1) {
+                e.stopPropagation();
+                onSelect(!isSelected);
+              }
+            }}
             onClick={(e) => e.stopPropagation()}
             className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
+            style={{ userSelect: 'none' }}
           />
         </div>
       </td>
@@ -88,11 +112,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
       <td className="px-1.5 py-1.5">
         <ProgressBar progress={project.progress} />
       </td>
-      <EditableCell
+      <CustomerCell
         project={project}
-        field="client"
-        type="search"
-        editableCell={editableCell}
         onUpdate={onUpdateField}
       />
       <EditableCell

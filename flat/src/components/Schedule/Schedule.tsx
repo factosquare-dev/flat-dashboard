@@ -136,7 +136,7 @@ const Schedule: React.FC<ScheduleProps> = ({
   const handleOpenEmail = () => {
     const selectedFactories = selectedProjects.length > 0 
       ? projects.filter(p => selectedProjects.includes(p.id)).map(p => p.name)
-      : factories.map(f => f.name);
+      : []; // 선택된 것이 없으면 빈 배열로 설정
     setModalState(prev => ({ 
       ...prev, 
       showEmailModal: true, 
@@ -146,6 +146,41 @@ const Schedule: React.FC<ScheduleProps> = ({
 
   const handleAddTask = () => {
     setModalState(prev => ({ ...prev, showTaskModal: true }));
+  };
+
+  const handleAddFactory = (factory: { id: string; name: string; type: string }) => {
+    // 이미 존재하지 않는 경우에만 추가
+    if (!projects.find(p => p.id === factory.id)) {
+      // 색상 배열 정의 (실제 색상 값)
+      const colors = [
+        "#3b82f6", // blue-500
+        "#ef4444", // red-500
+        "#22c55e", // green-500
+        "#eab308", // yellow-500
+        "#a855f7", // purple-500
+        "#ec4899", // pink-500
+        "#6366f1", // indigo-500
+        "#f97316", // orange-500
+        "#14b8a6", // teal-500
+        "#06b6d4"  // cyan-500
+      ];
+      
+      // 현재 사용중인 색상들 찾기
+      const usedColors = projects.map(p => p.color);
+      
+      // 사용되지 않은 첫 번째 색상 찾기
+      const availableColor = colors.find(color => !usedColors.includes(color)) || colors[projects.length % colors.length];
+      
+      const newProject: Participant = {
+        id: factory.id,
+        name: factory.name,
+        type: factory.type,
+        period: '',
+        color: availableColor
+      };
+      
+      setProjects(prev => [...prev, newProject]);
+    }
   };
 
   return (
@@ -174,7 +209,7 @@ const Schedule: React.FC<ScheduleProps> = ({
           onDeleteProject={handleDeleteProject}
           onProjectSelect={handleProjectSelect}
           onSelectAll={handleSelectAll}
-          onAddFactory={() => setModalState(prev => ({ ...prev, showProductRequestModal: true }))}
+          onAddFactory={() => setModalState(prev => ({ ...prev, showFactoryModal: true }))}
           onTaskCreate={handleQuickTaskCreate}
           onGridWidthChange={handleGridWidthChange}
         />
@@ -187,6 +222,7 @@ const Schedule: React.FC<ScheduleProps> = ({
         onTaskSave={handleTaskSave}
         onTaskDelete={handleTaskDelete}
         onTaskCreate={handleTaskCreate}
+        onFactoryAdd={handleAddFactory}
       />
     </>
   );

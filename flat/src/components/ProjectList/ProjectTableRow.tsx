@@ -3,6 +3,7 @@ import type { Project } from '../../types/project';
 import { MoreVertical } from 'lucide-react';
 import { useEditableCell } from '../../hooks/useEditableCell';
 import EditableCell from './EditableCell';
+import SearchableCell from '../../features/projects/components/SearchableCell';
 import PriorityDropdown from './PriorityDropdown';
 import ServiceTypeDropdown from './ServiceTypeDropdown';
 import StatusDropdown from './StatusDropdown';
@@ -18,6 +19,7 @@ interface ProjectTableRowProps {
   onShowOptionsMenu: (projectId: string, position: { top: number; left: number }) => void;
   onMouseEnter?: () => void;
   isDragging?: boolean;
+  onStartDrag?: (index: number) => void;
 }
 
 const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
@@ -29,7 +31,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   onUpdateField,
   onShowOptionsMenu,
   onMouseEnter,
-  isDragging
+  isDragging,
+  onStartDrag
 }) => {
   const editableCell = useEditableCell();
 
@@ -48,7 +51,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
       onClick={handleRowClick}
       onMouseEnter={onMouseEnter}
     >
-      <td className="px-1 py-1.5">
+      <td className="px-1 py-1.5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-center">
           <input
             type="checkbox"
@@ -59,17 +62,17 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
             }}
             onMouseDown={(e) => {
               e.stopPropagation();
-              if (!isSelected) {
-                onSelect(true);
+              // 드래그 시작
+              if (index !== undefined && onStartDrag) {
+                onStartDrag(index);
               }
             }}
             onMouseEnter={(e) => {
               if (isDragging && e.buttons === 1) {
                 e.stopPropagation();
-                onSelect(true);
+                // 드래그 중에는 행의 onMouseEnter가 처리하므로 여기서는 아무것도 하지 않음
               }
             }}
-            onClick={(e) => e.stopPropagation()}
             className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
             style={{ userSelect: 'none' }}
           />
@@ -109,11 +112,9 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
       <td className="px-1.5 py-1.5">
         <ProgressBar progress={project.progress} />
       </td>
-      <EditableCell
+      <SearchableCell
         project={project}
         field="client"
-        type="search"
-        editableCell={editableCell}
         onUpdate={onUpdateField}
       />
       <EditableCell
@@ -130,25 +131,19 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         editableCell={editableCell}
         onUpdate={onUpdateField}
       />
-      <EditableCell
+      <SearchableCell
         project={project}
         field="manufacturer"
-        type="search"
-        editableCell={editableCell}
         onUpdate={onUpdateField}
       />
-      <EditableCell
+      <SearchableCell
         project={project}
         field="container"
-        type="search"
-        editableCell={editableCell}
         onUpdate={onUpdateField}
       />
-      <EditableCell
+      <SearchableCell
         project={project}
         field="packaging"
-        type="search"
-        editableCell={editableCell}
         onUpdate={onUpdateField}
       />
       <EditableCell

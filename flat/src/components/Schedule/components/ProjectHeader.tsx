@@ -13,6 +13,8 @@ interface ProjectHeaderProps {
   onDragEnd: () => void;
   onDelete: () => void;
   onMouseEnter: () => void;
+  onCheckboxMouseDown?: () => void;
+  isDragSelecting?: boolean;
 }
 
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -26,7 +28,9 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   onDragStart,
   onDragEnd,
   onDelete,
-  onMouseEnter
+  onMouseEnter,
+  onCheckboxMouseDown,
+  isDragSelecting
 }) => {
   return (
     <div
@@ -44,7 +48,21 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           className="mr-2 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
           checked={isSelected}
           onChange={(e) => onCheckboxChange(e.target.checked)}
-          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            if (onCheckboxMouseDown) {
+              onCheckboxMouseDown();
+            }
+          }}
+          onMouseEnter={(e) => {
+            if (isDragSelecting && e.buttons === 1) {
+              e.stopPropagation();
+            }
+          }}
+          style={{ userSelect: 'none' }}
         />
         <div
           className={`flex-1 cursor-move py-1.5 px-2 transition-all group ${

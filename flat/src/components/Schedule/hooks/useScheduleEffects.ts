@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { isToday } from '../../../utils/dateUtils';
 
 export const useScheduleEffects = (
@@ -8,6 +8,7 @@ export const useScheduleEffects = (
   setSliderValue: (value: number) => void
 ) => {
   const cellWidth = 40;
+  const hasScrolledToToday = useRef(false);
 
   // 스크롤 이벤트 핸들러만 설정
   useEffect(() => {
@@ -29,20 +30,46 @@ export const useScheduleEffects = (
 
   // 초기 로드 시에만 오늘 날짜로 스크롤
   useEffect(() => {
+    // days가 새로 로드되면 스크롤 플래그 리셋
+    hasScrolledToToday.current = false;
+    
     const scrollElement = scrollRef.current;
     if (scrollElement && days.length > 0) {
       const todayIndex = days.findIndex(day => isToday(day));
       if (todayIndex >= 0) {
         // setTimeout으로 초기 렌더링 후 스크롤
         setTimeout(() => {
-          const scrollPosition = Math.max(0, todayIndex * cellWidth - 200);
-          if (scrollRef.current) {
-            scrollRef.current.scrollLeft = scrollPosition;
+          if (!scrollRef.current) {
+            console.log('scrollRef not available');
+            return;
           }
-        }, 100);
+          
+          const viewportWidth = scrollRef.current.clientWidth;
+          const maxScrollLeft = scrollRef.current.scrollWidth - viewportWidth;
+          
+          // 스크롤 가능한 경우에만 스크롤
+          if (maxScrollLeft > 0) {
+            // 오늘 날짜의 절대 위치 (픽셀)
+            const todayPosition = todayIndex * cellWidth;
+            
+            // 비율 기반 계산으로 모든 프로젝트에서 일관된 중앙 위치
+            const totalDays = days.length;
+            const todayRatio = todayIndex / (totalDays - 1); // 전체에서 오늘의 비율 (0~1)
+            
+            // 스크롤 범위에서 해당 비율만큼 이동한 후 중앙 정렬
+            const baseScrollPosition = maxScrollLeft * todayRatio;
+            let scrollPosition = baseScrollPosition - (viewportWidth / 2);
+            
+            // 경계값 확인: 스크롤 가능 범위를 벗어나지 않도록 제한
+            scrollPosition = Math.max(0, Math.min(scrollPosition, maxScrollLeft));
+            
+            scrollRef.current.scrollLeft = scrollPosition;
+            hasScrolledToToday.current = true;
+          }
+        }, 300);
       }
     }
-  }, []); // 빈 배열로 초기 로드 시에만 실행
+  }, [days.length]); // days 배열의 길이가 변경될 때마다 실행
 
   const handleSliderChange = (value: number) => {
     setSliderValue(value);
@@ -55,8 +82,27 @@ export const useScheduleEffects = (
   const scrollToToday = () => {
     const todayIndex = days.findIndex(day => isToday(day));
     if (todayIndex >= 0 && scrollRef.current) {
-      const scrollPosition = Math.max(0, todayIndex * cellWidth - 200);
-      scrollRef.current.scrollLeft = scrollPosition;
+      const viewportWidth = scrollRef.current.clientWidth;
+      const maxScrollLeft = scrollRef.current.scrollWidth - viewportWidth;
+      
+      // 스크롤 가능한 경우에만 스크롤
+      if (maxScrollLeft > 0) {
+        // 오늘 날짜의 절대 위치 (픽셀)
+        const todayPosition = todayIndex * cellWidth;
+        
+        // 비율 기반 계산으로 모든 프로젝트에서 일관된 중앙 위치
+        const totalDays = days.length;
+        const todayRatio = todayIndex / (totalDays - 1); // 전체에서 오늘의 비율 (0~1)
+        
+        // 스크롤 범위에서 해당 비율만큼 이동한 후 중앙 정렬
+        const baseScrollPosition = maxScrollLeft * todayRatio;
+        let scrollPosition = baseScrollPosition - (viewportWidth / 2);
+        
+        // 경계값 확인: 스크롤 가능 범위를 벗어나지 않도록 제한
+        scrollPosition = Math.max(0, Math.min(scrollPosition, maxScrollLeft));
+        
+        scrollRef.current.scrollLeft = scrollPosition;
+      }
     }
   };
 

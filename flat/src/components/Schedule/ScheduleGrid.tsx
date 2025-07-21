@@ -128,23 +128,17 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
         onProjectMouseDown={handleProjectMouseDown}
         onProjectMouseEnter={handleProjectMouseEnter}
         onAddFactory={onAddFactory}
+        isDragSelecting={isDragSelecting}
       />
       
       {/* Scrollable right column - Gantt chart */}
-      <div 
-        className="flex-1" 
-        ref={scrollRef}
-        style={{ 
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          backgroundColor: 'rgba(249, 250, 251, 0.3)'
-        }}
-      >
+      <div className="flex-1 overflow-hidden">
         <ScheduleTimelineGrid
           projects={projects}
           tasks={tasks}
           days={days}
           cellWidth={cellWidth}
+          scrollRef={scrollRef}
           hoveredTaskId={hoveredTaskId}
           isDraggingTask={isDraggingTask}
           resizePreview={resizePreview}

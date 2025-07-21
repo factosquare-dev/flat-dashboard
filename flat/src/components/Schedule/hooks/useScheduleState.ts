@@ -11,6 +11,7 @@ interface ModalState {
   showTaskEditModal: boolean;
   showProductRequestModal: boolean;
   showTaskModal: boolean;
+  showFactoryModal: boolean;
   selectedTask: Task | null;
   selectedFactories: string[];
   selectedProjectId: string | null;
@@ -75,18 +76,18 @@ export const useScheduleState = (
     cellWidth
   };
 
-  // 색상 배열 정의
+  // 색상 배열 정의 (실제 색상 값)
   const colors = [
-    "bg-blue-500",
-    "bg-red-500", 
-    "bg-green-500",
-    "bg-yellow-500",
-    "bg-purple-500",
-    "bg-pink-500",
-    "bg-indigo-500",
-    "bg-orange-500",
-    "bg-teal-500",
-    "bg-cyan-500"
+    "#3b82f6", // blue-500
+    "#ef4444", // red-500
+    "#22c55e", // green-500
+    "#eab308", // yellow-500
+    "#a855f7", // purple-500
+    "#ec4899", // pink-500
+    "#6366f1", // indigo-500
+    "#f97316", // orange-500
+    "#14b8a6", // teal-500
+    "#06b6d4"  // cyan-500
   ];
 
   // 공장 데이터를 기반으로 초기 프로젝트 생성
@@ -109,6 +110,7 @@ export const useScheduleState = (
     showTaskEditModal: false,
     showProductRequestModal: false,
     showTaskModal: false,
+    showFactoryModal: false,
     selectedTask: null,
     selectedFactories: [],
     selectedProjectId: null,
