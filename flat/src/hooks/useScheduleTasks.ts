@@ -6,7 +6,7 @@ const generateTaskColor = (index: number): string => {
   return 'bg-blue-500';
 };
 
-export const useScheduleTasks = (participants: Participant[], startDate: Date, endDate: Date, initialTasks?: Task[]) => {
+export const useScheduleTasks = (participants: Participant[], startDate: Date, endDate: Date, initialTasks?: Task[], cellWidth: number = 50) => {
   const [tasks, setTasks] = useState<Task[]>(() => {
     if (initialTasks && initialTasks.length > 0) {
       // 초기 태스크가 있으면 위치 계산 후 설정
@@ -17,7 +17,6 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
         const daysSinceStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
         const taskDuration = Math.ceil((taskEndDate.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         
-        const cellWidth = 40;
         const x = daysSinceStart * cellWidth;
         const width = Math.max(cellWidth, taskDuration * cellWidth);
         
@@ -45,7 +44,6 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
     const daysSinceStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const taskDuration = Math.ceil((taskEndDate.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     
-    const cellWidth = 40;
     const x = daysSinceStart * cellWidth;
     const width = Math.max(cellWidth, taskDuration * cellWidth);
     
@@ -74,7 +72,7 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
   };
 
   const updateTask = (taskId: number, updates: Partial<Task>) => {
-    setTasks(tasks.map(task => {
+    setTasks(prevTasks => prevTasks.map(task => {
       if (task.id === taskId) {
         const updatedTask = { ...task, ...updates };
         

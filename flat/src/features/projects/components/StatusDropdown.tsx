@@ -45,7 +45,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer
+        className={`px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all
           border ${getStatusStyle(value)}`}
       >

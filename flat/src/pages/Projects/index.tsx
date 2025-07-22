@@ -1,5 +1,5 @@
 import React from 'react';
-import ProjectListContainer from '../../components/ProjectList';
+import ProjectListContainer from '../../components/ProjectList/index';
 
 const Projects: React.FC = () => {
   return (

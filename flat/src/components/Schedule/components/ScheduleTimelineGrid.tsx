@@ -1,10 +1,9 @@
 import React from 'react';
 import type { Participant, Task, ResizePreview } from '../../../types/schedule';
 import { isToday } from '../../../utils/dateUtils';
-import { assignTaskRows, getProjectRowCount } from '../../../utils/taskUtils';
+import { getProjectRowCount } from '../../../utils/taskUtils';
 import TimelineHeader from '../TimelineHeader';
-import GridCell from './GridCell';
-import TaskItem from './TaskItem';
+import ProjectRow from './ProjectRow';
 import DragPreview from './DragPreview';
 
 interface ScheduleTimelineGridProps {
@@ -31,6 +30,29 @@ interface ScheduleTimelineGridProps {
   onTaskDelete?: (taskId: number) => void;
 }
 
+// Custom scrollbar styles
+const scrollbarStyles = `
+  .timeline-scroll::-webkit-scrollbar {
+    height: 10px;
+  }
+  .timeline-scroll::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 5px;
+  }
+  .timeline-scroll::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 5px;
+    transition: background 0.2s;
+  }
+  .timeline-scroll::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+  .timeline-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db #f3f4f6;
+  }
+`;
+
 const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
   const {
     projects,
@@ -56,6 +78,14 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
     onTaskDelete
   } = props;
 
+  // Debug dragPreview state
+  console.log('[ScheduleTimelineGrid] DragPreview Debug:', {
+    hasDragPreview: !!dragPreview,
+    dragPreview,
+    hasDraggedTask: !!draggedTask,
+    draggedTask: draggedTask ? { id: draggedTask.id, title: draggedTask.title } : null
+  });
+
   // Find today's position for today line
   const todayIndex = days.findIndex(day => isToday(day));
   const todayPosition = todayIndex * cellWidth;
@@ -71,142 +101,122 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
 
   const allRows = [...projects, addFactoryProject];
 
+  // Debug scroll container
+  React.useEffect(() => {
+    if (scrollRef.current) {
+      console.log('[SCROLL DEBUG] Container dimensions:', {
+        scrollWidth: scrollRef.current.scrollWidth,
+        clientWidth: scrollRef.current.clientWidth,
+        offsetWidth: scrollRef.current.offsetWidth,
+        scrollHeight: scrollRef.current.scrollHeight,
+        clientHeight: scrollRef.current.clientHeight,
+        needsScroll: scrollRef.current.scrollWidth > scrollRef.current.clientWidth,
+        style: window.getComputedStyle(scrollRef.current).overflow
+      });
+    }
+  }, [projects, tasks, days]);
+
   return (
-    <div ref={scrollRef} className="w-full overflow-x-auto" style={{ overflowY: 'hidden', backgroundColor: 'rgba(249, 250, 251, 0.3)' }}>
-      <div className="min-w-max relative">
+    <>
+      <style dangerouslySetInnerHTML={{ __html: scrollbarStyles }} />
+      <div 
+        ref={scrollRef} 
+        className="w-full overflow-x-auto overflow-y-hidden relative timeline-scroll" 
+        style={{ 
+          backgroundColor: 'rgba(249, 250, 251, 0.3)', 
+          position: 'relative',
+          maxWidth: '100%',
+          height: 'fit-content'
+        }}
+      >
+      <div className="min-w-max relative" style={{ position: 'relative', overflow: 'visible' }}>
         {/* Timeline header with border */}
         <div className="border-b border-gray-200">
           <TimelineHeader days={days} cellWidth={cellWidth} />
         </div>
         
-        {/* Project rows */}
+        {/* Project rows - now using separated ProjectRow component */}
         {allRows.map((project) => {
           const isAddFactoryRow = project.id === 'ADD_FACTORY_ROW_ID';
-          const projectTasks = tasks.filter(t => t.projectId === project.id);
-          const rowCount = isAddFactoryRow ? 1 : getProjectRowCount(project.id, tasks);
-          const projectHeight = isAddFactoryRow ? 50 : Math.max(50, rowCount * 40 + 20);
           
           return (
-            <div
+            <ProjectRow
               key={project.id}
-              className={`relative flex ${isAddFactoryRow ? 'bg-white border-b border-gray-200' : 'border-b border-gray-200'}`}
-              style={{ height: `${projectHeight}px`, minHeight: '50px' }}
-            >
-              <div className="flex-1 relative bg-white/50" data-project-id={project.id}>
-                <div className="absolute inset-0 flex">
-                  {days.map((day, dayIndex) => (
-                    <GridCell
-                      key={dayIndex}
-                      day={day}
-                      cellWidth={cellWidth}
-                      projectId={project.id}
-                      isAddFactoryRow={isAddFactoryRow}
-                      onClick={!isAddFactoryRow ? (e) => {
-                        e.stopPropagation();
-                        const clickedDate = day.toISOString().split('T')[0];
-                        onGridClick(e, project.id, clickedDate);
-                      } : undefined}
-                      onDragOver={!isAddFactoryRow ? (e) => {
-                        e.preventDefault();
-                        e.currentTarget.classList.add('bg-blue-100/70');
-                      } : undefined}
-                      onDragLeave={!isAddFactoryRow ? (e) => {
-                        e.currentTarget.classList.remove('bg-blue-100/70');
-                      } : undefined}
-                      onDrop={!isAddFactoryRow ? (e) => {
-                        e.preventDefault();
-                        e.currentTarget.classList.remove('bg-blue-100/70');
-                        const dragData = e.dataTransfer.getData('text/plain');
-                        const taskId = e.dataTransfer.getData('taskId');
-                        const clickedDate = day.toISOString().split('T')[0];
-                        
-                        if (dragData === 'new-task') {
-                          const factory = projects.find(p => p.id === project.id);
-                          if (factory) {
-                            props.onGridClick(e, project.id, clickedDate);
-                          }
-                        } else if (taskId) {
-                          e.stopPropagation();
-                          const taskIndex = parseInt(e.dataTransfer.getData('taskIndex'));
-                          props.onTaskDrop(e, project.id, taskIndex);
-                        } else {
-                          onGridClick(e, project.id, clickedDate);
-                        }
-                      } : undefined}
-                    />
-                  ))}
-                </div>
-                
-                {/* Tasks and drag preview */}
-                {!isAddFactoryRow && (
-                  <div className="relative h-full flex items-center pointer-events-none">
-                    {/* Drag preview */}
-                    {dragPreview && dragPreview.projectId === project.id && (
-                      <DragPreview
-                        projectId={dragPreview.projectId}
-                        startDate={dragPreview.startDate}
-                        endDate={dragPreview.endDate}
-                        draggedTask={draggedTask}
-                        days={days}
-                        cellWidth={cellWidth}
-                      />
-                    )}
-                    
-                    {/* Tasks */}
-                    {(() => {
-                      const taskRows = assignTaskRows(projectTasks);
-                      
-                      return projectTasks.map((task, taskIndex) => {
-                        const isResizing = resizePreview && resizePreview.taskId === task.id;
-                        const startDate = isResizing ? new Date(resizePreview.startDate) : new Date(task.startDate);
-                        const endDate = isResizing ? new Date(resizePreview.endDate) : new Date(task.endDate);
-                        const taskRow = taskRows.get(task.id) || 0;
-                      
-                      const left = (startDate.getTime() - days[0].getTime()) / (1000 * 60 * 60 * 24) * cellWidth;
-                      const width = Math.max(cellWidth, ((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1) * cellWidth);
-                      // Center task vertically: 10px base padding + row * 40px + 5px to center 30px task in 40px row
-                      const top = 10 + taskRow * 40 + 5;
-                      
-                      return (
-                        <TaskItem
-                          key={task.id}
-                          task={task}
-                          startDate={startDate}
-                          endDate={endDate}
-                          left={left}
-                          width={width}
-                          top={top}
-                          isDragging={!!draggedTask && draggedTask.id === task.id}
-                          isResizing={!!isResizing}
-                          isHovered={hoveredTaskId === task.id}
-                          onDragStart={(e) => onTaskDragStart(e, task, taskIndex)}
-                          onDragEnd={onTaskDragEnd}
-                          onDragOver={onTaskDragOver}
-                          onDrop={(e) => onTaskDrop(e, project.id, taskIndex)}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onTaskClick(task);
-                          }}
-                          onMouseEnter={() => onTaskHover(task.id)}
-                          onMouseLeave={() => onTaskHover(null)}
-                          onResizeStart={(e, direction) => onTaskMouseDown(e, task, direction)}
-                          onDelete={onTaskDelete ? () => onTaskDelete(task.id) : undefined}
-                        />
-                      );
-                    });
-                    })()}
-                  </div>
-                )}
-              </div>
-            </div>
+              project={project}
+              tasks={tasks}
+              days={days}
+              cellWidth={cellWidth}
+              isAddFactoryRow={isAddFactoryRow}
+              hoveredTaskId={hoveredTaskId}
+              isDraggingTask={isDraggingTask}
+              resizePreview={resizePreview}
+              dragPreview={dragPreview}
+              draggedTask={draggedTask}
+              modalState={modalState}
+              scrollRef={scrollRef}
+              allRows={allRows}
+              onGridClick={onGridClick}
+              onTaskClick={onTaskClick}
+              onTaskDragStart={onTaskDragStart}
+              onTaskDragEnd={onTaskDragEnd}
+              onTaskDragOver={onTaskDragOver}
+              onTaskDrop={onTaskDrop}
+              onTaskMouseDown={onTaskMouseDown}
+              onTaskHover={onTaskHover}
+              onTaskDelete={onTaskDelete}
+            />
           );
         })}
         
         {/* 공장 추가 행 아래 경계선 */}
         <div className="border-b border-gray-200" style={{ height: '1px' }}></div>
         
+        {/* SCROLL-SYNCHRONIZED Global drag preview - 스크롤과 완벽 동기화 */}
+        {dragPreview && dragPreview.projectId && dragPreview.startDate && (() => {
+          const targetProject = allRows.find(p => p.id === dragPreview.projectId && p.id !== 'ADD_FACTORY_ROW_ID');
+          
+          if (!targetProject) {
+            return null;
+          }
+          
+          const projectIndex = allRows.findIndex(p => p.id === dragPreview.projectId);
+          const totalHeightAbove = allRows.slice(0, projectIndex).reduce((sum, p) => {
+            const rowCount = p.id === 'ADD_FACTORY_ROW_ID' ? 1 : getProjectRowCount(p.id, tasks);
+            const height = p.id === 'ADD_FACTORY_ROW_ID' ? 50 : Math.max(50, rowCount * 40 + 20);
+            return sum + height;
+          }, 0);
+          
+          
+          return (
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: `${52 + totalHeightAbove + 15}px`, // Header + project offset + task offset
+                left: '0px',
+                right: '0px', 
+                width: '100%',
+                height: '30px',
+                zIndex: 999, // Below factory names but above tasks
+                overflow: 'visible', // Allow preview to extend beyond container
+                position: 'absolute',
+                pointerEvents: 'none'
+              }}
+            >
+              <DragPreview
+                projectId={dragPreview.projectId}
+                startDate={dragPreview.startDate}
+                endDate={dragPreview.endDate}
+                draggedTask={draggedTask}
+                days={days}
+                cellWidth={cellWidth}
+                scrollLeft={scrollRef.current?.scrollLeft || 0}
+              />
+            </div>
+          );
+        })()}
       </div>
     </div>
+    </>
   );
 };
 

@@ -6,6 +6,7 @@ import { useDynamicLayout } from './hooks/useDynamicLayout';
 import ScheduleLayout from './components/ScheduleLayout';
 import ScheduleGridContainer from './ScheduleGridContainer';
 import ScheduleModals from './ScheduleModals';
+import ScheduleTableView from './components/ScheduleTableView';
 import { factories, taskTypesByFactoryType } from '../../data/factories';
 import { findAvailableDateRange } from '../../utils/taskUtils';
 
@@ -31,6 +32,7 @@ const Schedule: React.FC<ScheduleProps> = ({
   isLoading = false
 }) => {
   const [gridWidth, setGridWidth] = useState(0);
+  const [viewMode, setViewMode] = useState<'gantt' | 'table'>('table');
   const { containerStyle, debugInfo } = useDynamicLayout();
 
   const handleGridWidthChange = useCallback((width: number) => {
@@ -67,11 +69,17 @@ const Schedule: React.FC<ScheduleProps> = ({
     }
   };
 
-  const handleTaskSave = (updatedTask: Task) => {
+  const handleTaskSave = async (updatedTask: Task) => {
     if (modalState.selectedTask) {
-      taskControls.updateTask(modalState.selectedTask.id, updatedTask);
+      try {
+        await taskControls.updateTask(modalState.selectedTask.id, updatedTask);
+        setModalState(prev => ({ ...prev, showTaskEditModal: false, selectedTask: null }));
+      } catch (error) {
+        console.error('[Schedule] Failed to update task:', error);
+        // Keep modal open on error
+        alert('태스크 업데이트 중 오류가 발생했습니다.');
+      }
     }
-    setModalState(prev => ({ ...prev, showTaskEditModal: false, selectedTask: null }));
   };
 
   const handleTaskDelete = () => {
@@ -148,21 +156,25 @@ const Schedule: React.FC<ScheduleProps> = ({
     setModalState(prev => ({ ...prev, showTaskModal: true }));
   };
 
+  const handleToggleTableView = () => {
+    setViewMode(prevMode => prevMode === 'gantt' ? 'table' : 'gantt');
+  };
+
   const handleAddFactory = (factory: { id: string; name: string; type: string }) => {
     // 이미 존재하지 않는 경우에만 추가
     if (!projects.find(p => p.id === factory.id)) {
-      // 색상 배열 정의 (실제 색상 값)
+      // 색상 배열 정의 (더 세련된 색상)
       const colors = [
-        "#3b82f6", // blue-500
-        "#ef4444", // red-500
-        "#22c55e", // green-500
-        "#eab308", // yellow-500
-        "#a855f7", // purple-500
-        "#ec4899", // pink-500
-        "#6366f1", // indigo-500
-        "#f97316", // orange-500
-        "#14b8a6", // teal-500
-        "#06b6d4"  // cyan-500
+        "#3B82F6", // 블루 (신뢰감)
+        "#10B981", // 에메랄드 (성장)
+        "#8B5CF6", // 바이올렛 (창의성)
+        "#F59E0B", // 앰버 (따뜻함)
+        "#EC4899", // 핑크 (혁신)
+        "#14B8A6", // 틸 (차분함)
+        "#6366F1", // 인디고 (전문성)
+        "#84CC16", // 라임 (신선함)
+        "#F97316", // 오렌지 (활력)
+        "#06B6D4"  // 시안 (기술)
       ];
       
       // 현재 사용중인 색상들 찾기
@@ -193,26 +205,43 @@ const Schedule: React.FC<ScheduleProps> = ({
         onBack={onBack}
         onAddTask={handleAddTask}
         projectName={projectName}
+        onToggleTableView={handleToggleTableView}
+        isTableView={viewMode === 'table'}
       >
-        <ScheduleGridContainer
-          projects={projects}
-          tasks={taskControls.tasks}
-          days={dateRange.days}
-          cellWidth={dateRange.cellWidth}
-          scrollRef={dragControls.scrollRef}
-          taskControls={taskControls}
-          dragControls={dragControls}
-          modalState={modalState}
-          setModalState={setModalState}
-          selectedProjects={selectedProjects}
-          setProjects={setProjects}
-          onDeleteProject={handleDeleteProject}
-          onProjectSelect={handleProjectSelect}
-          onSelectAll={handleSelectAll}
-          onAddFactory={() => setModalState(prev => ({ ...prev, showFactoryModal: true }))}
-          onTaskCreate={handleQuickTaskCreate}
-          onGridWidthChange={handleGridWidthChange}
-        />
+        {viewMode === 'gantt' ? (
+          <ScheduleGridContainer
+            projects={projects}
+            tasks={taskControls.tasks}
+            days={dateRange.days}
+            cellWidth={dateRange.cellWidth}
+            scrollRef={dragControls.scrollRef}
+            taskControls={taskControls}
+            dragControls={dragControls}
+            modalState={modalState}
+            setModalState={setModalState}
+            selectedProjects={selectedProjects}
+            setProjects={setProjects}
+            onDeleteProject={handleDeleteProject}
+            onProjectSelect={handleProjectSelect}
+            onSelectAll={handleSelectAll}
+            onAddFactory={() => setModalState(prev => ({ ...prev, showFactoryModal: true }))}
+            onTaskCreate={handleQuickTaskCreate}
+            onGridWidthChange={handleGridWidthChange}
+          />
+        ) : (
+          <ScheduleTableView
+            projects={projects}
+            tasks={taskControls.tasks}
+            onTaskClick={(task) => {
+              setModalState(prev => ({ 
+                ...prev, 
+                showTaskEditModal: true, 
+                selectedTask: task 
+              }));
+            }}
+            onDeleteProject={handleDeleteProject}
+          />
+        )}
       </ScheduleLayout>
       
       <ScheduleModals

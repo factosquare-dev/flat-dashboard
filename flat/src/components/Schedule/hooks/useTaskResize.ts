@@ -1,45 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Task, ResizePreview } from '../../../types/schedule';
 import { findAvailableDateRange } from '../../../utils/taskUtils';
+import { GridCoordinateCalculator } from '../utils/dragCalculations';
+import { setInteractionMode, setPreventClickUntil } from '../utils/globalState';
 
-// Common date calculation function for resize
-// For resize, we want the date where the edge of the task will be
-const calculateDateFromX = (x: number, cellWidth: number, days: Date[], isEndDate: boolean = false): Date => {
-  // For better UX, use snap zones for more intuitive date selection
-  // Start date: snap to the start of the cell (left edge)
-  // End date: snap to the end of the cell (right edge) to include the full day
+// Resize-specific date calculation with snap zones
+const calculateResizeDateFromX = (
+  x: number, 
+  cellWidth: number, 
+  days: Date[], 
+  isEndDate: boolean = false
+): Date => {
+  // Create calculator for resize operations
+  const calculator = new GridCoordinateCalculator({ days, cellWidth });
+  
+  // Use snap zones for better UX during resize
+  const safeCellWidth = cellWidth || 1; // Guard against division by zero
+  const cellIndex = Math.floor(x / safeCellWidth);
+  const cellOffset = x % safeCellWidth;
+  const snapThreshold = safeCellWidth * 0.5;
   
   if (isEndDate) {
-    // For end dates, we want to snap to cell boundaries
-    // If cursor is in first half of cell, snap to end of previous cell
-    // If cursor is in second half of cell, snap to end of current cell
-    const cellIndex = Math.floor(x / cellWidth);
-    const cellOffset = x % cellWidth;
+    // For end dates, snap to cell end boundaries
+    const targetIndex = cellOffset < snapThreshold 
+      ? Math.max(0, cellIndex - 1)  // Snap to end of previous day
+      : Math.min(cellIndex, days.length - 1); // Snap to end of current day
     
-    if (cellOffset < cellWidth * 0.5) {
-      // Snap to end of previous day
-      const selectedIndex = Math.max(0, cellIndex - 1);
-      return new Date(days[selectedIndex]);
-    } else {
-      // Snap to end of current day
-      const selectedIndex = Math.min(cellIndex, days.length - 1);
-      return new Date(days[selectedIndex]);
+    // Bounds check
+    if (targetIndex < 0 || targetIndex >= days.length) {
+      return new Date(days[Math.max(0, Math.min(days.length - 1, targetIndex))]);
     }
+    
+    return new Date(days[targetIndex]);
   } else {
-    // For start dates, snap to cell boundaries
-    // If cursor is in first half of cell, snap to start of current cell
-    // If cursor is in second half of cell, snap to start of next cell
-    const cellIndex = Math.floor(x / cellWidth);
-    const cellOffset = x % cellWidth;
+    // For start dates, snap to cell start boundaries  
+    const targetIndex = cellOffset < snapThreshold
+      ? cellIndex  // Snap to start of current day
+      : Math.min(cellIndex + 1, days.length - 1); // Snap to start of next day
     
-    if (cellOffset < cellWidth * 0.5) {
-      // Snap to start of current day
-      return new Date(days[cellIndex]);
-    } else {
-      // Snap to start of next day
-      const selectedIndex = Math.min(cellIndex + 1, days.length - 1);
-      return new Date(days[selectedIndex]);
+    // Bounds check
+    if (targetIndex < 0 || targetIndex >= days.length) {
+      return new Date(days[Math.max(0, Math.min(days.length - 1, targetIndex))]);
     }
+    
+    return new Date(days[targetIndex]);
   }
 };
 
@@ -54,43 +58,80 @@ export const useTaskResize = (
   const [resizePreview, setResizePreview] = useState<ResizePreview | null>(null);
   const [hoveredDateIndex, setHoveredDateIndex] = useState<number | null>(null);
   const [snapIndicatorX, setSnapIndicatorX] = useState<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const handleMouseMoveRef = useRef<(e: MouseEvent) => void>();
+  const handleMouseUpRef = useRef<() => void>();
 
   const handleTaskMouseDown = (e: React.MouseEvent, task: Task, direction: 'start' | 'end') => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // CRITICAL: Clear any drag state before starting resize
     setModalState((prev: any) => ({
       ...prev,
+      isDraggingTask: false,
+      draggedTask: null,
       isResizingTask: true,
       resizingTask: task,
       resizeDirection: direction
     }));
+    
+    // Set initial preview immediately
+    setResizePreview({
+      taskId: task.id,
+      startDate: task.startDate,
+      endDate: task.endDate
+    });
+    
+    // Set global interaction state
+    setInteractionMode('resizing');
+    
+    console.log('[RESIZE START] Starting resize (cleared drag state):', { taskId: task.id, direction });
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    // CRITICAL: Skip if dragging to prevent conflicts
+    if (modalState.isDraggingTask) {
+      console.log('[RESIZE] Skipping mousemove - drag in progress');
+      return;
+    }
+    
     if (modalState.isResizingTask && modalState.resizingTask && modalState.resizeDirection && scrollRef.current) {
       e.preventDefault();
-      const rect = scrollRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left + scrollRef.current.scrollLeft;
       
-      // Use common calculation with isEndDate parameter for accurate date selection
+      // Cancel previous animation frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      
+      // Use requestAnimationFrame for smooth updates
+      animationFrameRef.current = requestAnimationFrame(() => {
+        if (!scrollRef.current) return;
+        
+        const rect = scrollRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left + scrollRef.current.scrollLeft;
+        
+      
+      // Use unified calculation with snap zones for resize
       const isEndDate = modalState.resizeDirection === 'end';
-      const newDate = calculateDateFromX(x, cellWidth, days, isEndDate);
+      const newDate = calculateResizeDateFromX(x, cellWidth, days, isEndDate);
       const dateStr = newDate.toISOString().split('T')[0];
       
       // Track which date index is being hovered for visual feedback
       const hoveredIndex = days.findIndex(day => 
         day.toISOString().split('T')[0] === dateStr
       );
-      setHoveredDateIndex(hoveredIndex);
+      
+      // Only update state if values have changed to reduce re-renders
+      if (hoveredDateIndex !== hoveredIndex) {
+        setHoveredDateIndex(hoveredIndex);
+      }
       
       // Calculate snap indicator position
       if (hoveredIndex >= 0) {
-        if (isEndDate) {
-          // For end date, show indicator at the right edge of the selected cell
-          setSnapIndicatorX((hoveredIndex + 1) * cellWidth);
-        } else {
-          // For start date, show indicator at the left edge of the selected cell
-          setSnapIndicatorX(hoveredIndex * cellWidth);
+        const newSnapX = isEndDate ? (hoveredIndex + 1) * cellWidth : hoveredIndex * cellWidth;
+        if (snapIndicatorX !== newSnapX) {
+          setSnapIndicatorX(newSnapX);
         }
       }
       
@@ -159,22 +200,58 @@ export const useTaskResize = (
         }
       }
       
-      setResizePreview({
-        taskId: task.id,
-        startDate: previewStartDate,
-        endDate: previewEndDate
+      // Only update preview if dates have changed
+      if (!resizePreview || 
+          resizePreview.startDate !== previewStartDate || 
+          resizePreview.endDate !== previewEndDate) {
+        setResizePreview({
+          taskId: task.id,
+          startDate: previewStartDate,
+          endDate: previewEndDate
+        });
+      }
       });
     }
-  };
+  }, [modalState.isDraggingTask, modalState.isResizingTask, modalState.resizingTask, modalState.resizeDirection, scrollRef, cellWidth, days, taskControls.tasks]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
+    console.log('[RESIZE] ========== MOUSE UP - ENDING RESIZE ==========');
+    
+    // CRITICAL: Skip if dragging to prevent conflicts
+    if (modalState.isDraggingTask) {
+      console.log('[RESIZE] Skipping mouseup - drag in progress');
+      return;
+    }
+    
+    console.log('[RESIZE] Current state:', {
+      isResizingTask: modalState.isResizingTask,
+      hasResizingTask: !!modalState.resizingTask,
+      hasResizePreview: !!resizePreview,
+      taskId: modalState.resizingTask?.id,
+      previewDates: resizePreview ? {
+        startDate: resizePreview.startDate,
+        endDate: resizePreview.endDate
+      } : null
+    });
+    
     if (modalState.isResizingTask && modalState.resizingTask && resizePreview) {
       // Apply the preview dates directly since we already validated them during resize
+      console.log('[RESIZE] Applying resize:', {
+        taskId: modalState.resizingTask.id,
+        startDate: resizePreview.startDate,
+        endDate: resizePreview.endDate
+      });
+      
       taskControls.updateTask(modalState.resizingTask.id, {
         startDate: resizePreview.startDate,
         endDate: resizePreview.endDate
       });
     }
+    
+    // Reset interaction state
+    setInteractionMode('idle');
+    setPreventClickUntil(Date.now() + 300);
+    
     setModalState((prev: any) => ({
       ...prev,
       isResizingTask: false,
@@ -184,33 +261,58 @@ export const useTaskResize = (
     setResizePreview(null);
     setHoveredDateIndex(null);
     setSnapIndicatorX(null);
-  };
+  }, [modalState.isDraggingTask, modalState.isResizingTask, modalState.resizingTask, resizePreview, taskControls, setModalState]);
+
+  // Store callbacks in refs to avoid re-creating event listeners
+  useEffect(() => {
+    handleMouseMoveRef.current = handleMouseMove;
+    handleMouseUpRef.current = handleMouseUp;
+  }, [handleMouseMove, handleMouseUp]);
 
   // Set up global mouse event listeners
   useEffect(() => {
+    if (!modalState.isResizingTask) return;
+    
+    console.log('[RESIZE] Setting up global mouse listeners');
+    
     const handleGlobalMouseMove = (e: MouseEvent) => {
-      handleMouseMove(e);
+      if (handleMouseMoveRef.current) {
+        handleMouseMoveRef.current(e);
+      }
     };
     
     const handleGlobalMouseUp = (e: MouseEvent) => {
-      handleMouseUp();
+      console.log('[RESIZE] MouseUp caught');
+      if (handleMouseUpRef.current) {
+        handleMouseUpRef.current();
+      }
     };
     
-    if (modalState.isResizingTask) {
-      // Set resize cursor globally
-      document.body.style.cursor = 'ew-resize';
-      
-      document.addEventListener('mousemove', handleGlobalMouseMove);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-      
-      return () => {
-        document.removeEventListener('mousemove', handleGlobalMouseMove);
-        document.removeEventListener('mouseup', handleGlobalMouseUp);
-        // Reset cursor
-        document.body.style.cursor = '';
-      };
-    }
-  }, [modalState.isResizingTask, modalState.resizingTask, modalState.resizeDirection]);
+    // Set resize cursor globally
+    document.body.style.cursor = 'ew-resize';
+    
+    // Single set of listeners with capture phase
+    document.addEventListener('mousemove', handleGlobalMouseMove, true);
+    document.addEventListener('mouseup', handleGlobalMouseUp, true);
+    window.addEventListener('mouseup', handleGlobalMouseUp, true);
+    
+    return () => {
+      console.log('[RESIZE] Cleaning up mouse listeners');
+      document.removeEventListener('mousemove', handleGlobalMouseMove, true);
+      document.removeEventListener('mouseup', handleGlobalMouseUp, true);
+      window.removeEventListener('mouseup', handleGlobalMouseUp, true);
+      document.body.style.cursor = '';
+    };
+  }, [modalState.isResizingTask]); // Remove handleMouseUp from dependencies
+
+  // Cleanup animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
 
   return {
     resizePreview,

@@ -5,13 +5,14 @@ import { useProjectListState } from './hooks/useProjectListState';
 import ProjectListLayout from './components/ProjectListLayout';
 import ProjectTableSection from './ProjectTableSection';
 import ProjectModals from './ProjectModals';
+import { factories } from '../../data/factories';
 
 interface ProjectListProps {
   onSelectProject: (project: Project) => void;
   className?: string;
 }
 
-const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject, className = '' }) => {
+const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, className = '' }) => {
   const { containerStyle } = useDynamicLayout();
   const {
     showEmailModal,
@@ -70,7 +71,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject, className = 
         showProjectModal={showProjectModal}
         modalMode={modalMode}
         editingProject={editingProject}
-        availableFactories={[]} // Add factories if needed
+        availableFactories={factories}
         onCloseEmailModal={() => setShowEmailModal(false)}
         onCloseProjectModal={() => setShowProjectModal(false)}
         onSaveProject={handleSaveProject}
@@ -78,6 +79,8 @@ const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject, className = 
       />
     </>
   );
-};
+});
+
+ProjectList.displayName = 'ProjectList';
 
 export default ProjectList;

@@ -48,11 +48,11 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({ days, cellWidth }) => {
                 key={index}
                 className={`text-center text-[10px] flex items-center justify-center border-r border-gray-100 transition-colors relative ${
                   isWeekend(day) ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-700 hover:bg-gray-50'
-                } ${isFirstOfMonth ? 'pl-2' : ''}`}
+                }`}
                 style={{ 
                   width: `${cellWidth}px`, 
-                  height: '28px',
-                  paddingLeft: isFirstOfMonth ? '8px' : '0' // Add padding for first day of month
+                  height: '28px'
+                  // Removed padding to maintain alignment with grid cells
                 }}
               >
                 <div className="flex flex-col items-center gap-0.5">

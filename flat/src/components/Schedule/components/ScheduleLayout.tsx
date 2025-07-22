@@ -12,6 +12,8 @@ interface ScheduleLayoutProps {
   onBack?: () => void;
   onAddTask: () => void;
   projectName?: string;
+  onToggleTableView?: () => void;
+  isTableView?: boolean;
 }
 
 const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
@@ -22,7 +24,9 @@ const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
   onOpenEmail,
   onBack,
   onAddTask,
-  projectName
+  projectName,
+  onToggleTableView,
+  isTableView
 }) => {
   return (
     <>
@@ -45,6 +49,8 @@ const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
               onOpenEmail={onOpenEmail}
               onBack={onBack}
               projectName={projectName}
+              onToggleTableView={onToggleTableView}
+              isTableView={isTableView}
             />
           </div>
 

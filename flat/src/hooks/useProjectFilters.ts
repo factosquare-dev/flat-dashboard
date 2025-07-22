@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import type { Project, ProjectStatus, ServiceType, Priority } from '../types/project';
 
 export const useProjectFilters = () => {
@@ -10,16 +10,16 @@ export const useProjectFilters = () => {
   const [searchValue, setSearchValue] = useState('');
   const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({ start: null, end: null });
 
-  const handleSort = (field: keyof Project) => {
+  const handleSort = useCallback((field: keyof Project) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
       setSortDirection('asc');
     }
-  };
+  }, [sortField, sortDirection]);
 
-  const filterProjects = (projects: Project[]) => {
+  const filterProjects = useCallback((projects: Project[]) => {
     return projects.filter(project => {
       const matchesStatus = statusFilters.includes(project.status);
       const matchesPriority = selectedPriority === 'all' || project.priority === selectedPriority;
@@ -59,9 +59,9 @@ export const useProjectFilters = () => {
       
       return matchesStatus && matchesPriority && matchesServiceType && matchesSearch && matchesDateRange;
     });
-  };
+  }, [statusFilters, selectedPriority, selectedServiceType, searchValue, dateRange]);
 
-  const sortProjects = (projects: Project[]) => {
+  const sortProjects = useCallback((projects: Project[]) => {
     if (!sortField) return projects;
 
     return [...projects].sort((a, b) => {
@@ -78,20 +78,22 @@ export const useProjectFilters = () => {
         ? aStr.localeCompare(bStr) 
         : bStr.localeCompare(aStr);
     });
-  };
+  }, [sortField, sortDirection]);
 
-  const getFilteredAndSortedProjects = (projects: Project[]) => {
-    const filtered = filterProjects(projects);
-    return sortProjects(filtered);
-  };
+  const getFilteredAndSortedProjects = useMemo(() => {
+    return (projects: Project[]) => {
+      const filtered = filterProjects(projects);
+      return sortProjects(filtered);
+    };
+  }, [statusFilters, selectedPriority, selectedServiceType, searchValue, dateRange, sortField, sortDirection]);
 
-  const handleStatusFilterToggle = (status: ProjectStatus) => {
+  const handleStatusFilterToggle = useCallback((status: ProjectStatus) => {
     setStatusFilters(prev => 
       prev.includes(status) 
         ? prev.filter(s => s !== status)
         : [...prev, status]
     );
-  };
+  }, []);
 
   return {
     statusFilters,

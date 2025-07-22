@@ -24,23 +24,25 @@ export const createMockSchedules = (): Schedule[] => {
       startDate: formatDate(addDays(today, -30)),
       endDate: formatDate(addDays(today, 60)),
       participants: [
-        { id: '큐셀시스템', name: '큐셀시스템', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'blue' },
-        { id: '(주)연우', name: '(주)연우', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'red' },
-        { id: '(주)네트모베이지', name: '(주)네트모베이지', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'yellow' }
+        { id: 'mfg-1', name: '큐셀시스템', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'blue' },
+        { id: 'cont-1', name: '(주)연우', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'red' },
+        { id: 'pack-1', name: '(주)네트모베이지', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'yellow' }
       ],
       tasks: [
         // 완료된 태스크들
         { id: 1, factory: '큐셀시스템', taskType: '원료 준비', startDate: formatDate(addDays(today, -30)), endDate: formatDate(addDays(today, -27)), color: 'blue', status: 'completed', projectId: 'proj-001' },
         { id: 2, factory: '큐셀시스템', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -26)), endDate: formatDate(addDays(today, -20)), color: 'blue', status: 'completed', projectId: 'proj-001' },
-        { id: 3, factory: '(주)연우', taskType: '금형 제작', startDate: formatDate(addDays(today, -25)), endDate: formatDate(addDays(today, -16)), color: 'red', status: 'completed', projectId: 'proj-001' },
+        { id: 3, factory: '(주)연우', taskType: '금형 제작', startDate: formatDate(addDays(today, -25)), endDate: formatDate(addDays(today, -16)), color: 'red', status: 'completed', projectId: 'cont-1' },
+        
+        // 지연된 태스크 (뷰티코리아)
+        { id: 4, factory: '큐셀시스템', taskType: '안정성 테스트', startDate: formatDate(addDays(today, -10)), endDate: formatDate(addDays(today, -3)), color: 'blue', status: 'in-progress', projectId: 'proj-001', assignee: '김철수' },
         
         // 진행중인 태스크들
-        { id: 4, factory: '큐셀시스템', taskType: '품질 검사', startDate: formatDate(addDays(today, -5)), endDate: formatDate(addDays(today, 2)), color: 'blue', status: 'in-progress', projectId: 'proj-001' },
-        { id: 5, factory: '(주)연우', taskType: '사출 성형', startDate: formatDate(addDays(today, -3)), endDate: formatDate(addDays(today, 4)), color: 'red', status: 'in-progress', projectId: 'proj-001' },
+        { id: 6, factory: '(주)연우', taskType: '사출 성형', startDate: formatDate(addDays(today, -3)), endDate: formatDate(addDays(today, 4)), color: 'red', status: 'in-progress', projectId: 'cont-1' },
         
         // 예정된 태스크들
-        { id: 6, factory: '(주)네트모베이지', taskType: '디자인 작업', startDate: formatDate(addDays(today, 5)), endDate: formatDate(addDays(today, 10)), color: 'yellow', status: 'pending', projectId: 'proj-001' },
-        { id: 7, factory: '(주)네트모베이지', taskType: '포장 작업', startDate: formatDate(addDays(today, 11)), endDate: formatDate(addDays(today, 15)), color: 'yellow', status: 'pending', projectId: 'proj-001' }
+        { id: 7, factory: '(주)네트모베이지', taskType: '디자인 작업', startDate: formatDate(addDays(today, 5)), endDate: formatDate(addDays(today, 10)), color: 'yellow', status: 'pending', projectId: 'proj-001' },
+        { id: 8, factory: '(주)네트모베이지', taskType: '포장 작업', startDate: formatDate(addDays(today, 11)), endDate: formatDate(addDays(today, 15)), color: 'yellow', status: 'pending', projectId: 'proj-001' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -52,20 +54,20 @@ export const createMockSchedules = (): Schedule[] => {
       startDate: formatDate(addDays(today, -20)),
       endDate: formatDate(addDays(today, 40)),
       participants: [
-        { id: '주식회사 코스모로스', name: '주식회사 코스모로스', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'purple' },
-        { id: '삼화플라스틱', name: '삼화플라스틱', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'green' },
-        { id: '(주)세신상사', name: '(주)세신상사', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'orange' }
+        { id: 'cosmos-001', name: '주식회사 코스모로스', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'purple' },
+        { id: 'samhwa-001', name: '삼화플라스틱', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'green' },
+        { id: 'seshin-001', name: '(주)세신상사', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'orange' }
       ],
       tasks: [
         // 완료된 태스크들
-        { id: 8, factory: '주식회사 코스모로스', taskType: '원료 준비', startDate: formatDate(addDays(today, -20)), endDate: formatDate(addDays(today, -17)), color: 'purple', status: 'completed', projectId: 'proj-002' },
+        { id: 9, factory: '주식회사 코스모로스', taskType: '원료 준비', startDate: formatDate(addDays(today, -20)), endDate: formatDate(addDays(today, -17)), color: 'purple', status: 'completed', projectId: 'proj-002' },
         
         // 진행중인 태스크들
-        { id: 9, factory: '주식회사 코스모로스', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -10)), endDate: formatDate(addDays(today, 5)), color: 'purple', status: 'in-progress', projectId: 'proj-002' },
-        { id: 10, factory: '삼화플라스틱', taskType: '용기 제작', startDate: formatDate(addDays(today, -2)), endDate: formatDate(addDays(today, 3)), color: 'green', status: 'in-progress', projectId: 'proj-002' },
+        { id: 10, factory: '주식회사 코스모로스', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -10)), endDate: formatDate(addDays(today, 5)), color: 'purple', status: 'in-progress', projectId: 'proj-002' },
+        { id: 11, factory: '삼화플라스틱', taskType: '용기 제작', startDate: formatDate(addDays(today, -2)), endDate: formatDate(addDays(today, 3)), color: 'green', status: 'in-progress', projectId: 'proj-002' },
         
         // 예정된 태스크들
-        { id: 11, factory: '(주)세신상사', taskType: '라벨링', startDate: formatDate(addDays(today, 10)), endDate: formatDate(addDays(today, 12)), color: 'orange', status: 'pending', projectId: 'proj-002' }
+        { id: 12, factory: '(주)세신상사', taskType: '라벨링', startDate: formatDate(addDays(today, 10)), endDate: formatDate(addDays(today, 12)), color: 'orange', status: 'pending', projectId: 'proj-002' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -77,18 +79,18 @@ export const createMockSchedules = (): Schedule[] => {
       startDate: formatDate(addDays(today, -45)),
       endDate: formatDate(addDays(today, 15)),
       participants: [
-        { id: '(주)뷰티팩토리', name: '(주)뷰티팩토리', period: `${formatDate(addDays(today, -45))} ~ ${formatDate(addDays(today, 15))}`, color: 'teal' },
-        { id: '(주)에이치피씨', name: '(주)에이치피씨', period: `${formatDate(addDays(today, -45))} ~ ${formatDate(addDays(today, 15))}`, color: 'indigo' }
+        { id: 'beautyfactory-001', name: '(주)뷰티팩토리', period: `${formatDate(addDays(today, -45))} ~ ${formatDate(addDays(today, 15))}`, color: 'teal' },
+        { id: 'hpc-001', name: '(주)에이치피씨', period: `${formatDate(addDays(today, -45))} ~ ${formatDate(addDays(today, 15))}`, color: 'indigo' }
       ],
       tasks: [
         // 대부분 완료된 태스크들
-        { id: 12, factory: '(주)뷰티팩토리', taskType: '원료 준비', startDate: formatDate(addDays(today, -45)), endDate: formatDate(addDays(today, -42)), color: 'teal', status: 'completed', projectId: 'proj-003' },
-        { id: 13, factory: '(주)뷰티팩토리', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -41)), endDate: formatDate(addDays(today, -35)), color: 'teal', status: 'completed', projectId: 'proj-003' },
-        { id: 14, factory: '(주)뷰티팩토리', taskType: '품질 검사', startDate: formatDate(addDays(today, -34)), endDate: formatDate(addDays(today, -30)), color: 'teal', status: 'completed', projectId: 'proj-003' },
-        { id: 15, factory: '(주)에이치피씨', taskType: '용기 제작', startDate: formatDate(addDays(today, -40)), endDate: formatDate(addDays(today, -32)), color: 'indigo', status: 'completed', projectId: 'proj-003' },
+        { id: 13, factory: '(주)뷰티팩토리', taskType: '원료 준비', startDate: formatDate(addDays(today, -45)), endDate: formatDate(addDays(today, -42)), color: 'teal', status: 'completed', projectId: 'proj-003' },
+        { id: 14, factory: '(주)뷰티팩토리', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -41)), endDate: formatDate(addDays(today, -35)), color: 'teal', status: 'completed', projectId: 'proj-003' },
+        { id: 15, factory: '(주)뷰티팩토리', taskType: '품질 검사', startDate: formatDate(addDays(today, -34)), endDate: formatDate(addDays(today, -30)), color: 'teal', status: 'completed', projectId: 'proj-003' },
+        { id: 16, factory: '(주)에이치피씨', taskType: '용기 제작', startDate: formatDate(addDays(today, -40)), endDate: formatDate(addDays(today, -32)), color: 'indigo', status: 'completed', projectId: 'proj-003' },
         
         // 진행중인 마지막 태스크
-        { id: 16, factory: '(주)뷰티팩토리', taskType: '최종 승인', startDate: formatDate(addDays(today, -1)), endDate: formatDate(addDays(today, 1)), color: 'teal', status: 'in-progress', projectId: 'proj-003' }
+        { id: 17, factory: '(주)뷰티팩토리', taskType: '최종 승인', startDate: formatDate(addDays(today, -1)), endDate: formatDate(addDays(today, 1)), color: 'teal', status: 'in-progress', projectId: 'proj-003' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -100,12 +102,12 @@ export const createMockSchedules = (): Schedule[] => {
       startDate: formatDate(addDays(today, 30)),
       endDate: formatDate(addDays(today, 90)),
       participants: [
-        { id: '코스메카코리아', name: '코스메카코리아', period: `${formatDate(addDays(today, 30))} ~ ${formatDate(addDays(today, 90))}`, color: 'pink' }
+        { id: 'cosmeca-001', name: '코스메카코리아', period: `${formatDate(addDays(today, 30))} ~ ${formatDate(addDays(today, 90))}`, color: 'pink' }
       ],
       tasks: [
         // 모든 태스크가 예정됨
-        { id: 17, factory: '코스메카코리아', taskType: '원료 준비', startDate: formatDate(addDays(today, 30)), endDate: formatDate(addDays(today, 33)), color: 'pink', status: 'pending', projectId: 'proj-004' },
-        { id: 18, factory: '코스메카코리아', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, 34)), endDate: formatDate(addDays(today, 41)), color: 'pink', status: 'pending', projectId: 'proj-004' }
+        { id: 18, factory: '코스메카코리아', taskType: '원료 준비', startDate: formatDate(addDays(today, 30)), endDate: formatDate(addDays(today, 33)), color: 'pink', status: 'pending', projectId: 'proj-004' },
+        { id: 19, factory: '코스메카코리아', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, 34)), endDate: formatDate(addDays(today, 41)), color: 'pink', status: 'pending', projectId: 'proj-004' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -117,14 +119,14 @@ export const createMockSchedules = (): Schedule[] => {
       startDate: formatDate(addDays(today, -60)),
       endDate: formatDate(addDays(today, -15)),
       participants: [
-        { id: '(주)아모레퍼시픽 오산공장', name: '(주)아모레퍼시픽 오산공장', period: `${formatDate(addDays(today, -60))} ~ ${formatDate(addDays(today, -15))}`, color: 'gray' }
+        { id: 'amorepacific-001', name: '(주)아모레퍼시픽 오산공장', period: `${formatDate(addDays(today, -60))} ~ ${formatDate(addDays(today, -15))}`, color: 'gray' }
       ],
       tasks: [
         // 모든 태스크가 완료됨
-        { id: 19, factory: '(주)아모레퍼시픽 오산공장', taskType: '원료 준비', startDate: formatDate(addDays(today, -60)), endDate: formatDate(addDays(today, -57)), color: 'gray', status: 'completed', projectId: 'proj-005' },
-        { id: 20, factory: '(주)아모레퍼시픽 오산공장', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -56)), endDate: formatDate(addDays(today, -49)), color: 'gray', status: 'completed', projectId: 'proj-005' },
-        { id: 21, factory: '(주)아모레퍼시픽 오산공장', taskType: '품질 검사', startDate: formatDate(addDays(today, -48)), endDate: formatDate(addDays(today, -45)), color: 'gray', status: 'completed', projectId: 'proj-005' },
-        { id: 22, factory: '(주)아모레퍼시픽 오산공장', taskType: '최종 승인', startDate: formatDate(addDays(today, -20)), endDate: formatDate(addDays(today, -15)), color: 'gray', status: 'completed', projectId: 'proj-005' }
+        { id: 20, factory: '(주)아모레퍼시픽 오산공장', taskType: '원료 준비', startDate: formatDate(addDays(today, -60)), endDate: formatDate(addDays(today, -57)), color: 'gray', status: 'completed', projectId: 'proj-005' },
+        { id: 21, factory: '(주)아모레퍼시픽 오산공장', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -56)), endDate: formatDate(addDays(today, -49)), color: 'gray', status: 'completed', projectId: 'proj-005' },
+        { id: 22, factory: '(주)아모레퍼시픽 오산공장', taskType: '품질 검사', startDate: formatDate(addDays(today, -48)), endDate: formatDate(addDays(today, -45)), color: 'gray', status: 'completed', projectId: 'proj-005' },
+        { id: 23, factory: '(주)아모레퍼시픽 오산공장', taskType: '최종 승인', startDate: formatDate(addDays(today, -20)), endDate: formatDate(addDays(today, -15)), color: 'gray', status: 'completed', projectId: 'proj-005' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()

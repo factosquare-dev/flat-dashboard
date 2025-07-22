@@ -165,6 +165,17 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         editableCell={editableCell}
         onUpdate={onUpdateField}
       />
+      <td className="px-1.5 py-1.5 text-center">
+        <input
+          type="checkbox"
+          checked={project.depositPaid || false}
+          onChange={(e) => {
+            e.stopPropagation();
+            onUpdateField(project.id, 'depositPaid', e.target.checked);
+          }}
+          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+        />
+      </td>
       <td className="px-1.5 py-1.5">
         <PriorityDropdown 
           value={project.priority}

@@ -216,6 +216,24 @@
   @apply scale-x-100;
 }
 
+/* Table header draggable */
+.table-header-cell[draggable="true"] {
+  @apply cursor-move;
+}
+
+.table-header-cell[draggable="true"]:hover {
+  @apply bg-gray-100;
+}
+
+.table-header-cell[draggable="true"]:active {
+  @apply bg-gray-200;
+}
+
+/* Drag over effect */
+.table-header-cell.drag-over {
+  @apply bg-blue-100 border-l-2 border-blue-500;
+}
+
 .table-row {
   @apply border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200;
 }

@@ -100,7 +100,7 @@ export const scheduleApi = {
         
         // 각 공장별로 하나씩 진행중인 태스크 추가
         const inProgressTasks: Task[] = [];
-        let taskId = Math.max(...newSchedule.tasks.map(t => t.id)) + 1;
+        let taskId = Math.max(...newSchedule.tasks.map(t => typeof t.id === 'number' ? t.id : parseInt(String(t.id)) || 0)) + 1;
         
         newSchedule.participants.forEach((participant, index) => {
           const startDate = new Date();

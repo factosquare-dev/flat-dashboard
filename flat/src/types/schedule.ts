@@ -1,25 +1,27 @@
 // Schedule related types
 
 export interface Task {
-  id: number;
-  title: string;
+  id: number | string;
+  title?: string;
+  taskType?: string;
   projectId: string;
   factory?: string;
   details?: string;
   startDate: string;
   endDate: string;
-  color: string;
-  x: number;
-  width: number;
+  color?: string;
+  x?: number;
+  width?: number;
   isCompleted?: boolean;
   allDay?: boolean;
   originalStartDate?: string;
   originalEndDate?: string;
+  assignee?: string; // 담당자
   
   // 의존성 및 승인 관련 필드
   dependsOn?: number[]; // 선행 작업 ID 배열
   blockedBy?: number[]; // 이 작업을 막고 있는 작업 ID 배열
-  status?: 'pending' | 'in_progress' | 'completed' | 'approved' | 'rejected' | 'blocked';
+  status?: 'pending' | 'in-progress' | 'completed' | 'approved' | 'rejected' | 'blocked';
   approvalRequired?: boolean; // 승인이 필요한 작업인지
   approvedBy?: string; // 승인자
   approvedAt?: string; // 승인 일시
@@ -57,11 +59,29 @@ export interface ResizePreview {
   endDate: string;
 }
 
+export interface ModalState {
+  isDraggingTask: boolean;
+  draggedTask: Task | null;
+  isResizingTask: boolean;
+  resizingTask: Task | null;
+  resizeDirection: 'start' | 'end' | null;
+  showTaskModal: boolean;
+  showTaskEditModal: boolean;
+  selectedTask: Task | null;
+  selectedProjectId: string | null;
+  selectedDate: string | null;
+  selectedFactory: string | null;
+  hoveredTaskId: number | null;
+  draggedProjectIndex: number | null;
+  dragOverProjectIndex: number | null;
+}
+
 // Ensure all types are properly exported
 export type {
   Task,
   Participant,
   Schedule,
   DragTooltip,
-  ResizePreview
+  ResizePreview,
+  ModalState
 };

@@ -9,15 +9,17 @@ interface TaskEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   task: {
-    id: number;
-    factory: string;
-    task: string;
-    date: string;
+    id: number | string;
+    factory?: string;
+    task?: string;
+    title?: string;
+    taskType?: string;
+    date?: string;
     startDate?: string;
     endDate?: string;
   } | null;
   onSave?: (updatedTask: any) => void;
-  onDelete?: (taskId: number) => void;
+  onDelete?: (taskId: number | string) => void;
 }
 
 const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, onSave, onDelete }) => {
@@ -27,9 +29,9 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, on
 
   useEffect(() => {
     if (task) {
-      setTaskName(task.task);
-      setStartDate(task.startDate || task.date);
-      setEndDate(task.endDate || task.date);
+      setTaskName(task.title || task.taskType || task.task || '');
+      setStartDate(task.startDate || task.date || '');
+      setEndDate(task.endDate || task.date || '');
     }
   }, [task]);
 
@@ -39,7 +41,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, on
     if (onSave) {
       onSave({
         ...task,
-        task: taskName,
+        // Keep the original task name/type unchanged
         date: startDate,
         startDate: startDate,
         endDate: endDate
@@ -97,39 +99,38 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, on
             공장
           </label>
           <div className="w-full px-4 py-2.5 bg-gray-100 rounded-lg text-base text-gray-700">
-            {task.factory}
+            {task.factory || 'Unknown Factory'}
           </div>
         </div>
 
-        {/* 태스크 이름 */}
-        <FormInput
-          label="태스크 이름"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-          placeholder="태스크 이름을 입력하세요"
-          icon={<CheckSquare className="icon-md" />}
-          inputSize="md"
-        />
+        {/* 태스크 이름 (읽기 전용) */}
+        <div>
+          <label className="block text-base font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <CheckSquare className="icon-md" />
+            태스크 이름
+          </label>
+          <div className="w-full px-4 py-2.5 bg-gray-100 rounded-lg text-base text-gray-700">
+            {taskName || 'Unknown Task'}
+          </div>
+        </div>
 
         {/* 시작 날짜 */}
         <FormInput
           type="date"
           label="시작일"
-          value={startDate}
+          value={startDate || ''}
           onChange={(e) => setStartDate(e.target.value)}
           icon={<Calendar className="icon-md" />}
-          inputSize="md"
         />
 
         {/* 종료 날짜 */}
         <FormInput
           type="date"
           label="종료일"
-          value={endDate}
+          value={endDate || ''}
           onChange={(e) => setEndDate(e.target.value)}
           min={startDate}
           icon={<Calendar className="icon-md" />}
-          inputSize="md"
         />
       </div>
     </BaseModal>

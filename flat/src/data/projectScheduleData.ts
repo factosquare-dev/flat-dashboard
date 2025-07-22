@@ -68,6 +68,30 @@ const formatDate = (date: Date): string => {
   return date.toISOString().split('T')[0];
 };
 
+// 공장별 담당자 매핑
+const getAssigneeForFactory = (factoryName: string): string => {
+  const assigneeMap: { [key: string]: string } = {
+    '큐셀시스템': '김철수',
+    '(주)연우': '이영희',
+    '(주)네트모베이지': '정수진',
+    '주식회사 코스모로스': '최현우',
+    // 추가 공장들
+    '삼성전자': '박민수',
+    'LG화학': '홍길동',
+    '아모레퍼시픽': '김영희',
+    '한국콜마': '이철수'
+  };
+  
+  // 공장명에서 키워드를 찾아서 매핑
+  for (const [key, assignee] of Object.entries(assigneeMap)) {
+    if (factoryName.includes(key)) {
+      return assignee;
+    }
+  }
+  
+  return '담당자'; // 기본값
+};
+
 // 프로젝트 진행률에 따른 태스크 생성
 export const generateTasksForProject = (project: Project, factories: ProjectFactory[]): Task[] => {
   const tasks: Task[] = [];
@@ -98,12 +122,18 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
     
     factoryTasks.forEach((taskType, taskIndex) => {
       const duration = TASK_DURATIONS[taskType as keyof typeof TASK_DURATIONS] || 5;
-      const taskEndDate = addDays(taskStartDate, duration);
+      let taskEndDate = addDays(taskStartDate, duration);
       
       // 태스크 상태 결정 (오늘 날짜 기준)
       let status: 'pending' | 'in-progress' | 'completed' = 'pending';
       
-      if (project.status === '완료') {
+      // 뷰티코리아 프로젝트에 지연된 태스크 추가
+      if (project.client?.includes('뷰티코리아') && taskIndex === 0) {
+        // 첫 번째 태스크를 지연 상태로 만들기
+        taskStartDate = addDays(today, -10);
+        taskEndDate = addDays(today, -3);
+        status = 'in-progress'; // 종료일이 지났는데 완료되지 않음
+      } else if (project.status === '완료') {
         status = 'completed';
       } else if (project.status === '시작전') {
         status = 'pending';
@@ -123,11 +153,15 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
         id: taskId++,
         factory: factory.name,
         taskType: taskType,
+        title: taskType,
         startDate: formatDate(taskStartDate),
         endDate: formatDate(taskEndDate),
         color: factory.color.replace('bg-', '').replace('-500', ''),
         status: status,
-        projectId: project.id
+        projectId: project.id,
+        assignee: getAssigneeForFactory(factory.name),
+        x: 0,
+        width: 0
       });
       
       // 다음 태스크는 현재 태스크가 끝난 후 시작 (순차적 작업)

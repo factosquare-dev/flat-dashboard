@@ -21,6 +21,7 @@ export interface Project {
   purchase: string;
   priority: Priority;
   scheduleId?: string; // 스케줄 ID 추가
+  depositPaid?: boolean; // 선금입금 여부
 }
 
 export type FactoryType = 'manufacturing' | 'container' | 'packaging';

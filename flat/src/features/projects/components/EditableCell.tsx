@@ -158,7 +158,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       }}
     >
       <div className="relative">
-        <div className={`${type === 'currency' ? 'tabular-nums' : 'truncate max-w-[140px]'} group-hover:text-gray-900 transition-colors`} title={value as string}>
+        <div className={`${type === 'currency' ? 'tabular-nums' : type === 'date' ? 'whitespace-nowrap' : 'truncate max-w-[140px]'} group-hover:text-gray-900 transition-colors`} title={value as string}>
           {type === 'currency' ? formatCurrency(parseInt(value as string)) : 
            type === 'date' ? new Date(value as string).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' }).replace(/\. /g, '-').replace('.', '') :
            value}

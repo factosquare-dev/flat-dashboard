@@ -30,7 +30,7 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer
+        className="px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all
           border bg-indigo-100 text-indigo-700 border-indigo-300"
       >
@@ -43,7 +43,7 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
       </button>
       
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <div className="absolute z-50 mt-1 w-auto min-w-[8rem] bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
           {serviceTypes.map((serviceType) => (
             <button
               key={serviceType}
@@ -52,7 +52,7 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
                 onChange(serviceType);
                 setIsOpen(false);
               }}
-              className="w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all
+              className="w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all whitespace-nowrap
                 bg-indigo-100 text-indigo-700 border-indigo-300"
             >
               {serviceType}

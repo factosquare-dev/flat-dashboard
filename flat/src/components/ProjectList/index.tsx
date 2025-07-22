@@ -4,6 +4,7 @@ import type { Schedule as ScheduleType } from '../../types/schedule';
 import { scheduleApi } from '../../api/scheduleApi';
 import Schedule from '../Schedule';
 import ProjectListView from './ProjectList';
+import ProjectListErrorBoundary from './ProjectListErrorBoundary';
 
 interface ProjectListContainerProps {
   className?: string;
@@ -46,10 +47,12 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
   }
   
   return (
-    <ProjectListView
-      onSelectProject={setSelectedProject}
-      className={className}
-    />
+    <ProjectListErrorBoundary>
+      <ProjectListView
+        onSelectProject={setSelectedProject}
+        className={className}
+      />
+    </ProjectListErrorBoundary>
   );
 };
 

@@ -38,18 +38,23 @@ const GridCell: React.FC<GridCellProps> = ({
 
   return (
     <div
-      className={`cursor-pointer transition-colors ${
+      className={`cursor-pointer transition-colors relative border-r border-gray-100 ${
         isTodayCell 
-          ? 'bg-blue-100/20 hover:bg-blue-100/30' 
+          ? 'bg-blue-50/30 hover:bg-blue-100/40' 
           : isWeekendDay 
-          ? 'bg-gray-100/50 hover:bg-gray-100' 
-          : 'hover:bg-blue-50/30'
+          ? 'bg-gray-50/80 hover:bg-gray-100' 
+          : 'bg-white/50 hover:bg-blue-50/30'
       }`}
-      style={{ width: `${cellWidth}px` }}
+      style={{ 
+        width: `${cellWidth}px`, 
+        height: '100%'
+      }}
       onClick={onClick}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
+      data-date={day.toISOString().split('T')[0]}
+      data-project-id={projectId}
     />
   );
 };

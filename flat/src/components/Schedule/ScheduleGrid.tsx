@@ -101,7 +101,8 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
   } = useProjectDragSelection({
     projects,
     selectedProjects,
-    onProjectSelect
+    onProjectSelect,
+    isDisabled: draggedProjectIndex !== null // Disable checkbox drag when factory is being dragged
   });
 
   return (
@@ -132,7 +133,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
       />
       
       {/* Scrollable right column - Gantt chart */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <ScheduleTimelineGrid
           projects={projects}
           tasks={tasks}
@@ -159,12 +160,22 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
       </div>
       
       {/* Tooltips and Indicators */}
-      {isDraggingTask && dragTooltip && (
+      {isDraggingTask && dragTooltip && !modalState.showTaskModal && (
         <DragTooltipComponent tooltip={dragTooltip} />
       )}
       
-      {resizePreview && (
+      {/* Resize Preview */}
+      {resizePreview && !modalState.showTaskModal && (
         <ResizePreviewComponent preview={resizePreview} />
+      )}
+      
+      {/* DEBUG: Resize preview state */}
+      {process.env.NODE_ENV === 'development' && (
+        <div style={{ position: 'fixed', top: '10px', right: '10px', background: 'black', color: 'white', padding: '5px', fontSize: '10px', zIndex: 99999 }}>
+          ResizePreview: {resizePreview ? 'YES' : 'NO'}<br/>
+          showTaskModal: {modalState.showTaskModal ? 'YES' : 'NO'}<br/>
+          isResizingTask: {modalState.isResizingTask ? 'YES' : 'NO'}
+        </div>
       )}
     </div>
   );

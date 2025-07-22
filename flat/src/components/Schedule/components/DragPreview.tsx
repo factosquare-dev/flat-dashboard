@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Task } from '../../../types/schedule';
+import { GridCoordinateCalculator } from '../utils/dragCalculations';
 
 interface DragPreviewProps {
   projectId: string;
@@ -8,6 +9,7 @@ interface DragPreviewProps {
   draggedTask: Task | null;
   days: Date[];
   cellWidth: number;
+  scrollLeft?: number;
 }
 
 const DragPreview: React.FC<DragPreviewProps> = ({
@@ -16,27 +18,54 @@ const DragPreview: React.FC<DragPreviewProps> = ({
   endDate,
   draggedTask,
   days,
-  cellWidth
+  cellWidth,
+  scrollLeft = 0
 }) => {
-  const left = (new Date(startDate).getTime() - days[0].getTime()) / (1000 * 60 * 60 * 24) * cellWidth;
-  const width = Math.max(cellWidth, ((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24) + 1) * cellWidth);
+  if (!draggedTask) {
+    return null;
+  }
+
+  // Calculate horizontal position using unified coordinate calculator
+  const calculator = new GridCoordinateCalculator({
+    days,
+    cellWidth,
+    scrollLeft
+  });
+  
+  const startDateObj = new Date(startDate);
+  const endDateObj = new Date(endDate);
+  const position = calculator.calculateTaskPosition(startDateObj, endDateObj, true); // Use true for preview positioning with scroll adjustment
+
 
   return (
     <div
       className="absolute pointer-events-none"
       style={{
-        left: `${left}px`,
-        width: `${width}px`,
+        left: `${position.x}px`,
+        width: `${position.width}px`,
         minWidth: `${cellWidth}px`,
-        top: '15px',
-        height: '30px'
+        top: '0px',
+        height: '30px',
+        zIndex: 999, // Very high to be visible above everything
+        transform: 'translate3d(0, 0, 0)',
+        transition: 'none'
       }}
     >
-      <div className="relative h-full rounded-md overflow-hidden bg-blue-100/40 border-2 border-blue-500 border-dashed animate-pulse">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-200/20 to-transparent animate-slide" />
+      {/* Perfect dashed border preview */}
+      <div 
+        className="relative h-full rounded-md border-2 border-dashed border-blue-500"
+        style={{
+          backgroundColor: 'rgba(59, 130, 246, 0.15)', // 매우 연한 파란색 배경
+          backdropFilter: 'blur(0.5px)',
+          borderStyle: 'dashed',
+          borderWidth: '2px',
+          borderColor: '#3B82F6',
+          borderRadius: '6px'
+        }}
+      >
         <div className="relative h-full px-2 flex items-center">
-          <span className="text-xs text-blue-700 font-semibold truncate">
-            {draggedTask?.title || '새 태스크'}
+          <span className="text-xs font-medium truncate" style={{ color: '#1E40AF' }}>
+            {draggedTask.title || draggedTask.taskType || 'Moving...'}
           </span>
         </div>
       </div>

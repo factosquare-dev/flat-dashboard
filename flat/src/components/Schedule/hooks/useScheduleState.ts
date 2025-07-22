@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Participant, Task } from '../../../types/schedule';
 import { getDaysArray, formatDate } from '../../../utils/dateUtils';
 import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
@@ -64,7 +64,8 @@ export const useScheduleState = (
     endDate.setMonth(endDate.getMonth() + 6);
   }
 
-  const days = getDaysArray(startDate, endDate);
+  // Memoize days calculation to avoid unnecessary recalculation
+  const days = useMemo(() => getDaysArray(startDate, endDate), [startDate, endDate]);
   
   // cellWidth를 고정값으로 설정
   const cellWidth = 50; // 고정 너비로 설정하여 스크롤 보장
@@ -127,7 +128,7 @@ export const useScheduleState = (
   });
 
   const dragControls = useScheduleDrag();
-  const taskControls = useScheduleTasks(projects, startDate, endDate, initialTasks);
+  const taskControls = useScheduleTasks(projects, startDate, endDate, initialTasks, cellWidth);
 
   const handleProjectSelect = (projectId: string, checked: boolean) => {
     if (checked) {

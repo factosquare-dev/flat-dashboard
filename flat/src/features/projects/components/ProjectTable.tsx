@@ -91,6 +91,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
               <th className="table-header-cell">포장</th>
               <th className="table-header-cell text-right">매출</th>
               <th className="table-header-cell text-right">매입</th>
+              <th className="table-header-cell text-center">선금입금</th>
               <th 
                 className="table-header-cell table-header-cell-sortable text-center"
                 onClick={() => onSort('priority')}

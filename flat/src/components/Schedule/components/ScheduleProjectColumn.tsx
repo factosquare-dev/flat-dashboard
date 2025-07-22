@@ -55,7 +55,7 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
   const allRows = [...projects, addFactoryProject];
 
   return (
-    <div className="w-72 bg-white flex-shrink-0 relative">
+    <div className="w-72 bg-white flex-shrink-0 relative" style={{ zIndex: 10000 }}>
       {/* Combined header - matching timeline header total height (24px + 28px + 1px border) */}
       <div className="border-b border-gray-200 border-r border-gray-100 bg-gray-50/50 flex items-center justify-center" style={{ height: '53px' }}>
         <span className="text-xs font-medium text-gray-600">공장</span>
@@ -64,6 +64,8 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
       {/* Project names with right border only for actual projects */}
       <div className="border-r border-gray-100">
         {projects.map((project, index) => {
+        if (!project) return null;
+        
         const rowCount = getProjectRowCount(project.id, tasks);
         const projectHeight = Math.max(50, rowCount * 40 + 20);
         
@@ -90,7 +92,7 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
               isDropTarget={dragOverProjectIndex === index}
               projectHeight={projectHeight}
               onCheckboxChange={(checked) => onProjectSelect(project.id, checked)}
-              onDragStart={onProjectDragStart}
+              onDragStart={(e) => onProjectDragStart(e, index)}
               onDragEnd={onProjectDragEnd}
               onDelete={() => onDeleteProject(project.id)}
               onMouseEnter={() => onProjectMouseEnter(index)}

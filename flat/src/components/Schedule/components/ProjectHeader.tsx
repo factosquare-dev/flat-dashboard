@@ -37,40 +37,55 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       className={`border-b border-gray-100 flex items-center transition-all hover:bg-gray-50/50 ${
         isDropTarget ? 'bg-blue-50/50' : ''
       } ${isDragging ? 'opacity-50' : ''}`}
-      style={{ height: `${projectHeight}px`, minHeight: '50px' }}
+      style={{ 
+        height: `${projectHeight}px`, 
+        minHeight: '50px',
+        zIndex: 10000, // 최상위 레이어 - 미리보기보다 위에
+        position: 'relative'
+      }}
     >
       <div 
         className="flex items-center px-4 py-2 w-full select-none"
-        onMouseEnter={onMouseEnter}
       >
-        <input
-          type="checkbox"
-          className="mr-2 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-          checked={isSelected}
-          onChange={(e) => onCheckboxChange(e.target.checked)}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            if (onCheckboxMouseDown) {
-              onCheckboxMouseDown();
-            }
-          }}
-          onMouseEnter={(e) => {
-            if (isDragSelecting && e.buttons === 1) {
+        <div 
+          className="flex items-center mr-2 p-1"
+          onMouseEnter={onMouseEnter}
+        >
+          <input
+            type="checkbox"
+            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+            checked={isSelected}
+            onChange={(e) => onCheckboxChange(e.target.checked)}
+            onClick={(e) => {
               e.stopPropagation();
-            }
-          }}
-          style={{ userSelect: 'none' }}
-        />
+            }}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              if (onCheckboxMouseDown) {
+                onCheckboxMouseDown();
+              }
+            }}
+            onMouseEnter={(e) => {
+              if (isDragSelecting && e.buttons === 1) {
+                e.stopPropagation();
+              }
+            }}
+            style={{ userSelect: 'none' }}
+          />
+        </div>
         <div
           className={`flex-1 cursor-move py-1.5 px-2 transition-all group ${
             isSelected ? 'bg-blue-50' : ''
           }`}
           draggable
-          onDragStart={onDragStart}
+          onDragStart={(e) => {
+            e.stopPropagation();
+            onDragStart(e);
+          }}
           onDragEnd={onDragEnd}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+          }}
         >
           <div className="flex items-center gap-2">
             <div 

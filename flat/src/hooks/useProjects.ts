@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Project } from '../types/project';
 import { factories } from '../data/factories';
 import { scheduleApi } from '../api/scheduleApi';
@@ -33,6 +33,10 @@ export const useProjects = () => {
   const [totalCount, setTotalCount] = useState(0);
   const ITEMS_PER_PAGE = 50; // 한 번에 로드할 아이템 수
   const PREFETCH_THRESHOLD = 0.7; // 70% 스크롤 시 미리 로드
+  
+  // Race condition 방지를 위한 ref
+  const loadingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // 스케줄에서 프로젝트 데이터 가져오기
   useEffect(() => {
@@ -61,32 +65,32 @@ export const useProjects = () => {
     fetchSchedulesAndProjects();
   }, []); // 마운트 시 한 번만 실행
 
-  const updateProject = (projectId: string, field: keyof Project, value: any) => {
-    setProjects(projects.map(p => 
+  const updateProject = useCallback((projectId: string, field: keyof Project, value: any) => {
+    setProjects(prevProjects => prevProjects.map(p => 
       p.id === projectId ? { ...p, [field]: value } : p
     ));
-  };
+  }, []);
   
-  const updateProjectBatch = (projectId: string, updates: Partial<Project>) => {
-    setProjects(projects.map(p => 
+  const updateProjectBatch = useCallback((projectId: string, updates: Partial<Project>) => {
+    setProjects(prevProjects => prevProjects.map(p => 
       p.id === projectId ? { ...p, ...updates } : p
     ));
-  };
+  }, []);
 
-  const deleteProject = (projectId: string) => {
-    setProjects(projects.filter(p => p.id !== projectId));
-  };
+  const deleteProject = useCallback((projectId: string) => {
+    setProjects(prevProjects => prevProjects.filter(p => p.id !== projectId));
+  }, []);
 
-  const addProject = (projectData: Partial<Project>) => {
+  const addProject = useCallback((projectData: Partial<Project>) => {
     const newProject: Project = {
       id: Date.now().toString(),
       client: projectData.client || '',
       manager: projectData.manager || '',
       productType: projectData.productType || '',
       serviceType: projectData.serviceType || 'OEM',
-      currentStage: [],
-      status: '시작전',
-      progress: 0,
+      currentStage: projectData.currentStage || [],
+      status: projectData.status || '시작전',
+      progress: projectData.progress || 0,
       startDate: projectData.startDate || new Date().toISOString().split('T')[0],
       endDate: projectData.endDate || new Date().toISOString().split('T')[0],
       manufacturer: projectData.manufacturer || '',
@@ -94,10 +98,11 @@ export const useProjects = () => {
       packaging: projectData.packaging || '',
       sales: projectData.sales || '0',
       purchase: projectData.purchase || '0',
-      priority: projectData.priority || '보통'
+      priority: projectData.priority || '보통',
+      depositPaid: projectData.depositPaid || false
     };
-    setProjects([...projects, newProject]);
-  };
+    setProjects(prevProjects => [...prevProjects, newProject]);
+  }, []);
 
   const getSelectedFactories = () => {
     // 프로젝트가 선택되지 않았으면 모든 공장을 반환
@@ -167,14 +172,27 @@ export const useProjects = () => {
     }
   };
 
-  const loadMoreProjects = async () => {
-    if (isLoading || !hasMore) return;
+  const loadMoreProjects = useCallback(async () => {
+    if (loadingRef.current || !hasMore) return;
     
+    loadingRef.current = true;
     setIsLoading(true);
+    
+    // 이전 요청 취소
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
     
     try {
       // 실제 API 호출 시뮬레이션
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(resolve, 300);
+        abortControllerRef.current?.signal.addEventListener('abort', () => {
+          clearTimeout(timeout);
+          reject(new Error('Aborted'));
+        });
+      });
       
       // 실제로는 API에서 total count를 받아옴
       const simulatedTotalCount = 500; // 예시: 전체 500개 항목
@@ -200,7 +218,8 @@ export const useProjects = () => {
         packaging: getRandomFactory('포장').name,
         sales: `${Math.floor(Math.random() * 1000000000) + 100000000}`,
         purchase: `${Math.floor(Math.random() * 500000000) + 50000000}`,
-        priority: ['높음', '보통', '낮음'][index % 3] as any
+        priority: ['높음', '보통', '낮음'][index % 3] as any,
+        depositPaid: Math.random() > 0.5
       }));
       
       setProjects(prev => [...prev, ...newProjects]);
@@ -210,11 +229,15 @@ export const useProjects = () => {
       if (projects.length + newProjects.length >= simulatedTotalCount) {
         setHasMore(false);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message !== 'Aborted') {
+        console.error('Failed to load more projects:', error);
+      }
     } finally {
+      loadingRef.current = false;
       setIsLoading(false);
     }
-  };
+  }, [hasMore, page, projects.length]);
 
   // 스크롤 위치 기반 프리페칭
   useEffect(() => {
@@ -235,9 +258,10 @@ export const useProjects = () => {
     scrollContainer?.addEventListener('scroll', handleScroll);
     
     return () => {
+      const scrollContainer = document.querySelector('.project-table-container');
       scrollContainer?.removeEventListener('scroll', handleScroll);
     };
-  }, [hasMore, isLoading, projects.length]);
+  }, [hasMore, isLoading, loadMoreProjects]);
 
   // 무한 스크롤 설정 (폴백용)
   const { observerRef: loadMoreRef } = useInfiniteScroll({
@@ -246,6 +270,32 @@ export const useProjects = () => {
     onLoadMore: loadMoreProjects,
     threshold: 500 // 더 일찍 트리거
   });
+
+  const refreshProjects = async () => {
+    setIsLoading(true);
+    setProjects([]);
+    setPage(1);
+    setHasMore(true);
+    
+    try {
+      const allSchedules = await scheduleApi.getAllSchedules();
+      const newProjects: Project[] = [];
+      const newSchedules = new Map<string, Schedule>();
+      
+      allSchedules.forEach(schedule => {
+        const projectData = extractProjectFromSchedule(schedule);
+        newProjects.push(projectData as Project);
+        newSchedules.set(projectData.id, schedule);
+      });
+      
+      setProjects(newProjects);
+      setSchedules(newSchedules);
+    } catch (error) {
+      console.error('Failed to refresh projects:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
     projects,
@@ -264,6 +314,7 @@ export const useProjects = () => {
     handleSelectRow,
     loadMoreProjects,
     loadMoreRef,
+    refreshProjects,
     getProjectSchedule: (projectId: string) => schedules.get(projectId) || null
   };
 };

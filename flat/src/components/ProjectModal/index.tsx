@@ -6,7 +6,9 @@ import ScheduleSection from './ScheduleSection';
 import FactoryInfoSection from './FactoryInfoSection';
 import AmountInfoSection from './AmountInfoSection';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
+import CommentSection from '../CommentSection';
 import type { ProjectModalProps, ProjectData } from './types';
+import type { Comment, User } from '../../types/comment';
 
 const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, editData, mode }) => {
   const [formData, setFormData] = useState<ProjectData>({
@@ -25,6 +27,68 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
     purchase: '',
     description: ''
   });
+
+  // Mock current user - 실제로는 전역 상태나 props로 받아야 함
+  const currentUser: User = {
+    id: 'current-user',
+    name: '현재 사용자',
+    avatar: ''
+  };
+
+  // Mock comments - 실제로는 API에서 가져와야 함
+  const [comments, setComments] = useState<Comment[]>([
+    {
+      id: '1',
+      content: '이 프로젝트 진행 상황이 궁금합니다. @김철수 님 확인 부탁드려요.',
+      author: { id: '1', name: '이영희', avatar: '' },
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+      projectId: editData?.id || '',
+      mentions: [{ id: '2', name: '김철수' }]
+    },
+    {
+      id: '2',
+      content: '@이영희 현재 제조 단계 진행 중입니다. 예정대로 진행되고 있어요.',
+      author: { id: '2', name: '김철수', avatar: '' },
+      createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+      parentId: '1',
+      projectId: editData?.id || '',
+      mentions: [{ id: '1', name: '이영희' }]
+    }
+  ]);
+
+  const handleAddComment = (content: string, parentId?: string, mentions?: string[]) => {
+    const newComment: Comment = {
+      id: Date.now().toString(),
+      content,
+      author: currentUser,
+      createdAt: new Date().toISOString(),
+      projectId: editData?.id || '',
+      parentId,
+      mentions: mentions ? mentions.map(id => ({ id, name: '사용자' })) : undefined
+    };
+
+    // 모든 댓글은 플랫하게 저장 (1단계로만 표시)
+    setComments(prevComments => [...prevComments, newComment]);
+
+    // TODO: API 호출하여 댓글 저장
+    // TODO: 멘션된 사용자에게 알림 전송
+  };
+
+  const handleEditComment = (commentId: string, content: string) => {
+    setComments(prevComments => 
+      prevComments.map(comment => 
+        comment.id === commentId 
+          ? { ...comment, content, updatedAt: new Date().toISOString() }
+          : comment
+      )
+    );
+    // TODO: API 호출하여 댓글 수정
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
+    // TODO: API 호출하여 댓글 삭제
+  };
 
   useEffect(() => {
     if (editData && mode === 'edit') {
@@ -95,17 +159,15 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
             <FactoryInfoSection formData={formData} onChange={updateFormData} />
             <AmountInfoSection formData={formData} onChange={updateFormData} />
 
-            {/* 비고 */}
-            <div className="bg-white rounded-xl p-5 border border-gray-200">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">비고</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => updateFormData({ description: e.target.value })}
-                rows={4}
-                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
-                placeholder="추가 메모사항을 입력하세요"
-              />
-            </div>
+            {/* 댓글 섹션 */}
+            <CommentSection
+              projectId={editData?.id || 'new'}
+              comments={comments}
+              currentUser={currentUser}
+              onAddComment={handleAddComment}
+              onDeleteComment={handleDeleteComment}
+              onEditComment={handleEditComment}
+            />
           </div>
         </form>
     </BaseModal>

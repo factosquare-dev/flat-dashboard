@@ -1,21 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Project } from '../../types/project';
-import ProjectTable from './ProjectTable';
+import type { Priority, ServiceType, ProjectStatus } from '../../types/project';
+import DraggableProjectTable from './DraggableProjectTable';
 import OptionsMenu from './OptionsMenu';
+import LoadingIndicator from './components/LoadingIndicator';
+import InfiniteScrollTrigger from './components/InfiniteScrollTrigger';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { useDragSelection } from '../../hooks/useDragSelection';
+
+interface ProjectFilters {
+  sortField: keyof Project | null;
+  sortDirection: 'asc' | 'desc';
+  handleSort: (field: keyof Project) => void;
+}
 
 interface ProjectTableSectionProps {
   projects: Project[];
   isLoading: boolean;
   hasMore: boolean;
-  filters: any;
+  filters: ProjectFilters;
   onEdit: (project: Project) => void;
   onDelete: (projectId: string) => void;
   onDuplicate: (project: Project) => void;
   onSelectProject: (project: Project) => void;
   onUpdateProject?: (projectId: string, updates: Partial<Project>) => void;
-  loadMoreRef: any;
+  loadMoreRef: React.RefObject<HTMLDivElement>;
 }
 
 const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
@@ -94,7 +103,10 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     return setupAutoScroll(containerRef.current);
   }, [setupAutoScroll]);
 
-  const handleShowOptionsMenu = (projectId: string, position: { top: number; left: number }) => {
+  const handleShowOptionsMenu = (projectId: string, position: { top: number; left: number }, event?: React.MouseEvent) => {
+    if (event) {
+      event.stopPropagation();
+    }
     if (showOptionsMenu === projectId) {
       setShowOptionsMenu(null);
       setDropdownPosition(null);
@@ -139,7 +151,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
         onMouseUp={handleEndDrag}
         onMouseLeave={handleEndDrag}
       >
-        <ProjectTable
+        <DraggableProjectTable
           projects={projects || []}
           selectedRows={selectedRows}
           sortField={sortField}
@@ -155,25 +167,13 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           onStartDrag={handleStartDrag}
         />
         
-        {/* Loading indicator */}
-        {isLoading && (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-2 text-gray-600">Loading more projects...</span>
-          </div>
-        )}
+        <LoadingIndicator isLoading={isLoading} />
         
-        {/* Infinite scroll trigger */}
-        {hasMore && !isLoading && (
-          <div ref={loadMoreRef} className="h-4" />
-        )}
-        
-        {/* End message */}
-        {!hasMore && (
-          <div className="text-center py-8 text-gray-500">
-            No more projects to load
-          </div>
-        )}
+        <InfiniteScrollTrigger 
+          hasMore={hasMore}
+          isLoading={isLoading}
+          loadMoreRef={loadMoreRef}
+        />
       </div>
       
       {showOptionsMenu && dropdownPosition && (

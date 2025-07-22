@@ -24,7 +24,12 @@ export const useScheduleEffects = (
     const scrollElement = scrollRef.current;
     if (scrollElement) {
       scrollElement.addEventListener('scroll', handleScroll);
-      return () => scrollElement.removeEventListener('scroll', handleScroll);
+      return () => {
+        // Check if element still exists before removing listener
+        if (scrollRef.current) {
+          scrollRef.current.removeEventListener('scroll', handleScroll);
+        }
+      };
     }
   }, [scrollRef, setSliderValue]);
 

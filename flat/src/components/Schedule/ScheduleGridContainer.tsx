@@ -5,6 +5,7 @@ import ScheduleGrid from './ScheduleGrid';
 import { factories, taskTypesByFactoryType } from '../../data/factories';
 import { useTaskDrag } from './hooks/useTaskDrag';
 import { useTaskResize } from './hooks/useTaskResize';
+import DragPreview from './components/DragPreview';
 
 interface ScheduleGridContainerProps {
   projects: Participant[];
@@ -25,6 +26,8 @@ interface ScheduleGridContainerProps {
   onTaskCreate?: (task: { projectId: string; factory: string; startDate: string; endDate: string }) => void;
   onGridWidthChange?: (width: number) => void;
 }
+
+import { getInteractionState, setInteractionMode, setPreventClickUntil } from './utils/globalState';
 
 const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   projects,
@@ -50,10 +53,19 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     dragTooltip,
     dragPreview,
     handleTaskDragStart,
-    handleTaskDragEnd,
+    handleTaskDragEnd: originalHandleTaskDragEnd,
     handleTaskDragOver,
     handleTaskDrop
   } = useTaskDrag(projects, days, cellWidth, scrollRef, taskControls, setModalState, modalState);
+  
+  // Wrap handleTaskDragEnd to update interaction state
+  const handleTaskDragEnd = () => {
+    originalHandleTaskDragEnd();
+    // Update interaction state
+    setInteractionMode('idle');
+    setPreventClickUntil(Date.now() + 300);
+    console.log('[INTERACTION] Drag ended, preventing clicks for 300ms');
+  };
 
   // Task resize hooks  
   const {
@@ -62,25 +74,56 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     snapIndicatorX,
     handleTaskMouseDown,
     handleMouseMove,
-    handleMouseUp
+    handleMouseUp: originalHandleMouseUp
   } = useTaskResize(days, cellWidth, scrollRef, taskControls, modalState, setModalState);
+  
+  
+  // Note: handleMouseUp in useTaskResize already handles interaction state
+  // No need to wrap it here
 
   const handleTaskClick = (task: Task) => {
-    if (!dragControls.isDragClick()) return;
-    setModalState((prev: any) => ({
-      ...prev,
-      selectedTask: task,
-      showTaskEditModal: true
-    }));
+    // Allow task clicks if it's a simple click (not a drag)
+    if (dragControls.isDragClick() || !modalState.isDragging) {
+      setModalState((prev: any) => ({
+        ...prev,
+        selectedTask: task,
+        showTaskEditModal: true
+      }));
+    }
   };
 
   const handleGridClick = (e: React.MouseEvent, projectId: string, date: string) => {
+    // Check interaction state
+    const now = Date.now();
+    const state = getInteractionState();
+    if (state.mode !== 'idle' || now < state.preventClickUntil) {
+      console.log('[GRID CLICK] Prevented due to:', {
+        mode: state.mode,
+        preventClickUntil: state.preventClickUntil,
+        timeLeft: Math.max(0, state.preventClickUntil - now)
+      });
+      return;
+    }
+    
+    // Additional safety check for ongoing operations
+    if (modalState.isDraggingTask || modalState.isResizingTask) {
+      console.log('[GRID CLICK] Prevented due to ongoing operation');
+      return;
+    }
+    
+    // Clear any lingering drag/resize state when opening modal
     setModalState((prev: any) => ({
       ...prev,
       showTaskModal: true,
       selectedProjectId: projectId,
       selectedDate: date,
-      selectedFactory: projects.find(p => p.id === projectId)?.name || ''
+      selectedFactory: projects.find(p => p.id === projectId)?.name || '',
+      // Clear drag states
+      isDraggingTask: false,
+      draggedTask: null,
+      isResizingTask: false,
+      resizingTask: null,
+      resizeDirection: null
     }));
   };
 
@@ -128,6 +171,21 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   const handleProjectDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
     if (modalState.draggedProjectIndex !== null && modalState.draggedProjectIndex !== dropIndex) {
+      const newProjects = [...projects];
+      const [draggedProject] = newProjects.splice(modalState.draggedProjectIndex, 1);
+      
+      // Insert at the new position
+      newProjects.splice(dropIndex, 0, draggedProject);
+      
+      // Update the projects state
+      setProjects(newProjects);
+      
+      // Reset drag state
+      setModalState(prev => ({
+        ...prev,
+        draggedProjectIndex: null,
+        dragOverProjectIndex: null
+      }));
     }
   };
 
@@ -147,7 +205,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
         resizePreview={resizePreview}
         hoveredDateIndex={hoveredDateIndex}
         snapIndicatorX={snapIndicatorX}
-        dragPreview={dragPreview}
+        dragPreview={dragPreview} // Restore preview to grid for proper scrolling
         draggedTask={modalState.draggedTask}
         selectedProjects={selectedProjects}
         modalState={modalState}
@@ -155,7 +213,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
         setProjects={setProjects}
         onMouseDown={dragControls.handleMouseDown}
         onMouseMove={modalState.isResizingTask ? handleMouseMove : dragControls.handleMouseMove}
-        onMouseUp={modalState.isResizingTask ? handleMouseUp : dragControls.handleMouseUp}
+        onMouseUp={modalState.isResizingTask ? originalHandleMouseUp : dragControls.handleMouseUp}
         onTaskClick={handleTaskClick}
         onTaskDragStart={handleTaskDragStart}
         onTaskDragEnd={handleTaskDragEnd}
