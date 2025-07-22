@@ -1,96 +1,253 @@
-// Common utility types
-export type ID = string | number;
+/**
+ * Common type definitions used across the application
+ */
 
-export type Status = 'idle' | 'loading' | 'success' | 'error';
-
-export interface ApiResponse<T = any> {
-  data: T;
-  message?: string;
+/**
+ * Generic API response type
+ */
+export interface ApiResponse<T> {
   success: boolean;
-  timestamp: string;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+  message?: string;
 }
 
-export interface PaginatedResponse<T = any> {
-  data: T[];
+/**
+ * Pagination parameters
+ */
+export interface PaginationParams {
+  page: number;
+  limit: number;
+  total?: number;
+}
+
+/**
+ * Paginated response
+ */
+export interface PaginatedResponse<T> {
+  items: T[];
   pagination: {
     page: number;
     limit: number;
     total: number;
     totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
   };
 }
 
-export interface FilterOptions {
-  search?: string;
-  status?: string[];
-  dateRange?: {
-    start: Date | null;
-    end: Date | null;
-  };
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+/**
+ * Sort parameters
+ */
+export interface SortParams<T> {
+  field: keyof T;
+  direction: 'asc' | 'desc';
 }
 
-export interface BaseEntity {
-  id: ID;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy?: ID;
-  updatedBy?: ID;
+/**
+ * Date range
+ */
+export interface DateRange {
+  start: string | null;
+  end: string | null;
 }
 
-export interface SelectOption<T = string> {
+/**
+ * Time range
+ */
+export interface TimeRange {
+  startTime: string;
+  endTime: string;
+}
+
+/**
+ * Entity with timestamps
+ */
+export interface Timestamped {
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Entity with ID
+ */
+export interface Identifiable {
+  id: string | number;
+}
+
+/**
+ * Selection state
+ */
+export interface SelectionState<T> {
+  selected: T[];
+  isAllSelected: boolean;
+}
+
+/**
+ * Modal state
+ */
+export interface ModalState {
+  isOpen: boolean;
+  data?: any;
+}
+
+/**
+ * Loading state
+ */
+export interface LoadingState {
+  isLoading: boolean;
+  error?: Error | null;
+}
+
+/**
+ * Form field state
+ */
+export interface FieldState<T> {
   value: T;
-  label: string;
-  disabled?: boolean;
-  description?: string;
+  error?: string;
+  touched?: boolean;
+  isDirty?: boolean;
 }
 
-// Form related types
-export interface FormField<T = any> {
-  name: string;
-  label?: string;
-  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
-  required?: boolean;
-  placeholder?: string;
-  options?: SelectOption<T>[];
-  validation?: {
-    min?: number;
-    max?: number;
-    pattern?: RegExp;
-    custom?: (value: T) => string | null;
+/**
+ * Option type for select/dropdown
+ */
+export interface Option<T = string> {
+  label: string;
+  value: T;
+  disabled?: boolean;
+}
+
+/**
+ * Tree node structure
+ */
+export interface TreeNode<T> {
+  id: string;
+  data: T;
+  children?: TreeNode<T>[];
+  parent?: string;
+  level?: number;
+  isExpanded?: boolean;
+}
+
+/**
+ * Draggable item
+ */
+export interface DraggableItem {
+  id: string;
+  index: number;
+  isDragging?: boolean;
+}
+
+/**
+ * Position coordinates
+ */
+export interface Position {
+  x: number;
+  y: number;
+}
+
+/**
+ * Size dimensions
+ */
+export interface Size {
+  width: number;
+  height: number;
+}
+
+/**
+ * Rectangle bounds
+ */
+export interface Bounds extends Position, Size {}
+
+/**
+ * Color with optional opacity
+ */
+export interface Color {
+  hex: string;
+  rgb?: {
+    r: number;
+    g: number;
+    b: number;
+  };
+  opacity?: number;
+}
+
+/**
+ * User preferences
+ */
+export interface UserPreferences {
+  theme?: 'light' | 'dark' | 'system';
+  language?: string;
+  timezone?: string;
+  dateFormat?: string;
+  numberFormat?: string;
+}
+
+/**
+ * File upload
+ */
+export interface FileUpload {
+  file: File;
+  progress?: number;
+  status?: 'pending' | 'uploading' | 'completed' | 'error';
+  error?: string;
+  url?: string;
+}
+
+/**
+ * Notification
+ */
+export interface Notification {
+  id: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message?: string;
+  duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
   };
 }
 
-export interface FormErrors {
-  [key: string]: string | undefined;
+/**
+ * Permission
+ */
+export interface Permission {
+  resource: string;
+  action: string;
+  allowed: boolean;
 }
 
-// Event types
-export interface CustomEvent<T = any> {
-  type: string;
-  payload: T;
-  timestamp: Date;
-  source?: string;
-}
+/**
+ * Make all properties optional recursively
+ */
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
 
-// Navigation types
-export interface BreadcrumbItem {
-  label: string;
-  path?: string;
-  isActive?: boolean;
-}
+/**
+ * Make all properties required recursively
+ */
+export type DeepRequired<T> = {
+  [P in keyof T]-?: T[P] extends object ? DeepRequired<T[P]> : T[P];
+};
 
-// File upload types
-export interface FileUpload {
-  id: ID;
-  name: string;
-  size: number;
-  type: string;
-  url?: string;
-  status: 'pending' | 'uploading' | 'success' | 'error';
-  progress?: number;
-  error?: string;
-}
+/**
+ * Extract keys of specific type
+ */
+export type KeysOfType<T, U> = {
+  [K in keyof T]: T[K] extends U ? K : never;
+}[keyof T];
+
+/**
+ * Nullable type
+ */
+export type Nullable<T> = T | null;
+
+/**
+ * Maybe type (nullable or undefined)
+ */
+export type Maybe<T> = T | null | undefined;

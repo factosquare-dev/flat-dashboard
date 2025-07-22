@@ -79,9 +79,14 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     <table className="w-full min-w-[1800px] table-fixed" role="table">
         <thead className="sticky top-0 z-10 bg-gray-50 border-b border-gray-100">
           <tr role="row">
-            <th className="w-8 px-1 py-1.5 text-left" scope="col">
+            <th className="w-16 px-1 py-1.5 text-left" scope="col">
               <div className="flex items-center justify-center">
-                <span className="sr-only">확장 및 선택 열</span>
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  onChange={(e) => onSelectAll(e.target.checked)}
+                  checked={projects.length > 0 && selectedRows.length === projects.filter(p => p.type === 'task').length}
+                />
               </div>
             </th>
             {columns.map(renderHeaderCell)}
@@ -95,20 +100,21 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
         </thead>
         <tbody className="divide-y divide-gray-100">
           {projects?.map((project, index) => (
-            <ProjectTableRow
-              key={project.id}
-              project={project}
-              index={index}
-              columns={columns}
-              isSelected={selectedRows.includes(project.id)}
-              onSelect={(checked) => onSelectRow(project.id, checked, index)}
-              onRowClick={onSelectProject}
-              onUpdateField={onUpdateProject}
-              onShowOptionsMenu={onShowOptionsMenu}
-              onMouseEnter={onMouseEnterRow ? () => onMouseEnterRow(index) : undefined}
-              isDragging={isDragging}
-              onStartDrag={onStartDrag ? () => onStartDrag(index) : undefined}
-            />
+            <React.Fragment key={project.id}>
+              <ProjectTableRow
+                project={project}
+                index={index}
+                columns={columns}
+                isSelected={selectedRows.includes(project.id)}
+                onSelect={(checked) => onSelectRow(project.id, checked, index)}
+                onRowClick={onSelectProject}
+                onUpdateField={onUpdateProject}
+                onShowOptionsMenu={onShowOptionsMenu}
+                onMouseEnter={onMouseEnterRow ? () => onMouseEnterRow(index) : undefined}
+                isDragging={isDragging}
+                onStartDrag={onStartDrag ? () => onStartDrag(index) : undefined}
+              />
+            </React.Fragment>
           ))}
         </tbody>
       </table>

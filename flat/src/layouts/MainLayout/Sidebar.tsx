@@ -25,7 +25,15 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-  { name: 'Projects', path: '/projects', icon: FolderOpen },
+  { 
+    name: 'Projects', 
+    path: '/projects', 
+    icon: FolderOpen,
+    children: [
+      { name: 'Project Lists', path: '/projects/list', icon: FolderOpen },
+      { name: 'Sample List', path: '/projects/sample', icon: FolderOpen },
+    ]
+  },
   { name: 'Users', path: '/users', icon: Users },
   { name: 'Factories', path: '/factories', icon: Factory },
 ];

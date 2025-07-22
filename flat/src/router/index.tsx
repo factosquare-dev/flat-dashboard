@@ -27,6 +27,18 @@ const router = createBrowserRouter([
       },
       {
         path: 'projects',
+        element: <Navigate to="/projects/list" replace />,
+      },
+      {
+        path: 'projects/list',
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <Projects />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'projects/sample',
         element: (
           <Suspense fallback={<LoadingScreen />}>
             <Projects />

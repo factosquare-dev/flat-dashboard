@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { Project } from '../../types/project';
 import type { Priority, ServiceType, ProjectStatus } from '../../types/project';
 import DraggableProjectTable from './DraggableProjectTable';
+import HierarchicalProjectTable from './HierarchicalProjectTable';
 import OptionsMenu from './OptionsMenu';
 import LoadingIndicator from './components/LoadingIndicator';
 import InfiniteScrollTrigger from './components/InfiniteScrollTrigger';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { useDragSelection } from '../../hooks/useDragSelection';
+import { hierarchicalProjects } from '../../data/hierarchicalProjects';
 
 interface ProjectFilters {
   sortField: keyof Project | null;
@@ -151,8 +153,9 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
         onMouseUp={handleEndDrag}
         onMouseLeave={handleEndDrag}
       >
-        <DraggableProjectTable
-          projects={projects || []}
+        {/* 임시로 계층 구조 테이블 사용 */}
+        <HierarchicalProjectTable
+          projects={hierarchicalProjects}
           selectedRows={selectedRows}
           sortField={sortField}
           sortDirection={sortDirection}
@@ -162,9 +165,9 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           onSelectProject={onSelectProject}
           onUpdateProject={handleUpdateProject}
           onShowOptionsMenu={handleShowOptionsMenu}
-          onMouseEnterRow={handleMouseEnterRow}
-          isDragging={isDragging}
-          onStartDrag={handleStartDrag}
+          onEdit={handleEditProject}
+          onDelete={handleDeleteProject}
+          onDuplicate={handleDuplicateProject}
         />
         
         <LoadingIndicator isLoading={isLoading} />

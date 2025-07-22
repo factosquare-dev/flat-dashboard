@@ -11,7 +11,10 @@ import {
   FileText,
   Package,
   Truck,
-  Settings
+  Settings,
+  Folder,
+  FolderOpen,
+  FileSpreadsheet
 } from 'lucide-react';
 import { useEditableCell } from '../../hooks/useEditableCell';
 import EditableCell from './EditableCell';
@@ -319,44 +322,101 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         }}
       >
         <td className="px-1 py-1.5" onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center justify-center gap-1">
-            <button
-              onClick={handleToggleTasks}
-              className="p-0.5 hover:bg-gray-200 rounded transition-colors"
-              title={isExpanded ? "태스크 숨기기" : "태스크 표시"}
-              aria-expanded={isExpanded}
-              aria-label={isExpanded ? "태스크 숨기기" : "태스크 표시"}
-            >
-              {isExpanded ? (
-                <ChevronDown className="w-4 h-4 text-gray-600" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-gray-600" />
-              )}
-            </button>
-            <input
-              type="checkbox"
-              checked={isSelected}
-              onChange={(e) => {
-                e.stopPropagation();
-                onSelect(e.target.checked);
-              }}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                // 드래그 시작
-                if (index !== undefined && onStartDrag) {
-                  onStartDrag(index);
-                }
-              }}
-              onMouseEnter={(e) => {
-                if (isDragging && e.buttons === 1) {
+          <div 
+            className="flex items-center gap-1"
+            style={{ paddingLeft: `${(project.level || 0) * 20}px` }}
+          >
+            {/* 대형 프로젝트만 확장/축소 버튼 */}
+            {project.type === 'master' && project.children && project.children.length > 0 && (
+              <button
+                onClick={(e) => {
                   e.stopPropagation();
-                  // 드래그 중에는 행의 onMouseEnter가 처리하므로 여기서는 아무것도 하지 않음
-                }
-              }}
-              className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
-              style={{ userSelect: 'none' }}
-              aria-label={`프로젝트 ${project.client} 선택`}
-            />
+                  onSelect(false); // 토글 트리거
+                }}
+                className="p-0.5 hover:bg-gray-200 rounded transition-colors"
+                title={project.isExpanded ? "축소" : "확장"}
+              >
+                {project.isExpanded ? (
+                  <ChevronDown className="w-4 h-4 text-gray-600" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                )}
+              </button>
+            )}
+            
+            {/* 대형 프로젝트만 폴더 아이콘 */}
+            {project.type === 'master' && (
+              project.isExpanded ? 
+                <FolderOpen className="w-4 h-4 text-blue-600" /> : 
+                <Folder className="w-4 h-4 text-blue-600" />
+            )}
+            
+            {/* 소형 프로젝트는 기존처럼 확장/축소 버튼과 체크박스 */}
+            {project.type === 'sub' && (
+              <>
+                <button
+                  onClick={handleToggleTasks}
+                  className="p-0.5 hover:bg-gray-200 rounded transition-colors"
+                  title={isExpanded ? "태스크 숨기기" : "태스크 표시"}
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="w-3 h-3" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3" />
+                  )}
+                </button>
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    onSelect(e.target.checked);
+                  }}
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    if (index !== undefined && onStartDrag) {
+                      onStartDrag(index);
+                    }
+                  }}
+                  onMouseEnter={(e) => {
+                    if (isDragging && e.buttons === 1) {
+                      e.stopPropagation();
+                    }
+                  }}
+                  className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
+                  style={{ userSelect: 'none' }}
+                  aria-label={`프로젝트 ${project.client} 선택`}
+                />
+              </>
+            )}
+            
+            {/* 태스크는 들여쓰기와 체크박스만 */}
+            {project.type === 'task' && (
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  onSelect(e.target.checked);
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  // 드래그 시작
+                  if (index !== undefined && onStartDrag) {
+                    onStartDrag(index);
+                  }
+                }}
+                onMouseEnter={(e) => {
+                  if (isDragging && e.buttons === 1) {
+                    e.stopPropagation();
+                    // 드래그 중에는 행의 onMouseEnter가 처리하므로 여기서는 아무것도 하지 않음
+                  }
+                }}
+                className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
+                style={{ userSelect: 'none' }}
+                aria-label={`프로젝트 ${project.client} 선택`}
+              />
+            )}
           </div>
         </td>
       {columns.map((column) => (

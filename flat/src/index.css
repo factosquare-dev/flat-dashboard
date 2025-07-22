@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import unified theme system */
+@import './styles/theme.css';
+
 /* Animation for drag preview */
 @keyframes slide {
   0% {

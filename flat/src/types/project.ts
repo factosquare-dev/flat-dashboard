@@ -22,6 +22,12 @@ export interface Project {
   priority: Priority;
   scheduleId?: string; // 스케줄 ID 추가
   depositPaid?: boolean; // 선금입금 여부
+  // 계층 구조를 위한 필드들
+  type?: 'master' | 'sub' | 'task';
+  parentId?: string;
+  children?: Project[];
+  isExpanded?: boolean;
+  level?: number;
 }
 
 export type FactoryType = 'manufacturing' | 'container' | 'packaging';

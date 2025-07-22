@@ -5,6 +5,7 @@ import { scheduleApi } from '../api/scheduleApi';
 import { extractProjectFromSchedule } from '../data/mockSchedules';
 import type { Schedule } from '../types/schedule';
 import { useInfiniteScroll } from './useInfiniteScroll';
+import { hierarchicalProjects, flattenProjects, toggleProject } from '../data/hierarchicalProjects';
 // 스케줄에서 프로젝트 데이터를 가져오기 위한 빈 초기 데이터
 const initialProjects: Project[] = [];  // 빈 배열로 시작
 
@@ -22,7 +23,9 @@ const getRandomFactory = (type: string) => {
 
 
 export const useProjects = () => {
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  // 임시로 계층 구조 데이터 사용
+  const [hierarchicalData, setHierarchicalData] = useState<Project[]>(hierarchicalProjects);
+  const [projects, setProjects] = useState<Project[]>(flattenProjects(hierarchicalProjects));
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);

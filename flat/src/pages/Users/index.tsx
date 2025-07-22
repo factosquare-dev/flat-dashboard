@@ -1,177 +1,131 @@
-import React, { useState } from 'react';
-import { Users, Plus, MoreVertical } from 'lucide-react';
-import type { UserRole } from '../../store/slices/userSlice';
+import React, { useState, useCallback } from 'react';
 import UserModal, { type UserFormData } from '../../components/Users/UserModal';
-
-interface UserData extends UserFormData {
-  id: string;
-}
+import UserCard, { type UserData } from '../../components/Users/UserCard';
+import UserToolbar from '../../components/Users/UserToolbar';
+import { useUserFilter } from '../../hooks/useUserFilter';
+import { useUserManagement } from '../../hooks/useUserManagement';
 
 const UsersPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
-  const [activeTab, setActiveTab] = useState<'admin' | 'manager' | 'customer'>('admin');
   
-  // 샘플 데이터
-  const [users, setUsers] = useState<UserData[]>([
-    {
-      id: '1',
-      name: '김철수',
-      email: 'kim@example.com',
-      phone: '010-1234-5678',
-      role: 'admin',
-      department: 'IT',
-      position: '팀장'
-    },
-    {
-      id: '2',
-      name: '이영희',
-      email: 'lee@example.com',
-      phone: '010-2345-6789',
-      role: 'manager',
-      department: '영업',
-      position: '매니저'
-    },
-    {
-      id: '3',
-      name: '박민수',
-      email: 'park@example.com',
-      phone: '010-3456-7890',
-      role: 'customer',
-      department: '고객사',
-      position: '대표'
-    },
-    {
-      id: '4',
-      name: '정수진',
-      email: 'jung@example.com',
-      phone: '010-4567-8901',
-      role: 'customer',
-      department: '코스모',
-      position: '담당자'
-    }
-  ]);
+  // 사용자 관리 훅 사용
+  const {
+    users,
+    addUser,
+    updateUser,
+    deleteUser,
+    checkEmailExists,
+    checkPhoneExists,
+  } = useUserManagement();
 
-  const filteredUsers = users.filter(user => user.role === activeTab);
+  // 필터링 로직을 커스텀 훅으로 분리
+  const {
+    selectedRole,
+    searchTerm,
+    filteredUsers,
+    setSelectedRole,
+    setSearchTerm,
+  } = useUserFilter(users);
 
-  const handleAddUser = () => {
+  const handleAddUser = useCallback(() => {
     setEditingUser(null);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleEditUser = (user: UserData) => {
+  const handleEditUser = useCallback((user: UserData) => {
     setEditingUser(user);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleSaveUser = (userData: UserFormData) => {
+  const handleDeleteUser = useCallback((userId: string) => {
+    const success = deleteUser(userId);
+    if (!success) {
+      alert('사용자 삭제에 실패했습니다.');
+    }
+  }, [deleteUser]);
+
+  const handleSaveUser = useCallback((userData: UserFormData) => {
+    // 이메일 중복 확인
+    if (checkEmailExists(userData.email, editingUser?.id)) {
+      alert('이미 사용 중인 이메일입니다.');
+      return;
+    }
+
+    // 전화번호 중복 확인
+    if (checkPhoneExists(userData.phone, editingUser?.id)) {
+      alert('이미 사용 중인 전화번호입니다.');
+      return;
+    }
+
     if (editingUser) {
       // 수정
-      setUsers(prev => prev.map(u => 
-        u.id === editingUser.id ? { ...userData, id: editingUser.id } : u
-      ));
+      const success = updateUser(editingUser.id, userData);
+      if (!success) {
+        alert('사용자 수정에 실패했습니다.');
+        return;
+      }
     } else {
       // 추가
-      const newUser: UserData = {
-        ...userData,
-        id: String(Date.now())
-      };
-      setUsers(prev => [...prev, newUser]);
+      addUser(userData);
     }
-  };
+    
+    setIsModalOpen(false);
+    setEditingUser(null);
+  }, [editingUser, addUser, updateUser, checkEmailExists, checkPhoneExists]);
 
-  const getTabButtonClass = (tab: UserRole) => {
-    return activeTab === tab
-      ? 'px-6 py-2 rounded-full bg-blue-500 text-white'
-      : 'px-6 py-2 rounded-full bg-gray-200 text-gray-700';
-  };
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setEditingUser(null);
+  }, []);
 
   return (
-    <div className="h-full bg-gray-50">
-      <div className="p-6">
-        {/* 탭 버튼 */}
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setActiveTab('admin')}
-            className={getTabButtonClass('admin')}
-          >
-            관리자 추가
-          </button>
-          <button
-            onClick={() => setActiveTab('manager')}
-            className={getTabButtonClass('manager')}
-          >
-            고객 추가
-          </button>
-          <button
-            onClick={() => setActiveTab('customer')}
-            className={`${getTabButtonClass('customer')} ${activeTab === 'customer' ? 'bg-gray-600' : ''}`}
-          >
-            검색
-          </button>
+    <div className="h-full flex flex-col bg-gray-50">
+      {/* 상단 툴바 */}
+      <UserToolbar
+        selectedRole={selectedRole}
+        searchTerm={searchTerm}
+        onRoleChange={setSelectedRole}
+        onSearchChange={setSearchTerm}
+        onAddUser={handleAddUser}
+      />
+
+      {/* 메인 컨텐츠 영역 */}
+      <div className="flex-1 overflow-auto p-6">
+        {/* 사용자 수 표시 */}
+        <div className="mb-4">
+          <p className="text-sm text-gray-600">
+            총 {filteredUsers.length}명의 사용자
+          </p>
         </div>
 
-        {/* 사용자 카드 목록 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredUsers.map((user) => (
-            <div key={user.id} className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <h3 className="text-lg font-medium">{user.name}</h3>
-                  <span className={`px-3 py-1 rounded-full text-sm ${
-                    user.role === 'customer' ? 'bg-gray-100 text-gray-700' :
-                    user.role === 'manager' ? 'bg-green-100 text-green-700' :
-                    'bg-purple-100 text-purple-700'
-                  }`}>
-                    {user.role}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <button className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
-                    수정
-                  </button>
-                  <button className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
-                    삭제
-                  </button>
-                </div>
-              </div>
-              
-              <div className="space-y-2 text-sm text-gray-600">
-                <div>
-                  <span className="text-gray-500">회사:</span> {user.department || '코스모'}
-                </div>
-                <div>
-                  <span className="text-gray-500">연락처:</span> {user.phone}
-                </div>
-                <div>
-                  <span className="text-gray-500">이메일:</span> {user.email}
-                </div>
-              </div>
-            </div>
-          ))}
-          
-          {/* 추가 버튼 카드 */}
-          <button
-            onClick={handleAddUser}
-            className="bg-white rounded-lg shadow-sm p-6 border-2 border-dashed border-gray-300 hover:border-blue-400 hover:bg-gray-50 transition-colors flex flex-col items-center justify-center gap-2"
-          >
-            <Plus className="w-8 h-8 text-gray-400" />
-            <span className="text-gray-600">
-              {activeTab === 'admin' ? '관리자 추가' : 
-               activeTab === 'manager' ? '고객 추가' : 
-               '사용자 추가'}
-            </span>
-          </button>
-        </div>
-
-        {/* 사용자 추가/수정 모달 */}
-        <UserModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleSaveUser}
-          editData={editingUser}
-        />
+        {/* 사용자 카드 그리드 */}
+        {filteredUsers.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredUsers.map((user) => (
+              <UserCard
+                key={user.id}
+                user={user}
+                onEdit={handleEditUser}
+                onDelete={handleDeleteUser}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+            <p className="text-lg mb-2">검색 결과가 없습니다</p>
+            <p className="text-sm">다른 검색어를 시도해보세요</p>
+          </div>
+        )}
       </div>
+
+      {/* 사용자 추가/수정 모달 */}
+      <UserModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSave={handleSaveUser}
+        editData={editingUser}
+      />
     </div>
   );
 };
