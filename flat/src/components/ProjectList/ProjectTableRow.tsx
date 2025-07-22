@@ -283,13 +283,12 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                 e.stopPropagation();
                 onUpdateField(project.id, 'depositPaid', e.target.checked);
               }}
-              className="w-4 h-4 rounded focus:ring-2"
+              className="w-4 h-4 rounded focus:ring-2 focus:ring-blue-500"
               style={{ 
                 color: theme.colors.primary[600],
                 backgroundColor: theme.colors.gray[100],
-                borderColor: theme.colors.gray[300],
-                '--tw-ring-color': theme.colors.primary[500]
-              } as React.CSSProperties}
+                borderColor: theme.colors.gray[300]
+              }}
             />
           </td>
         );
@@ -341,12 +340,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                   e.stopPropagation();
                   onSelect(false); // 토글 트리거
                 }}
-                className="p-0.5 rounded transition-colors"
-                style={{ 
-                  '--hover-bg': theme.colors.gray[200]
-                } as React.CSSProperties}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.colors.gray[200]}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                className="p-0.5 rounded transition-colors hover:bg-gray-200"
                 title={project.isExpanded ? "축소" : "확장"}
               >
                 {project.isExpanded ? (
@@ -369,12 +363,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               <>
                 <button
                   onClick={handleToggleTasks}
-                  className="p-0.5 rounded transition-colors"
-                style={{ 
-                  '--hover-bg': theme.colors.gray[200]
-                } as React.CSSProperties}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.colors.gray[200]}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  className="p-0.5 rounded transition-colors hover:bg-gray-200"
                   title={isExpanded ? "태스크 숨기기" : "태스크 표시"}
                 >
                   {isExpanded ? (
@@ -401,14 +390,11 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                       e.stopPropagation();
                     }
                   }}
-                  className="w-4 h-4 rounded border focus:ring-1 cursor-pointer transition-all"
+                  className="w-4 h-4 rounded border focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
                   style={{ 
                     borderColor: theme.colors.gray[300],
-                    color: theme.colors.primary[600],
-                    '--tw-ring-color': theme.colors.primary[500]
-                  } as React.CSSProperties}
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = theme.colors.primary[400]}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = theme.colors.gray[300]}
+                    color: theme.colors.primary[600]
+                  }}
                   style={{ userSelect: 'none' }}
                   aria-label={`프로젝트 ${project.client} 선택`}
                 />

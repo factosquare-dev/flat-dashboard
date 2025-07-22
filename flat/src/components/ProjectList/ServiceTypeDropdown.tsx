@@ -32,13 +32,12 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
           setIsOpen(!isOpen);
         }}
         className="px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all border"
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all border"
         style={{
           backgroundColor: theme.colors.primary[100],
           color: theme.colors.primary[700],
-          borderColor: theme.colors.primary[300],
-          '--tw-ring-color': theme.colors.primary[500]
-        } as React.CSSProperties}
+          borderColor: theme.colors.primary[300]
+        }}
       >
         {value}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">

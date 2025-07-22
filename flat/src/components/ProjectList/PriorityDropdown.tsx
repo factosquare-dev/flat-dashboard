@@ -35,25 +35,20 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
   };
 
   const getPriorityStyle = (priority: Priority): React.CSSProperties => {
-    const color = priorityColors[priority];
-    
-    // Extract color values (assuming format like var(--color-priority-high))
-    const colorValue = color.replace('var(--color-priority-', '').replace(')', '');
-    
     let bgColor, textColor, borderColor;
     
-    switch (colorValue) {
-      case 'high':
+    switch (priority) {
+      case '높음':
         bgColor = theme.colors.danger[100];
         textColor = theme.colors.danger[700];
         borderColor = theme.colors.danger[300];
         break;
-      case 'medium':
+      case '보통':
         bgColor = theme.colors.warning[100];
         textColor = theme.colors.warning[700];
         borderColor = theme.colors.warning[300];
         break;
-      case 'low':
+      case '낮음':
         bgColor = theme.colors.success[100];
         textColor = theme.colors.success[700];
         borderColor = theme.colors.success[300];
@@ -92,12 +87,9 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
           setIsOpen(!isOpen);
         }}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-offset-2
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
           transition-all cursor-pointer"
-        style={{
-          ...getPriorityStyle(value),
-          '--tw-ring-color': theme.colors.primary[500]
-        } as React.CSSProperties}
+        style={getPriorityStyle(value)}
       >
         {getPriorityIcon(value)}
         <span className="text-xs font-medium">{value}</span>

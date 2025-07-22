@@ -12,30 +12,25 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const getStatusStyle = (status: ProjectStatus): React.CSSProperties => {
-    const color = statusColors[status] || theme.colors.gray[500];
-    
-    // Extract color values (assuming format like var(--color-status-pending))
-    const colorValue = color.replace('var(--color-status-', '').replace(')', '');
-    
     let bgColor, textColor, borderColor;
     
-    switch (colorValue) {
-      case 'pending':
+    switch (status) {
+      case '시작전':
         bgColor = theme.colors.gray[100];
         textColor = theme.colors.gray[700];
         borderColor = theme.colors.gray[300];
         break;
-      case 'inprogress':
+      case '진행중':
         bgColor = theme.colors.info[100];
         textColor = theme.colors.info[700];
         borderColor = theme.colors.info[300];
         break;
-      case 'completed':
+      case '완료':
         bgColor = theme.colors.success[100];
         textColor = theme.colors.success[700];
         borderColor = theme.colors.success[300];
         break;
-      case 'stopped':
+      case '중단':
         bgColor = theme.colors.danger[100];
         textColor = theme.colors.danger[700];
         borderColor = theme.colors.danger[300];
@@ -74,11 +69,8 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
           setIsOpen(!isOpen);
         }}
         className="px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all border"
-        style={{
-          ...getStatusStyle(value),
-          '--tw-ring-color': theme.colors.primary[500]
-        } as React.CSSProperties}
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all border"
+        style={getStatusStyle(value)}
       >
         {value}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
