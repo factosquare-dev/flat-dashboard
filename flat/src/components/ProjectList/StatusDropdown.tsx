@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ProjectStatus } from '../../types/project';
-import { theme, statusColors } from '../../config/theme';
 
 interface StatusDropdownProps {
   value: ProjectStatus;
@@ -11,41 +10,19 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const getStatusStyle = (status: ProjectStatus): React.CSSProperties => {
-    let bgColor, textColor, borderColor;
-    
+  const getStatusStyle = (status: ProjectStatus) => {
     switch (status) {
       case '시작전':
-        bgColor = theme.colors.gray[100];
-        textColor = theme.colors.gray[700];
-        borderColor = theme.colors.gray[300];
-        break;
+        return 'bg-gray-100 text-gray-700 border-gray-300';
       case '진행중':
-        bgColor = theme.colors.info[100];
-        textColor = theme.colors.info[700];
-        borderColor = theme.colors.info[300];
-        break;
+        return 'bg-blue-100 text-blue-700 border-blue-300';
       case '완료':
-        bgColor = theme.colors.success[100];
-        textColor = theme.colors.success[700];
-        borderColor = theme.colors.success[300];
-        break;
+        return 'bg-green-100 text-green-700 border-green-300';
       case '중단':
-        bgColor = theme.colors.danger[100];
-        textColor = theme.colors.danger[700];
-        borderColor = theme.colors.danger[300];
-        break;
+        return 'bg-red-100 text-red-700 border-red-300';
       default:
-        bgColor = theme.colors.gray[100];
-        textColor = theme.colors.gray[700];
-        borderColor = theme.colors.gray[300];
+        return 'bg-gray-100 text-gray-700 border-gray-300';
     }
-    
-    return {
-      backgroundColor: bgColor,
-      color: textColor,
-      borderColor: borderColor
-    };
   };
 
   useEffect(() => {
@@ -68,9 +45,9 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all border"
-        style={getStatusStyle(value)}
+        className={`px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all
+          border ${getStatusStyle(value)}`}
       >
         {value}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -81,11 +58,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
       </button>
       
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-32 rounded-lg shadow-lg border overflow-hidden"
-          style={{
-            backgroundColor: theme.colors.white,
-            borderColor: theme.colors.gray[200]
-          }}>
+        <div className="absolute z-50 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
           {statuses.map((status) => (
             <button
               key={status}
@@ -94,8 +67,8 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
                 onChange(status);
                 setIsOpen(false);
               }}
-              className="w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all"
-              style={getStatusStyle(status)}
+              className={`w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all
+                ${getStatusStyle(status)}`}
             >
               {status}
             </button>

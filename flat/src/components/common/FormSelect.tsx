@@ -1,5 +1,4 @@
 import React from 'react';
-import { theme } from '../../config/theme';
 
 interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Priority } from '../../types/project';
-import { theme, priorityColors } from '../../config/theme';
 
 interface PriorityDropdownProps {
   value: Priority;
@@ -34,36 +33,17 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
     }
   };
 
-  const getPriorityStyle = (priority: Priority): React.CSSProperties => {
-    let bgColor, textColor, borderColor;
-    
+  const getPriorityStyle = (priority: Priority) => {
     switch (priority) {
       case '높음':
-        bgColor = theme.colors.danger[100];
-        textColor = theme.colors.danger[700];
-        borderColor = theme.colors.danger[300];
-        break;
+        return 'bg-red-100 text-red-700 border-red-300';
       case '보통':
-        bgColor = theme.colors.warning[100];
-        textColor = theme.colors.warning[700];
-        borderColor = theme.colors.warning[300];
-        break;
+        return 'bg-yellow-100 text-yellow-700 border-yellow-300';
       case '낮음':
-        bgColor = theme.colors.success[100];
-        textColor = theme.colors.success[700];
-        borderColor = theme.colors.success[300];
-        break;
+        return 'bg-green-100 text-green-700 border-green-300';
       default:
-        bgColor = theme.colors.gray[100];
-        textColor = theme.colors.gray[700];
-        borderColor = theme.colors.gray[300];
+        return 'bg-gray-100 text-gray-700 border-gray-300';
     }
-    
-    return {
-      backgroundColor: bgColor,
-      color: textColor,
-      borderColor: borderColor
-    };
   };
 
   useEffect(() => {
@@ -86,10 +66,9 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border whitespace-nowrap
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border whitespace-nowrap
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-          transition-all cursor-pointer"
-        style={getPriorityStyle(value)}
+          transition-all cursor-pointer ${getPriorityStyle(value)}`}
       >
         {getPriorityIcon(value)}
         <span className="text-xs font-medium">{value}</span>
@@ -99,11 +78,7 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
       </button>
       
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-24 rounded-lg shadow-lg border overflow-hidden"
-          style={{
-            backgroundColor: theme.colors.white,
-            borderColor: theme.colors.gray[200]
-          }}>
+        <div className="absolute z-50 mt-1 w-24 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
           {priorities.map((priority) => (
             <button
               key={priority}
@@ -112,9 +87,8 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
                 onChange(priority);
                 setIsOpen(false);
               }}
-              className="w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all
-                flex items-center gap-2"
-              style={getPriorityStyle(priority)}
+              className={`w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all
+                flex items-center gap-2 ${getPriorityStyle(priority)}`}
             >
               {getPriorityIcon(priority)}
               {priority}
