@@ -46,7 +46,7 @@ export function isValidDateRange(startDate: string, endDate: string): boolean {
 /**
  * Validate required fields
  */
-export function validateRequiredFields<T extends Record<string, any>>(
+export function validateRequiredFields<T extends Record<string, unknown>>(
   data: T,
   requiredFields: (keyof T)[]
 ): { isValid: boolean; missingFields: string[] } {

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ServiceType } from '../../types/project';
+import { theme } from '../../config/theme';
 
 interface ServiceTypeDropdownProps {
   value: ServiceType;
@@ -31,8 +32,13 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
           setIsOpen(!isOpen);
         }}
         className="px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all
-          border bg-indigo-100 text-indigo-700 border-indigo-300"
+          focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all border"
+        style={{
+          backgroundColor: theme.colors.primary[100],
+          color: theme.colors.primary[700],
+          borderColor: theme.colors.primary[300],
+          '--tw-ring-color': theme.colors.primary[500]
+        } as React.CSSProperties}
       >
         {value}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -43,7 +49,11 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
       </button>
       
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-auto min-w-[8rem] bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <div className="absolute z-50 mt-1 w-auto min-w-[8rem] rounded-lg shadow-lg border overflow-hidden"
+          style={{
+            backgroundColor: theme.colors.white,
+            borderColor: theme.colors.gray[200]
+          }}>
           {serviceTypes.map((serviceType) => (
             <button
               key={serviceType}
@@ -52,8 +62,12 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
                 onChange(serviceType);
                 setIsOpen(false);
               }}
-              className="w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all whitespace-nowrap
-                bg-indigo-100 text-indigo-700 border-indigo-300"
+              className="w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all whitespace-nowrap"
+              style={{
+                backgroundColor: theme.colors.primary[100],
+                color: theme.colors.primary[700],
+                borderColor: theme.colors.primary[300]
+              }}
             >
               {serviceType}
             </button>

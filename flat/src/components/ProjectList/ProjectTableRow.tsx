@@ -16,6 +16,8 @@ import {
   FolderOpen,
   FileSpreadsheet
 } from 'lucide-react';
+import { theme } from '../../config/theme';
+import { Badge } from '../common';
 import { useEditableCell } from '../../hooks/useEditableCell';
 import EditableCell from './EditableCell';
 import SearchableCell from '../../features/projects/components/SearchableCell';
@@ -110,28 +112,28 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   };
 
   const getStatusIcon = (status?: string, completed?: boolean) => {
-    if (completed) return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+    if (completed) return <CheckCircle2 className="w-4 h-4" style={{ color: theme.colors.success[500] }} />;
     
     switch (status) {
       case 'in-progress':
-        return <Clock className="w-4 h-4 text-blue-500" />;
+        return <Clock className="w-4 h-4" style={{ color: theme.colors.info[500] }} />;
       case 'delayed':
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
+        return <AlertCircle className="w-4 h-4" style={{ color: theme.colors.danger[500] }} />;
       default:
-        return <Circle className="w-4 h-4 text-gray-400" />;
+        return <Circle className="w-4 h-4" style={{ color: theme.colors.gray[400] }} />;
     }
   };
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
       case 'high':
-        return 'text-red-600 bg-red-50';
+        return { color: theme.colors.danger[600], backgroundColor: theme.colors.danger[50] };
       case 'medium':
-        return 'text-yellow-600 bg-yellow-50';
+        return { color: theme.colors.warning[600], backgroundColor: theme.colors.warning[50] };
       case 'low':
-        return 'text-green-600 bg-green-50';
+        return { color: theme.colors.success[600], backgroundColor: theme.colors.success[50] };
       default:
-        return 'text-gray-600 bg-gray-50';
+        return { color: theme.colors.gray[600], backgroundColor: theme.colors.gray[50] };
     }
   };
 
@@ -168,7 +170,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                   </span>
                 ))
               ) : (
-                <span className="text-xs text-gray-400">-</span>
+                <span className="text-xs" style={{ color: theme.colors.gray[400] }}>-</span>
               )}
             </div>
           </td>
@@ -281,7 +283,13 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                 e.stopPropagation();
                 onUpdateField(project.id, 'depositPaid', e.target.checked);
               }}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              className="w-4 h-4 rounded focus:ring-2"
+              style={{ 
+                color: theme.colors.primary[600],
+                backgroundColor: theme.colors.gray[100],
+                borderColor: theme.colors.gray[300],
+                '--tw-ring-color': theme.colors.primary[500]
+              } as React.CSSProperties}
             />
           </td>
         );
@@ -298,7 +306,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
       
       default:
         return (
-          <td className="px-1.5 py-1.5 text-xs text-gray-400">
+          <td className="px-1.5 py-1.5 text-xs" style={{ color: theme.colors.gray[400] }}>
             -
           </td>
         );
@@ -333,13 +341,18 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                   e.stopPropagation();
                   onSelect(false); // 토글 트리거
                 }}
-                className="p-0.5 hover:bg-gray-200 rounded transition-colors"
+                className="p-0.5 rounded transition-colors"
+                style={{ 
+                  '--hover-bg': theme.colors.gray[200]
+                } as React.CSSProperties}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.colors.gray[200]}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 title={project.isExpanded ? "축소" : "확장"}
               >
                 {project.isExpanded ? (
-                  <ChevronDown className="w-4 h-4 text-gray-600" />
+                  <ChevronDown className="w-4 h-4" style={{ color: theme.colors.gray[600] }} />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                  <ChevronRight className="w-4 h-4" style={{ color: theme.colors.gray[600] }} />
                 )}
               </button>
             )}
@@ -347,8 +360,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
             {/* 대형 프로젝트만 폴더 아이콘 */}
             {project.type === 'master' && (
               project.isExpanded ? 
-                <FolderOpen className="w-4 h-4 text-blue-600" /> : 
-                <Folder className="w-4 h-4 text-blue-600" />
+                <FolderOpen className="w-4 h-4" style={{ color: theme.colors.primary[600] }} /> : 
+                <Folder className="w-4 h-4" style={{ color: theme.colors.primary[600] }} />
             )}
             
             {/* 소형 프로젝트는 기존처럼 확장/축소 버튼과 체크박스 */}
@@ -356,7 +369,12 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               <>
                 <button
                   onClick={handleToggleTasks}
-                  className="p-0.5 hover:bg-gray-200 rounded transition-colors"
+                  className="p-0.5 rounded transition-colors"
+                style={{ 
+                  '--hover-bg': theme.colors.gray[200]
+                } as React.CSSProperties}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.colors.gray[200]}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   title={isExpanded ? "태스크 숨기기" : "태스크 표시"}
                 >
                   {isExpanded ? (
@@ -383,7 +401,14 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                       e.stopPropagation();
                     }
                   }}
-                  className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
+                  className="w-4 h-4 rounded border focus:ring-1 cursor-pointer transition-all"
+                  style={{ 
+                    borderColor: theme.colors.gray[300],
+                    color: theme.colors.primary[600],
+                    '--tw-ring-color': theme.colors.primary[500]
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = theme.colors.primary[400]}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = theme.colors.gray[300]}
                   style={{ userSelect: 'none' }}
                   aria-label={`프로젝트 ${project.client} 선택`}
                 />
@@ -436,11 +461,13 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
                   left: buttonRect.right - dropdownWidth
                 }, e);
               }}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors options-menu-button"
+              className="p-2 rounded-lg transition-colors options-menu-button"
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.colors.gray[100]}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               aria-label={`프로젝트 ${project.client} 옵션 메뉴`}
               aria-haspopup="true"
             >
-              <MoreVertical className="icon-sm text-gray-600" aria-hidden="true" />
+              <MoreVertical className="icon-sm" style={{ color: theme.colors.gray[600] }} aria-hidden="true" />
             </button>
           </div>
         </td>

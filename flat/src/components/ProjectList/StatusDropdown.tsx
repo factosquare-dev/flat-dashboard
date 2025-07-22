@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ProjectStatus } from '../../types/project';
+import { theme, statusColors } from '../../config/theme';
 
 interface StatusDropdownProps {
   value: ProjectStatus;
@@ -10,19 +11,46 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const getStatusStyle = (status: ProjectStatus) => {
-    switch (status) {
-      case '시작전':
-        return 'bg-gray-100 text-gray-700 border-gray-300';
-      case '진행중':
-        return 'bg-blue-100 text-blue-700 border-blue-300';
-      case '완료':
-        return 'bg-green-100 text-green-700 border-green-300';
-      case '중단':
-        return 'bg-red-100 text-red-700 border-red-300';
+  const getStatusStyle = (status: ProjectStatus): React.CSSProperties => {
+    const color = statusColors[status] || theme.colors.gray[500];
+    
+    // Extract color values (assuming format like var(--color-status-pending))
+    const colorValue = color.replace('var(--color-status-', '').replace(')', '');
+    
+    let bgColor, textColor, borderColor;
+    
+    switch (colorValue) {
+      case 'pending':
+        bgColor = theme.colors.gray[100];
+        textColor = theme.colors.gray[700];
+        borderColor = theme.colors.gray[300];
+        break;
+      case 'inprogress':
+        bgColor = theme.colors.info[100];
+        textColor = theme.colors.info[700];
+        borderColor = theme.colors.info[300];
+        break;
+      case 'completed':
+        bgColor = theme.colors.success[100];
+        textColor = theme.colors.success[700];
+        borderColor = theme.colors.success[300];
+        break;
+      case 'stopped':
+        bgColor = theme.colors.danger[100];
+        textColor = theme.colors.danger[700];
+        borderColor = theme.colors.danger[300];
+        break;
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-300';
+        bgColor = theme.colors.gray[100];
+        textColor = theme.colors.gray[700];
+        borderColor = theme.colors.gray[300];
     }
+    
+    return {
+      backgroundColor: bgColor,
+      color: textColor,
+      borderColor: borderColor
+    };
   };
 
   useEffect(() => {
@@ -45,9 +73,12 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all
-          border ${getStatusStyle(value)}`}
+        className="px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
+          focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all border"
+        style={{
+          ...getStatusStyle(value),
+          '--tw-ring-color': theme.colors.primary[500]
+        } as React.CSSProperties}
       >
         {value}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -58,7 +89,11 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
       </button>
       
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <div className="absolute z-50 mt-1 w-32 rounded-lg shadow-lg border overflow-hidden"
+          style={{
+            backgroundColor: theme.colors.white,
+            borderColor: theme.colors.gray[200]
+          }}>
           {statuses.map((status) => (
             <button
               key={status}
@@ -67,8 +102,8 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
                 onChange(status);
                 setIsOpen(false);
               }}
-              className={`w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all
-                ${getStatusStyle(status)}`}
+              className="w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all"
+              style={getStatusStyle(status)}
             >
               {status}
             </button>

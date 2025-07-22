@@ -11,7 +11,7 @@ export interface ApiResponse<T> {
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
   message?: string;
 }
@@ -90,7 +90,7 @@ export interface SelectionState<T> {
  */
 export interface ModalState {
   isOpen: boolean;
-  data?: any;
+  data?: unknown;
 }
 
 /**
