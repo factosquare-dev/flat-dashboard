@@ -1,9 +1,8 @@
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
 
 interface FloatingActionButtonProps {
   onClick: () => void;
-  icon: React.ReactElement<LucideIcon>;
+  icon: React.ReactElement;
   label: string;
   variant?: 'primary' | 'secondary';
   position?: 'first' | 'second' | 'third';
