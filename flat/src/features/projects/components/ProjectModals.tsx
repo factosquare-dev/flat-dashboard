@@ -1,7 +1,10 @@
-import React from 'react';
-import type { Project } from '../../types/project';
-import EmailModal from '../EmailModal/index';
-import ProjectModal from '../ProjectModal/index';
+import React, { lazy, useCallback } from 'react';
+import type { Project } from '../../../types/project';
+import LazyBoundary from '../../../components/common/LazyBoundary';
+
+// Lazy load modal components
+const EmailModal = lazy(() => import('../../../components/EmailModal/index'));
+const ProjectModal = lazy(() => import('../../../components/ProjectModal/index'));
 
 interface ProjectModalsProps {
   showEmailModal: boolean;
@@ -26,27 +29,39 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   onSaveProject,
   onSendEmail
 }) => {
-  const handleEmailSend = (emailData: any) => {
-    console.log('Email sent:', emailData);
+  const handleEmailSend = useCallback((emailData: { 
+    to: string; 
+    subject: string; 
+    body: string; 
+    attachments?: File[] 
+  }) => {
     onSendEmail();
-  };
+  }, [onSendEmail]);
 
   return (
     <>
-      <EmailModal 
-        isOpen={showEmailModal}
-        onClose={onCloseEmailModal}
-        onSend={handleEmailSend}
-        availableFactories={availableFactories}
-      />
+      {showEmailModal && (
+        <LazyBoundary>
+          <EmailModal 
+            isOpen={showEmailModal}
+            onClose={onCloseEmailModal}
+            onSend={handleEmailSend}
+            availableFactories={availableFactories}
+          />
+        </LazyBoundary>
+      )}
       
-      <ProjectModal
-        isOpen={showProjectModal}
-        onClose={onCloseProjectModal}
-        onSave={onSaveProject}
-        editData={editingProject}
-        mode={modalMode}
-      />
+      {showProjectModal && (
+        <LazyBoundary>
+          <ProjectModal
+            isOpen={showProjectModal}
+            onClose={onCloseProjectModal}
+            onSave={onSaveProject}
+            editData={editingProject}
+            mode={modalMode}
+          />
+        </LazyBoundary>
+      )}
     </>
   );
 };

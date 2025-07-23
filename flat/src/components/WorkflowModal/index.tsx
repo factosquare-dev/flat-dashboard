@@ -1,6 +1,6 @@
 import React, { useReducer, useCallback } from 'react';
 import BaseModal from '../common/BaseModal';
-import Button from '../common/Button';
+import { Button } from '../ui/Button';
 import { FactorySelection } from './FactorySelection';
 import { TaskSelection } from './TaskSelection';
 import { DateSelection } from './DateSelection';

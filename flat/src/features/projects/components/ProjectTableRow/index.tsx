@@ -1,9 +1,9 @@
 import React from 'react';
-import type { Project } from '../../../types/project';
+import type { Project } from '../../../../types/project';
 import { MoreVertical } from 'lucide-react';
-import { useEditableCell } from '../../../hooks/useEditableCell';
+import { useEditableCell } from '../../../../hooks/useEditableCell';
 import TaskList from '../TaskList';
-import type { Column } from '../../../hooks/useColumnOrder';
+import type { Column } from '../../../../hooks/useColumnOrder';
 import { useTaskManagement } from './useTaskManagement';
 import SelectionCell from './SelectionCell';
 import * as cellRenderers from './cellRenderers';

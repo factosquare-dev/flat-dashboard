@@ -4,7 +4,7 @@ import BaseModal from '../common/BaseModal';
 import FormInput from '../common/FormInput';
 import FormSelect from '../common/FormSelect';
 import FormTextarea from '../common/FormTextarea';
-import Button from '../common/Button';
+import { Button } from '../ui/Button';
 import FactorySelector from './FactorySelector';
 import FileAttachment from './FileAttachment';
 

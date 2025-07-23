@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import type { Project } from '../../../types/project';
-import { useProjects } from '../../../hooks/useProjects';
-import { useProjectFilters } from '../../../hooks/useProjectFilters';
+import { useState, useCallback } from 'react';
+import type { Project } from '../../../../types/project';
+import { useProjects } from '../../../../hooks/useProjects';
+import { useProjectFilters } from '../../../../hooks/useProjectFilters';
+import { formatDateISO } from '../../../../utils/dateUtils';
 
 export const useProjectListState = () => {
   const projectsHook = useProjects();
@@ -12,54 +13,59 @@ export const useProjectListState = () => {
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
-  const handleCreateProject = () => {
+  const handleCreateProject = useCallback(() => {
     setModalMode('create');
     setEditingProject(null);
     setShowProjectModal(true);
-  };
+  }, []);
 
-  const handleEditProject = (project: Project) => {
+  const handleEditProject = useCallback((project: Project) => {
     setModalMode('edit');
     setEditingProject(project);
     setShowProjectModal(true);
-  };
+  }, []);
 
-  const handleDeleteProject = (projectId: string) => {
+  const handleDeleteProject = useCallback((projectId: string) => {
     if (confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) {
       projectsHook.deleteProject(projectId);
     }
-  };
+  }, [projectsHook]);
 
-  const handleDuplicateProject = (project: Project) => {
+  const handleDuplicateProject = useCallback((project: Project) => {
+    const { id, ...projectWithoutId } = project;
     const newProject = {
-      ...project,
-      id: undefined,
-      name: `${project.name} (복사본)`,
-      createdAt: new Date().toISOString()
+      ...projectWithoutId,
+      client: `${project.client} (복사본)`,
+      startDate: formatDateISO(new Date()),
+      endDate: formatDateISO(new Date())
     };
     projectsHook.addProject(newProject);
-  };
+  }, [projectsHook]);
 
-  const handleSaveProject = (projectData: Partial<Project>) => {
+  const handleSaveProject = useCallback((projectData: Partial<Project>) => {
     if (modalMode === 'edit' && editingProject) {
       projectsHook.updateProject(editingProject.id, projectData);
     } else {
       projectsHook.addProject(projectData as Omit<Project, 'id'>);
     }
     setShowProjectModal(false);
-  };
+  }, [modalMode, editingProject, projectsHook]);
 
-  const handleRefresh = () => {
-    // Add refresh logic here if needed
-  };
+  const handleRefresh = useCallback(async () => {
+    try {
+      await projectsHook.refreshProjects();
+    } catch (error) {
+      console.error('Failed to refresh projects:', error);
+    }
+  }, [projectsHook]);
 
-  const handleSendEmail = () => {
+  const handleSendEmail = useCallback(() => {
     setShowEmailModal(true);
-  };
+  }, []);
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     filtersHook.setSearchValue(query);
-  };
+  }, [filtersHook]);
 
   return {
     // State

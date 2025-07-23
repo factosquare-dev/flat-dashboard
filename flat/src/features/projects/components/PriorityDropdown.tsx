@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { Priority } from '../../types/project';
+import React, { useState, useRef, useEffect } from 'react';
+import type { Priority } from '../../../types/project';
 
 interface PriorityDropdownProps {
   value: Priority;
@@ -46,16 +46,16 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
     }
   };
 
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setIsOpen(false);
-    }
-  }, []);
-
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [handleClickOutside]);
+  }, []);
 
   const priorities: Priority[] = ['높음', '보통', '낮음'];
 
@@ -67,7 +67,7 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
           setIsOpen(!isOpen);
         }}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
           transition-all cursor-pointer ${getPriorityStyle(value)}`}
       >
         {getPriorityIcon(value)}

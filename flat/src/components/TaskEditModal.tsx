@@ -3,7 +3,7 @@ import { Calendar, Building2, CheckSquare } from 'lucide-react';
 import BaseModal, { ModalFooter } from './common/BaseModal';
 import FormInput from './common/FormInput';
 import FormSelect from './common/FormSelect';
-import Button from './common/Button';
+import { Button } from './ui/Button';
 
 interface TaskEditModalProps {
   isOpen: boolean;

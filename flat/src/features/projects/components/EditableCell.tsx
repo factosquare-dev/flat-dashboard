@@ -1,16 +1,14 @@
-import React, { useRef, useEffect } from 'react';
-import type { Project } from '../../types/project';
-import { formatCurrency, parseCurrency } from '../../utils/currency';
-import { factoriesByType } from '../../data/mockData';
-import type { UseEditableCellReturn } from '../../../hooks/useEditableCell';
-import { UI_DELAYS } from '../../../constants/time';
+import React from 'react';
+import type { Project } from '../../../types/project';
+import { formatCurrency, parseCurrency } from '../../../utils/currency';
+import { factoriesByType } from '../../../data/mockData';
 
 interface EditableCellProps {
   project: Project;
   field: keyof Project;
   type: 'text' | 'search' | 'date' | 'currency';
-  editableCell: UseEditableCellReturn;
-  onUpdate: (projectId: string, field: keyof Project, value: string | number) => void;
+  editableCell: any; // Use the return type from useEditableCell
+  onUpdate: (projectId: string, field: keyof Project, value: any) => void;
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({
@@ -33,18 +31,8 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
   const value = project[field];
   const editing = isEditing(project.id, field);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
 
-  if (type === 'search' && editing) {
+  if (type === 'search' && editing && field !== 'client') {
     // 필드에 따라 다른 공장 리스트 사용
     let searchList: string[] = [];
     if (field === 'manufacturer') {

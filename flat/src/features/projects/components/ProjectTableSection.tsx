@@ -1,20 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import type { Project } from '../../types/project';
-import ProjectTable from './ProjectTable';
+import React, { useState, useEffect, useRef } from 'react';
+import type { Project } from '../../../types/project';
+import type { Priority, ServiceType, ProjectStatus } from '../../../types/project';
+import DraggableProjectTable from './DraggableProjectTable';
+import HierarchicalProjectTable from './HierarchicalProjectTable';
 import OptionsMenu from './OptionsMenu';
-import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
+import LoadingIndicator from './components/LoadingIndicator';
+import InfiniteScrollTrigger from './components/InfiniteScrollTrigger';
+import { useInfiniteScroll } from '../../../hooks/useInfiniteScroll';
+import { useDragSelection } from '../../../hooks/useDragSelection';
+import { hierarchicalProjects } from '../../../data/hierarchicalProjects';
+
+interface ProjectFilters {
+  sortField: keyof Project | null;
+  sortDirection: 'asc' | 'desc';
+  handleSort: (field: keyof Project) => void;
+}
 
 interface ProjectTableSectionProps {
   projects: Project[];
   isLoading: boolean;
   hasMore: boolean;
-  filters: any;
+  filters: ProjectFilters;
   onEdit: (project: Project) => void;
   onDelete: (projectId: string) => void;
   onDuplicate: (project: Project) => void;
   onSelectProject: (project: Project) => void;
   onUpdateProject?: (projectId: string, updates: Partial<Project>) => void;
-  loadMoreRef: any;
+  loadMoreRef: React.RefObject<HTMLDivElement>;
 }
 
 const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
@@ -32,10 +44,25 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   const [showOptionsMenu, setShowOptionsMenu] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{top: number, left: number} | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const sortField = filters?.sortField || null;
   const sortDirection = filters?.sortDirection || 'asc';
   const handleSort = filters?.handleSort || (() => {});
+
+  const {
+    isDragging,
+    handleStartDrag,
+    handleMouseEnterItem,
+    handleEndDrag,
+    handleSelectItem,
+    setupAutoScroll
+  } = useDragSelection({
+    items: projects || [],
+    selectedItems: selectedRows,
+    onSelectionChange: setSelectedRows,
+    getItemId: (project) => project.id
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -64,15 +91,24 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     }
   };
   
-  const handleSelectRow = (projectId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedRows(prev => [...prev, projectId]);
-    } else {
-      setSelectedRows(prev => prev.filter(id => id !== projectId));
-    }
+  const handleSelectRow = (projectId: string, checked: boolean, index?: number) => {
+    console.log('handleSelectRow called:', { projectId, checked, index });
+    handleSelectItem(projectId, checked);
   };
 
-  const handleShowOptionsMenu = (projectId: string, position: { top: number; left: number }) => {
+  const handleMouseEnterRow = (index: number) => {
+    handleMouseEnterItem(index);
+  };
+
+  // 자동 스크롤 기능
+  useEffect(() => {
+    return setupAutoScroll(containerRef.current);
+  }, [setupAutoScroll]);
+
+  const handleShowOptionsMenu = (projectId: string, position: { top: number; left: number }, event?: React.MouseEvent) => {
+    if (event) {
+      event.stopPropagation();
+    }
     if (showOptionsMenu === projectId) {
       setShowOptionsMenu(null);
       setDropdownPosition(null);
@@ -111,9 +147,15 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-        <ProjectTable
-          projects={projects || []}
+      <div 
+        ref={containerRef}
+        className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 project-table-container"
+        onMouseUp={handleEndDrag}
+        onMouseLeave={handleEndDrag}
+      >
+        {/* 임시로 계층 구조 테이블 사용 */}
+        <HierarchicalProjectTable
+          projects={hierarchicalProjects}
           selectedRows={selectedRows}
           sortField={sortField}
           sortDirection={sortDirection}
@@ -123,27 +165,18 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           onSelectProject={onSelectProject}
           onUpdateProject={handleUpdateProject}
           onShowOptionsMenu={handleShowOptionsMenu}
+          onEdit={handleEditProject}
+          onDelete={handleDeleteProject}
+          onDuplicate={handleDuplicateProject}
         />
         
-        {/* Loading indicator */}
-        {isLoading && (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-2 text-gray-600">Loading more projects...</span>
-          </div>
-        )}
+        <LoadingIndicator isLoading={isLoading} />
         
-        {/* Infinite scroll trigger */}
-        {hasMore && !isLoading && (
-          <div ref={loadMoreRef} className="h-4" />
-        )}
-        
-        {/* End message */}
-        {!hasMore && (
-          <div className="text-center py-8 text-gray-500">
-            No more projects to load
-          </div>
-        )}
+        <InfiniteScrollTrigger 
+          hasMore={hasMore}
+          isLoading={isLoading}
+          loadMoreRef={loadMoreRef}
+        />
       </div>
       
       {showOptionsMenu && dropdownPosition && (

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { ServiceType } from '../../types/project';
+import React, { useState, useRef, useEffect } from 'react';
+import type { ServiceType } from '../../../types/project';
 
 interface ServiceTypeDropdownProps {
   value: ServiceType;
@@ -10,16 +10,16 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setIsOpen(false);
-    }
-  }, []);
-
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [handleClickOutside]);
+  }, []);
 
   const serviceTypes: ServiceType[] = ['OEM', 'ODM', 'OBM', 'Private Label', 'White Label', '기타'];
 
@@ -31,7 +31,7 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
           setIsOpen(!isOpen);
         }}
         className="px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all
           border bg-indigo-100 text-indigo-700 border-indigo-300"
       >
         {value}

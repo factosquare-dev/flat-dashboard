@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from '../ui/Alert';
+// Alert component removed, using inline styling instead
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
@@ -22,7 +22,11 @@ export const PageErrorView: React.FC<ErrorViewProps> = ({ state, onRetry, showEr
           <CardTitle className="text-xl">Something went wrong</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert variant="error" description="We're sorry, but something unexpected happened. Please try again or contact support if the problem persists." />
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800 text-sm">
+              We're sorry, but something unexpected happened. Please try again or contact support if the problem persists.
+            </p>
+          </div>
           
           {state.eventId && (
             <div className="text-xs text-gray-500 text-center">

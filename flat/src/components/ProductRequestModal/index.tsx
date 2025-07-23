@@ -4,7 +4,7 @@ import EmailModal from '../EmailModal/index';
 import BaseModal from '../common/BaseModal';
 import FormInput from '../common/FormInput';
 import FormTextarea from '../common/FormTextarea';
-import Button from '../common/Button';
+import { Button } from '../ui/Button';
 import OrderInfoForm from './OrderInfoForm';
 import ContentInfoForm from './ContentInfoForm';
 import IngredientInfoForm from './IngredientInfoForm';

@@ -3,8 +3,8 @@ import type { Project } from '../../types/project';
 import type { Schedule as ScheduleType } from '../../types/schedule';
 import { scheduleApi } from '../../api/scheduleApi';
 import Schedule from '../Schedule';
-import ProjectListView from './ProjectList';
-import ProjectListErrorBoundary from './ProjectListErrorBoundary';
+import ProjectListView from '../../features/projects/components/ProjectList';
+import ProjectListErrorBoundary from '../../features/projects/components/ProjectListErrorBoundary';
 
 interface ProjectListContainerProps {
   className?: string;

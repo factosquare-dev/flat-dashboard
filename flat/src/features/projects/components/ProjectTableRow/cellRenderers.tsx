@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Project } from '../../../types/project';
 import EditableCell from '../EditableCell';
-import SearchableCell from '../../../features/projects/components/SearchableCell';
+import SearchableCell from '../SearchableCell';
 import PriorityDropdown from '../PriorityDropdown';
 import ServiceTypeDropdown from '../ServiceTypeDropdown';
 import StatusDropdown from '../StatusDropdown';
