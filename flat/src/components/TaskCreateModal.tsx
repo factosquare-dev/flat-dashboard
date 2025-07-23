@@ -131,6 +131,16 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     }, UI_DELAYS.MODAL_CLEANUP);
     onClose();
   };
+  
+  // 컴포넌트 언마운트 시 cleanup
+  React.useEffect(() => {
+    return () => {
+      if (cleanupTimeoutRef.current) {
+        clearTimeout(cleanupTimeoutRef.current);
+        cleanupTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const handleFactoryChange = (newFactory: string) => {
     setFactory(newFactory);

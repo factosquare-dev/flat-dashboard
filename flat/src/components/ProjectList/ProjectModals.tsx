@@ -1,5 +1,6 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, useCallback } from 'react';
 import type { Project } from '../../types/project';
+import LazyBoundary from '../common/LazyBoundary';
 
 // Lazy load modal components
 const EmailModal = lazy(() => import('../EmailModal/index'));
@@ -28,25 +29,30 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   onSaveProject,
   onSendEmail
 }) => {
-  const handleEmailSend = (emailData: any) => {
+  const handleEmailSend = useCallback((emailData: { 
+    to: string; 
+    subject: string; 
+    body: string; 
+    attachments?: File[] 
+  }) => {
     onSendEmail();
-  };
+  }, [onSendEmail]);
 
   return (
     <>
       {showEmailModal && (
-        <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+        <LazyBoundary>
           <EmailModal 
             isOpen={showEmailModal}
             onClose={onCloseEmailModal}
             onSend={handleEmailSend}
             availableFactories={availableFactories}
           />
-        </Suspense>
+        </LazyBoundary>
       )}
       
       {showProjectModal && (
-        <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+        <LazyBoundary>
           <ProjectModal
             isOpen={showProjectModal}
             onClose={onCloseProjectModal}
@@ -54,7 +60,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
             editData={editingProject}
             mode={modalMode}
           />
-        </Suspense>
+        </LazyBoundary>
       )}
     </>
   );

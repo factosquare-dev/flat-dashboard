@@ -167,6 +167,17 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
       )}
     </>
   );
+}, (prevProps, nextProps) => {
+  // props 비교 함수로 불필요한 리렌더링 방지
+  return (
+    prevProps.project.id === nextProps.project.id &&
+    prevProps.project === nextProps.project &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.isDragging === nextProps.isDragging &&
+    prevProps.index === nextProps.index &&
+    prevProps.columns.length === nextProps.columns.length &&
+    prevProps.columns.every((col, idx) => col.id === nextProps.columns[idx]?.id)
+  );
 });
 
 ProjectTableRow.displayName = 'ProjectTableRow';

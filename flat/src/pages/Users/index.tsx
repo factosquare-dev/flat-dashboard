@@ -85,7 +85,6 @@ const UsersPage: React.FC = () => {
         searchTerm={searchTerm}
         onRoleChange={setSelectedRole}
         onSearchChange={setSearchTerm}
-        onAddUser={handleAddUser}
       />
 
       {/* 메인 컨텐츠 영역 */}

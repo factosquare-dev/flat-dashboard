@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import type { FactoryType } from '../../hooks/useFactoryFilter';
 
 interface FactoryToolbarProps {
@@ -7,7 +7,6 @@ interface FactoryToolbarProps {
   searchTerm: string;
   onTypeChange: (type: FactoryType) => void;
   onSearchChange: (term: string) => void;
-  onAddFactory: () => void;
 }
 
 const FACTORY_TYPES: FactoryType[] = ['제조', '용기', '포장'];
@@ -17,7 +16,6 @@ const FactoryToolbar: React.FC<FactoryToolbarProps> = ({
   searchTerm,
   onTypeChange,
   onSearchChange,
-  onAddFactory,
 }) => {
   const getTypeButtonClass = (type: FactoryType) => {
     return selectedType === type
@@ -57,16 +55,6 @@ const FactoryToolbar: React.FC<FactoryToolbarProps> = ({
           </div>
         </div>
 
-        {/* 액션 버튼 */}
-        <div className="flex gap-3">
-          <button
-            onClick={onAddFactory}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4" />
-            새 공장 추가
-          </button>
-        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import type { UserRole } from '../../store/slices/userSlice';
 
 interface UserToolbarProps {
@@ -7,7 +7,6 @@ interface UserToolbarProps {
   searchTerm: string;
   onRoleChange: (role: UserRole) => void;
   onSearchChange: (term: string) => void;
-  onAddUser: () => void;
 }
 
 const USER_ROLES: { value: UserRole; label: string }[] = [
@@ -21,7 +20,6 @@ const UserToolbar: React.FC<UserToolbarProps> = ({
   searchTerm,
   onRoleChange,
   onSearchChange,
-  onAddUser,
 }) => {
   const getRoleButtonClass = (role: UserRole) => {
     return selectedRole === role
@@ -61,16 +59,6 @@ const UserToolbar: React.FC<UserToolbarProps> = ({
           </div>
         </div>
 
-        {/* 액션 버튼 */}
-        <div className="flex gap-3">
-          <button
-            onClick={onAddUser}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4" />
-            새 사용자 추가
-          </button>
-        </div>
       </div>
     </div>
   );

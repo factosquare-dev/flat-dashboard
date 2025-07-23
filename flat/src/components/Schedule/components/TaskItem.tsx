@@ -204,6 +204,21 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
       )}
     </div>
   );
+}, (prevProps, nextProps) => {
+  // 성능 최적화를 위한 props 비교
+  return (
+    prevProps.task.id === nextProps.task.id &&
+    prevProps.task === nextProps.task &&
+    prevProps.left === nextProps.left &&
+    prevProps.width === nextProps.width &&
+    prevProps.top === nextProps.top &&
+    prevProps.isDragging === nextProps.isDragging &&
+    prevProps.isResizing === nextProps.isResizing &&
+    prevProps.isHovered === nextProps.isHovered &&
+    prevProps.isDraggingAnyTask === nextProps.isDraggingAnyTask &&
+    prevProps.startDate === nextProps.startDate &&
+    prevProps.endDate === nextProps.endDate
+  );
 });
 
 TaskItem.displayName = 'TaskItem';

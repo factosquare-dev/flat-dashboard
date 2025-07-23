@@ -51,7 +51,6 @@ const FactoriesPage: React.FC = () => {
         searchTerm={searchTerm}
         onTypeChange={setSelectedType}
         onSearchChange={setSearchTerm}
-        onAddFactory={handleAddFactory}
       />
 
       {/* 메인 컨텐츠 영역 */}
@@ -98,7 +97,7 @@ const FactoriesPage: React.FC = () => {
         isOpen={modalState.isOpen}
         onClose={handleCloseModal}
         onSave={handleSaveFactory}
-        editData={modalState.data as FactoryFormData | null}
+        editData={modalState.data ? modalState.data as FactoryFormData : null}
       />
     </div>
   );
