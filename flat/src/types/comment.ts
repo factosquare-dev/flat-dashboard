@@ -1,19 +1,20 @@
-export interface User {
+export interface CommentAuthor {
   id: string;
   name: string;
-  avatar?: string;
+  profileImage?: string;
 }
 
 export interface Comment {
   id: string;
+  projectId: string;
+  userId: string;
+  author: CommentAuthor;
   content: string;
-  author: User;
-  createdAt: string;
-  updatedAt?: string;
+  createdAt: Date;
+  updatedAt: Date;
   parentId?: string;
   replies?: Comment[];
-  mentions?: User[];
-  projectId: string;
+  mentions?: CommentAuthor[];
 }
 
 export interface CreateCommentInput {

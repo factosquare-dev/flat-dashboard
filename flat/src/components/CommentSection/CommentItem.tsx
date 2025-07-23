@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import type { Comment, User } from '../../types/comment';
+import type { Comment, CommentAuthor } from '../../types/comment';
 import { MessageSquare, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import CommentInput from './CommentInput';
 import { formatRelativeTime } from '../../utils/dateUtils';
@@ -7,7 +7,7 @@ import { formatRelativeTime } from '../../utils/dateUtils';
 interface CommentItemProps {
   comment: Comment;
   replies?: Comment[];
-  currentUser: User;
+  currentUser: CommentAuthor;
   onReply: (comment: Comment) => void;
   onEdit: (commentId: string, content: string) => void;
   onDelete: (commentId: string) => void;

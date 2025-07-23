@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import type { Comment, User } from '../../types/comment';
+import type { Comment, CommentAuthor } from '../../types/comment';
 import CommentItem from './CommentItem';
 import CommentInput from './CommentInput';
 
 interface CommentSectionProps {
   projectId: string;
   comments: Comment[];
-  currentUser: User;
+  currentUser: CommentAuthor;
   onAddComment: (content: string, parentId?: string, mentions?: string[]) => void;
   onDeleteComment: (commentId: string) => void;
   onEditComment: (commentId: string, content: string) => void;

@@ -8,7 +8,8 @@ import AmountInfoSection from './AmountInfoSection';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
 import CommentSection from '../CommentSection';
 import type { ProjectModalProps, ProjectData } from './types';
-import type { Comment, User } from '../../types/comment';
+import type { Comment } from '../../types/comment';
+import type { User } from '../../types/user';
 
 const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, editData, mode }) => {
   const [formData, setFormData] = useState<ProjectData>({

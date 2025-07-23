@@ -1,28 +1,73 @@
 // Project related types
 export type ServiceType = 'OEM' | 'ODM' | 'OBM' | 'Private Label' | 'White Label' | '기타';
-export type ProjectStatus = '시작전' | '진행중' | '완료' | '중단';
-export type Priority = '높음' | '보통' | '낮음';
+
+// Export enums for better type safety
+export enum ProjectStatus {
+  PLANNING = 'PLANNING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  ON_HOLD = 'ON_HOLD',
+}
+
+export enum ProjectType {
+  MASTER = 'MASTER',
+  SUB = 'SUB',
+  TASK = 'TASK',
+}
+
+// Support both Korean and English status for backward compatibility
+export type ProjectStatusKorean = '시작전' | '진행중' | '완료' | '중단';
+export type Priority = '높음' | '보통' | '낮음' | 'high' | 'medium' | 'low';
+
+export interface Customer {
+  id: string;
+  name: string;
+  contactPerson: string;
+  contactNumber: string;
+  email: string;
+}
+
+export interface Product {
+  name: string;
+  volume: string;
+  unitPrice: number;
+}
 
 export interface Project {
   id: string;
-  client: string;
-  manager: string;
-  productType: string;
-  serviceType: ServiceType;
-  currentStage: string[];
-  status: ProjectStatus;
-  progress: number;
-  startDate: string;
-  endDate: string;
-  manufacturer: string;
-  container: string;
-  packaging: string;
-  priority: Priority;
-  scheduleId?: string; // 스케줄 ID 추가
-  depositPaid?: boolean; // 선금입금 여부
-  // 계층 구조를 위한 필드들
-  type?: 'master' | 'sub' | 'task';
+  projectNumber?: string;
+  name: string;
+  type: ProjectType;
   parentId?: string;
+  status: ProjectStatus;
+  customer: Customer;
+  product: Product;
+  quantity: number;
+  totalAmount: number;
+  depositAmount: number;
+  depositStatus: 'pending' | 'received' | 'refunded';
+  startDate: Date;
+  endDate: Date;
+  manufacturerId: string;
+  containerId: string;
+  packagingId: string;
+  priority: Priority;
+  progress: number;
+  scheduleId: string;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+  // Legacy fields for backward compatibility
+  client?: string;
+  manager?: string;
+  productType?: string;
+  serviceType?: ServiceType;
+  currentStage?: string[];
+  manufacturer?: string;
+  container?: string;
+  packaging?: string;
+  depositPaid?: boolean;
   children?: Project[];
   isExpanded?: boolean;
   level?: number;

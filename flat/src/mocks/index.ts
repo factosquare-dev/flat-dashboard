@@ -1,23 +1,39 @@
 /**
- * Mock 데이터 중앙 관리
- * 개발 환경에서만 사용되며, 프로덕션에서는 실제 API를 사용합니다.
+ * Mock System Main Export
+ * Provides a unified mock database and API system
  */
 
-export const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || true; // TODO: Set to false when backend is ready
+// Database exports
+export * from './database';
+export { mockDb } from './database';
 
-// Mock 데이터 exports
-export * from './schedule';
-export * from './project';
-export * from './gantt';
-export * from './factory';
-export * from './user';
+// Service exports
+export * from './services';
+export { getServices, initializeServices, resetServices } from './services';
 
-// Mock 데이터 초기화 함수
-export const initializeMockData = () => {
-  if (!USE_MOCK_DATA) return;
-  
-  console.info('🔧 Mock 데이터를 초기화합니다...');
-  
-  // 각 도메인별 초기화 함수 호출
-  // 필요시 각 모듈에서 초기화 함수를 export하여 여기서 호출
-};
+// API exports
+export { mockApi, initializeMockApi } from './api/MockApi';
+
+// Types
+export * from './database/types';
+
+// Initialize the mock system
+import { initializeServices } from './services';
+import { initializeMockApi } from './api/MockApi';
+
+// Auto-initialize on import - TEMPORARILY DISABLED
+// if (typeof window !== 'undefined') {
+//   // Browser environment
+//   initializeServices();
+//   initializeMockApi();
+//   
+//   // Make mock API available globally for debugging
+//   (window as any).__FLAT_MOCK_API__ = {
+//     services: () => import('./services').then(m => m.getServices()),
+//     database: () => import('./database').then(m => m.mockDb),
+//     api: () => import('./api/MockApi').then(m => m.mockApi),
+//     reset: () => import('./services').then(m => m.resetServices()),
+//   };
+//   
+//   console.log('FLAT Mock System initialized. Access via window.__FLAT_MOCK_API__');
+// }

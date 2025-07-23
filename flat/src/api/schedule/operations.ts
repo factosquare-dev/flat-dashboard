@@ -2,8 +2,7 @@ import type { Schedule, Task, Participant } from '../../types/schedule';
 import type { Project } from '../../types/project';
 import { createScheduleFromProject, createSampleInProgressTasks } from '../../data/projectScheduleData';
 import { formatDateISO } from '../../utils/dateUtils';
-import { USE_MOCK_DATA } from '../../mocks';
-import { createInProgressTasks } from '../../mocks/schedule/tasks';
+import { USE_MOCK_DATA } from './mockData';
 
 /**
  * 프로젝트로부터 스케줄 생성 또는 조회
@@ -29,7 +28,11 @@ export const getOrCreateScheduleForProject = async (
     
     // 진행중인 태스크가 없으면 샘플 태스크 추가
     if (!hasInProgressTask) {
-      const inProgressTasks = createInProgressTasks(newSchedule);
+      const inProgressTasks = createSampleInProgressTasks(
+        project.id,
+        new Date(project.startDate),
+        new Date(project.endDate)
+      );
       newSchedule.tasks = [...newSchedule.tasks, ...inProgressTasks];
     }
   }
