@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Task } from '../../../types/schedule';
+import type { Task, Participant } from '../../../types/schedule';
 import { getInteractionState } from '../utils/globalState';
 
 interface TaskItemProps {
@@ -14,8 +14,12 @@ interface TaskItemProps {
   isHovered: boolean;
   isDraggingAnyTask?: boolean;
   dragPreview?: { projectId: string; startDate: string; endDate: string } | null;
-  allRows?: any[];
-  modalState?: any;
+  allRows?: Participant[];
+  modalState?: {
+    isResizingTask?: boolean;
+    resizingTask?: Task;
+    isDraggingTask?: boolean;
+  };
   onDragStart: (e: React.DragEvent) => void;
   onDragEnd: () => void;
   onDragOver: (e: React.DragEvent) => void;
@@ -27,7 +31,7 @@ interface TaskItemProps {
   onDelete?: () => void;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({
+const TaskItem: React.FC<TaskItemProps> = React.memo(({
   task,
   startDate,
   endDate,
@@ -87,20 +91,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
         const clickBlocked = isClickBlocked();
         const state = getInteractionState();
         
-        console.log('[TaskItem] Click:', { 
-          taskId: task.id, 
-          isResizing, 
-          isDragging,
-          clickBlocked,
-          interactionMode: state.mode,
-          preventClickUntil: state.preventClickUntil,
-          currentTime: Date.now()
-        });
         
         if (isResizing || isDragging || clickBlocked) {
-          console.log('[TaskItem] Click blocked:', {
-            reason: isResizing ? 'resizing' : isDragging ? 'dragging' : 'global-interaction-state'
-          });
           e.preventDefault();
           return;
         }
@@ -108,21 +100,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
         onClick(e);
       }}
       onDragStart={(e) => {
-        console.log('[TaskItem] onDragStart triggered:', { 
-          taskId: task.id, 
-          isResizing,
-          isDragging,
-          isDraggingAnyTask,
-          pointerEvents: isDraggingAnyTask && !isDragging ? 'none' : 'auto'
-        });
         
         // CRITICAL: Prevent drag if resizing any task
         if (isResizing || modalState?.isResizingTask) {
           e.preventDefault();
-          console.log('[TaskItem] Drag prevented - resize in progress:', {
-            localIsResizing: isResizing,
-            globalIsResizing: modalState?.isResizingTask
-          });
           return;
         }
         
@@ -130,30 +111,20 @@ const TaskItem: React.FC<TaskItemProps> = ({
         const state = getInteractionState();
         if (state.mode === 'resizing') {
           e.preventDefault();
-          console.log('[TaskItem] Drag prevented - another task is being resized');
           return;
         }
         
-        console.log('[TaskItem] Drag allowed - calling onDragStart');
         onDragStart(e);
       }}
       onDragEnd={() => {
-        console.log('[TaskItem] onDragEnd triggered:', { taskId: task.id });
         onDragEnd();
       }}
       onDragOver={(e) => {
-        console.log('[TaskItem] onDragOver triggered:', { taskId: task.id });
         onDragOver(e);
       }}
       onDrop={(e) => {
-        console.log('[TaskItem] onDrop triggered:', { 
-          taskId: task.id,
-          hasDragPreview: !!dragPreview,
-          dragPreviewContent: dragPreview
-        });
         
         // SIMPLIFIED: Just allow drop if there's any drag activity
-        console.log('[TaskItem] ✅ DROP ALLOWED on TaskItem - calling onDrop');
         onDrop(e);
       }}
       onMouseEnter={onMouseEnter}
@@ -171,7 +142,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
         onMouseDown={(e) => {
           e.stopPropagation();
           e.preventDefault();
-          console.log('[TaskItem] Resize handle mousedown - start');
           onResizeStart(e, 'start');
         }}
         onMouseUp={(e) => {
@@ -197,7 +167,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
         onMouseDown={(e) => {
           e.stopPropagation();
           e.preventDefault();
-          console.log('[TaskItem] Resize handle mousedown - end');
           onResizeStart(e, 'end');
         }}
         onMouseUp={(e) => {
@@ -235,6 +204,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
       )}
     </div>
   );
-};
+});
+
+TaskItem.displayName = 'TaskItem';
 
 export default TaskItem;

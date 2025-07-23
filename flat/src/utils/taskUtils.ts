@@ -1,4 +1,5 @@
 import type { Task } from '../types/schedule';
+import { formatDateISO } from './dateUtils';
 
 // 두 태스크가 날짜 범위에서 겹치는지 확인
 export const isTaskOverlapping = (task1: Task, task2: Task): boolean => {
@@ -31,8 +32,9 @@ export const assignTaskRows = (tasks: Task[]): Map<number, number> => {
   sortedTasks.forEach(task => {
     let row = 0;
     let foundRow = false;
+    const maxRows = 100; // 최대 100개 행까지만 검색
     
-    while (!foundRow) {
+    while (!foundRow && row < maxRows) {
       // 현재 row에 있는 태스크들과 충돌 확인
       const tasksInRow = sortedTasks.filter(t => 
         taskRows.get(t.id) === row && isTaskOverlapping(task, t)
@@ -44,6 +46,11 @@ export const assignTaskRows = (tasks: Task[]): Map<number, number> => {
       } else {
         row++;
       }
+    }
+    
+    // 빈 행을 찾지 못한 경우 마지막 행에 배치
+    if (!foundRow) {
+      taskRows.set(task.id, row);
     }
   });
   
@@ -79,14 +86,16 @@ export const findAvailableDateRange = (
   currentEnd.setDate(currentEnd.getDate() + duration);
   
   let foundValidRange = false;
+  let attempts = 0;
+  const maxAttempts = 365; // 최대 1년까지만 검색
   
-  while (!foundValidRange) {
+  while (!foundValidRange && attempts < maxAttempts) {
     const testTask: Task = {
       id: -1,
       projectId,
       title: '',
-      startDate: currentStart.toISOString().split('T')[0],
-      endDate: currentEnd.toISOString().split('T')[0],
+      startDate: formatDateISO(currentStart),
+      endDate: formatDateISO(currentEnd),
       x: 0,
       width: 0,
       color: '',
@@ -105,11 +114,17 @@ export const findAvailableDateRange = (
       currentStart = new Date(latestEnd + 24 * 60 * 60 * 1000);
       currentEnd = new Date(currentStart);
       currentEnd.setDate(currentEnd.getDate() + duration);
+      attempts++;
     }
   }
   
+  // 사용 가능한 날짜를 찾지 못한 경우 경고
+  if (!foundValidRange) {
+    console.warn(`Could not find available date range for project ${projectId} within 1 year`);
+  }
+  
   return {
-    startDate: currentStart.toISOString().split('T')[0],
-    endDate: currentEnd.toISOString().split('T')[0]
+    startDate: formatDateISO(currentStart),
+    endDate: formatDateISO(currentEnd)
   };
 };

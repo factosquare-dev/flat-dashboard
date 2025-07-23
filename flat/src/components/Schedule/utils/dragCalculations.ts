@@ -1,4 +1,6 @@
 // Unified coordinate calculation utilities for consistent grid positioning
+import { formatDateISO } from '../../../utils/dateUtils';
+
 export interface GridCoordinates {
   x: number;
   width: number;
@@ -50,7 +52,7 @@ export class GridCoordinateCalculator {
       cellWidth,
       daysFromStart,
       clampedDays,
-      resultDate: days[clampedDays]?.toISOString().split('T')[0]
+      resultDate: days[clampedDays] ? formatDateISO(days[clampedDays]) : undefined
     });
     
     return new Date(days[clampedDays] || days[0]);
@@ -83,8 +85,8 @@ export class GridCoordinateCalculator {
     const dayIndex = this.getDayIndex(startDate);
     
     console.log('[GRID CALC] calculateTaskPosition:', {
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
+      startDate: formatDateISO(startDate),
+      endDate: formatDateISO(endDate),
       left,
       width,
       x,

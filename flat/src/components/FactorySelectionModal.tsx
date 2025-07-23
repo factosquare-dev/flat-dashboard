@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { factories, Factory } from '../data/factories';
+import { factories, type Factory } from '../data/factories';
 
 interface FactorySelectionModalProps {
   isOpen: boolean;

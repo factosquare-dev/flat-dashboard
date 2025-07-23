@@ -1,7 +1,19 @@
 import { useState } from 'react';
 import type { EditingCell } from '../types/project';
 
-export const useEditableCell = () => {
+export interface UseEditableCellReturn {
+  editingCell: EditingCell | null;
+  searchValue: string;
+  searchSuggestions: string[];
+  showSuggestions: boolean;
+  setShowSuggestions: React.Dispatch<React.SetStateAction<boolean>>;
+  startEditing: (projectId: string, field: string) => void;
+  stopEditing: () => void;
+  isEditing: (projectId: string, field: string) => boolean;
+  handleSearch: (value: string, searchList: string[]) => void;
+}
+
+export const useEditableCell = (): UseEditableCellReturn => {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);

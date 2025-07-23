@@ -32,6 +32,34 @@ const manufacturingFactories = getFactoriesByType('제조');
 const containerFactories = getFactoriesByType('용기');
 const packagingFactories = getFactoriesByType('포장');
 
+// 공장별 태스크 목록
+export const tasksByFactory: { [key: string]: string[] } = {
+  '큐셀시스템': ['PCB 설계', 'SMT 작업', '최종 조립', '품질 검사', '포장'],
+  '(주)연우': ['금형 제작', '사출 성형', '도장 작업', '조립', '검수'],
+  '(주)네트모베이지': ['회로 설계', '펌웨어 개발', '하드웨어 테스트', '인증 시험'],
+  '주식회사 코스모로스': ['기구 설계', '시제품 제작', '성능 테스트', '양산 준비']
+};
+
+// 사용 가능한 인증서 목록
+export const availableCertifications = [
+  'ISO 22716', 'CGMP', 'ISO 9001', 'ISO 14001', 'ISO 45001',
+  'FSC', 'VEGAN', 'HALAL', 'EWG', 'COSMOS', 'ECOCERT'
+];
+
+// 프로젝트 색상 팔레트
+export const projectColors = [
+  "#3B82F6", // 블루 (신뢰감)
+  "#10B981", // 에메랄드 (성장)
+  "#8B5CF6", // 바이올렛 (창의성)
+  "#F59E0B", // 앰버 (따뜻함)
+  "#EC4899", // 핑크 (혁신)
+  "#14B8A6", // 틸 (차분함)
+  "#6366F1", // 인디고 (전문성)
+  "#84CC16", // 라임 (신선함)
+  "#F97316", // 오렌지 (활력)
+  "#06B6D4"  // 시안 (기술)
+];
+
 // 공장 타입별 분류 (factories.ts 데이터 활용)
 export const factoriesByType = {
   manufacturing: manufacturingFactories.map(f => ({

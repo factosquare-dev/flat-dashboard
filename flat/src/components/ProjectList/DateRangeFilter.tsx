@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
+import { formatDateISO } from '../../utils/dateUtils';
 
 interface DateRangeFilterProps {
   value: { startDate: string | null; endDate: string | null };
@@ -61,8 +62,8 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ value, onChange }) =>
       const threeMonthsAgo = new Date();
       threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
       
-      setCustomEndDate(today.toISOString().split('T')[0]);
-      setCustomStartDate(threeMonthsAgo.toISOString().split('T')[0]);
+      setCustomEndDate(formatDateISO(today));
+      setCustomStartDate(formatDateISO(threeMonthsAgo));
       setShowCustomDatePicker(true);
       return;
     }
@@ -85,8 +86,8 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ value, onChange }) =>
     }
     
     onChange({
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0]
+      startDate: formatDateISO(startDate),
+      endDate: formatDateISO(endDate)
     });
   };
 

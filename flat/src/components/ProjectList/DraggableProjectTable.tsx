@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Project } from '../../types/project';
-import ProjectTableRow from './ProjectTableRow';
+import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '../../hooks/useColumnOrder';
 import type { Column } from '../../hooks/useColumnOrder';
 

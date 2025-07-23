@@ -4,6 +4,7 @@ import type { QueryOptions, QueryResult } from './types';
 import { queryCache } from './queryCache';
 import { executeWithRetry } from './retryLogic';
 import { getQueryKey } from './cacheUtils';
+import { DURATION } from '../../constants/time';
 
 export const useQuery = <T = any>(
   queryKey: string | string[],
@@ -14,8 +15,8 @@ export const useQuery = <T = any>(
     enabled = true,
     refetchOnWindowFocus = true,
     refetchOnReconnect = true,
-    staleTime = 5 * 60 * 1000, // 5 minutes
-    cacheTime = 10 * 60 * 1000, // 10 minutes
+    staleTime = DURATION.DEFAULT_STALE_TIME,
+    cacheTime = DURATION.DEFAULT_CACHE_TIME,
     refetchInterval,
     retry = 3,
     retryDelay = 1000,

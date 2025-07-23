@@ -1,5 +1,5 @@
 import type { Participant } from '../../types/schedule';
-import { formatDate } from '../../utils/dateUtils';
+import { formatDate } from '../../utils/formatUtils';
 import { TASK_COLORS } from './constants';
 
 export const createDefaultProjects = (today: Date): Participant[] => {

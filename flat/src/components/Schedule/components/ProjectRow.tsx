@@ -3,6 +3,7 @@ import type { Participant, Task } from '../../../types/schedule';
 import { getProjectRowCount, assignTaskRows } from '../../../utils/taskUtils';
 import { GridCoordinateCalculator } from '../utils/dragCalculations';
 import { getInteractionState } from '../utils/globalState';
+import { formatDateISO } from '../../../utils/dateUtils';
 import GridCell from './GridCell';
 import TaskItem from './TaskItem';
 
@@ -31,7 +32,7 @@ interface ProjectRowProps {
   onTaskDelete?: (taskId: number) => void;
 }
 
-const ProjectRow: React.FC<ProjectRowProps> = ({
+const ProjectRow: React.FC<ProjectRowProps> = React.memo(({
   project,
   tasks,
   days,
@@ -78,25 +79,21 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
               onClick={!isAddFactoryRow ? (e) => {
                 // Check if click target is the cell itself
                 if (e.target !== e.currentTarget) {
-                  console.log('[GridCell] Click blocked - not direct cell click');
                   return;
                 }
                 
                 // Check global interaction state
                 const state = getInteractionState();
                 if (state.mode !== 'idle' || Date.now() < state.preventClickUntil) {
-                  console.log('[GridCell] Click blocked by interaction state:', state.mode);
                   return;
                 }
                 
                 // Additional safety check
                 if (modalState.isResizingTask || modalState.isDraggingTask) {
-                  console.log('[GridCell] Click blocked - operation in progress');
                   return;
                 }
                 
-                const clickedDate = day.toISOString().split('T')[0];
-                console.log('[GridCell] Click allowed - opening new task modal');
+                const clickedDate = formatDateISO(day);
                 onGridClick(e, project.id, clickedDate);
               } : undefined}
               onDragOver={!isAddFactoryRow ? (e) => {
@@ -116,7 +113,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                 
                 // Calculate date using unified grid calculator
                 const rect = scrollRef.current?.getBoundingClientRect();
-                const fallbackDate = day.toISOString().split('T')[0];
+                const fallbackDate = formatDateISO(day);
                 let clickedDate = fallbackDate;
                 
                 if (rect && draggedTask) {
@@ -128,59 +125,27 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                   });
                   
                   const calculatedDate = dropCalculator.mouseXToDate(e.clientX, true);
-                  clickedDate = calculatedDate.toISOString().split('T')[0];
+                  clickedDate = formatDateISO(calculatedDate);
                   
-                  console.log('[GridCell DROP] Unified date calculation:', {
-                    clientX: e.clientX,
-                    rectLeft: rect.left,
-                    scrollLeft: scrollRef.current?.scrollLeft || 0,
-                    calculatedDate: clickedDate,
-                    fallbackDate,
-                    cellWidth,
-                    method: 'unified'
-                  });
                 }
                 
-                console.log('[GridCell DROP] Drop on cell:', {
-                  projectId: project.id,
-                  clickedDate,
-                  taskId: taskIdStr,
-                  dragData
-                });
                 
                 if (dragData === 'new-task' && !taskIdStr) {
-                  console.log('[GridCell DROP] Creating new task');
                   const factory = allRows.find(p => p.id === project.id);
                   if (factory) {
                     onGridClick(e, project.id, clickedDate);
                   }
                 } else if (taskIdStr && taskIdStr !== '') {
-                  console.log('[GridCell DROP] TASK DROP ATTEMPT:', {
-                    taskId: taskIdStr,
-                    targetProjectId: project.id,
-                    hasDragPreview: !!dragPreview,
-                    dragPreviewContent: dragPreview,
-                    isDraggingTask: isDraggingTask,
-                    hasDraggedTask: !!draggedTask,
-                    draggedTaskId: draggedTask?.id
-                  });
                   
                   // SIMPLIFIED CONDITION: Just check if we have a dragged task
                   if (!isDraggingTask || !draggedTask) {
-                    console.log('[GridCell DROP] Drop blocked - no active drag:', {
-                      isDraggingTask,
-                      hasDraggedTask: !!draggedTask
-                    });
                     return;
                   }
                   
-                  console.log('[GridCell DROP] ✅ DROP ALLOWED - calling onTaskDrop');
                   
                   try {
                     onTaskDrop(e, project.id, 0);
-                    console.log('[GridCell DROP] ✅ onTaskDrop called successfully');
                   } catch (error) {
-                    console.error('[GridCell DROP] ❌ Error calling onTaskDrop:', error);
                   }
                 }
               } : undefined}
@@ -251,6 +216,8 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
       </div>
     </div>
   );
-};
+});
+
+ProjectRow.displayName = 'ProjectRow';
 
 export default ProjectRow;

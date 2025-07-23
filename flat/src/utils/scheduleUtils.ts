@@ -1,4 +1,5 @@
 import type { Task } from '../types/schedule';
+import { formatDateISO } from './dateUtils';
 
 /**
  * 오늘 날짜에 걸쳐있는 태스크들을 찾아서 현재 단계를 반환합니다.
@@ -212,7 +213,7 @@ export const calculateEstimatedEndDate = (tasks: Task[]): string | null => {
     latestEndDate.setDate(latestEndDate.getDate() + delayDays);
   }
   
-  return latestEndDate.toISOString().split('T')[0];
+  return formatDateISO(latestEndDate);
 };
 
 /**

@@ -1,4 +1,5 @@
 import type { Schedule, Task } from '../types/schedule';
+import { formatDateISO } from '../utils/dateUtils';
 
 // 날짜 계산 함수
 const addDays = (date: Date, days: number): Date => {
@@ -8,7 +9,7 @@ const addDays = (date: Date, days: number): Date => {
 };
 
 const formatDate = (date: Date): string => {
-  return date.toISOString().split('T')[0];
+  return formatDateISO(date);
 };
 
 // 테스트용 스케줄 데이터 생성

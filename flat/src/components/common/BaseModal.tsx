@@ -42,12 +42,12 @@ const BaseModal: React.FC<BaseModalProps> = ({
     if (isOpen) {
       document.addEventListener('keydown', handleEscKey);
       document.body.style.overflow = 'hidden';
+      
+      return () => {
+        document.removeEventListener('keydown', handleEscKey);
+        document.body.style.overflow = 'unset';
+      };
     }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -64,7 +64,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
       onClick={handleBackdropClick}
     >
       <div 
-        className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} ${className}`}
+        className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} ${className || ''}`.trim()}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header - Standardized */}
@@ -107,7 +107,7 @@ export const ModalFooter: React.FC<{ children: React.ReactNode; className?: stri
   children, 
   className = '' 
 }) => (
-  <div className={`flex items-center justify-end gap-3 ${className}`}>
+  <div className={`flex items-center justify-end gap-3 ${className || ''}`.trim()}>
     {children}
   </div>
 );

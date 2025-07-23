@@ -17,8 +17,6 @@ export interface Project {
   manufacturer: string;
   container: string;
   packaging: string;
-  sales: string;
-  purchase: string;
   priority: Priority;
   scheduleId?: string; // 스케줄 ID 추가
   depositPaid?: boolean; // 선금입금 여부

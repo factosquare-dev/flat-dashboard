@@ -1,12 +1,13 @@
 import type { CacheEntry } from './types';
+import { DURATION } from '../../constants/time';
 
 class QueryCache {
   private cache = new Map<string, CacheEntry>();
   private cleanupInterval: NodeJS.Timeout;
 
   constructor() {
-    // Clean up cache every 5 minutes
-    this.cleanupInterval = setInterval(() => this.cleanup(), 5 * 60 * 1000);
+    // Clean up cache periodically
+    this.cleanupInterval = setInterval(() => this.cleanup(), DURATION.CACHE_CLEANUP_INTERVAL);
   }
 
   get<T = any>(key: string): CacheEntry<T> | undefined {

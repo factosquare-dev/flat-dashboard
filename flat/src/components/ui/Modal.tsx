@@ -54,12 +54,13 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const handleEscape = React.useCallback((event: KeyboardEvent) => {
+    if (closeOnEscape && event.key === 'Escape') {
+      onClose();
+    }
+  }, [closeOnEscape, onClose]);
+
   useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (closeOnEscape && event.key === 'Escape') {
-        onClose();
-      }
-    };
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
@@ -74,7 +75,7 @@ const Modal: React.FC<ModalProps> = ({
         document.body.style.overflow = 'unset';
       }
     };
-  }, [isOpen, onClose, closeOnEscape, preventScroll]);
+  }, [isOpen, handleEscape, preventScroll]);
 
   if (!isOpen) return null;
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import type { Comment, User } from '../../types/comment';
 import CommentItem from './CommentItem';
 import CommentInput from './CommentInput';
@@ -22,6 +22,47 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 }) => {
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const commentSectionRef = useRef<HTMLDivElement>(null);
+
+  // Optimize comment structure with memoization
+  const commentStructure = useMemo(() => {
+    const topLevelComments: Comment[] = [];
+    const repliesMap = new Map<string, Comment[]>();
+    
+    // First pass: separate top-level comments and create replies map
+    comments.forEach(comment => {
+      if (!comment.parentId) {
+        topLevelComments.push(comment);
+      }
+    });
+    
+    // Second pass: organize replies for each top-level comment
+    topLevelComments.forEach(topComment => {
+      const replies: Comment[] = [];
+      
+      // Find direct replies
+      comments.forEach(comment => {
+        if (comment.parentId === topComment.id) {
+          replies.push(comment);
+        }
+      });
+      
+      // Find indirect replies (replies to replies)
+      comments.forEach(comment => {
+        if (comment.parentId && comment.parentId !== topComment.id) {
+          const parent = comments.find(p => p.id === comment.parentId);
+          if (parent && parent.parentId === topComment.id) {
+            replies.push(comment);
+          }
+        }
+      });
+      
+      // Sort replies by date (ascending order)
+      replies.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      repliesMap.set(topComment.id, replies);
+    });
+    
+    return { topLevelComments, repliesMap };
+  }, [comments]);
 
   const handleReply = (comment: Comment) => {
     // 같은 댓글을 다시 클릭하면 토글 (닫기)
@@ -74,38 +115,21 @@ const CommentSection: React.FC<CommentSectionProps> = ({
         
         {/* Comments list - 최상위 댓글만 표시 (replies는 각 comment 내부에서 렌더링) */}
         <div className="mt-6 space-y-4">
-          {comments.filter(comment => !comment.parentId).map((comment) => {
-            // 이 댓글의 모든 답글 찾기 (대댓글, 대대댓글 등 모두 포함)
-            const getRepliesForComment = (commentId: string): Comment[] => {
-              const directReplies = comments.filter(c => c.parentId === commentId);
-              const indirectReplies = comments.filter(c => {
-                // parentId가 있고, 그 parent의 parent가 원래 comment인 경우
-                if (!c.parentId || c.parentId === commentId) return false;
-                const parent = comments.find(p => p.id === c.parentId);
-                return parent && parent.parentId === commentId;
-              });
-              
-              // 시간순으로 정렬 (최신순)
-              const allReplies = [...directReplies, ...indirectReplies];
-              return allReplies.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-            };
-
-            return (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                replies={getRepliesForComment(comment.id)}
-                currentUser={currentUser}
-                onReply={handleReply}
-                onEdit={onEditComment}
-                onDelete={onDeleteComment}
-                onAddComment={(content, parentId, mentions) => handleSubmit(content, mentions, parentId)}
-                onCancelReply={() => setReplyToId(null)}
-                replyToId={replyToId}
-                isTopLevel={true}
-              />
-            );
-          })}
+          {commentStructure.topLevelComments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              replies={commentStructure.repliesMap.get(comment.id) || []}
+              currentUser={currentUser}
+              onReply={handleReply}
+              onEdit={onEditComment}
+              onDelete={onDeleteComment}
+              onAddComment={(content, parentId, mentions) => handleSubmit(content, mentions, parentId)}
+              onCancelReply={() => setReplyToId(null)}
+              replyToId={replyToId}
+              isTopLevel={true}
+            />
+          ))}
           
           {comments.length === 0 && (
             <p className="text-center text-gray-500 py-8">

@@ -1,8 +1,13 @@
 /**
- * API client with integrated logging and error handling
+ * Main API client - Refactored to use modular architecture
  */
 
 import { logger, PerformanceLogger } from '../utils/logger';
+import { RequestHandlers } from './api/requestHandlers';
+import { UploadHandler } from './api/uploadHandler';
+import type { ApiResponse, RequestOptions } from './api/requestHandlers';
+import type { UploadOptions, UploadResponse } from './api/uploadHandler';
+import type { ApiError } from './api/errorHandling';
 
 export interface ApiConfig {
   baseURL: string;
@@ -10,23 +15,10 @@ export interface ApiConfig {
   defaultHeaders: Record<string, string>;
 }
 
-export interface ApiResponse<T = any> {
-  data: T;
-  status: number;
-  statusText: string;
-  headers: Headers;
-}
-
-export interface ApiError {
-  message: string;
-  status?: number;
-  statusText?: string;
-  data?: any;
-}
-
 class ApiClient {
   private config: ApiConfig;
-  private requestId: number = 0;
+  private requestHandlers: RequestHandlers;
+  private uploadHandler: UploadHandler;
 
   constructor(config: Partial<ApiConfig> = {}) {
     this.config = {
@@ -38,138 +30,30 @@ class ApiClient {
       ...config,
     };
 
+    // Initialize handlers with configuration
+    this.requestHandlers = new RequestHandlers(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    
+    this.uploadHandler = new UploadHandler(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+
     logger.info('API client initialized', {
       baseURL: this.config.baseURL,
       timeout: this.config.timeout,
     });
   }
 
-  private generateRequestId(): string {
-    return `req-${Date.now()}-${++this.requestId}`;
-  }
-
-  private buildUrl(endpoint: string): string {
-    // Handle absolute URLs
-    if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
-      return endpoint;
-    }
-    
-    // Handle relative URLs
-    const baseURL = this.config.baseURL.endsWith('/') 
-      ? this.config.baseURL.slice(0, -1)
-      : this.config.baseURL;
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    
-    return `${baseURL}${cleanEndpoint}`;
-  }
-
-  private async makeRequest<T>(
-    method: string,
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
-    const requestId = this.generateRequestId();
-    const url = this.buildUrl(endpoint);
-    const startTime = performance.now();
-
-    // Prepare request
-    const config: RequestInit = {
-      method,
-      headers: {
-        ...this.config.defaultHeaders,
-        ...options.headers,
-        'X-Request-ID': requestId,
-      },
-      ...options,
-    };
-
-    // Add timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
-    config.signal = controller.signal;
-
-    logger.debug(`API request started: ${method} ${url}`, {
-      requestId,
-      method,
-      url,
-      headers: config.headers,
-    });
-
-    try {
-      const response = await fetch(url, config);
-      clearTimeout(timeoutId);
-      
-      const duration = performance.now() - startTime;
-      const responseData = await this.parseResponse<T>(response);
-
-      // Log successful request
-      logger.logApiRequest(method, url, response.status, Math.round(duration));
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      logger.debug(`API request completed: ${method} ${url}`, {
-        requestId,
-        status: response.status,
-        duration: Math.round(duration),
-      });
-
-      return {
-        data: responseData,
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      };
-
-    } catch (error) {
-      clearTimeout(timeoutId);
-      const duration = performance.now() - startTime;
-
-      // Create API error
-      const apiError: ApiError = {
-        message: error instanceof Error ? error.message : 'Unknown error',
-      };
-
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        // Network error
-        apiError.message = 'Network error - please check your connection';
-        logger.logApiRequest(method, url, 0, Math.round(duration), error as Error);
-      } else if (error.name === 'AbortError') {
-        // Timeout error
-        apiError.message = 'Request timeout';
-        logger.logApiRequest(method, url, 0, Math.round(duration), error as Error);
-      } else {
-        // Other errors
-        logger.logApiRequest(method, url, undefined, Math.round(duration), error as Error);
-      }
-
-      logger.error(`API request failed: ${method} ${url}`, error as Error, {
-        requestId,
-        duration: Math.round(duration),
-      });
-
-      throw apiError;
-    }
-  }
-
-  private async parseResponse<T>(response: Response): Promise<T> {
-    const contentType = response.headers.get('content-type');
-    
-    if (contentType && contentType.includes('application/json')) {
-      return await response.json();
-    } else if (contentType && contentType.includes('text/')) {
-      return await response.text() as unknown as T;
-    } else {
-      return await response.blob() as unknown as T;
-    }
-  }
-
   /**
    * GET request
    */
-  async get<T = any>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>('GET', endpoint, options);
+  async get<T = any>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.requestHandlers.get<T>(endpoint, options);
   }
 
   /**
@@ -178,14 +62,9 @@ class ApiClient {
   async post<T = any>(
     endpoint: string,
     data?: any,
-    options: RequestInit = {}
+    options?: RequestOptions
   ): Promise<ApiResponse<T>> {
-    const config: RequestInit = {
-      ...options,
-      body: data ? JSON.stringify(data) : undefined,
-    };
-    
-    return this.makeRequest<T>('POST', endpoint, config);
+    return this.requestHandlers.post<T>(endpoint, data, options);
   }
 
   /**
@@ -194,14 +73,9 @@ class ApiClient {
   async put<T = any>(
     endpoint: string,
     data?: any,
-    options: RequestInit = {}
+    options?: RequestOptions
   ): Promise<ApiResponse<T>> {
-    const config: RequestInit = {
-      ...options,
-      body: data ? JSON.stringify(data) : undefined,
-    };
-    
-    return this.makeRequest<T>('PUT', endpoint, config);
+    return this.requestHandlers.put<T>(endpoint, data, options);
   }
 
   /**
@@ -210,93 +84,52 @@ class ApiClient {
   async patch<T = any>(
     endpoint: string,
     data?: any,
-    options: RequestInit = {}
+    options?: RequestOptions
   ): Promise<ApiResponse<T>> {
-    const config: RequestInit = {
-      ...options,
-      body: data ? JSON.stringify(data) : undefined,
-    };
-    
-    return this.makeRequest<T>('PATCH', endpoint, config);
+    return this.requestHandlers.patch<T>(endpoint, data, options);
   }
 
   /**
    * DELETE request
    */
-  async delete<T = any>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>('DELETE', endpoint, options);
+  async delete<T = any>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.requestHandlers.delete<T>(endpoint, options);
   }
 
   /**
-   * Upload file with progress tracking
+   * HEAD request
    */
-  async upload<T = any>(
+  async head(endpoint: string, options?: RequestOptions): Promise<ApiResponse<void>> {
+    return this.requestHandlers.head(endpoint, options);
+  }
+
+  /**
+   * OPTIONS request
+   */
+  async options(endpoint: string, options?: RequestOptions): Promise<ApiResponse<any>> {
+    return this.requestHandlers.options(endpoint, options);
+  }
+
+  /**
+   * Upload single file with progress tracking
+   */
+  async upload<T = UploadResponse>(
     endpoint: string,
     file: File,
-    options: {
-      onProgress?: (progress: number) => void;
-      additionalData?: Record<string, string>;
-    } = {}
+    options?: UploadOptions
   ): Promise<ApiResponse<T>> {
-    const requestId = this.generateRequestId();
-    const url = this.buildUrl(endpoint);
-    const startTime = performance.now();
+    return this.uploadHandler.uploadFile(endpoint, file, options) as Promise<ApiResponse<T>>;
+  }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    if (options.additionalData) {
-      Object.entries(options.additionalData).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
-    }
-
-    logger.info(`File upload started: ${file.name}`, {
-      requestId,
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-    });
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'X-Request-ID': requestId,
-        },
-        body: formData,
-      });
-
-      const duration = performance.now() - startTime;
-      const responseData = await this.parseResponse<T>(response);
-
-      logger.info(`File upload completed: ${file.name}`, {
-        requestId,
-        status: response.status,
-        duration: Math.round(duration),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      return {
-        data: responseData,
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      };
-
-    } catch (error) {
-      const duration = performance.now() - startTime;
-      
-      logger.error(`File upload failed: ${file.name}`, error as Error, {
-        requestId,
-        duration: Math.round(duration),
-      });
-
-      throw error;
-    }
+  /**
+   * Upload multiple files
+   */
+  async uploadMultiple<T = UploadResponse[]>(
+    endpoint: string,
+    files: File[],
+    options?: UploadOptions
+  ): Promise<ApiResponse<T>> {
+    return this.uploadHandler.uploadMultipleFiles(endpoint, files, options) as Promise<ApiResponse<T>>;
   }
 
   /**
@@ -332,6 +165,18 @@ class ApiClient {
    */
   setAuthToken(token: string): void {
     this.config.defaultHeaders['Authorization'] = `Bearer ${token}`;
+    // Update handlers with new headers
+    this.requestHandlers = new RequestHandlers(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    this.uploadHandler = new UploadHandler(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    
     logger.info('Authentication token set');
   }
 
@@ -340,6 +185,18 @@ class ApiClient {
    */
   removeAuthToken(): void {
     delete this.config.defaultHeaders['Authorization'];
+    // Update handlers with new headers
+    this.requestHandlers = new RequestHandlers(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    this.uploadHandler = new UploadHandler(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    
     logger.info('Authentication token removed');
   }
 
@@ -348,14 +205,67 @@ class ApiClient {
    */
   setBaseURL(baseURL: string): void {
     this.config.baseURL = baseURL;
+    // Update handlers with new base URL
+    this.requestHandlers = new RequestHandlers(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    this.uploadHandler = new UploadHandler(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    
     logger.info('Base URL updated', { baseURL });
   }
+
+  /**
+   * Update timeout setting
+   */
+  setTimeout(timeout: number): void {
+    this.config.timeout = timeout;
+    // Update handlers with new timeout
+    this.requestHandlers = new RequestHandlers(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    this.uploadHandler = new UploadHandler(
+      this.config.baseURL,
+      this.config.defaultHeaders,
+      this.config.timeout
+    );
+    
+    logger.info('Timeout updated', { timeout });
+  }
+
+  /**
+   * Get current configuration
+   */
+  getConfig(): ApiConfig {
+    return { ...this.config };
+  }
+
+  // Utility methods (delegated to upload handler)
+  static getFileExtension = UploadHandler.getFileExtension;
+  static formatFileSize = UploadHandler.formatFileSize;
+  static isImageFile = UploadHandler.isImageFile;
+  static isVideoFile = UploadHandler.isVideoFile;
+  static isDocumentFile = UploadHandler.isDocumentFile;
 }
 
 // Create singleton instance
 export const apiClient = new ApiClient();
 
-// Export types
-export type { ApiConfig, ApiResponse, ApiError };
+// Export types from modules
+export type { 
+  ApiConfig, 
+  ApiResponse, 
+  RequestOptions,
+  UploadOptions,
+  UploadResponse,
+  ApiError 
+};
 
 export default apiClient;

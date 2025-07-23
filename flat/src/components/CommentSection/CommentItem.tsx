@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import type { Comment, User } from '../../types/comment';
 import { MessageSquare, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import CommentInput from './CommentInput';
+import { formatRelativeTime } from '../../utils/dateUtils';
 
 interface CommentItemProps {
   comment: Comment;
@@ -33,18 +34,6 @@ const CommentItem: React.FC<CommentItemProps> = ({
   
   const isAuthor = currentUser.id === comment.author.id;
   
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return '방금';
-    if (diffInMinutes < 60) return `${diffInMinutes}분 전`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}시간 전`;
-    if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}일 전`;
-    
-    return date.toLocaleDateString('ko-KR');
-  };
 
   const handleEdit = (content: string) => {
     onEdit(comment.id, content);
@@ -97,7 +86,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm font-medium text-gray-900">{comment.author.name}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">{formatDate(comment.createdAt)}</span>
+                    <span className="text-xs text-gray-500">{formatRelativeTime(comment.createdAt)}</span>
                     {isAuthor && (
                       <div className="relative">
                         <button
@@ -243,4 +232,4 @@ const CommentItem: React.FC<CommentItemProps> = ({
   );
 };
 
-export default CommentItem;
+export default memo(CommentItem);

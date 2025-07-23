@@ -5,6 +5,7 @@ export const SCHEDULE_CONSTANTS = {
   DEFAULT_DAYS_BEFORE_TODAY: 7,
   DEFAULT_MONTHS_AFTER_TODAY: 3,
   DEFAULT_DAYS_AFTER_END_DATE: 30,
+  INTERACTION_PREVENTION_DELAY: 300, // Delay in ms to prevent accidental clicks after drag/resize
 } as const;
 
 export const TASK_COLORS = {

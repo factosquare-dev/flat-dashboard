@@ -4,8 +4,8 @@
 
 // Re-export existing utilities
 export * from './apiClient';
-export { formatCurrency as formatCurrencyUtil, parseCurrency } from './currency';
-export { formatDate as formatDateUtil, formatDateRange as formatDateRangeUtil, getDaysFromToday, isDateInRange } from './dateUtils';
+export { formatCurrency, parseCurrency } from './currency';
+export { getDayNumber, formatDayNumberRange, getDaysFromToday, isDateInRange } from './dateUtils';
 export * from './scheduleUtils';
 export * from './taskUtils';
 
@@ -17,7 +17,6 @@ export {
   formatDateRange,
   getDaysBetween,
   formatNumber,
-  formatCurrency,
   formatPercentage,
   formatFileSize,
   truncateText,
@@ -29,3 +28,12 @@ export * from './validationUtils';
 
 // Re-export logger
 export { logger } from './logger';
+
+// Export error handling utilities
+export { 
+  ErrorHandler,
+  handleApiError,
+  handleComponentError,
+  handleAsync,
+  retryOperation
+} from './errorHandler';

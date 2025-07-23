@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import type { Participant, Task } from '../../types/schedule';
-import EmailModal from '../EmailModal/index';
-import WorkflowModal from '../WorkflowModal';
-import TaskEditModal from '../TaskEditModal';
-import ProductRequestModal from '../ProductRequestModal/index';
-import TaskCreateModal from '../TaskCreateModal';
-import FactorySelectionModal from './FactorySelectionModal';
 import { factories } from '../../data/factories';
+
+// Lazy load all modal components
+const EmailModal = lazy(() => import('../EmailModal/index'));
+const WorkflowModal = lazy(() => import('../WorkflowModal'));
+const TaskEditModal = lazy(() => import('../TaskEditModal'));
+const ProductRequestModal = lazy(() => import('../ProductRequestModal/index'));
+const TaskCreateModal = lazy(() => import('../TaskCreateModal'));
+const FactorySelectionModal = lazy(() => import('./FactorySelectionModal'));
 
 interface ModalState {
   showEmailModal: boolean;
@@ -86,9 +88,9 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
         isOpen={modalState.showEmailModal}
         onClose={() => setModalState(prev => ({ ...prev, showEmailModal: false }))}
         onSend={handleEmailSend}
-        defaultRecipients={modalState.selectedFactories.length > 0 ? modalState.selectedFactories.join(', ') : ''}
+        defaultRecipients={modalState.selectedFactories?.length > 0 ? modalState.selectedFactories.join(', ') : ''}
         availableFactories={
-          modalState.selectedFactories.length > 0 ? 
+          modalState.selectedFactories?.length > 0 ? 
             // 선택된 공장들만 표시
             modalState.selectedFactories.map(name => {
               const factory = factories.find(f => f.name === name);

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface UseInfiniteScrollProps {
   hasMore: boolean;
@@ -17,18 +17,23 @@ export const useInfiniteScroll = ({
 }: UseInfiniteScrollProps) => {
   const observerRef = useRef<HTMLDivElement | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
+  const callbackRef = useRef<() => void>();
 
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting && hasMore && !isLoading) {
-        onLoadMore();
-      }
-    },
-    [hasMore, isLoading, onLoadMore]
-  );
+  // Store the latest callback
+  callbackRef.current = () => {
+    if (hasMore && !isLoading) {
+      onLoadMore();
+    }
+  };
 
   useEffect(() => {
+    const handleObserver = (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && callbackRef.current) {
+        callbackRef.current();
+      }
+    };
+
     if (observer.current) {
       observer.current.disconnect();
     }
@@ -48,7 +53,9 @@ export const useInfiniteScroll = ({
         observer.current.disconnect();
       }
     };
-  }, [handleObserver, threshold, rootElement]);
+    // Note: hasMore, isLoading, onLoadMore are not in deps because they are accessed via callbackRef
+    // This prevents unnecessary observer recreations while still accessing latest values
+  }, [threshold, rootElement]);
 
   return { observerRef };
 };

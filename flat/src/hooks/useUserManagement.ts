@@ -1,8 +1,34 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { UserData } from './useUserFilter';
 import type { UserFormData } from '../components/Users/UserModal';
+import type { UserRole } from '../store/slices/userSlice';
 
 const STORAGE_KEY = 'flat_users';
+
+// Type guard for UserRole validation
+const isValidUserRole = (role: any): role is UserRole => {
+  return typeof role === 'string' && ['admin', 'manager', 'customer'].includes(role);
+};
+
+// Type guard for UserData validation with runtime type checking
+const isValidUserData = (obj: any): obj is UserData => {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.email === 'string' &&
+    typeof obj.phone === 'string' &&
+    isValidUserRole(obj.role) &&
+    (obj.department === undefined || typeof obj.department === 'string') &&
+    (obj.position === undefined || typeof obj.position === 'string')
+  );
+};
+
+// Type guard for UserData array validation
+const isValidUserDataArray = (arr: any): arr is UserData[] => {
+  return Array.isArray(arr) && arr.every(isValidUserData);
+};
 
 // 초기 샘플 데이터
 const initialUsers: UserData[] = [
@@ -83,11 +109,23 @@ const initialUsers: UserData[] = [
 export const useUserManagement = () => {
   // localStorage에서 데이터 로드
   const loadUsers = (): UserData[] => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+      return initialUsers;
+    }
+
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : initialUsers;
+      const parsed = JSON.parse(stored);
+      
+      // Runtime type validation using type guard
+      if (isValidUserDataArray(parsed)) {
+        return parsed;
+      } else {
+        console.warn('Invalid user data format in localStorage, using defaults');
+        return initialUsers;
+      }
     } catch (error) {
-      console.error('Failed to load users from localStorage:', error);
+      console.warn('Failed to parse user data from localStorage:', error);
       return initialUsers;
     }
   };

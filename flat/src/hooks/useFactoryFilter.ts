@@ -15,6 +15,8 @@ export const useFactoryFilter = (factories: Factory[]): UseFactoryFilterReturn =
   const [selectedType, setSelectedType] = useState<FactoryType>('제조');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const searchLower = useMemo(() => searchTerm.toLowerCase(), [searchTerm]);
+
   const filteredFactories = useMemo(() => {
     return factories.filter(factory => {
       // 타입 필터링
@@ -25,8 +27,7 @@ export const useFactoryFilter = (factories: Factory[]): UseFactoryFilterReturn =
         return matchesType;
       }
 
-      // 검색어 필터링
-      const searchLower = searchTerm.toLowerCase();
+      // 검색어 필터링 (사전에 lowercase로 변환된 값 사용)
       const matchesSearch = 
         factory.name.toLowerCase().includes(searchLower) ||
         factory.address.toLowerCase().includes(searchLower) ||
@@ -41,7 +42,7 @@ export const useFactoryFilter = (factories: Factory[]): UseFactoryFilterReturn =
       
       return matchesType && matchesSearch;
     });
-  }, [factories, selectedType, searchTerm]);
+  }, [factories, selectedType, searchLower, searchTerm]);
 
   return {
     selectedType,

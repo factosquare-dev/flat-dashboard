@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { ProjectStatus } from '../../types/project';
 
 interface StatusDropdownProps {
@@ -25,16 +25,16 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
+    }
+  }, []);
 
+  useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [handleClickOutside]);
 
   const statuses: ProjectStatus[] = ['시작전', '진행중', '완료', '중단'];
 

@@ -76,6 +76,29 @@ export interface ModalState {
   dragOverProjectIndex: number | null;
 }
 
+// Task Controls interface
+export interface TaskControls {
+  tasks: Task[];
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  addTask: (task: Omit<Task, 'id' | 'x' | 'width' | 'color'>) => Task;
+  updateTask: (taskId: number, updates: Partial<Task>) => void;
+  deleteTask: (taskId: number) => void;
+  reorderTasks: (draggedIndex: number, targetIndex: number, projectId: string) => void;
+  calculateTaskPosition: (taskStartDate: Date, taskEndDate: Date) => { x: number; width: number };
+}
+
+// Drag Controls interface
+export interface DragControls {
+  isDragging: boolean;
+  scrollRef: React.RefObject<HTMLDivElement>;
+  handleMouseDown: (e: React.MouseEvent) => void;
+  handleMouseMove: (e: React.MouseEvent) => void;
+  handleMouseUp: () => void;
+  isDragClick: () => boolean;
+  handleSliderChange?: (value: number) => void;
+  scrollToToday?: () => void;
+}
+
 // Ensure all types are properly exported
 export type {
   Task,
@@ -83,5 +106,7 @@ export type {
   Schedule,
   DragTooltip,
   ResizePreview,
-  ModalState
+  ModalState,
+  TaskControls,
+  DragControls
 };

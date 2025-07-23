@@ -1,13 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { factories, type Factory as FactoryType } from '../../data/factories';
 import FactoryModal, { type FactoryFormData } from '../../components/Factories/FactoryModal';
 import FactoryCard from '../../components/Factories/FactoryCard';
 import FactoryToolbar from '../../components/Factories/FactoryToolbar';
+import FloatingActionButton from '../../components/common/FloatingActionButton';
 import { useFactoryFilter } from '../../hooks/useFactoryFilter';
+import { useModalState } from '../../hooks/useModalState';
+import { Building2 } from 'lucide-react';
 
 const FactoriesPage: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingFactory, setEditingFactory] = useState<FactoryType | null>(null);
+  const modalState = useModalState<FactoryType | null>(false, null);
   
   // 필터링 로직을 커스텀 훅으로 분리
   const {
@@ -19,14 +21,12 @@ const FactoriesPage: React.FC = () => {
   } = useFactoryFilter(factories);
 
   const handleAddFactory = useCallback(() => {
-    setEditingFactory(null);
-    setIsModalOpen(true);
-  }, []);
+    modalState.open(null);
+  }, [modalState]);
 
   const handleEditFactory = useCallback((factory: FactoryType) => {
-    setEditingFactory(factory);
-    setIsModalOpen(true);
-  }, []);
+    modalState.open(factory);
+  }, [modalState]);
 
   const handleDeleteFactory = useCallback((factoryId: string) => {
     // TODO: API 연동 시 실제 삭제 로직 구현
@@ -36,13 +36,12 @@ const FactoriesPage: React.FC = () => {
   const handleSaveFactory = useCallback((factoryData: FactoryFormData) => {
     // TODO: API 연동 시 실제 저장 로직 구현
     console.log('Save factory:', factoryData);
-    setIsModalOpen(false);
-  }, []);
+    modalState.close();
+  }, [modalState]);
 
   const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setEditingFactory(null);
-  }, []);
+    modalState.close();
+  }, [modalState]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50">
@@ -85,12 +84,21 @@ const FactoriesPage: React.FC = () => {
 
       </div>
 
+      {/* 플로팅 액션 버튼 - 새 공장 추가 */}
+      <FloatingActionButton
+        onClick={handleAddFactory}
+        icon={<Building2 />}
+        label="새 공장 추가"
+        variant="primary"
+        position="first"
+      />
+
       {/* 공장 추가/수정 모달 */}
       <FactoryModal
-        isOpen={isModalOpen}
+        isOpen={modalState.isOpen}
         onClose={handleCloseModal}
         onSave={handleSaveFactory}
-        editData={editingFactory as FactoryFormData | null}
+        editData={modalState.data as FactoryFormData | null}
       />
     </div>
   );

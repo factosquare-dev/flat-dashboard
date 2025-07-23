@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { ServiceType } from '../../types/project';
 
 interface ServiceTypeDropdownProps {
@@ -10,16 +10,16 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
+    }
+  }, []);
 
+  useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [handleClickOutside]);
 
   const serviceTypes: ServiceType[] = ['OEM', 'ODM', 'OBM', 'Private Label', 'White Label', '기타'];
 

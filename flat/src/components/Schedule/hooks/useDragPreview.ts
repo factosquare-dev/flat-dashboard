@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { factories } from '../../../data/factories';
+import { formatDateISO } from '../../../utils/dateUtils';
 
 export const useDragPreview = (projects: any[]) => {
   const [dragPreview, setDragPreview] = useState<{ projectId: string; startDate: string; endDate: string } | null>(null);
@@ -21,8 +22,8 @@ export const useDragPreview = (projects: any[]) => {
     draggedTaskFactory: string
   ) => {
     // Always update with new dates
-    const newStartDate = startDate.toISOString().split('T')[0];
-    const newEndDate = endDate.toISOString().split('T')[0];
+    const newStartDate = formatDateISO(startDate);
+    const newEndDate = formatDateISO(endDate);
     
     // Mark that we've moved from initial position
     if (isInitialPosition) {

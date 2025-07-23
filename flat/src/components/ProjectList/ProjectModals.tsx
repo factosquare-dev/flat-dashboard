@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import type { Project } from '../../types/project';
-import EmailModal from '../EmailModal/index';
-import ProjectModal from '../ProjectModal/index';
+
+// Lazy load modal components
+const EmailModal = lazy(() => import('../EmailModal/index'));
+const ProjectModal = lazy(() => import('../ProjectModal/index'));
 
 interface ProjectModalsProps {
   showEmailModal: boolean;
@@ -32,20 +34,28 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
 
   return (
     <>
-      <EmailModal 
-        isOpen={showEmailModal}
-        onClose={onCloseEmailModal}
-        onSend={handleEmailSend}
-        availableFactories={availableFactories}
-      />
+      {showEmailModal && (
+        <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+          <EmailModal 
+            isOpen={showEmailModal}
+            onClose={onCloseEmailModal}
+            onSend={handleEmailSend}
+            availableFactories={availableFactories}
+          />
+        </Suspense>
+      )}
       
-      <ProjectModal
-        isOpen={showProjectModal}
-        onClose={onCloseProjectModal}
-        onSave={onSaveProject}
-        editData={editingProject}
-        mode={modalMode}
-      />
+      {showProjectModal && (
+        <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+          <ProjectModal
+            isOpen={showProjectModal}
+            onClose={onCloseProjectModal}
+            onSave={onSaveProject}
+            editData={editingProject}
+            mode={modalMode}
+          />
+        </Suspense>
+      )}
     </>
   );
 };

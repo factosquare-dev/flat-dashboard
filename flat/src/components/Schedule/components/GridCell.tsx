@@ -1,5 +1,5 @@
 import React from 'react';
-import { isWeekend, isToday } from '../../../utils/dateUtils';
+import { isWeekend, isToday, formatDateISO } from '../../../utils/dateUtils';
 
 interface GridCellProps {
   day: Date;
@@ -53,7 +53,7 @@ const GridCell: React.FC<GridCellProps> = ({
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      data-date={day.toISOString().split('T')[0]}
+      data-date={formatDateISO(day)}
       data-project-id={projectId}
     />
   );

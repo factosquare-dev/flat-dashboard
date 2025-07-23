@@ -4,7 +4,7 @@ import type { DragTooltip } from '../../../types/schedule';
 export const useDragTooltip = () => {
   const [dragTooltip, setDragTooltip] = useState<DragTooltip | null>(null);
 
-  const formatDate = (date: Date) => {
+  const formatDateShort = (date: Date) => {
     return date.toLocaleDateString('ko-KR', { 
       month: 'short', 
       day: 'numeric' 
@@ -17,7 +17,7 @@ export const useDragTooltip = () => {
     setDragTooltip({
       x,
       y,
-      date: `${formatDate(startDate)} ~ ${formatDate(endDate)} (${taskDuration + 1}일)`
+      date: `${formatDateShort(startDate)} ~ ${formatDateShort(endDate)} (${taskDuration + 1}일)`
     });
   };
 

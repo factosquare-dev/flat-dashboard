@@ -1,6 +1,7 @@
 import type { Project } from '../types/project';
 import type { Schedule, Task, Participant } from '../types/schedule';
 import { projectFactories } from './mockData';
+import { formatDateISO } from '../utils/dateUtils';
 
 // 태스크 타입별 기간 (일)
 const TASK_DURATIONS = {
@@ -65,7 +66,7 @@ const addDays = (date: Date, days: number): Date => {
 };
 
 const formatDate = (date: Date): string => {
-  return date.toISOString().split('T')[0];
+  return formatDateISO(date);
 };
 
 // 공장별 담당자 매핑

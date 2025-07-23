@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Project } from '../../types/project';
 import { MoreVertical, GripVertical } from 'lucide-react';
-import ProjectTableRow from './ProjectTableRow';
+import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '../../hooks/useColumnOrder';
 import type { Column } from '../../hooks/useColumnOrder';
 
@@ -21,7 +21,7 @@ interface ProjectTableProps {
   onStartDrag?: (index: number) => void;
 }
 
-const ProjectTable: React.FC<ProjectTableProps> = ({
+const ProjectTable: React.FC<ProjectTableProps> = React.memo(({
   projects,
   selectedRows,
   sortField,
@@ -131,6 +131,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
         </table>
     </div>
   );
-};
+});
+
+ProjectTable.displayName = 'ProjectTable';
 
 export default ProjectTable;

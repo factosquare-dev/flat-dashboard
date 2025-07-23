@@ -146,7 +146,7 @@ const FactoryCard: React.FC<FactoryCardProps> = ({ factory, onEdit, onDelete }) 
             <div className="flex flex-wrap gap-2">
               {factory.certifications.map((cert, index) => (
                 <span 
-                  key={index} 
+                  key={cert} 
                   className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
                   title={cert}
                 >

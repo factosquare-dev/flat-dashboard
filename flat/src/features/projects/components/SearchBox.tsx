@@ -34,6 +34,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isOpen && anchorElement) {
@@ -47,11 +48,25 @@ const SearchBox: React.FC<SearchBoxProps> = ({
       setSearchTerm('');
       setSelectedIndex(0);
       
-      setTimeout(() => {
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      timeoutRef.current = setTimeout(() => {
         searchInputRef.current?.focus();
       }, 10);
     }
   }, [isOpen, anchorElement]);
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

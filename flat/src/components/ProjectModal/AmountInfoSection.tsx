@@ -1,6 +1,7 @@
 import React from 'react';
 import { DollarSign } from 'lucide-react';
 import type { ProjectData } from './types';
+import { formatCurrency } from '../../utils/currency';
 
 interface AmountInfoSectionProps {
   formData: ProjectData;
@@ -8,20 +9,10 @@ interface AmountInfoSectionProps {
 }
 
 const AmountInfoSection: React.FC<AmountInfoSectionProps> = ({ formData, onChange }) => {
-  const formatCurrency = (value: string) => {
+  const formatCurrencyValue = (value: string) => {
     const num = value.replace(/[^0-9]/g, '');
     if (!num) return '';
-    
-    const number = parseInt(num);
-    const eok = Math.floor(number / 100000000);
-    const man = Math.floor((number % 100000000) / 10000);
-    
-    let result = '';
-    if (eok > 0) result += `${eok}억`;
-    if (man > 0) result += `${result ? ' ' : ''}${man}만`;
-    if (result) result += '원';
-    
-    return result || num;
+    return formatCurrency(parseInt(num));
   };
 
   const handleCurrencyChange = (field: 'sales' | 'purchase', value: string) => {
@@ -47,7 +38,7 @@ const AmountInfoSection: React.FC<AmountInfoSectionProps> = ({ formData, onChang
           <label className="block text-sm font-medium text-gray-700 mb-2">매출</label>
           <input
             type="text"
-            value={formatCurrency(formData.sales)}
+            value={formatCurrencyValue(formData.sales)}
             onChange={(e) => handleCurrencyChange('sales', e.target.value)}
             onKeyPress={handleKeyPress}
             className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -58,7 +49,7 @@ const AmountInfoSection: React.FC<AmountInfoSectionProps> = ({ formData, onChang
           <label className="block text-sm font-medium text-gray-700 mb-2">매입</label>
           <input
             type="text"
-            value={formatCurrency(formData.purchase)}
+            value={formatCurrencyValue(formData.purchase)}
             onChange={(e) => handleCurrencyChange('purchase', e.target.value)}
             onKeyPress={handleKeyPress}
             className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"

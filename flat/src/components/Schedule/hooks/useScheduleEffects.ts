@@ -74,7 +74,7 @@ export const useScheduleEffects = (
         }, 300);
       }
     }
-  }, [days.length]); // days 배열의 길이가 변경될 때마다 실행
+  }, [days, scrollRef]); // days 배열이 변경될 때마다 실행
 
   const handleSliderChange = (value: number) => {
     setSliderValue(value);

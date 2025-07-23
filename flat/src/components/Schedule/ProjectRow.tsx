@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Trash2 } from 'lucide-react';
 import type { Participant, Task } from '../../types/schedule';
 import { isWeekend } from '../../utils/dateUtils';
@@ -49,7 +49,10 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   projectIndex,
   isDragOver
 }) => {
-  const projectTasks = tasks.filter(task => task.projectId === project.id);
+  const projectTasks = useMemo(
+    () => tasks.filter(task => task.projectId === project.id),
+    [tasks, project.id]
+  );
 
   return (
     <div
@@ -83,7 +86,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
         <div className="absolute inset-0 flex">
           {days.map((day, index) => (
             <div
-              key={index}
+              key={day.toISOString()}
               className={`${isWeekend(day) ? 'bg-gray-100' : ''}`}
               style={{ width: `${cellWidth}px` }}
             />

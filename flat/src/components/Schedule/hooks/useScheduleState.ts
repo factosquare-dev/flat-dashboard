@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import type { Participant, Task } from '../../../types/schedule';
-import { getDaysArray, formatDate } from '../../../utils/dateUtils';
+import { getDaysArray } from '../../../utils/dateUtils';
+import { formatDate } from '../../../utils/formatUtils';
 import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
 import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
 import { factories } from '../../../data/factories';
@@ -50,17 +51,19 @@ export const useScheduleState = (
   
   if (projectStartDate && projectEndDate) {
     // 프로젝트 날짜가 제공된 경우, 앞뒤로 4일씩 여유 추가
-    startDate = new Date(projectStartDate);
+    const projectStart = new Date(projectStartDate);
+    startDate = new Date(projectStart.getTime());
     startDate.setDate(startDate.getDate() - 4);
     
-    endDate = new Date(projectEndDate);
+    const projectEnd = new Date(projectEndDate);
+    endDate = new Date(projectEnd.getTime());
     endDate.setDate(endDate.getDate() + 4);
   } else {
     // 날짜가 제공되지 않은 경우 기본값 사용 - 더 긴 기간으로 설정
-    startDate = new Date(today);
+    startDate = new Date(today.getTime());
     startDate.setDate(startDate.getDate() - 30);
     
-    endDate = new Date(today);
+    endDate = new Date(today.getTime());
     endDate.setMonth(endDate.getMonth() + 6);
   }
 
@@ -77,8 +80,8 @@ export const useScheduleState = (
     cellWidth
   };
 
-  // 색상 배열 정의 (실제 색상 값)
-  const colors = [
+  // 색상 배열 정의 (실제 색상 값) - useMemo로 최적화
+  const colors = useMemo(() => [
     "#3b82f6", // blue-500
     "#ef4444", // red-500
     "#22c55e", // green-500
@@ -89,7 +92,7 @@ export const useScheduleState = (
     "#f97316", // orange-500
     "#14b8a6", // teal-500
     "#06b6d4"  // cyan-500
-  ];
+  ], []);
 
   // 공장 데이터를 기반으로 초기 프로젝트 생성
   const initialProjects = participants && participants.length > 0 ? participants : 

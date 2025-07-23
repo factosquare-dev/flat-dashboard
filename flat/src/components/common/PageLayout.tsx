@@ -16,7 +16,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`fixed inset-0 bg-gray-50 overflow-hidden ${className}`}>
+    <div className={`fixed inset-0 bg-gray-50 overflow-hidden ${className || ''}`.trim()}>
       <div 
         className="absolute bg-white overflow-hidden"
         style={{

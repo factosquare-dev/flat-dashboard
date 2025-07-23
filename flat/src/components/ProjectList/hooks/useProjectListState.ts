@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { Project } from '../../../types/project';
 import { useProjects } from '../../../hooks/useProjects';
 import { useProjectFilters } from '../../../hooks/useProjectFilters';
+import { formatDateISO } from '../../../utils/dateUtils';
 
 export const useProjectListState = () => {
   const projectsHook = useProjects();
@@ -35,8 +36,8 @@ export const useProjectListState = () => {
     const newProject = {
       ...projectWithoutId,
       client: `${project.client} (복사본)`,
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date().toISOString().split('T')[0]
+      startDate: formatDateISO(new Date()),
+      endDate: formatDateISO(new Date())
     };
     projectsHook.addProject(newProject);
   }, [projectsHook]);

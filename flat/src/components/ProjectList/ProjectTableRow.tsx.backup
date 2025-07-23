@@ -16,7 +16,6 @@ import {
   FolderOpen,
   FileSpreadsheet
 } from 'lucide-react';
-import { Badge } from '../common';
 import { useEditableCell } from '../../hooks/useEditableCell';
 import EditableCell from './EditableCell';
 import SearchableCell from '../../features/projects/components/SearchableCell';

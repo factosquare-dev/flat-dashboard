@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { Participant, Task } from '../../../types/schedule';
 
 interface ScheduleTableViewProps {
@@ -8,21 +8,27 @@ interface ScheduleTableViewProps {
   onDeleteProject?: (projectId: string) => void;
 }
 
-const ScheduleTableView: React.FC<ScheduleTableViewProps> = ({
+const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
   projects,
   tasks,
   onTaskClick,
   onDeleteProject
 }) => {
   // Sort all tasks by start date
-  const sortedTasks = [...tasks].sort((a, b) => 
-    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  const sortedTasks = useMemo(
+    () => [...tasks].sort((a, b) => 
+      new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    ),
+    [tasks]
   );
 
   // Create a map of project id to project for quick lookup
-  const projectMap = new Map(projects.map(p => [p.id, p]));
+  const projectMap = useMemo(
+    () => new Map(projects.map(p => [p.id, p])),
+    [projects]
+  );
 
-  const formatDate = (dateString: string) => {
+  const formatDateShort = (dateString: string) => {
     try {
       const date = new Date(dateString);
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -119,9 +125,9 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = ({
                 {/* 일정 */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2 text-xs text-gray-600">
-                    <span>{formatDate(task.startDate)}</span>
+                    <span>{formatDateShort(task.startDate)}</span>
                     <span className="text-gray-300">~</span>
-                    <span>{formatDate(task.endDate)}</span>
+                    <span>{formatDateShort(task.endDate)}</span>
                   </div>
                 </td>
                 
@@ -190,6 +196,8 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = ({
       </table>
     </div>
   );
-};
+});
+
+ScheduleTableView.displayName = 'ScheduleTableView';
 
 export default ScheduleTableView;

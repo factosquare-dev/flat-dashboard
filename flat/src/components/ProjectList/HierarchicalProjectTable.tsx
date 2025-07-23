@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Project } from '../../types/project';
 import { ChevronDown, ChevronRight, Folder, FolderOpen, FileSpreadsheet } from 'lucide-react';
 import DraggableProjectTable from './DraggableProjectTable';
@@ -22,6 +22,11 @@ interface HierarchicalProjectTableProps {
 
 const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props) => {
   const [projectData, setProjectData] = useState<Project[]>(props.projects);
+  
+  // Sync local state with props when props change
+  useEffect(() => {
+    setProjectData(props.projects);
+  }, [props.projects]);
   
   const handleToggleProject = (projectId: string) => {
     const toggled = toggleProject(projectData, projectId);

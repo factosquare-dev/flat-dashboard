@@ -53,13 +53,26 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     dragImage.style.position = 'absolute';
     dragImage.style.top = '-9999px';
     dragImage.style.left = '-9999px';
-    dragImage.innerHTML = `<span style="font-size: 11px; color: #1e40af; font-weight: 500;">${label}</span>`;
+    // Safe text content - prevents XSS attacks
+    const span = document.createElement('span');
+    span.style.fontSize = '11px';
+    span.style.color = '#1e40af';
+    span.style.fontWeight = '500';
+    span.textContent = label; // Safe text assignment - no HTML parsing
+    dragImage.appendChild(span);
     document.body.appendChild(dragImage);
     
     e.dataTransfer.setDragImage(dragImage, 25, 15);
     
     setTimeout(() => {
-      document.body.removeChild(dragImage);
+      try {
+        // Safe DOM element removal with error handling
+        if (dragImage && document.body.contains(dragImage)) {
+          document.body.removeChild(dragImage);
+        }
+      } catch (error) {
+        console.warn('Failed to remove drag image element:', error);
+      }
     }, 0);
     
     e.currentTarget.classList.add('opacity-50');

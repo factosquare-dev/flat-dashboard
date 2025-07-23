@@ -4,6 +4,9 @@ import BaseModal from './common/BaseModal';
 import FormInput from './common/FormInput';
 import FormSelect from './common/FormSelect';
 import Button from './common/Button';
+import { formatDateISO } from '../utils/dateUtils';
+import { UI_DELAYS } from '../constants/time';
+import { useToast } from '../hooks/useToast';
 
 interface TaskCreateModalProps {
   isOpen: boolean;
@@ -24,12 +27,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   projectId,
   selectedFactory
 }) => {
-  const getToday = () => new Date().toISOString().split('T')[0];
+  const getToday = () => formatDateISO(new Date());
+  const { error: toastError } = useToast();
   
   const [factory, setFactory] = useState('');
   const [taskType, setTaskType] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const cleanupTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   
   // 모달이 열릴 때 날짜 초기화
   React.useEffect(() => {
@@ -51,6 +56,15 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       }
     }
   }, [selectedFactory, projectId, isOpen]);
+  
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (cleanupTimeoutRef.current) {
+        clearTimeout(cleanupTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // 사용 가능한 공장 목록 필터링
   const availableFactoryList = availableFactories.length > 0 
@@ -63,24 +77,58 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     : [];
 
   const handleSave = () => {
-    if (factory && taskType && startDate && endDate) {
-      onSave({
-        factory,
-        taskType,
-        startDate,
-        endDate
-      });
+    // Input validation with proper error messages
+    if (!factory?.trim()) {
+      toastError('공장 선택 오류', '공장을 선택해주세요.');
+      return;
     }
+    
+    if (!taskType?.trim()) {
+      toastError('작업 유형 오류', '작업 유형을 선택해주세요.');
+      return;
+    }
+    
+    if (!startDate?.trim() || !endDate?.trim()) {
+      toastError('날짜 입력 오류', '시작일과 종료일을 모두 입력해주세요.');
+      return;
+    }
+    
+    // Validate dates with better error handling
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      toastError('날짜 형식 오류', '올바른 날짜 형식이 아닙니다.');
+      return;
+    }
+    
+    if (start > end) {
+      toastError('날짜 범위 오류', '시작일은 종료일보다 이전이어야 합니다.');
+      return;
+    }
+    
+    onSave({
+      factory,
+      taskType,
+      startDate,
+      endDate
+    });
   };
   
   const handleClose = () => {
+    // Clear any existing timeout
+    if (cleanupTimeoutRef.current) {
+      clearTimeout(cleanupTimeoutRef.current);
+    }
+    
     // 모달이 닫힐 때만 초기화 (다시 열릴 때 새로운 값으로 설정됨)
-    setTimeout(() => {
+    cleanupTimeoutRef.current = setTimeout(() => {
       setFactory('');
       setTaskType('');
       setStartDate('');
       setEndDate('');
-    }, 300);
+      cleanupTimeoutRef.current = null;
+    }, UI_DELAYS.MODAL_CLEANUP);
     onClose();
   };
 

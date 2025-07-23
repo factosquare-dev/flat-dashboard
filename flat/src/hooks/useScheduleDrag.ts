@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { isToday } from '../utils/dateUtils';
 
 export const useScheduleDrag = (
@@ -43,25 +43,30 @@ export const useScheduleDrag = (
     return dragTime < 200 && dragDistance < 5;
   };
 
-  // 스크롤 이벤트 핸들러 (슬라이더 동기화)
+  // 스크롤 이벤트 핸들러 (슬라이더 동기화) - 메모리 누수 방지를 위해 useCallback 사용
+  const handleScroll = useCallback(() => {
+    if (!setSliderValue || !scrollRef.current) return;
+    
+    const scrollLeft = scrollRef.current.scrollLeft;
+    const scrollWidth = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+    const percentage = scrollWidth > 0 ? (scrollLeft / scrollWidth) * 100 : 0;
+    setSliderValue(percentage);
+  }, [setSliderValue]);
+
   useEffect(() => {
     if (!setSliderValue) return;
-
-    const handleScroll = () => {
-      if (scrollRef.current) {
-        const scrollLeft = scrollRef.current.scrollLeft;
-        const scrollWidth = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
-        const percentage = scrollWidth > 0 ? (scrollLeft / scrollWidth) * 100 : 0;
-        setSliderValue(percentage);
-      }
-    };
 
     const scrollElement = scrollRef.current;
     if (scrollElement) {
       scrollElement.addEventListener('scroll', handleScroll);
-      return () => scrollElement.removeEventListener('scroll', handleScroll);
+      return () => {
+        // 정리 시 스크롤 요소 존재 여부를 다시 확인하여 안전하게 제거
+        if (scrollElement) {
+          scrollElement.removeEventListener('scroll', handleScroll);
+        }
+      };
     }
-  }, [setSliderValue]);
+  }, [setSliderValue, handleScroll]);
 
   // 오늘 날짜로 자동 스크롤 (정중앙 정렬)
   useEffect(() => {
@@ -74,7 +79,8 @@ export const useScheduleDrag = (
     if (todayIndex < 0) return;
 
     // 약간의 지연 후 실행
-    setTimeout(() => {
+    const SCROLL_TO_TODAY_DELAY = 150;
+    const timeoutId = setTimeout(() => {
       if (!scrollRef.current) return;
 
       const todayPosition = todayIndex * cellWidth;
@@ -82,7 +88,9 @@ export const useScheduleDrag = (
       const scrollLeft = todayPosition - viewportWidth / 2 + cellWidth / 2;
 
       scrollRef.current.scrollLeft = Math.max(0, scrollLeft);
-    }, 150);
+    }, SCROLL_TO_TODAY_DELAY);
+
+    return () => clearTimeout(timeoutId);
   }, [days]);
 
   // 슬라이더 이동 처리

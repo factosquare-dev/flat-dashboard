@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Participant, Task } from '../../types/schedule';
+import type { Participant, Task, TaskControls, DragControls, ModalState } from '../../types/schedule';
 import { findAvailableDateRange } from '../../utils/taskUtils';
 import ScheduleGrid from './ScheduleGrid';
 import { factories, taskTypesByFactoryType } from '../../data/factories';
@@ -13,10 +13,10 @@ interface ScheduleGridContainerProps {
   days: Date[];
   cellWidth: number;
   scrollRef: React.RefObject<HTMLDivElement>;
-  taskControls: any;
-  dragControls: any;
-  modalState: any;
-  setModalState: any;
+  taskControls: TaskControls;
+  dragControls: DragControls;
+  modalState: ModalState;
+  setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
   selectedProjects: string[];
   setProjects: (projects: Participant[]) => void;
   onDeleteProject: (projectId: string) => void;
@@ -28,6 +28,7 @@ interface ScheduleGridContainerProps {
 }
 
 import { getInteractionState, setInteractionMode, setPreventClickUntil } from './utils/globalState';
+import { SCHEDULE_CONSTANTS } from './constants';
 
 const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   projects,
@@ -63,8 +64,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     originalHandleTaskDragEnd();
     // Update interaction state
     setInteractionMode('idle');
-    setPreventClickUntil(Date.now() + 300);
-    console.log('[INTERACTION] Drag ended, preventing clicks for 300ms');
+    setPreventClickUntil(Date.now() + SCHEDULE_CONSTANTS.INTERACTION_PREVENTION_DELAY);
   };
 
   // Task resize hooks  
@@ -97,17 +97,11 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     const now = Date.now();
     const state = getInteractionState();
     if (state.mode !== 'idle' || now < state.preventClickUntil) {
-      console.log('[GRID CLICK] Prevented due to:', {
-        mode: state.mode,
-        preventClickUntil: state.preventClickUntil,
-        timeLeft: Math.max(0, state.preventClickUntil - now)
-      });
       return;
     }
     
     // Additional safety check for ongoing operations
     if (modalState.isDraggingTask || modalState.isResizingTask) {
-      console.log('[GRID CLICK] Prevented due to ongoing operation');
       return;
     }
     

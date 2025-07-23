@@ -1,18 +1,21 @@
-export const formatDate = (date: Date): string => {
+export const getDayNumber = (date: Date): string => {
   return date.getDate().toString();
 };
 
-export const formatDateRange = (start: Date, end: Date): string => {
-  return `${formatDate(start)} ~ ${formatDate(end)}`;
+export const formatDayNumberRange = (start: Date, end: Date): string => {
+  return `${getDayNumber(start)} ~ ${getDayNumber(end)}`;
 };
 
 export const getDaysArray = (start: Date, end: Date): Date[] => {
   const days: Date[] = [];
-  const current = new Date(start);
+  const startTime = start.getTime();
+  const endTime = end.getTime();
+  const oneDay = 24 * 60 * 60 * 1000;
   
-  while (current <= end) {
-    days.push(new Date(current));
-    current.setDate(current.getDate() + 1);
+  let currentTime = startTime;
+  while (currentTime <= endTime) {
+    days.push(new Date(currentTime));
+    currentTime += oneDay;
   }
   
   return days;
@@ -38,7 +41,118 @@ export const isWeekend = (date: Date): boolean => {
 
 export const getDateFromX = (x: number, startDate: Date, cellWidth: number): Date => {
   const daysFromStart = Math.round(x / cellWidth);
-  const date = new Date(startDate);
-  date.setDate(date.getDate() + daysFromStart);
-  return date;
+  const newDate = new Date(startDate.getTime());
+  newDate.setDate(newDate.getDate() + daysFromStart);
+  return newDate;
+};
+
+export const formatDateISO = (date: Date): string => {
+  return date.toISOString().split('T')[0];
+};
+
+// Alias for backward compatibility - use formatDateISO instead
+export const dateToString = formatDateISO;
+
+export const formatRelativeTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+  
+  if (diffInMinutes < 1) return '방금';
+  if (diffInMinutes < 60) return `${diffInMinutes}분 전`;
+  if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}시간 전`;
+  if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}일 전`;
+  
+  return date.toLocaleDateString('ko-KR');
+};
+
+export const getDaysFromToday = (dateString: string): number => {
+  const targetDate = new Date(dateString);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  targetDate.setHours(0, 0, 0, 0);
+  
+  const diffTime = targetDate.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
+export const isDateInRange = (date: Date, startDate: Date, endDate: Date): boolean => {
+  const targetTime = date.getTime();
+  const startTime = startDate.getTime();
+  const endTime = endDate.getTime();
+  
+  return targetTime >= startTime && targetTime <= endTime;
+};
+
+export const addDays = (date: Date, days: number): Date => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+};
+
+export const isSameDate = (date1: Date, date2: Date): boolean => {
+  return date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate();
+};
+
+// Format date to Korean locale string
+export function formatDate(date: string | Date, format: 'short' | 'long' | 'full' = 'short'): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  
+  if (isNaN(d.getTime())) {
+    return '-';
+  }
+  
+  switch (format) {
+    case 'short':
+      return d.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+    case 'long':
+      return d.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    case 'full':
+      return d.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+      });
+    default:
+      return d.toLocaleDateString('ko-KR');
+  }
+}
+
+// Format date range
+export function formatDateRange(startDate: string | Date, endDate: string | Date): string {
+  const start = formatDate(startDate);
+  const end = formatDate(endDate);
+  
+  if (start === end) {
+    return start;
+  }
+  
+  return `${start} ~ ${end}`;
+}
+
+// Calculate days between dates
+export function getDaysBetween(startDate: string | Date, endDate: string | Date): number {
+  const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
+  const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
+  
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diffDays;
+}
+
+// String to Date conversion
+export const stringToDate = (dateStr: string): Date => {
+  return new Date(dateStr + 'T00:00:00');
 };

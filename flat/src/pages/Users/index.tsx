@@ -1,13 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import UserModal, { type UserFormData } from '../../components/Users/UserModal';
 import UserCard, { type UserData } from '../../components/Users/UserCard';
 import UserToolbar from '../../components/Users/UserToolbar';
+import FloatingActionButton from '../../components/common/FloatingActionButton';
 import { useUserFilter } from '../../hooks/useUserFilter';
 import { useUserManagement } from '../../hooks/useUserManagement';
+import { useModalState } from '../../hooks/useModalState';
+import { UserPlus } from 'lucide-react';
 
 const UsersPage: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<UserData | null>(null);
+  const modalState = useModalState<UserData | null>(false, null);
   
   // 사용자 관리 훅 사용
   const {
@@ -29,14 +31,12 @@ const UsersPage: React.FC = () => {
   } = useUserFilter(users);
 
   const handleAddUser = useCallback(() => {
-    setEditingUser(null);
-    setIsModalOpen(true);
-  }, []);
+    modalState.open(null);
+  }, [modalState]);
 
   const handleEditUser = useCallback((user: UserData) => {
-    setEditingUser(user);
-    setIsModalOpen(true);
-  }, []);
+    modalState.open(user);
+  }, [modalState]);
 
   const handleDeleteUser = useCallback((userId: string) => {
     const success = deleteUser(userId);
@@ -47,20 +47,20 @@ const UsersPage: React.FC = () => {
 
   const handleSaveUser = useCallback((userData: UserFormData) => {
     // 이메일 중복 확인
-    if (checkEmailExists(userData.email, editingUser?.id)) {
+    if (checkEmailExists(userData.email, modalState.data?.id)) {
       alert('이미 사용 중인 이메일입니다.');
       return;
     }
 
     // 전화번호 중복 확인
-    if (checkPhoneExists(userData.phone, editingUser?.id)) {
+    if (checkPhoneExists(userData.phone, modalState.data?.id)) {
       alert('이미 사용 중인 전화번호입니다.');
       return;
     }
 
-    if (editingUser) {
+    if (modalState.data) {
       // 수정
-      const success = updateUser(editingUser.id, userData);
+      const success = updateUser(modalState.data.id, userData);
       if (!success) {
         alert('사용자 수정에 실패했습니다.');
         return;
@@ -70,14 +70,12 @@ const UsersPage: React.FC = () => {
       addUser(userData);
     }
     
-    setIsModalOpen(false);
-    setEditingUser(null);
-  }, [editingUser, addUser, updateUser, checkEmailExists, checkPhoneExists]);
+    modalState.close();
+  }, [modalState, addUser, updateUser, checkEmailExists, checkPhoneExists]);
 
   const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setEditingUser(null);
-  }, []);
+    modalState.close();
+  }, [modalState]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50">
@@ -119,12 +117,21 @@ const UsersPage: React.FC = () => {
         )}
       </div>
 
+      {/* 플로팅 액션 버튼 - 새 사용자 추가 */}
+      <FloatingActionButton
+        onClick={handleAddUser}
+        icon={<UserPlus />}
+        label="새 사용자 추가"
+        variant="primary"
+        position="first"
+      />
+
       {/* 사용자 추가/수정 모달 */}
       <UserModal
-        isOpen={isModalOpen}
+        isOpen={modalState.isOpen}
         onClose={handleCloseModal}
         onSave={handleSaveUser}
-        editData={editingUser}
+        editData={modalState.data}
       />
     </div>
   );

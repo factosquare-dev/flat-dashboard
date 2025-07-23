@@ -2,67 +2,8 @@
  * Common formatting utilities
  */
 
-/**
- * Format date to Korean locale string
- */
-export function formatDate(date: string | Date, format: 'short' | 'long' | 'full' = 'short'): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  
-  if (isNaN(d.getTime())) {
-    return '-';
-  }
-  
-  switch (format) {
-    case 'short':
-      return d.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      });
-    case 'long':
-      return d.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    case 'full':
-      return d.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long',
-      });
-    default:
-      return d.toLocaleDateString('ko-KR');
-  }
-}
-
-/**
- * Format date range
- */
-export function formatDateRange(startDate: string | Date, endDate: string | Date): string {
-  const start = formatDate(startDate);
-  const end = formatDate(endDate);
-  
-  if (start === end) {
-    return start;
-  }
-  
-  return `${start} ~ ${end}`;
-}
-
-/**
- * Calculate days between dates
- */
-export function getDaysBetween(startDate: string | Date, endDate: string | Date): number {
-  const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
-  const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
-  
-  const diffTime = Math.abs(end.getTime() - start.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  return diffDays;
-}
+// Re-export date formatting functions from dateUtils for backward compatibility
+export { formatDate, formatDateRange, getDaysBetween } from './dateUtils';
 
 /**
  * Format number with thousand separators
@@ -74,15 +15,6 @@ export function formatNumber(value: number, decimals: number = 0): string {
   });
 }
 
-/**
- * Format currency
- */
-export function formatCurrency(value: number, currency: string = 'KRW'): string {
-  return value.toLocaleString('ko-KR', {
-    style: 'currency',
-    currency,
-  });
-}
 
 /**
  * Format percentage
@@ -133,30 +65,8 @@ export function formatPhoneNumber(phone: string): string {
   return phone;
 }
 
-/**
- * Get relative time string
- */
-export function getRelativeTime(date: string | Date): string {
-  const now = new Date();
-  const target = typeof date === 'string' ? new Date(date) : date;
-  const diffMs = now.getTime() - target.getTime();
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffHour = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHour / 24);
-  
-  if (diffDay > 7) {
-    return formatDate(target);
-  } else if (diffDay > 0) {
-    return `${diffDay}일 전`;
-  } else if (diffHour > 0) {
-    return `${diffHour}시간 전`;
-  } else if (diffMin > 0) {
-    return `${diffMin}분 전`;
-  } else {
-    return '방금 전';
-  }
-}
+// Re-export relative time formatting from dateUtils for backward compatibility
+export { formatRelativeTime as getRelativeTime } from './dateUtils';
 
 /**
  * Generate initials from name

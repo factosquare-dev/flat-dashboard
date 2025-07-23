@@ -13,7 +13,7 @@ interface TaskListProps {
   onTaskToggle: (taskId: string) => void;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ projectId, tasks, onTaskToggle }) => {
+const TaskList: React.FC<TaskListProps> = React.memo(({ projectId, tasks, onTaskToggle }) => {
   const completedCount = tasks.filter(t => t.completed).length;
   
   return (
@@ -89,6 +89,8 @@ const TaskList: React.FC<TaskListProps> = ({ projectId, tasks, onTaskToggle }) =
       </div>
     </div>
   );
-};
+});
+
+TaskList.displayName = 'TaskList';
 
 export default TaskList;

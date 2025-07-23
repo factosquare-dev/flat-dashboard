@@ -8,6 +8,24 @@ export interface Column {
   width?: string;
 }
 
+// Type guard for Column validation with runtime type checking
+const isValidColumn = (obj: any): obj is Column => {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    typeof obj.id === 'string' &&
+    typeof obj.label === 'string' &&
+    (obj.sortable === undefined || typeof obj.sortable === 'boolean') &&
+    (obj.align === undefined || ['left', 'center', 'right'].includes(obj.align)) &&
+    (obj.width === undefined || typeof obj.width === 'string')
+  );
+};
+
+// Type guard for Column array validation
+const isValidColumnArray = (arr: any): arr is Column[] => {
+  return Array.isArray(arr) && arr.every(isValidColumn);
+};
+
 const DEFAULT_COLUMNS: Column[] = [
   { id: 'productType', label: '제품유형', sortable: true, width: 'w-32' },
   { id: 'client', label: '고객명', sortable: true, width: 'w-32' },
@@ -33,12 +51,20 @@ export const useColumnOrder = () => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        const savedColumns = JSON.parse(saved);
-        // 새로운 컬럼이 추가된 경우를 대비하여 머지
-        const savedIds = savedColumns.map((col: Column) => col.id);
-        const newColumns = DEFAULT_COLUMNS.filter(col => !savedIds.includes(col.id));
-        return [...savedColumns, ...newColumns];
-      } catch {
+        const parsed = JSON.parse(saved);
+        
+        // Runtime type validation using type guard
+        if (isValidColumnArray(parsed)) {
+          // 새로운 컬럼이 추가된 경우를 대비하여 머지
+          const savedIds = parsed.map(col => col.id);
+          const newColumns = DEFAULT_COLUMNS.filter(col => !savedIds.includes(col.id));
+          return [...parsed, ...newColumns];
+        } else {
+          console.warn('Invalid column data format in localStorage, using defaults');
+          return DEFAULT_COLUMNS;
+        }
+      } catch (error) {
+        console.warn('Failed to parse column data from localStorage:', error);
         return DEFAULT_COLUMNS;
       }
     }

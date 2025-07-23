@@ -23,6 +23,8 @@ export const useDynamicLayout = () => {
 
   useEffect(() => {
     let rafId: number | null = null;
+    let timeoutId: NodeJS.Timeout | null = null;
+    let sidebarEventListeners: Array<{ element: Element; event: string; handler: EventListener }> = [];
     
     const calculateMargins = () => {
       if (rafId) return;
@@ -129,15 +131,27 @@ export const useDynamicLayout = () => {
     // Event listeners
     window.addEventListener('resize', calculateMargins);
     
-    // Periodic check for sidebar changes
-    const interval = setInterval(calculateMargins, 500);
+    // ResizeObserver for more efficient sidebar size tracking
+    const resizeObserver = new ResizeObserver(calculateMargins);
+    const sidebar = document.querySelector('aside') || 
+                   document.querySelector('[role="navigation"]') || 
+                   document.querySelector('.sidebar');
+    if (sidebar) {
+      resizeObserver.observe(sidebar);
+    }
     
     // Sidebar transition events
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
       const sidebar = document.querySelector('.flex-1.flex.flex-col.overflow-y-auto');
       if (sidebar) {
-        sidebar.addEventListener('transitionstart', calculateMargins);
-        sidebar.addEventListener('transitionend', calculateMargins);
+        // Add event listeners and track them for cleanup
+        const addTrackedListener = (element: Element, event: string, handler: EventListener) => {
+          element.addEventListener(event, handler);
+          sidebarEventListeners.push({ element, event, handler });
+        };
+        
+        addTrackedListener(sidebar, 'transitionstart', calculateMargins);
+        addTrackedListener(sidebar, 'transitionend', calculateMargins);
         
         // Toggle button click handling
         const toggleButton = document.querySelector('[class*="toggle"]') || 
@@ -153,11 +167,7 @@ export const useDynamicLayout = () => {
             }
           };
           
-          sidebar.addEventListener('click', handleSidebarClick);
-          
-          return () => {
-            sidebar.removeEventListener('click', handleSidebarClick);
-          };
+          addTrackedListener(sidebar, 'click', handleSidebarClick);
         }
       }
     }, 500);
@@ -181,9 +191,25 @@ export const useDynamicLayout = () => {
     }
     
     return () => {
+      // Clean up all event listeners
       window.removeEventListener('resize', calculateMargins);
-      clearInterval(interval);
+      resizeObserver.disconnect();
       observer.disconnect();
+      
+      // Clear timeout if it hasn't fired yet
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      
+      // Remove all tracked sidebar event listeners
+      sidebarEventListeners.forEach(({ element, event, handler }) => {
+        element.removeEventListener(event, handler);
+      });
+      
+      // Cancel any pending animation frame
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 

@@ -40,7 +40,7 @@ const FileAttachment: React.FC<FileAttachmentProps> = ({
       {attachments.length > 0 && (
         <div className="mt-2 space-y-1">
           {attachments.map((file, index) => (
-            <div key={index} className="text-sm text-gray-600 flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+            <div key={file.name} className="text-sm text-gray-600 flex items-center justify-between p-2 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2">
                 <Paperclip className="w-3.5 h-3.5" />
                 <span className="truncate">{file.name}</span>

@@ -22,6 +22,7 @@ export const useProjectDragSelection = ({
   
   const handleProjectMouseDown = (index: number) => {
     if (isDisabled) return;
+    if (index < 0 || index >= projects.length) return;
     
     setIsMouseDown(true);
     setDragStartIndex(index);
@@ -40,8 +41,10 @@ export const useProjectDragSelection = ({
       if (!isDragSelecting && index !== dragStartIndex) {
         setIsDragSelecting(true);
         // 시작 지점의 항목도 선택/해제
-        const startProjectId = projects[dragStartIndex].id;
-        onProjectSelect(startProjectId, dragAction === 'select');
+        if (dragStartIndex >= 0 && dragStartIndex < projects.length) {
+          const startProjectId = projects[dragStartIndex].id;
+          onProjectSelect(startProjectId, dragAction === 'select');
+        }
       }
       
       if (isDragSelecting && dragAction) {
@@ -49,12 +52,14 @@ export const useProjectDragSelection = ({
         const start = Math.min(dragStartIndex, index);
         const end = Math.max(dragStartIndex, index);
         for (let i = start; i <= end; i++) {
-          const projectId = projects[i].id;
-          const isSelected = selectedProjects.includes(projectId);
-          if (dragAction === 'select' && !isSelected) {
-            onProjectSelect(projectId, true);
-          } else if (dragAction === 'deselect' && isSelected) {
-            onProjectSelect(projectId, false);
+          if (i >= 0 && i < projects.length) {
+            const projectId = projects[i].id;
+            const isSelected = selectedProjects.includes(projectId);
+            if (dragAction === 'select' && !isSelected) {
+              onProjectSelect(projectId, true);
+            } else if (dragAction === 'deselect' && isSelected) {
+              onProjectSelect(projectId, false);
+            }
           }
         }
       }
@@ -73,9 +78,11 @@ export const useProjectDragSelection = ({
     
     // 드래그하지 않고 클릭만 한 경우
     if (!isDragSelecting && dragStartIndex !== null && isMouseDown) {
-      const projectId = projects[dragStartIndex].id;
-      const isSelected = selectedProjects.includes(projectId);
-      onProjectSelect(projectId, !isSelected);
+      if (dragStartIndex >= 0 && dragStartIndex < projects.length) {
+        const projectId = projects[dragStartIndex].id;
+        const isSelected = selectedProjects.includes(projectId);
+        onProjectSelect(projectId, !isSelected);
+      }
     }
     
     setIsDragSelecting(false);
