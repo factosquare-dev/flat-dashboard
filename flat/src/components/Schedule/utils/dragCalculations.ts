@@ -84,16 +84,7 @@ export class GridCoordinateCalculator {
     
     const dayIndex = this.getDayIndex(startDate);
     
-    console.log('[GRID CALC] calculateTaskPosition:', {
-      startDate: formatDateISO(startDate),
-      endDate: formatDateISO(endDate),
-      left,
-      width,
-      x,
-      forPreview,
-      scrollLeft,
-      dayIndex
-    });
+    // Debug logging removed
     
     return { x, width, date: startDate, dayIndex };
   }

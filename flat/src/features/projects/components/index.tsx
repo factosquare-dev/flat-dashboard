@@ -31,7 +31,7 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
         .catch(error => {
           if (isMounted) {
             setScheduleError('스케줄을 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
-            console.error('Failed to load schedule:', error);
+            // Error handled silently
           }
         })
         .finally(() => {

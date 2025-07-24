@@ -4,8 +4,9 @@ import { createScheduleFromProject, createSampleInProgressTasks } from '../../da
 import { formatDateISO } from '../../utils/dateUtils';
 import { USE_MOCK_DATA } from '../../mocks/mockData';
 import { getDatabaseWithRetry } from '../../mocks/database/utils';
-import { scheduleAdapter } from '../../mocks/adapters/scheduleAdapter';
+// Removed deprecated scheduleAdapter import
 import { createMockSchedules } from '../../data/mockSchedules';
+import { mockDataService } from '../../services/mockDataService';
 
 /**
  * 프로젝트로부터 스케줄 생성 또는 조회
@@ -14,55 +15,160 @@ export const getOrCreateScheduleForProject = async (
   project: Project,
   existingSchedules: Map<string, Schedule>
 ): Promise<Schedule> => {
+  console.log('[getOrCreateScheduleForProject] 1. Called for project:', project.id, project.client ? `${project.client} - ${project.productType}` : 'No name');
+  console.log('[getOrCreateScheduleForProject] 2. USE_MOCK_DATA:', USE_MOCK_DATA);
+  
   // Use mock database if enabled
   if (USE_MOCK_DATA) {
+    console.log('[getOrCreateScheduleForProject] 3. Trying to get database...');
     try {
       const database = await getDatabaseWithRetry();
+      console.log('[getOrCreateScheduleForProject] 4. Got database:', !!database);
       
       if (database && database.schedules) {
+        console.log('[getOrCreateScheduleForProject] 5. Database has schedules');
         const schedules = Array.from(database.schedules.values());
+        console.log('[getOrCreateScheduleForProject] 6. Number of schedules in DB:', schedules.length);
         const existingSchedule = schedules.find(s => s.projectId === project.id);
+        console.log('[getOrCreateScheduleForProject] 7. Found existing schedule:', !!existingSchedule);
         
         if (existingSchedule) {
-          // Convert to legacy format
-          const legacyData = scheduleAdapter.convertToLegacyFormat(existingSchedule);
+          console.log('[getOrCreateScheduleForProject] 8. Returning existing schedule from DB');
+          
+          // Get tasks for this schedule
+          const scheduleTasks = Array.from(database.tasks.values())
+            .filter(task => task.scheduleId === existingSchedule.id)
+            .map(task => {
+              // Get factory name from factoryId
+              const factory = database.factories.get(task.factoryId);
+              const factoryColor = factory?.type === 'MANUFACTURING' ? 'blue' : 
+                                   factory?.type === 'CONTAINER' ? 'red' : 
+                                   factory?.type === 'PACKAGING' ? 'yellow' : 'gray';
+              
+              return {
+                id: task.id,
+                projectId: task.projectId,
+                factory: factory?.name || '',
+                factoryId: task.factoryId,
+                taskType: task.title,
+                startDate: typeof task.startDate === 'string' ? task.startDate : task.startDate.toISOString().split('T')[0],
+                endDate: typeof task.endDate === 'string' ? task.endDate : task.endDate.toISOString().split('T')[0],
+                status: task.status.toLowerCase().replace('_', '-'),
+                assignee: task.assignee || '',
+                color: factoryColor
+              };
+            });
+          
+          // Get participants from project factories
+          const participants = [];
+          const projectData = database.projects.get(existingSchedule.projectId);
+          
+          if (projectData) {
+            if (projectData.manufacturerId) {
+              const factory = database.factories.get(projectData.manufacturerId);
+              if (factory) {
+                participants.push({
+                  id: factory.id,
+                  name: factory.name,
+                  period: `${existingSchedule.startDate} ~ ${existingSchedule.endDate}`,
+                  color: 'blue'
+                });
+              }
+            }
+            
+            if (projectData.containerId) {
+              const factory = database.factories.get(projectData.containerId);
+              if (factory) {
+                participants.push({
+                  id: factory.id,
+                  name: factory.name,
+                  period: `${existingSchedule.startDate} ~ ${existingSchedule.endDate}`,
+                  color: 'red'
+                });
+              }
+            }
+            
+            if (projectData.packagingId) {
+              const factory = database.factories.get(projectData.packagingId);
+              if (factory) {
+                participants.push({
+                  id: factory.id,
+                  name: factory.name,
+                  period: `${existingSchedule.startDate} ~ ${existingSchedule.endDate}`,
+                  color: 'yellow'
+                });
+              }
+            }
+          }
+          
           return {
             id: existingSchedule.id,
             projectId: existingSchedule.projectId,
-            participants: legacyData.participants,
-            tasks: legacyData.tasks,
-            startDate: legacyData.startDate,
-            endDate: legacyData.endDate,
-            createdAt: existingSchedule.createdAt.toISOString(),
-            updatedAt: existingSchedule.updatedAt.toISOString()
+            participants: participants,
+            tasks: scheduleTasks,
+            startDate: typeof existingSchedule.startDate === 'string' ? existingSchedule.startDate : existingSchedule.startDate.toISOString().split('T')[0],
+            endDate: typeof existingSchedule.endDate === 'string' ? existingSchedule.endDate : existingSchedule.endDate.toISOString().split('T')[0],
+            createdAt: typeof existingSchedule.createdAt === 'string' ? existingSchedule.createdAt : existingSchedule.createdAt.toISOString(),
+            updatedAt: typeof existingSchedule.updatedAt === 'string' ? existingSchedule.updatedAt : existingSchedule.updatedAt.toISOString()
           };
         }
       }
     } catch (error) {
-      console.error('[Schedule Operations] Error accessing mock database:', error);
+      console.log('[getOrCreateScheduleForProject] 9. Error in mock database section:', error);
       // Fall through to old logic
     }
   }
   
+  console.log('[getOrCreateScheduleForProject] 10. Continuing to fallback logic...');
+  
   // Fallback: Create schedule with mock tasks for development
   
-  // Get mock schedules and find tasks for similar projects
-  const mockSchedules = createMockSchedules();
-  const mockSchedule = mockSchedules.find(s => s.projectId === project.id) || mockSchedules[0];
+  // Get mock schedules and find tasks for this specific project
+  console.log('[getOrCreateScheduleForProject] 11. About to create mock schedules...');
+  let mockSchedules: Schedule[] = [];
+  try {
+    mockSchedules = createMockSchedules();
+    console.log('[getOrCreateScheduleForProject] 12. Created mock schedules:', mockSchedules.length);
+    console.log('[getOrCreateScheduleForProject] 13. Available mock schedules:', mockSchedules.map(s => ({ id: s.id, projectId: s.projectId, name: s.name })));
+  } catch (error) {
+    console.log('[getOrCreateScheduleForProject] 14. Error creating mock schedules:', error);
+  }
   
+  console.log('[getOrCreateScheduleForProject] 15. Looking for mockSchedule with projectId:', project.id);
+  const mockSchedule = mockSchedules.find(s => s.projectId === project.id);
+  
+  if (!mockSchedule) {
+    console.log('[getOrCreateScheduleForProject] 16. No mockSchedule found for projectId:', project.id);
+  } else {
+    console.log('[getOrCreateScheduleForProject] 17. Found mockSchedule:', mockSchedule.id);
+  }
+  
+  console.log('[getOrCreateScheduleForProject] 18. Setting up project dates...');
   // Filter tasks to fit within project dates
   const projectStart = new Date(project.startDate);
   const projectEnd = new Date(project.endDate);
+  console.log('[getOrCreateScheduleForProject] 19. Project dates:', project.startDate, 'to', project.endDate);
   
+  console.log('[getOrCreateScheduleForProject] 20. Creating task arrays...');
   // Create non-overlapping tasks within each factory
   let globalTaskId = 1;
   const filteredTasks: any[] = [];
   
   
   if (mockSchedule) {
+    console.log('[getOrCreateScheduleForProject] 21. Found mockSchedule:', mockSchedule.id);
+    console.log('[getOrCreateScheduleForProject] 22. mockSchedule.tasks:', mockSchedule.tasks.length);
+    
+    // Filter tasks that belong to this project only
+    const projectTasks = mockSchedule.tasks.filter(task => 
+      task.projectId === project.id
+    );
+    
+    console.log('[getOrCreateScheduleForProject] 23. Filtered tasks for project', project.id, ':', projectTasks.length);
+    
     // Group tasks by factory
     const tasksByFactory = new Map<string, any[]>();
-    mockSchedule.tasks.forEach(task => {
+    projectTasks.forEach(task => {
       const factory = task.factory || 'Unknown';
       if (!tasksByFactory.has(factory)) {
         tasksByFactory.set(factory, []);
@@ -120,16 +226,70 @@ export const getOrCreateScheduleForProject = async (
     });
   }
   
+  // Get participants based on project's factories
+  const participants: Participant[] = [];
+  let allFactories: any[] = [];
+  
+  try {
+    allFactories = mockDataService.getAllFactories();
+    console.log('[getOrCreateScheduleForProject] 24. All factories:', allFactories.length);
+  } catch (error) {
+    console.log('[getOrCreateScheduleForProject] 25. Error getting factories:', error);
+  }
+  
+  if (project.manufacturer && project.manufacturer !== 'null') {
+    // Try to find by ID first, then by name
+    const factory = allFactories.find(f => f.id === project.manufacturer || f.name === project.manufacturer);
+    if (factory) {
+      participants.push({
+        id: factory.id,
+        name: factory.name,
+        period: `${project.startDate} ~ ${project.endDate}`,
+        color: 'blue'
+      });
+    }
+  }
+  
+  if (project.container && project.container !== 'null') {
+    // Try to find by ID first, then by name
+    const factory = allFactories.find(f => f.id === project.container || f.name === project.container);
+    if (factory) {
+      participants.push({
+        id: factory.id,
+        name: factory.name,
+        period: `${project.startDate} ~ ${project.endDate}`,
+        color: 'red'
+      });
+    }
+  }
+  
+  if (project.packaging && project.packaging !== 'null') {
+    // Try to find by ID first, then by name
+    const factory = allFactories.find(f => f.id === project.packaging || f.name === project.packaging);
+    if (factory) {
+      participants.push({
+        id: factory.id,
+        name: factory.name,
+        period: `${project.startDate} ~ ${project.endDate}`,
+        color: 'yellow'
+      });
+    }
+  }
+  
   const newSchedule: Schedule = {
     id: `schedule-${project.id}-${Date.now()}`,
     projectId: project.id,
-    participants: mockSchedule ? mockSchedule.participants : [],
+    participants: participants,
     tasks: filteredTasks,
     startDate: project.startDate,
     endDate: project.endDate,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
+  
+  console.log('[getOrCreateScheduleForProject] 26. Created schedule with', participants.length, 'participants and', filteredTasks.length, 'tasks');
+  console.log('[getOrCreateScheduleForProject] 27. Participants:', participants.map(p => ({ id: p.id, name: p.name })));
+  console.log('[getOrCreateScheduleForProject] 28. Project factories - manufacturer:', project.manufacturer, 'container:', project.container, 'packaging:', project.packaging);
   
   
   if (USE_MOCK_DATA) {

@@ -90,7 +90,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
       return newProjects;
     } catch (error) {
       if (!signal.aborted) {
-        console.error('Error loading projects:', error);
+        // Error handled silently
         throw error;
       }
       return [];
@@ -168,7 +168,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
         onProjectsUpdate(refreshedProjects);
       }
     } catch (error) {
-      console.error('Error refreshing projects:', error);
+      // Error handled silently
     }
   }, [loadProjects, onProjectsUpdate]);
 
@@ -183,7 +183,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
       setSchedules(prev => new Map(prev).set(projectId, schedule));
       return schedule;
     } catch (error) {
-      console.error(`Error loading schedule for project ${projectId}:`, error);
+      // Error handled silently
       return null;
     }
   }, [schedules]);

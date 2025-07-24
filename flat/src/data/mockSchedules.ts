@@ -33,6 +33,142 @@ export const createMockSchedules = (): Schedule[] => {
   const packagingFactories = availableFactories.filter(f => f.type === FACTORY_TYPES.PACKAGING);
   
   const schedules: Schedule[] = [
+    // Sub-project schedules
+    {
+      id: 'sch-sub-1-1',
+      projectId: 'sub-1-1',
+      name: `뷰티코리아 - 프리미엄 에센스`,
+      startDate: formatDate(addDays(today, -30)),
+      endDate: formatDate(addDays(today, 60)),
+      participants: [
+        manufacturingFactories[0] && { id: manufacturingFactories[0].id, name: manufacturingFactories[0].name, period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'blue' },
+        containerFactories[0] && { id: containerFactories[0].id, name: containerFactories[0].name, period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'red' },
+        packagingFactories[0] && { id: packagingFactories[0].id, name: packagingFactories[0].name, period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'yellow' }
+      ].filter(Boolean),
+      tasks: [
+        // 제조 공장 태스크들
+        ...(manufacturingFactories[0] ? [{
+          id: 101, 
+          factory: manufacturingFactories[0].name, 
+          factoryId: manufacturingFactories[0].id, 
+          taskType: TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT, 
+          startDate: formatDate(addDays(today, -30)), 
+          endDate: formatDate(addDays(today, -27)), 
+          color: 'blue', 
+          status: 'completed', 
+          projectId: 'sub-1-1'
+        },
+        {
+          id: 102, 
+          factory: manufacturingFactories[0].name, 
+          factoryId: manufacturingFactories[0].id, 
+          taskType: TASK_TYPES.MANUFACTURING.MIXING, 
+          startDate: formatDate(addDays(today, -26)), 
+          endDate: formatDate(addDays(today, -20)), 
+          color: 'blue', 
+          status: 'completed', 
+          projectId: 'sub-1-1'
+        },
+        {
+          id: 103, 
+          factory: manufacturingFactories[0].name, 
+          factoryId: manufacturingFactories[0].id, 
+          taskType: TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK, 
+          startDate: formatDate(addDays(today, -19)), 
+          endDate: formatDate(addDays(today, -15)), 
+          color: 'blue', 
+          status: 'in-progress', 
+          projectId: 'sub-1-1'
+        }] : []),
+        
+        // 용기 공장 태스크들
+        ...(containerFactories[0] ? [{
+          id: 104, 
+          factory: containerFactories[0].name, 
+          factoryId: containerFactories[0].id, 
+          taskType: TASK_TYPES.CONTAINER.MOLD_MAKING, 
+          startDate: formatDate(addDays(today, -14)), 
+          endDate: formatDate(addDays(today, -10)), 
+          color: 'red', 
+          status: 'in-progress', 
+          projectId: 'sub-1-1'
+        },
+        {
+          id: 105, 
+          factory: containerFactories[0].name, 
+          factoryId: containerFactories[0].id, 
+          taskType: TASK_TYPES.CONTAINER.INJECTION_MOLDING, 
+          startDate: formatDate(addDays(today, -9)), 
+          endDate: formatDate(addDays(today, -5)), 
+          color: 'red', 
+          status: 'pending', 
+          projectId: 'sub-1-1'
+        }] : []),
+        
+        // 포장 공장 태스크들
+        ...(packagingFactories[0] ? [{
+          id: 106, 
+          factory: packagingFactories[0].name, 
+          factoryId: packagingFactories[0].id, 
+          taskType: TASK_TYPES.PACKAGING.DESIGN, 
+          startDate: formatDate(addDays(today, 5)), 
+          endDate: formatDate(addDays(today, 9)), 
+          color: 'yellow', 
+          status: 'pending', 
+          projectId: 'sub-1-1'
+        }] : [])
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'sch-sub-1-2',
+      projectId: 'sub-1-2',
+      name: `뷰티코리아 - 화이트닝 크림`,
+      startDate: formatDate(addDays(today, -20)),
+      endDate: formatDate(addDays(today, 40)),
+      participants: [
+        manufacturingFactories[1] && { id: manufacturingFactories[1].id, name: manufacturingFactories[1].name, period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'purple' }
+      ].filter(Boolean),
+      tasks: [
+        ...(manufacturingFactories[1] ? [{
+          id: 107, 
+          factory: manufacturingFactories[1].name, 
+          factoryId: manufacturingFactories[1].id, 
+          taskType: TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT, 
+          startDate: formatDate(addDays(today, -20)), 
+          endDate: formatDate(addDays(today, -17)), 
+          color: 'purple', 
+          status: 'completed', 
+          projectId: 'sub-1-2'
+        },
+        {
+          id: 108, 
+          factory: manufacturingFactories[1].name, 
+          factoryId: manufacturingFactories[1].id, 
+          taskType: TASK_TYPES.MANUFACTURING.MIXING, 
+          startDate: formatDate(addDays(today, -16)), 
+          endDate: formatDate(addDays(today, -10)), 
+          color: 'purple', 
+          status: 'completed', 
+          projectId: 'sub-1-2'
+        },
+        {
+          id: 109, 
+          factory: manufacturingFactories[1].name, 
+          factoryId: manufacturingFactories[1].id, 
+          taskType: TASK_TYPES.MANUFACTURING.FILLING, 
+          startDate: formatDate(addDays(today, -9)), 
+          endDate: formatDate(addDays(today, -5)), 
+          color: 'purple', 
+          status: 'in-progress', 
+          projectId: 'sub-1-2'
+        }] : [])
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    // Existing schedules
     {
       id: 'sch-001',
       projectId: 'proj-001',
@@ -322,35 +458,12 @@ export const createMockSchedules = (): Schedule[] => {
   
   // 생성된 스케줄 검증
   if (process.env.NODE_ENV === 'development') {
-    console.log('🔍 스케줄 검증 시작...');
     schedules.forEach(schedule => {
       const validation = validateSchedule(schedule);
       if (!validation.isValid) {
-        console.error(`❌ 스케줄 "${schedule.name}" 검증 실패:`, validation.errors);
-        
-        // 공장별 태스크 겹침 상세 로그 (factoryId 기준)
-        const factoryTasks = schedule.tasks.reduce((acc, task) => {
-          const factoryKey = task.factoryId || task.factory || 'unknown';
-          if (!acc[factoryKey]) acc[factoryKey] = [];
-          acc[factoryKey].push({
-            id: task.id,
-            taskType: task.taskType,
-            startDate: task.startDate,
-            endDate: task.endDate
-          });
-          return acc;
-        }, {} as Record<string, any[]>);
-        
-        Object.entries(factoryTasks).forEach(([factory, tasks]) => {
-          if (tasks.length > 1) {
-            console.log(`🏭 ${factory} 태스크들:`, tasks);
-          }
-        });
-      } else {
-        console.log(`✅ 스케줄 "${schedule.name}" 검증 통과`);
+        // Validation errors are handled silently
       }
     });
-    console.log('🔍 스케줄 검증 완료');
   }
   
   return schedules;

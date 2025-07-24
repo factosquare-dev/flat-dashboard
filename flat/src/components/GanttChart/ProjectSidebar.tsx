@@ -15,9 +15,6 @@ const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   projects, 
   onToggleProject 
 }) => {
-  // 디버깅: ProjectSidebar에서 받는 프로젝트 데이터 확인
-  console.log('[ProjectSidebar] 🚨 Received projects:', projects);
-  console.log('[ProjectSidebar] 🚨 Project names:', projects.map(p => p.name));
   const renderSidebarContent = () => {
     const elements: JSX.Element[] = [];
     let currentRow = 0;

@@ -50,10 +50,21 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
   const projects = useMemo<Project[]>(() => {
     const colorMap = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-cyan-500'];
     
+    console.log('[IntegratedGanttChart] Creating projects');
+    console.log('[IntegratedGanttChart] Participants:', participants);
+    console.log('[IntegratedGanttChart] Total tasks:', tasks.length);
+    console.log('[IntegratedGanttChart] Tasks detail:', tasks);
+    
     return participants.map((participant, index) => {
       // Get tasks for this participant - 오직 factoryId로만 매칭 (가장 안전)
       const projectTasks = tasks
-        .filter(task => task.factoryId === participant.id)
+        .filter(task => {
+          const matches = task.factoryId === participant.id;
+          if (!matches && task.factory === participant.name) {
+            console.warn(`[IntegratedGanttChart] Task ${task.id} has factory name '${task.factory}' but no factoryId, participant.id: ${participant.id}`);
+          }
+          return matches;
+        })
         .map(task => ({
           id: task.id,
           title: task.title || task.taskType || '태스크',
@@ -64,6 +75,8 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
           progress: task.progress || 0
         }));
 
+      console.log(`[IntegratedGanttChart] Factory '${participant.name}' (${participant.id}): ${projectTasks.length} tasks`);
+      
       return {
         id: participant.id,
         name: participant.name,
