@@ -423,32 +423,34 @@ export const seedData = {
    * NO MORE HARDCODED DATES!
    */
   createSynchronizedProjects(customer1: Customer, customer2: Customer, pmUser: User, currentDate: Date) {
+    console.log('[SeedData] 🗓️ Creating synchronized projects with PROPER date hierarchy (no hardcoding!)');
+
     // Calculate dynamic start dates based on current date + 1 week (realistic project planning)
     const baseStartDate = new Date(currentDate);
     baseStartDate.setDate(baseStartDate.getDate() + 7); // Projects start next week
 
-    console.log('[SeedData] 🗓️ Creating synchronized projects with dynamic dates (no hardcoding!)');
-
-    // Master Project 1: 프리미엄 화장품 라인 A (3 months duration)
+    // ✅ Master Project 1: 프리미엄 화장품 라인 A (90 days = 3 months)
     const master1Start = new Date(baseStartDate);
-    const master1End = new Date(master1Start);
-    master1End.setMonth(master1End.getMonth() + 3); // 3 months duration
+    const master1End = new Date(master1Start.getTime() + (90 * 24 * 60 * 60 * 1000)); // Safe 90 days addition
 
-    // Sub Project: Must fall within Master project dates
-    const sub1Start = new Date(master1Start);
-    sub1Start.setDate(sub1Start.getDate() + 30); // Start 1 month after master
-    const sub1End = new Date(master1End);
-    sub1End.setDate(sub1End.getDate() - 15); // End 2 weeks before master ends
+    // ✅ Sub Project: MUST be within Master dates - starts 30 days after master, ends 15 days before master
+    const sub1Start = new Date(master1Start.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days after master start
+    const sub1End = new Date(master1End.getTime() - (15 * 24 * 60 * 60 * 1000));   // 15 days before master end
 
-    // Master Project 2: 천연 샴푸 시리즈 (2 months duration)
-    const master2Start = new Date(baseStartDate);
-    master2Start.setDate(master2Start.getDate() + 14); // Start 2 weeks after first project
-    const master2End = new Date(master2Start);
-    master2End.setMonth(master2End.getMonth() + 2); // 2 months duration
+    // ✅ Master Project 2: 천연 샴푸 시리즈 (60 days = 2 months)
+    const master2Start = new Date(baseStartDate.getTime() + (14 * 24 * 60 * 60 * 1000)); // 14 days after base
+    const master2End = new Date(master2Start.getTime() + (60 * 24 * 60 * 60 * 1000));    // Safe 60 days addition
 
-    console.log(`[SeedData] 🗓️ Master1: ${master1Start.toISOString().split('T')[0]} - ${master1End.toISOString().split('T')[0]}`);
-    console.log(`[SeedData] 🗓️ Sub1: ${sub1Start.toISOString().split('T')[0]} - ${sub1End.toISOString().split('T')[0]} (within Master1)`);
-    console.log(`[SeedData] 🗓️ Master2: ${master2Start.toISOString().split('T')[0]} - ${master2End.toISOString().split('T')[0]}`);
+    // ✅ Validation: Ensure Sub project is within Master
+    if (sub1Start < master1Start || sub1End > master1End) {
+      console.error('❌ [SeedData] Sub project dates are outside Master project range!');
+      console.error(`Master1: ${master1Start.toISOString().split('T')[0]} - ${master1End.toISOString().split('T')[0]}`);
+      console.error(`Sub1: ${sub1Start.toISOString().split('T')[0]} - ${sub1End.toISOString().split('T')[0]}`);
+    }
+
+    console.log(`[SeedData] ✅ Master1: ${master1Start.toISOString().split('T')[0]} - ${master1End.toISOString().split('T')[0]} (90 days)`);
+    console.log(`[SeedData] ✅ Sub1: ${sub1Start.toISOString().split('T')[0]} - ${sub1End.toISOString().split('T')[0]} (within Master1)`);
+    console.log(`[SeedData] ✅ Master2: ${master2Start.toISOString().split('T')[0]} - ${master2End.toISOString().split('T')[0]} (60 days)`);
 
     const masterProjects: Project[] = [
       {
