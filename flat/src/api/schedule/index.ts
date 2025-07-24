@@ -5,7 +5,7 @@
 
 import type { Schedule, Task, Participant } from '../../types/schedule';
 import type { Project } from '../../types/project';
-import { USE_MOCK_DATA } from './mockData';
+import { USE_MOCK_DATA } from '../../mocks/mockData';
 import { getApiClient, API_BASE_URL } from './apiClient';
 import {
   getOrCreateScheduleForProject,

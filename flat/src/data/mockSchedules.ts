@@ -1,5 +1,7 @@
 import type { Schedule, Task } from '../types/schedule';
 import { formatDateISO } from '../utils/dateUtils';
+import { getRandomManager, getRandomProductType, allClients, managerNames } from './mockData';
+import { mockFactories } from './scheduleMockData';
 
 // 날짜 계산 함수
 const addDays = (date: Date, days: number): Date => {
@@ -12,38 +14,49 @@ const formatDate = (date: Date): string => {
   return formatDateISO(date);
 };
 
-// 테스트용 스케줄 데이터 생성
+// 테스트용 스케줄 데이터 생성 - mock DB 데이터 사용
 export const createMockSchedules = (): Schedule[] => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  
+  // Mock DB에서 데이터 가져오기
+  const availableClients = allClients.length > 0 ? allClients : ['뷰티코리아', '그린코스메틱', '코스메디칼', '퍼스트뷰티'];
+  const availableManagers = managerNames.length > 0 ? managerNames : ['김철수', '이영희', '박민수', '정수진'];
+  const availableFactories = mockFactories.length > 0 ? mockFactories : [];
   
   const schedules: Schedule[] = [
     {
       id: 'sch-001',
       projectId: 'proj-001',
-      name: '(주)뷰티코리아 - 안티에이징 세럼',
+      name: `${availableClients[0] || '뷰티코리아'} - ${getRandomProductType()}`,
       startDate: formatDate(addDays(today, -30)),
       endDate: formatDate(addDays(today, 60)),
-      participants: [
-        { id: 'mfg-1', name: '큐셀시스템', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'blue' },
-        { id: 'cont-1', name: '(주)연우', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'red' },
-        { id: 'pack-1', name: '(주)네트모베이지', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'yellow' }
-      ],
+      participants: availableFactories.slice(0, 3).length > 0 ? 
+        availableFactories.slice(0, 3).map((factory, index) => ({
+          id: factory.id,
+          name: factory.name,
+          period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`,
+          color: ['blue', 'red', 'yellow'][index] || 'blue'
+        })) : [
+          { id: 'mfg-1', name: '큐셀시스템', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'blue' },
+          { id: 'cont-1', name: '(주)연우', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'red' },
+          { id: 'pack-1', name: '(주)네트모베이지', period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'yellow' }
+        ],
       tasks: [
         // 완료된 태스크들
-        { id: 1, factory: '큐셀시스템', taskType: '원료 준비', startDate: formatDate(addDays(today, -30)), endDate: formatDate(addDays(today, -27)), color: 'blue', status: 'completed', projectId: 'proj-001' },
-        { id: 2, factory: '큐셀시스템', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -26)), endDate: formatDate(addDays(today, -20)), color: 'blue', status: 'completed', projectId: 'proj-001' },
-        { id: 3, factory: '(주)연우', taskType: '금형 제작', startDate: formatDate(addDays(today, -25)), endDate: formatDate(addDays(today, -16)), color: 'red', status: 'completed', projectId: 'cont-1' },
+        { id: 1, factory: availableFactories.find(f => f.type === '제조')?.name || '큐셀시스템', taskType: '원료 준비', startDate: formatDate(addDays(today, -30)), endDate: formatDate(addDays(today, -27)), color: 'blue', status: 'completed', projectId: 'proj-001' },
+        { id: 2, factory: availableFactories.find(f => f.type === '제조')?.name || '큐셀시스템', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -26)), endDate: formatDate(addDays(today, -20)), color: 'blue', status: 'completed', projectId: 'proj-001' },
+        { id: 3, factory: availableFactories.find(f => f.type === '용기')?.name || '(주)연우', taskType: '금형 제작', startDate: formatDate(addDays(today, -25)), endDate: formatDate(addDays(today, -16)), color: 'red', status: 'completed', projectId: 'cont-1' },
         
-        // 지연된 태스크 (뷰티코리아)
-        { id: 4, factory: '큐셀시스템', taskType: '안정성 테스트', startDate: formatDate(addDays(today, -10)), endDate: formatDate(addDays(today, -3)), color: 'blue', status: 'in-progress', projectId: 'proj-001', assignee: '김철수' },
+        // 지연된 태스크
+        { id: 4, factory: availableFactories.find(f => f.type === '제조')?.name || '큐셀시스템', taskType: '안정성 테스트', startDate: formatDate(addDays(today, -10)), endDate: formatDate(addDays(today, -3)), color: 'blue', status: 'in-progress', projectId: 'proj-001', assignee: availableManagers[0] || '김철수' },
         
         // 진행중인 태스크들
-        { id: 6, factory: '(주)연우', taskType: '사출 성형', startDate: formatDate(addDays(today, -3)), endDate: formatDate(addDays(today, 4)), color: 'red', status: 'in-progress', projectId: 'cont-1' },
+        { id: 6, factory: availableFactories.find(f => f.type === '용기')?.name || '(주)연우', taskType: '사출 성형', startDate: formatDate(addDays(today, -3)), endDate: formatDate(addDays(today, 4)), color: 'red', status: 'in-progress', projectId: 'cont-1' },
         
         // 예정된 태스크들
-        { id: 7, factory: '(주)네트모베이지', taskType: '디자인 작업', startDate: formatDate(addDays(today, 5)), endDate: formatDate(addDays(today, 10)), color: 'yellow', status: 'pending', projectId: 'proj-001' },
-        { id: 8, factory: '(주)네트모베이지', taskType: '포장 작업', startDate: formatDate(addDays(today, 11)), endDate: formatDate(addDays(today, 15)), color: 'yellow', status: 'pending', projectId: 'proj-001' }
+        { id: 7, factory: availableFactories.find(f => f.type === '포장')?.name || '(주)네트모베이지', taskType: '디자인 작업', startDate: formatDate(addDays(today, 5)), endDate: formatDate(addDays(today, 10)), color: 'yellow', status: 'pending', projectId: 'proj-001' },
+        { id: 8, factory: availableFactories.find(f => f.type === '포장')?.name || '(주)네트모베이지', taskType: '포장 작업', startDate: formatDate(addDays(today, 11)), endDate: formatDate(addDays(today, 15)), color: 'yellow', status: 'pending', projectId: 'proj-001' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -51,24 +64,30 @@ export const createMockSchedules = (): Schedule[] => {
     {
       id: 'sch-002',
       projectId: 'proj-002',
-      name: '글로벌코스메틱 - 비비크림',
+      name: `${availableClients[1] || '그린코스메틱'} - ${getRandomProductType()}`,
       startDate: formatDate(addDays(today, -20)),
       endDate: formatDate(addDays(today, 40)),
-      participants: [
-        { id: 'cosmos-001', name: '주식회사 코스모로스', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'purple' },
-        { id: 'samhwa-001', name: '삼화플라스틱', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'green' },
-        { id: 'seshin-001', name: '(주)세신상사', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'orange' }
-      ],
+      participants: availableFactories.slice(1, 4).length > 0 ?
+        availableFactories.slice(1, 4).map((factory, index) => ({
+          id: factory.id,
+          name: factory.name,
+          period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`,
+          color: ['purple', 'green', 'orange'][index] || 'purple'
+        })) : [
+          { id: 'cosmos-001', name: '주식회사 코스모로스', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'purple' },
+          { id: 'samhwa-001', name: '삼화플라스틱', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'green' },
+          { id: 'seshin-001', name: '(주)세신상사', period: `${formatDate(addDays(today, -20))} ~ ${formatDate(addDays(today, 40))}`, color: 'orange' }
+        ],
       tasks: [
         // 완료된 태스크들
-        { id: 9, factory: '주식회사 코스모로스', taskType: '원료 준비', startDate: formatDate(addDays(today, -20)), endDate: formatDate(addDays(today, -17)), color: 'purple', status: 'completed', projectId: 'proj-002' },
+        { id: 9, factory: availableFactories.find(f => f.name.includes('코스모로스'))?.name || '주식회사 코스모로스', taskType: '원료 준비', startDate: formatDate(addDays(today, -20)), endDate: formatDate(addDays(today, -17)), color: 'purple', status: 'completed', projectId: 'proj-002' },
         
         // 진행중인 태스크들
-        { id: 10, factory: '주식회사 코스모로스', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -10)), endDate: formatDate(addDays(today, 5)), color: 'purple', status: 'in-progress', projectId: 'proj-002' },
-        { id: 11, factory: '삼화플라스틱', taskType: '용기 제작', startDate: formatDate(addDays(today, -2)), endDate: formatDate(addDays(today, 3)), color: 'green', status: 'in-progress', projectId: 'proj-002' },
+        { id: 10, factory: availableFactories.find(f => f.name.includes('코스모로스'))?.name || '주식회사 코스모로스', taskType: '혼합 및 제조', startDate: formatDate(addDays(today, -10)), endDate: formatDate(addDays(today, 5)), color: 'purple', status: 'in-progress', projectId: 'proj-002' },
+        { id: 11, factory: availableFactories.find(f => f.name.includes('삼화'))?.name || '삼화플라스틱', taskType: '용기 제작', startDate: formatDate(addDays(today, -2)), endDate: formatDate(addDays(today, 3)), color: 'green', status: 'in-progress', projectId: 'proj-002' },
         
         // 예정된 태스크들
-        { id: 12, factory: '(주)세신상사', taskType: '라벨링', startDate: formatDate(addDays(today, 10)), endDate: formatDate(addDays(today, 12)), color: 'orange', status: 'pending', projectId: 'proj-002' }
+        { id: 12, factory: availableFactories.find(f => f.type === '포장')?.name || '(주)세신상사', taskType: '라벨링', startDate: formatDate(addDays(today, 10)), endDate: formatDate(addDays(today, 12)), color: 'orange', status: 'pending', projectId: 'proj-002' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -76,7 +95,7 @@ export const createMockSchedules = (): Schedule[] => {
     {
       id: 'sch-003',
       projectId: 'proj-003',
-      name: '네이처바이오 - 탈모샴푸',
+      name: `${availableClients[2] || '코스메디칼'} - ${getRandomProductType()}`,
       startDate: formatDate(addDays(today, -45)),
       endDate: formatDate(addDays(today, 15)),
       participants: [
@@ -99,7 +118,7 @@ export const createMockSchedules = (): Schedule[] => {
     {
       id: 'sch-004',
       projectId: 'proj-004',
-      name: '프리미엄뷰티 - 바디로션',
+      name: `${availableClients[3] || '퍼스트뷰티'} - ${getRandomProductType()}`,
       startDate: formatDate(addDays(today, 30)),
       endDate: formatDate(addDays(today, 90)),
       participants: [
@@ -116,7 +135,7 @@ export const createMockSchedules = (): Schedule[] => {
     {
       id: 'sch-005',
       projectId: 'proj-005',
-      name: '클린뷰티랩 - 선크림',
+      name: `${availableClients[0] || '뷰티코리아'} - ${getRandomProductType()}`,
       startDate: formatDate(addDays(today, -60)),
       endDate: formatDate(addDays(today, -15)),
       participants: [
@@ -196,7 +215,7 @@ export const extractProjectFromSchedule = (schedule: Schedule): ProjectFromSched
     id: schedule.projectId,
     client,
     productType,
-    manager: ['김철수', '이영희', '박민수', '정수진', '최지훈'][Math.floor(Math.random() * 5)],
+    manager: getRandomManager(),
     serviceType: ['OEM', 'ODM', 'OBM', 'Private Label', 'White Label'][Math.floor(Math.random() * 5)] as any,
     currentStage: currentStages,
     status,

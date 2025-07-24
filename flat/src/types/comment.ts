@@ -1,3 +1,7 @@
+/**
+ * Comment type definitions
+ */
+
 export interface CommentAuthor {
   id: string;
   name: string;
@@ -23,3 +27,5 @@ export interface CreateCommentInput {
   parentId?: string;
   mentions?: string[];
 }
+
+export type UpdateCommentInput = Partial<CreateCommentInput>;

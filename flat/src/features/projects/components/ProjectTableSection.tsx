@@ -8,7 +8,7 @@ import LoadingIndicator from './components/LoadingIndicator';
 import InfiniteScrollTrigger from './components/InfiniteScrollTrigger';
 import { useInfiniteScroll } from '../../../hooks/useInfiniteScroll';
 import { useDragSelection } from '../../../hooks/useDragSelection';
-import { hierarchicalProjects } from '../../../data/hierarchicalProjects';
+import { getHierarchicalProjectsData } from '../../../data/hierarchicalProjects';
 
 interface ProjectFilters {
   sortField: keyof Project | null;
@@ -155,7 +155,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
       >
         {/* 임시로 계층 구조 테이블 사용 */}
         <HierarchicalProjectTable
-          projects={hierarchicalProjects}
+          projects={getHierarchicalProjectsData()}
           selectedRows={selectedRows}
           sortField={sortField}
           sortDirection={sortDirection}

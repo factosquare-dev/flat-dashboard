@@ -2,6 +2,7 @@ import React from 'react';
 import type { Project } from '../../../types/project';
 import { formatCurrency, parseCurrency } from '../../../utils/currency';
 import { factoriesByType } from '../../../data/mockData';
+import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
 
 interface EditableCellProps {
   project: Project;
@@ -32,10 +33,20 @@ const EditableCell: React.FC<EditableCellProps> = ({
   const value = project[field];
   const editing = isEditing(project.id, field);
 
-  if (type === 'search' && editing && field !== 'client') {
-    // 필드에 따라 다른 공장 리스트 사용
+  if (type === 'search' && editing) {
+    // 필드에 따라 다른 검색 리스트 사용
     let searchList: string[] = [];
-    if (field === 'manufacturer') {
+    if (field === 'client') {
+      // Mock DB에서 고객사 리스트 가져오기
+      try {
+        const db = MockDatabaseImpl.getInstance();
+        const database = db.getDatabase();
+        const customers = Array.from(database.customers.values());
+        searchList = customers.map(c => c.name);
+      } catch (error) {
+        searchList = ['뷰티코리아', '그린코스메틱', '코스메디칼', '퍼스트뷰티'];
+      }
+    } else if (field === 'manufacturer') {
       searchList = factoriesByType.manufacturing.map(f => f.name);
     } else if (field === 'container') {
       searchList = factoriesByType.container.map(f => f.name);

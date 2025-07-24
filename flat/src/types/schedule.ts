@@ -1,14 +1,51 @@
 // Schedule related types
 
+// Task status enum for better type safety
+export enum TaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  BLOCKED = 'BLOCKED',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED'
+}
+
+// Participant role in a task
+export interface Participant {
+  userId: string;
+  role: 'manager' | 'member' | 'reviewer';
+}
+
 export interface Task {
-  id: number | string;
-  title?: string;
+  id: string;
+  scheduleId: string;
+  title: string;
+  type: 'material' | 'production' | 'quality' | 'packaging' | 'inspection' | 'shipping' | 'other';
+  status: TaskStatus;
+  startDate: Date;
+  endDate: Date;
+  progress: number; // 0-100
+  participants: Participant[];
+  factoryId?: string;
+  priority: 'high' | 'medium' | 'low';
+  dependsOn: string[]; // Task IDs this task depends on
+  blockedBy: string[]; // Task IDs blocking this task
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt?: Date;
+  approvedBy?: string;
+  approvedAt?: Date;
+  rejectionReason?: string;
+  
+  // Legacy fields for backward compatibility
+  id_legacy?: number | string;
   taskType?: string;
-  projectId: string;
+  projectId?: string;
   factory?: string;
   details?: string;
-  startDate: string;
-  endDate: string;
+  startDate_string?: string;
+  endDate_string?: string;
   color?: string;
   x?: number;
   width?: number;
@@ -16,21 +53,11 @@ export interface Task {
   allDay?: boolean;
   originalStartDate?: string;
   originalEndDate?: string;
-  assignee?: string; // 담당자
-  
-  // 의존성 및 승인 관련 필드
-  dependsOn?: number[]; // 선행 작업 ID 배열
-  blockedBy?: number[]; // 이 작업을 막고 있는 작업 ID 배열
-  status?: 'pending' | 'in-progress' | 'completed' | 'approved' | 'rejected' | 'blocked';
-  approvalRequired?: boolean; // 승인이 필요한 작업인지
-  approvedBy?: string; // 승인자
-  approvedAt?: string; // 승인 일시
-  rejectedReason?: string; // 반려 사유
-  completedAt?: string; // 완료 일시
-  progress?: number; // 진행률 (0-100)
+  assignee?: string;
 }
 
-export interface Participant {
+// Legacy Participant interface for UI components
+export interface ParticipantLegacy {
   id: string;
   name: string;
   period: string;
@@ -41,10 +68,16 @@ export interface Participant {
 export interface Schedule {
   id: string;
   projectId: string;
-  participants: Participant[];
-  tasks: Task[];
-  createdAt: string;
-  updatedAt: string;
+  startDate: Date;
+  endDate: Date;
+  status: 'draft' | 'active' | 'completed' | 'archived';
+  createdAt: Date;
+  updatedAt: Date;
+  // Legacy fields
+  participants?: ParticipantLegacy[];
+  tasks?: Task[];
+  createdAt_string?: string;
+  updatedAt_string?: string;
 }
 
 export interface DragTooltip {

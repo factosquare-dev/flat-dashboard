@@ -14,8 +14,22 @@ export { getServices, initializeServices, resetServices } from './services';
 // API exports
 export { mockApi, initializeMockApi } from './api/MockApi';
 
-// Types
-export * from './database/types';
+// Types - export specific types to avoid circular dependencies
+export type { 
+  MockDatabase,
+  UserFactory,
+  ProjectAssignment,
+  FactoryProject,
+  UserCustomer,
+  QueryOptions,
+  QueryResult,
+  DbResponse,
+  DbTransaction,
+  DbOperation,
+  DbEventType,
+  DbEvent,
+  DbStats
+} from './database/types';
 
 // Initialize the mock system
 import { initializeServices } from './services';

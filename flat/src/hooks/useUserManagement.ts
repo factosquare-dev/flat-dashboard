@@ -2,181 +2,137 @@ import { useState, useCallback, useEffect } from 'react';
 import type { UserData } from './useUserFilter';
 import type { UserFormData } from '../components/Users/UserModal';
 import type { UserRole } from '../store/slices/userSlice';
+import { UserService } from '../mocks/services/UserService';
+import type { User } from '../types/user';
 
-const STORAGE_KEY = 'flat_users';
+// Create user service instance
+const userService = new UserService();
 
-// Type guard for UserRole validation
-const isValidUserRole = (role: any): role is UserRole => {
-  return typeof role === 'string' && ['admin', 'manager', 'customer'].includes(role);
+// Map database UserRole to UI UserRole
+const mapUserRole = (dbRole: string): UserRole => {
+  const roleMap: Record<string, UserRole> = {
+    'ADMIN': 'admin',
+    'PRODUCT_MANAGER': 'manager',
+    'FACTORY_MANAGER': 'manager',
+    'DEVELOPER': 'customer',
+    'QA': 'customer',
+    'USER': 'customer'
+  };
+  return roleMap[dbRole] || 'customer';
 };
 
-// Type guard for UserData validation with runtime type checking
-const isValidUserData = (obj: any): obj is UserData => {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string' &&
-    typeof obj.email === 'string' &&
-    typeof obj.phone === 'string' &&
-    isValidUserRole(obj.role) &&
-    (obj.department === undefined || typeof obj.department === 'string') &&
-    (obj.position === undefined || typeof obj.position === 'string')
-  );
+// Convert database User to UserData
+const convertUserToUserData = (user: User): UserData => {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phoneNumber || '',
+    role: mapUserRole(user.role),
+    department: user.department,
+    position: user.position
+  };
 };
 
-// Type guard for UserData array validation
-const isValidUserDataArray = (arr: any): arr is UserData[] => {
-  return Array.isArray(arr) && arr.every(isValidUserData);
-};
-
-// 초기 샘플 데이터
-const initialUsers: UserData[] = [
-  {
-    id: '1',
-    name: '김철수',
-    email: 'kim@example.com',
-    phone: '010-1234-5678',
-    role: 'admin',
-    department: 'IT팀',
-    position: '팀장'
-  },
-  {
-    id: '2',
-    name: '이영희',
-    email: 'lee@example.com',
-    phone: '010-2345-6789',
-    role: 'manager',
-    department: '영업팀',
-    position: '매니저'
-  },
-  {
-    id: '3',
-    name: '박민수',
-    email: 'park@samsung.com',
-    phone: '010-3456-7890',
-    role: 'customer',
-    department: '삼성전자',
-    position: '과장'
-  },
-  {
-    id: '4',
-    name: '정수진',
-    email: 'jung@lg.com',
-    phone: '010-4567-8901',
-    role: 'customer',
-    department: 'LG전자',
-    position: '대리'
-  },
-  {
-    id: '5',
-    name: '최동욱',
-    email: 'choi@example.com',
-    phone: '010-5678-9012',
-    role: 'admin',
-    department: '개발팀',
-    position: '시니어 개발자'
-  },
-  {
-    id: '6',
-    name: '강미나',
-    email: 'kang@example.com',
-    phone: '010-6789-0123',
-    role: 'manager',
-    department: '마케팅팀',
-    position: '팀장'
-  },
-  {
-    id: '7',
-    name: '윤서준',
-    email: 'yoon@hyundai.com',
-    phone: '010-7890-1234',
-    role: 'customer',
-    department: '현대자동차',
-    position: '부장'
-  },
-  {
-    id: '8',
-    name: '임하나',
-    email: 'lim@sk.com',
-    phone: '010-8901-2345',
-    role: 'customer',
-    department: 'SK하이닉스',
-    position: '차장'
-  }
-];
 
 export const useUserManagement = () => {
-  // localStorage에서 데이터 로드
-  const loadUsers = (): UserData[] => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      return initialUsers;
-    }
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Load users from mock database
+  const loadUsers = useCallback(async () => {
     try {
-      const parsed = JSON.parse(stored);
-      
-      // Runtime type validation using type guard
-      if (isValidUserDataArray(parsed)) {
-        return parsed;
-      } else {
-        console.warn('Invalid user data format in localStorage, using defaults');
-        return initialUsers;
+      const result = await userService.getAll();
+      if (result.success && result.data) {
+        const userData = result.data.map(convertUserToUserData);
+        setUsers(userData);
       }
     } catch (error) {
-      console.warn('Failed to parse user data from localStorage:', error);
-      return initialUsers;
+      console.error('Failed to load users:', error);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const [users, setUsers] = useState<UserData[]>(loadUsers);
-
-  // localStorage에 저장
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-    } catch (error) {
-      console.error('Failed to save users to localStorage:', error);
-    }
-  }, [users]);
-
-  const addUser = useCallback((userData: UserFormData): UserData => {
-    const newUser: UserData = {
-      ...userData,
-      id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    };
-    
-    setUsers(prev => [...prev, newUser]);
-    return newUser;
   }, []);
 
-  const updateUser = useCallback((userId: string, userData: UserFormData): boolean => {
-    const userExists = users.some(u => u.id === userId);
-    
-    if (!userExists) {
-      console.error(`User with id ${userId} not found`);
-      return false;
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  const addUser = useCallback(async (userData: UserFormData): Promise<UserData | null> => {
+    try {
+      // Map UI role to database role
+      const roleMap: Record<UserRole, string> = {
+        'admin': 'ADMIN',
+        'manager': 'PRODUCT_MANAGER',
+        'customer': 'USER'
+      };
+
+      const result = await userService.create({
+        username: userData.email.split('@')[0],
+        email: userData.email,
+        name: userData.name,
+        role: roleMap[userData.role] as any,
+        position: userData.position,
+        department: userData.department,
+        phoneNumber: userData.phone,
+        permissions: [],
+        isActive: true,
+      });
+
+      if (result.success && result.data) {
+        const newUserData = convertUserToUserData(result.data);
+        setUsers(prev => [...prev, newUserData]);
+        return newUserData;
+      }
+    } catch (error) {
+      console.error('Failed to add user:', error);
     }
+    return null;
+  }, []);
 
-    setUsers(prev => prev.map(u => 
-      u.id === userId ? { ...userData, id: userId } : u
-    ));
-    
-    return true;
-  }, [users]);
+  const updateUser = useCallback(async (userId: string, userData: UserFormData): Promise<boolean> => {
+    try {
+      // Map UI role to database role
+      const roleMap: Record<UserRole, string> = {
+        'admin': 'ADMIN',
+        'manager': 'PRODUCT_MANAGER',
+        'customer': 'USER'
+      };
 
-  const deleteUser = useCallback((userId: string): boolean => {
-    const userExists = users.some(u => u.id === userId);
-    
-    if (!userExists) {
-      console.error(`User with id ${userId} not found`);
-      return false;
+      const result = await userService.update(userId, {
+        email: userData.email,
+        name: userData.name,
+        role: roleMap[userData.role] as any,
+        position: userData.position,
+        department: userData.department,
+        phoneNumber: userData.phone,
+      });
+
+      if (result.success && result.data) {
+        const updatedUserData = convertUserToUserData(result.data);
+        setUsers(prev => prev.map(u => 
+          u.id === userId ? updatedUserData : u
+        ));
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to update user:', error);
     }
+    return false;
+  }, []);
 
-    setUsers(prev => prev.filter(user => user.id !== userId));
-    return true;
-  }, [users]);
+  const deleteUser = useCallback(async (userId: string): Promise<boolean> => {
+    try {
+      const result = await userService.delete(userId);
+      if (result.success) {
+        setUsers(prev => prev.filter(user => user.id !== userId));
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+    }
+    return false;
+  }, []);
 
   const getUserById = useCallback((userId: string): UserData | undefined => {
     return users.find(u => u.id === userId);
@@ -203,6 +159,7 @@ export const useUserManagement = () => {
 
   return {
     users,
+    isLoading,
     addUser,
     updateUser,
     deleteUser,
@@ -210,5 +167,6 @@ export const useUserManagement = () => {
     getUsersByRole,
     checkEmailExists,
     checkPhoneExists,
+    refreshUsers: loadUsers,
   };
 };

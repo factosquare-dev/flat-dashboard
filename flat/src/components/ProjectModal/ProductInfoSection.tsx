@@ -1,6 +1,7 @@
 import React from 'react';
 import { Package } from 'lucide-react';
 import type { ProjectData } from './types';
+import { productTypes, serviceTypes } from '../../data/mockData';
 
 interface ProductInfoSectionProps {
   formData: ProjectData;
@@ -19,14 +20,17 @@ const ProductInfoSection: React.FC<ProductInfoSectionProps> = ({ formData, onCha
           <label className="block text-sm font-medium text-gray-700 mb-2">
             제품 타입 <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
+          <select
             value={formData.productType}
             onChange={(e) => onChange({ productType: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-            placeholder="예: 스킨케어, 메이크업 등"
+            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
             required
-          />
+          >
+            <option value="">제품 타입을 선택하세요</option>
+            {productTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
         </div>
         <div className="group">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -37,7 +41,9 @@ const ProductInfoSection: React.FC<ProductInfoSectionProps> = ({ formData, onCha
             onChange={(e) => onChange({ serviceType: e.target.value })}
             className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
           >
-            <option value="OEM">OEM</option>
+            {serviceTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
             <option value="ODM">ODM</option>
             <option value="OBM">OBM</option>
             <option value="Private Label">Private Label</option>

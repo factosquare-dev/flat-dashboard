@@ -9,7 +9,7 @@ import { DbResponse, ProjectAssignment, FactoryProject } from '../database/types
 import { User } from '@/types/user';
 import { Factory } from '@/types/factory';
 import { Schedule, Task } from '@/types/schedule';
-import { Comment } from '@/types/comment';
+import type { Comment } from '@/types/comment';
 
 export interface ProjectWithRelations extends Project {
   users?: Array<User & { role: string; assignedAt: Date }>;

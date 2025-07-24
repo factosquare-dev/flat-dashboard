@@ -57,6 +57,7 @@ export class MockDatabaseImpl {
   private serializeDatabase(db: MockDatabase): any {
     return {
       users: Array.from(db.users.entries()),
+      customers: Array.from(db.customers.entries()),
       factories: Array.from(db.factories.entries()),
       projects: Array.from(db.projects.entries()),
       schedules: Array.from(db.schedules.entries()),
@@ -65,6 +66,7 @@ export class MockDatabaseImpl {
       userFactories: Array.from(db.userFactories.entries()),
       projectAssignments: Array.from(db.projectAssignments.entries()),
       factoryProjects: Array.from(db.factoryProjects.entries()),
+      userCustomers: Array.from(db.userCustomers.entries()),
     };
   }
 
@@ -72,16 +74,39 @@ export class MockDatabaseImpl {
    * Deserialize database from storage
    */
   private deserializeDatabase(data: any): MockDatabase {
+    // Helper function to convert date strings to Date objects
+    const convertDates = (obj: any): any => {
+      if (!obj) return obj;
+      
+      // Date fields to convert
+      const dateFields = ['createdAt', 'updatedAt', 'startDate', 'endDate', 'establishedDate', 'lastLoginAt', 'assignedAt', 'approvedAt', 'completedAt'];
+      
+      dateFields.forEach(field => {
+        if (obj[field] && typeof obj[field] === 'string') {
+          obj[field] = new Date(obj[field]);
+        }
+      });
+      
+      return obj;
+    };
+    
+    // Convert all entries to restore Date objects
+    const processEntries = (entries: any[]) => {
+      return entries?.map(([key, value]) => [key, convertDates(value)]) || [];
+    };
+    
     return {
-      users: new Map(data.users),
-      factories: new Map(data.factories),
-      projects: new Map(data.projects),
-      schedules: new Map(data.schedules),
-      tasks: new Map(data.tasks),
-      comments: new Map(data.comments),
-      userFactories: new Map(data.userFactories),
-      projectAssignments: new Map(data.projectAssignments),
-      factoryProjects: new Map(data.factoryProjects),
+      users: new Map(processEntries(data.users)),
+      customers: new Map(processEntries(data.customers)),
+      factories: new Map(processEntries(data.factories)),
+      projects: new Map(processEntries(data.projects)),
+      schedules: new Map(processEntries(data.schedules)),
+      tasks: new Map(processEntries(data.tasks)),
+      comments: new Map(processEntries(data.comments)),
+      userFactories: new Map(processEntries(data.userFactories)),
+      projectAssignments: new Map(processEntries(data.projectAssignments)),
+      factoryProjects: new Map(processEntries(data.factoryProjects)),
+      userCustomers: new Map(processEntries(data.userCustomers)),
     };
   }
 
@@ -112,6 +137,13 @@ export class MockDatabaseImpl {
       console.error('Failed to load database from storage:', error);
       return null;
     }
+  }
+
+  /**
+   * Get the database instance
+   */
+  getDatabase(): MockDatabase {
+    return this.db;
   }
 
   /**

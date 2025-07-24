@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { User } from '../../types/comment';
 import { Send, X } from 'lucide-react';
+import { managerNames } from '../../data/mockData';
 
 interface CommentInputProps {
   currentUser: User;
@@ -33,13 +34,12 @@ const CommentInput: React.FC<CommentInputProps> = ({
   const [cursorPosition, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  // Mock users for mention suggestions - 실제로는 API에서 가져와야 함
-  const mockUsers: MentionSuggestion[] = [
-    { id: '1', name: '김철수', avatar: '' },
-    { id: '2', name: '이영희', avatar: '' },
-    { id: '3', name: '박민수', avatar: '' },
-    { id: '4', name: '정수진', avatar: '' },
-  ];
+  // Mock users for mention suggestions - Mock DB에서 가져오기
+  const mockUsers: MentionSuggestion[] = managerNames.map((name, index) => ({
+    id: (index + 1).toString(),
+    name,
+    avatar: ''
+  }));
   
   const filteredUsers = mockUsers.filter(user => 
     user.name.toLowerCase().includes(mentionSearch.toLowerCase()) &&

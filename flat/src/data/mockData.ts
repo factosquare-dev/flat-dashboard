@@ -1,31 +1,27 @@
 import type { ProjectFactory } from '../types/project';
 import { factories, getFactoriesByType } from './factories';
+import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 
-// 고객사 목록
-export const allClients = [
-  // 대기업
-  '(주)아모레퍼시픽',
-  'LG생활건강',
-  '한국콜마',
-  '코스맥스',
-  
-  // 중견기업
-  '(주)뷰티코리아',
-  '글로벌코스메틱',
-  '네이처바이오',
-  '프리미엄뷰티',
-  '클린뷰티랩',
-  
-  // 브랜드
-  '이니스프리',
-  '미샤',
-  '더페이스샵',
-  '스킨푸드',
-  '에뛰드하우스',
-  '토니모리',
-  '네이처리퍼블릭',
-  '인코스런'
-];
+// 고객사 목록 - Mock DB에서 가져오기
+const getAllClients = () => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    const customers = Array.from(database.customers.values());
+    return customers.map(customer => customer.name);
+  } catch (error) {
+    console.warn('Failed to load clients from mock DB:', error);
+    // Fallback to static data
+    return [
+      '뷰티코리아',
+      '그린코스메틱', 
+      '코스메디칼',
+      '퍼스트뷰티'
+    ];
+  }
+};
+
+export const allClients = getAllClients();
 
 // factories.ts에서 가져온 공장 데이터를 기반으로 구성
 const manufacturingFactories = getFactoriesByType('제조');
@@ -139,42 +135,93 @@ export const factoryTypeIcons = {
   packaging: '📦'
 };
 
-// 고객사별 담당자 정보
-export const customerContacts = [
-  { id: '1', name: '김철수', company: '(주)아모레퍼시픽', position: '구매팀 과장', email: 'kim.cs@amorepacific.com', phone: '010-1234-5678' },
-  { id: '2', name: '이영희', company: 'LG생활건강', position: '개발팀 대리', email: 'lee.yh@lgcare.com', phone: '010-2345-6789' },
-  { id: '3', name: '박민수', company: '한국콜마', position: '기획팀 팀장', email: 'park.ms@kolmar.com', phone: '010-3456-7890' },
-  { id: '4', name: '정수진', company: '코스맥스', position: '마케팅팀 주임', email: 'jung.sj@cosmax.com', phone: '010-4567-8901' },
-  { id: '5', name: '최현우', company: '(주)뷰티코리아', position: '대표이사', email: 'choi.hw@beautykorea.com', phone: '010-5678-9012' },
-  { id: '6', name: '김미영', company: '글로벌코스메틱', position: '상품기획팀 부장', email: 'kim.my@globalcos.com', phone: '010-6789-0123' },
-  { id: '7', name: '이준호', company: '네이처바이오', position: '연구소 소장', email: 'lee.jh@naturebio.com', phone: '010-7890-1234' },
-  { id: '8', name: '박서연', company: '프리미엄뷰티', position: '품질관리팀 차장', email: 'park.sy@premiumbeauty.com', phone: '010-8901-2345' },
-  { id: '9', name: '정태훈', company: '클린뷰티랩', position: '생산팀 과장', email: 'jung.th@cleanbeautylab.com', phone: '010-9012-3456' },
-  { id: '10', name: '강민지', company: '이니스프리', position: '브랜드매니저', email: 'kang.mj@innisfree.com', phone: '010-0123-4567' },
-  { id: '11', name: '윤서준', company: '미샤', position: '디자인팀 팀장', email: 'yoon.sj@missha.com', phone: '010-1357-2468' },
-  { id: '12', name: '한지민', company: '더페이스샵', position: '영업팀 대리', email: 'han.jm@thefaceshop.com', phone: '010-2468-1357' },
-  { id: '13', name: '송민호', company: '스킨푸드', position: 'SCM팀 과장', email: 'song.mh@skinfood.com', phone: '010-3579-2468' },
-  { id: '14', name: '임수정', company: '에뛰드하우스', position: '온라인사업팀 팀장', email: 'lim.sj@etudehouse.com', phone: '010-4680-3579' },
-  { id: '15', name: '조현아', company: '토니모리', position: '글로벌사업부 부장', email: 'jo.ha@tonymoly.com', phone: '010-5791-4680' },
-  { id: '16', name: '정다은', company: '네이처리퍼블릭', position: '제품개발팀 차장', email: 'jung.de@naturerepublic.com', phone: '010-6802-4791' },
-  { id: '17', name: '이승호', company: '인코스런', position: '품질관리팀 과장', email: 'lee.sh@incosrun.com', phone: '010-7913-5802' }
-];
+// 고객사별 담당자 정보 - Mock DB에서 가져오기
+const getCustomerContacts = () => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    const customers = Array.from(database.customers.values());
+    const users = Array.from(database.users.values());
+    const userCustomers = Array.from(database.userCustomers.values());
+    
+    // 고객사별 담당자 찾기
+    return customers.map(customer => {
+      // 해당 고객사의 담당자 찾기 - contact role을 가진 유저
+      const customerRelation = userCustomers.find(uc => uc.customerId === customer.id && uc.role === 'contact');
+      const contactUser = customerRelation ? users.find(u => u.id === customerRelation.userId) : null;
+      
+      return {
+        id: customer.id,
+        name: contactUser?.name || customer.contactPerson,
+        company: customer.name,
+        position: contactUser?.position || '담당자',
+        email: contactUser?.email || customer.email,
+        phone: contactUser?.phone || customer.contactNumber
+      };
+    });
+  } catch (error) {
+    console.warn('Failed to load customer contacts from mock DB:', error);
+    // Mock DB 초기화 재시도
+    try {
+      const db = MockDatabaseImpl.getInstance();
+      const database = db.getDatabase();
+      return [
+        { id: 'customer-1', name: '박민수', company: '뷰티코리아', position: '구매팀장', email: 'park@beautykorea.com', phone: '010-3456-7890' },
+        { id: 'customer-2', name: '정수진', company: '그린코스메틱', position: '제품개발팀 과장', email: 'jung@greencosmetic.com', phone: '010-4567-8901' },
+        { id: 'customer-3', name: '윤서준', company: '코스메디칼', position: '연구소장', email: 'yoon@cosmedical.com', phone: '010-7890-1234' },
+        { id: 'customer-4', name: '임하나', company: '퍼스트뷰티', position: '마케팅팀 차장', email: 'lim@firstbeauty.com', phone: '010-8901-2345' }
+      ];
+    } catch {
+      return [];
+    }
+  }
+};
 
-// 제품 타입
-export const productTypes = [
-  '스킨케어',
-  '메이크업',
-  '클렌징',
-  '마스크팩',
-  '선케어',
-  '헤어케어',
-  '바디케어',
-  '향수',
-  '네일케어',
-  '남성화장품',
-  '유아화장품',
-  '기능성화장품'
-];
+export const customerContacts = getCustomerContacts();
+
+// Mock DB에서 매니저/사용자 목록 가져오기
+const getManagers = () => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    const users = Array.from(database.users.values());
+    return users
+      .filter(user => user.role === 'manager' || user.role === 'admin')
+      .map(user => user.name);
+  } catch (error) {
+    console.warn('Failed to load managers from mock DB:', error);
+    return ['김철수', '이영희', '박민수', '정수진', '최지훈', '김프로', '이매니저', '박팀장'];
+  }
+};
+
+export const managerNames = getManagers();
+
+// Mock DB에서 제품 타입 목록 가져오기
+const getProductTypes = () => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    const projects = Array.from(database.projects.values());
+    const productTypes = [...new Set(projects.map(p => p.productType).filter(Boolean))];
+    
+    if (productTypes.length > 0) {
+      return productTypes;
+    }
+  } catch (error) {
+    console.warn('Failed to load product types from mock DB:', error);
+  }
+  
+  // Fallback
+  return [
+    '스킨케어', '메이크업', '클렌징', '마스크팩', '선케어',
+    '헤어케어', '바디케어', '향수', '네일케어',
+    '남성화장품', '유아화장품', '기능성화장품',
+    '프리미엄 화장품 라인', '천연 샴푸 시리즈', '안티에이징 세럼',
+    '비비크림', '탈모샴푸', '바디로션', '선크림'
+  ];
+};
+
+export const productTypes = getProductTypes();
 
 // 서비스 타입
 export const serviceTypes = [
@@ -200,3 +247,30 @@ export const priorities = [
   '보통',
   '낮음'
 ];
+
+// 현재 단계 옵션들
+export const currentStageOptions = [
+  '설계', '제조', '용기', '포장', '품질검사', '승인'
+];
+
+// 매니저 랜덤 선택 함수
+export const getRandomManager = () => {
+  const managers = getManagers();
+  return managers[Math.floor(Math.random() * managers.length)];
+};
+
+// 제품 타입 랜덤 선택 함수
+export const getRandomProductType = () => {
+  const types = getProductTypes();
+  return types[Math.floor(Math.random() * types.length)];
+};
+
+// 서비스 타입 랜덤 선택 함수
+export const getRandomServiceType = () => {
+  return serviceTypes[Math.floor(Math.random() * serviceTypes.length)];
+};
+
+// 우선순위 랜덤 선택 함수
+export const getRandomPriority = () => {
+  return priorities[Math.floor(Math.random() * priorities.length)];
+};

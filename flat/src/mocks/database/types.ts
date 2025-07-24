@@ -3,17 +3,19 @@
  * Provides comprehensive type definitions for the mock database system
  */
 
-import { User, UserRole } from '@/types/user';
-import { Factory } from '@/types/factory';
-import { Project, ProjectType, ProjectStatus } from '@/types/project';
-import { Schedule, Task } from '@/types/schedule';
-import { Comment } from '@/types/comment';
+import type { User, UserRole } from '@/types/user';
+import type { Factory } from '@/types/factory';
+import type { Project, ProjectType, ProjectStatus } from '@/types/project';
+import type { Schedule, Task } from '@/types/schedule';
+import type { Comment } from '@/types/comment';
+import type { Customer } from '@/types/customer';
 
 /**
  * Database Collections
  */
 export interface MockDatabase {
   users: Map<string, User>;
+  customers: Map<string, Customer>;
   factories: Map<string, Factory>;
   projects: Map<string, Project>;
   schedules: Map<string, Schedule>;
@@ -24,6 +26,7 @@ export interface MockDatabase {
   userFactories: Map<string, UserFactory>;
   projectAssignments: Map<string, ProjectAssignment>;
   factoryProjects: Map<string, FactoryProject>;
+  userCustomers: Map<string, UserCustomer>;
 }
 
 /**
@@ -54,6 +57,15 @@ export interface FactoryProject {
   factoryType: 'manufacturer' | 'container' | 'packaging';
   isPrimary: boolean;
   assignedAt: Date;
+}
+
+export interface UserCustomer {
+  id: string;
+  userId: string;
+  customerId: string;
+  role: 'manager' | 'sales' | 'support';
+  assignedAt: Date;
+  assignedBy: string;
 }
 
 /**

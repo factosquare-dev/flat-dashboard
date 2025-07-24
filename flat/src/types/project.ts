@@ -41,6 +41,7 @@ export interface Project {
   type: ProjectType;
   parentId?: string;
   status: ProjectStatus;
+  customerId: string;
   customer: Customer;
   product: Product;
   quantity: number;

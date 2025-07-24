@@ -5,14 +5,14 @@
 
 import { useEffect, useState } from 'react';
 import type { Project } from '../../types/project';
-import { hierarchicalProjects, flattenProjects, toggleProject } from '../data/hierarchicalProjects';
+import { getHierarchicalProjectsData, flattenProjects, toggleProject } from '../data/hierarchicalProjects';
 import { useProjectData } from './useProjects/useProjectData';
 import { useProjectSelection } from './useProjects/useProjectSelection';
 import { useProjectPagination } from './useProjects/useProjectPagination';
 
 export const useProjects = () => {
   // Hierarchical data state (temporary until API is ready)
-  const [hierarchicalData, setHierarchicalData] = useState<Project[]>(hierarchicalProjects);
+  const [hierarchicalData, setHierarchicalData] = useState<Project[]>(() => getHierarchicalProjectsData());
   const [useHierarchicalMode, setUseHierarchicalMode] = useState(false);
 
   // Data management hook

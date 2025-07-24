@@ -38,14 +38,14 @@ const UsersPage: React.FC = () => {
     modalState.open(user);
   }, [modalState]);
 
-  const handleDeleteUser = useCallback((userId: string) => {
-    const success = deleteUser(userId);
+  const handleDeleteUser = useCallback(async (userId: string) => {
+    const success = await deleteUser(userId);
     if (!success) {
       alert('사용자 삭제에 실패했습니다.');
     }
   }, [deleteUser]);
 
-  const handleSaveUser = useCallback((userData: UserFormData) => {
+  const handleSaveUser = useCallback(async (userData: UserFormData) => {
     // 이메일 중복 확인
     if (checkEmailExists(userData.email, modalState.data?.id)) {
       alert('이미 사용 중인 이메일입니다.');
@@ -60,14 +60,18 @@ const UsersPage: React.FC = () => {
 
     if (modalState.data) {
       // 수정
-      const success = updateUser(modalState.data.id, userData);
+      const success = await updateUser(modalState.data.id, userData);
       if (!success) {
         alert('사용자 수정에 실패했습니다.');
         return;
       }
     } else {
       // 추가
-      addUser(userData);
+      const newUser = await addUser(userData);
+      if (!newUser) {
+        alert('사용자 추가에 실패했습니다.');
+        return;
+      }
     }
     
     modalState.close();

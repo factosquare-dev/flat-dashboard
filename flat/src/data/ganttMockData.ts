@@ -1,152 +1,69 @@
 /**
- * GanttChart Mock Data
+ * GanttChart Mock Data - factories.ts와 통합
  */
 
 import type { Project } from '../components/GanttChart/types';
+import { factories } from './factories';
 
-export const GANTT_MOCK_PROJECTS: Project[] = [
-  {
-    id: "qcell",
-    name: "큐셀시스템",
-    color: "bg-blue-500",
-    expanded: true,
-    tasks: [
-      {
-        id: 1,
-        title: "Requirements Analysis",
-        projectId: "qcell",
-        startDate: "2025-07-01",
-        endDate: "2025-07-07",
-        color: "bg-blue-400"
-      },
-      {
-        id: 2,
-        title: "Design Phase",
-        projectId: "qcell",
-        startDate: "2025-07-08",
-        endDate: "2025-07-15",
-        color: "bg-blue-600"
-      },
-      {
-        id: 3,
-        title: "Development",
-        projectId: "qcell",
-        startDate: "2025-07-16",
-        endDate: "2025-08-05",
-        color: "bg-blue-700"
-      }
-    ]
-  },
-  {
-    id: "innovate",
-    name: "이노베이트케어",
-    color: "bg-green-500",
-    expanded: false,
-    tasks: [
-      {
-        id: 4,
-        title: "Market Research",
-        projectId: "innovate",
-        startDate: "2025-07-03",
-        endDate: "2025-07-10",
-        color: "bg-green-400"
-      },
-      {
-        id: 5,
-        title: "Prototype",
-        projectId: "innovate",
-        startDate: "2025-07-11",
-        endDate: "2025-07-25",
-        color: "bg-green-600"
-      }
-    ]
-  },
-  {
-    id: "biohealth",
-    name: "바이오헬스케어",
-    color: "bg-purple-500",
-    expanded: true,
-    tasks: [
-      {
-        id: 6,
-        title: "Research",
-        projectId: "biohealth",
-        startDate: "2025-07-05",
-        endDate: "2025-07-20",
-        color: "bg-purple-400"
-      },
-      {
-        id: 7,
-        title: "Testing",
-        projectId: "biohealth",
-        startDate: "2025-07-21",
-        endDate: "2025-08-10",
-        color: "bg-purple-600"
-      }
-    ]
-  },
-  {
-    id: "netmovage",
-    name: "(주)네트모베이지",
-    color: "bg-yellow-500",
-    expanded: true,
-    tasks: [
-      {
-        id: "net-1",
-        title: "인프라 구축",
-        projectId: "netmovage",
-        startDate: "2025-07-19",
-        endDate: "2025-07-21",
-        color: "bg-yellow-400"
-      },
-      {
-        id: "net-2",
-        title: "보안 설정",
-        projectId: "netmovage",
-        startDate: "2025-07-20",
-        endDate: "2025-07-22",
-        color: "bg-yellow-500"
-      },
-      {
-        id: "net-3",
-        title: "성능 최적화",
-        projectId: "netmovage",
-        startDate: "2025-07-22",
-        endDate: "2025-07-24",
-        color: "bg-yellow-600"
-      }
-    ]
-  },
-  {
-    id: "cosmoros",
-    name: "주식회사 코스모로스",
-    color: "bg-cyan-500",
-    expanded: true,
-    tasks: [
-      {
-        id: "cos-1",
-        title: "기술 검토",
-        projectId: "cosmoros",
-        startDate: "2025-07-20",
-        endDate: "2025-07-22",
-        color: "bg-cyan-400"
-      },
-      {
-        id: "cos-2",
-        title: "프로토타입 개발",
-        projectId: "cosmoros",
-        startDate: "2025-07-21",
-        endDate: "2025-07-24",
-        color: "bg-cyan-500"
-      },
-      {
-        id: "cos-3",
-        title: "테스트 및 검증",
-        projectId: "cosmoros",
-        startDate: "2025-07-24",
-        endDate: "2025-07-26",
-        color: "bg-cyan-600"
-      }
-    ]
-  }
-];
+// factories.ts 데이터를 기반으로 Gantt 프로젝트 생성
+const createGanttProjectsFromFactories = (): Project[] => {
+  console.log('[GanttChart] 🏭 Creating projects from factories.ts:', factories);
+  console.log('[GanttChart] 🏭 First 5 factories:', factories.slice(0, 5).map(f => ({ id: f.id, name: f.name, type: f.type })));
+  
+  const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-cyan-500', 'bg-red-500', 'bg-indigo-500', 'bg-pink-500'];
+  
+  // 확실히 공장 이름이 표시되도록 명시적으로 공장 데이터 사용
+  const ganttProjects = factories.slice(0, 5).map((factory, index) => {
+    const projectName = `🏭 ${factory.name} (${factory.type})`;
+    console.log(`[GanttChart] 🏭 Creating project ${index}: ${projectName}`);
+    
+    return {
+      id: factory.id,
+      name: projectName, // 공장 이름과 타입을 명확히 표시 (이모지 추가로 구분)
+      color: colors[index % colors.length],
+      expanded: index % 2 === 0, // 짝수 인덱스는 펼쳐진 상태
+      tasks: [
+        {
+          id: `${factory.id}-1`,
+          title: "요구사항 분석",
+          projectId: factory.id,
+          startDate: "2025-07-01",
+          endDate: "2025-07-07",
+          color: colors[index % colors.length].replace('500', '400')
+        },
+        {
+          id: `${factory.id}-2`,
+          title: "설계 단계",
+          projectId: factory.id,
+          startDate: "2025-07-08",
+          endDate: "2025-07-15",
+          color: colors[index % colors.length].replace('500', '600')
+        },
+        {
+          id: `${factory.id}-3`,
+          title: "개발/제조",
+          projectId: factory.id,
+          startDate: "2025-07-16",
+          endDate: "2025-08-05",
+          color: colors[index % colors.length].replace('500', '700')
+        }
+      ]
+    };
+  });
+  
+  console.log('[GanttChart] 🏭 Final gantt projects:', ganttProjects);
+  console.log('[GanttChart] 🏭 Project names:', ganttProjects.map(p => p.name));
+  return ganttProjects;
+};
+
+// 동적으로 Gantt 프로젝트를 가져오는 함수 (resetMockData 대응)
+export const getGanttMockProjects = (): Project[] => {
+  console.log('[GanttChart] Getting fresh gantt projects...');
+  return createGanttProjectsFromFactories();
+};
+
+// 기존 상수는 유지하되, 동적 함수 사용 권장
+export const GANTT_MOCK_PROJECTS: Project[] = createGanttProjectsFromFactories();
+
+// 디버깅용: 생성된 프로젝트 확인
+console.log('[GanttChart] GANTT_MOCK_PROJECTS exported:', GANTT_MOCK_PROJECTS);

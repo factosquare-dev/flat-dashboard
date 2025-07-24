@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Project } from '../../../types/project';
 import { ChevronDown, ChevronRight, Folder, FolderOpen, FileSpreadsheet } from 'lucide-react';
 import DraggableProjectTable from './DraggableProjectTable';
-import { hierarchicalProjects, flattenProjects, toggleProject } from '../../../data/hierarchicalProjects';
+import { flattenProjects, toggleProject } from '../../../data/hierarchicalProjects';
 
 interface HierarchicalProjectTableProps {
   projects: Project[];

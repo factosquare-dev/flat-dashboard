@@ -1,341 +1,173 @@
 import type { Project } from '../types/project';
+import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import { staticHierarchicalProjects } from './hierarchicalProjectsStatic';
 
-export const hierarchicalProjects: Project[] = [
-  // 대형 프로젝트 1
-  {
-    id: 'master-1',
-    type: 'master',
-    level: 0,
-    isExpanded: true,
-    client: '삼성전자',
-    manager: '김철수',
-    productType: '',
-    serviceType: '기타',
-    currentStage: [],
-    status: '진행중',
-    progress: 60,
-    startDate: '2024-01-01',
-    endDate: '2024-06-30',
-    manufacturer: '',
-    container: '',
-    packaging: '',
-    priority: '높음',
-    children: [
-      {
-        id: 'sub-1',
-        type: 'sub',
-        level: 1,
-        parentId: 'master-1',
-        client: '큐셀시스템',
-        manager: '박민수',
-        productType: 'A제품',
-        serviceType: 'OEM',
-        currentStage: ['설계', '제조'],
-        status: '진행중',
-        progress: 45,
-        startDate: '2024-03-01',
-        endDate: '2024-04-15',
-        manufacturer: '큐셀시스템',
-        container: '(주)연우',
-        packaging: '(주)네트모베이지',
-        priority: '높음',
-        depositPaid: true,
-        children: [
-          {
-            id: 'task-1-1',
-            type: 'task',
-            level: 2,
-            parentId: 'sub-1',
-            client: '큐셀시스템',
-            manager: '박민수',
-            productType: 'A제품 - 원료 준비',
-            serviceType: 'OEM',
-            currentStage: ['완료'],
-            status: '완료',
-            progress: 100,
-            startDate: '2024-03-01',
-            endDate: '2024-03-05',
-            manufacturer: '큐셀시스템',
-            container: '',
-            packaging: '',
-            priority: '높음',
-            depositPaid: true
-          },
-          {
-            id: 'task-1-2',
-            type: 'task',
-            level: 2,
-            parentId: 'sub-1',
-            client: '큐셀시스템',
-            manager: '박민수',
-            productType: 'A제품 - 혼합 및 제조',
-            serviceType: 'OEM',
-            currentStage: ['진행중'],
-            status: '진행중',
-            progress: 75,
-            startDate: '2024-03-06',
-            endDate: '2024-03-20',
-            manufacturer: '큐셀시스템',
-            container: '',
-            packaging: '',
-            priority: '높음',
-            depositPaid: true
-          },
-          {
-            id: 'task-1-3',
-            type: 'task',
-            level: 2,
-            parentId: 'sub-1',
-            client: '큐셀시스템',
-            manager: '박민수',
-            productType: 'A제품 - 포장 및 출하',
-            serviceType: 'OEM',
-            currentStage: ['시작전'],
-            status: '시작전',
-            progress: 0,
-            startDate: '2024-03-21',
-            endDate: '2024-04-15',
-            manufacturer: '',
-            container: '(주)연우',
-            packaging: '(주)네트모베이지',
-            priority: '높음',
-            depositPaid: true
-          }
-        ]
-      },
-      {
-        id: 'sub-2',
-        type: 'sub',
-        level: 1,
-        parentId: 'master-1',
-        client: '큐셀시스템',
-        manager: '정수진',
-        productType: 'B제품',
-        serviceType: 'ODM',
-        currentStage: ['기획'],
-        status: '시작전',
-        progress: 10,
-        startDate: '2024-04-01',
-        endDate: '2024-04-30',
-        manufacturer: '주식회사 코스모로스',
-        container: '삼화플라스틱',
-        packaging: '서울포장산업(주)',
-        priority: '보통',
-        depositPaid: false,
-        children: [
-          {
-            id: 'task-2-1',
-            type: 'task',
-            level: 2,
-            parentId: 'sub-2',
-            client: '큐셀시스템',
-            manager: '정수진',
-            productType: 'B제품 - 기획 및 디자인',
-            serviceType: 'ODM',
-            currentStage: ['진행중'],
-            status: '진행중',
-            progress: 30,
-            startDate: '2024-04-01',
-            endDate: '2024-04-10',
-            manufacturer: '',
-            container: '',
-            packaging: '',
-            priority: '보통',
-            depositPaid: false
-          },
-          {
-            id: 'task-2-2',
-            type: 'task',
-            level: 2,
-            parentId: 'sub-2',
-            client: '큐셀시스템',
-            manager: '정수진',
-            productType: 'B제품 - 제조 준비',
-            serviceType: 'ODM',
-            currentStage: ['시작전'],
-            status: '시작전',
-            progress: 0,
-            startDate: '2024-04-11',
-            endDate: '2024-04-30',
-            manufacturer: '주식회사 코스모로스',
-            container: '삼화플라스틱',
-            packaging: '서울포장산업(주)',
-            priority: '보통',
-            depositPaid: false
-          }
-        ]
-      },
-      {
-        id: 'sub-3',
-        type: 'sub',
-        level: 1,
-        parentId: 'master-1',
-        client: '(주)연우',
-        manager: '김지현',
-        productType: 'C제품',
-        serviceType: 'OBM',
-        currentStage: ['완료'],
-        status: '완료',
-        progress: 100,
-        startDate: '2024-02-01',
-        endDate: '2024-03-15',
-        manufacturer: '(주)뷰티팩토리',
-        container: '(주)에이치피씨',
-        packaging: '(주)한솔피엔에스',
-        priority: '높음',
-        depositPaid: true
-      }
-    ]
-  },
-  
-  // 대형 프로젝트 2
-  {
-    id: 'master-2',
-    type: 'master',
-    level: 0,
-    isExpanded: false,
-    client: 'LG전자',
-    manager: '한지민',
-    productType: '',
-    serviceType: '기타',
-    currentStage: [],
-    status: '시작전',
-    progress: 0,
-    startDate: '2024-07-01',
-    endDate: '2024-12-31',
-    manufacturer: '',
-    container: '',
-    packaging: '',
-    priority: '보통',
-    children: [
-      {
-        id: 'sub-4',
-        type: 'sub',
-        level: 1,
-        parentId: 'master-2',
-        client: '네트모베이지',
-        manager: '송민호',
-        productType: 'D제품',
-        serviceType: 'Private Label',
-        currentStage: [],
-        status: '시작전',
-        progress: 0,
-        startDate: '2024-07-15',
-        endDate: '2024-09-30',
-        manufacturer: '코스메카코리아',
-        container: '태성산업(주)',
-        packaging: '대림포장(주)',
-        priority: '낮음'
-      }
-    ]
-  },
-  
-  // 독립적인 소형 프로젝트들 (대형 프로젝트에 속하지 않음)
-  {
-    id: 'independent-1',
-    type: 'sub',
-    level: 0,
-    client: '코스모로스',
-    manager: '이준호',
-    productType: 'E제품',
-    serviceType: 'OEM',
-    currentStage: ['제조', '포장'],
-    status: '진행중',
-    progress: 65,
-    startDate: '2024-05-01',
-    endDate: '2024-05-30',
-    manufacturer: '(주)아모레퍼시픽 오산공장',
-    container: '(주)펌텍코리아',
-    packaging: '(주)새한패키지',
-    priority: '높음',
-    depositPaid: true
-  },
-  {
-    id: 'independent-2',
-    type: 'sub',
-    level: 0,
-    client: '삼성전자',
-    manager: '박서준',
-    productType: 'F제품',
-    serviceType: 'ODM',
-    currentStage: ['기획', '설계'],
-    status: '진행중',
-    progress: 30,
-    startDate: '2024-06-01',
-    endDate: '2024-07-15',
-    manufacturer: '큐셀시스템',
-    container: '(주)연우',
-    packaging: '(주)네트모베이지',
-    priority: '보통',
-    depositPaid: false
-  },
-  {
-    id: 'independent-3',
-    type: 'sub',
-    level: 0,
-    client: 'LG전자',
-    manager: '김태희',
-    productType: 'G제품',
-    serviceType: 'White Label',
-    currentStage: ['완료'],
-    status: '완료',
-    progress: 100,
-    startDate: '2024-03-01',
-    endDate: '2024-04-30',
-    manufacturer: '주식회사 코스모로스',
-    container: '삼화플라스틱',
-    packaging: '서울포장산업(주)',
-    priority: '높음',
-    depositPaid: true
-  }
-];
-
-// 평면화된 프로젝트 리스트를 계층 구조로 변환하는 유틸리티 함수
-export function flattenProjects(projects: Project[]): Project[] {
-  const result: Project[] = [];
-  
-  projects.forEach(project => {
-    result.push(project);
+// Get projects from mock database instead of hardcoded data
+const getHierarchicalProjects = (): Project[] => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
     
-    // 대형 프로젝트가 확장되어 있으면 소형 프로젝트들 추가
-    if (project.type === 'master' && project.isExpanded && project.children) {
-      project.children.forEach(subProject => {
-        result.push(subProject);
-        
-        // 소형 프로젝트가 확장되어 있으면 태스크들 추가
-        if (subProject.isExpanded && subProject.children) {
-          subProject.children.forEach(task => {
-            result.push(task);
-          });
-        }
-      });
+    // Check if database is properly initialized
+    if (!db || typeof db.getDatabase !== 'function') {
+      console.warn('[hierarchicalProjects] Mock database not initialized, using static data');
+      return staticHierarchicalProjects;
     }
-  });
+    
+    const database = db.getDatabase();
+    if (!database || !database.projects || database.projects.size === 0) {
+      console.warn('[hierarchicalProjects] Database projects not available, using static data');
+      return staticHierarchicalProjects;
+    }
+    
+    const projects = Array.from(database.projects.values());
+    const customers = Array.from(database.customers.values());
+    const users = Array.from(database.users.values());
+    const factories = Array.from(database.factories.values());
+    
+    console.log('[hierarchicalProjects] Loaded data:', {
+      projectsCount: projects.length,
+      customersCount: customers.length,
+      usersCount: users.length,
+      factoriesCount: factories.length,
+      firstProject: projects[0],
+      customers: customers.map(c => ({id: c.id, name: c.name}))
+    });
   
-  return result;
-}
+  // Build hierarchical structure
+  const masterProjects = projects.filter(p => p.type === 'MASTER');
+  
+  return masterProjects.map(master => {
+    const subProjects = projects.filter(p => p.parentId === master.id);
+    
+    // Get customer from database
+    const masterCustomer = customers.find(c => c.id === master.customerId);
+    const customerName = masterCustomer?.name || 'Unknown Customer';
+    
+    // Get factory names from database
+    const manufacturerFactory = factories.find(f => f.id === master.manufacturerId);
+    const containerFactory = factories.find(f => f.id === master.containerId);
+    const packagingFactory = factories.find(f => f.id === master.packagingId);
+    
+    // Map to legacy format for backward compatibility
+    const mappedMaster = {
+      ...master,
+      type: 'master' as any,
+      level: 0,
+      isExpanded: true,
+      client: customerName, // Use customer name from database
+      manager: users.find(u => u.id === master.createdBy)?.name || 'Unknown',
+      productType: master.product.name,
+      serviceType: 'OEM' as any, // Default service type
+      currentStage: getStagesFromProgress(master.progress),
+      status: mapProjectStatus(master.status),
+      startDate: master.startDate.toISOString().split('T')[0],
+      endDate: master.endDate.toISOString().split('T')[0],
+      manufacturer: manufacturerFactory?.name || master.manufacturerId,
+      container: containerFactory?.name || master.containerId,
+      packaging: packagingFactory?.name || master.packagingId,
+      priority: master.priority,
+      depositPaid: master.depositStatus === 'received',
+      children: subProjects.map(sub => {
+        // SUB projects should inherit MASTER's customer
+        const subCustomer = customers.find(c => c.id === sub.customerId);
+        const subCustomerName = subCustomer?.name || customerName; // Fallback to master's customer
+        
+        // Get factory names for sub project
+        const subManufacturerFactory = factories.find(f => f.id === sub.manufacturerId);
+        const subContainerFactory = factories.find(f => f.id === sub.containerId);
+        const subPackagingFactory = factories.find(f => f.id === sub.packagingId);
+        
+        return {
+          ...sub,
+          type: 'sub' as any,
+          level: 1,
+          parentId: master.id,
+          client: customerName, // SUB project inherits MASTER's customer
+          manager: users.find(u => u.id === sub.createdBy)?.name || 'Unknown',
+          productType: sub.product.name,
+          serviceType: 'OEM' as any,
+          currentStage: getStagesFromProgress(sub.progress),
+          status: mapProjectStatus(sub.status),
+          startDate: sub.startDate.toISOString().split('T')[0],
+          endDate: sub.endDate.toISOString().split('T')[0],
+          manufacturer: subManufacturerFactory?.name || sub.manufacturerId,
+          container: subContainerFactory?.name || sub.containerId,
+          packaging: subPackagingFactory?.name || sub.packagingId,
+          priority: sub.priority,
+          depositPaid: sub.depositStatus === 'received',
+          children: [] // Tasks would go here if needed
+        };
+      })
+    };
+    
+    return mappedMaster;
+  });
+  } catch (error) {
+    console.error('[hierarchicalProjects] Error getting hierarchical projects:', error);
+    return staticHierarchicalProjects;
+  }
+};
 
-// 프로젝트 확장/축소 토글 함수
-export function toggleProject(projects: Project[], projectId: string): Project[] {
+// Helper function to map project status
+const mapProjectStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    'PLANNING': '시작전',
+    'IN_PROGRESS': '진행중',
+    'COMPLETED': '완료',
+    'CANCELLED': '중단',
+    'ON_HOLD': '중단'
+  };
+  return statusMap[status] || status;
+};
+
+// Helper function to get stages from progress
+const getStagesFromProgress = (progress: number): string[] => {
+  if (progress === 0) return ['시작전'];
+  if (progress < 30) return ['설계'];
+  if (progress < 60) return ['설계', '제조'];
+  if (progress < 90) return ['설계', '제조', '포장'];
+  if (progress === 100) return ['완료'];
+  return ['진행중'];
+};
+
+// Lazy load hierarchical projects to avoid initialization issues
+let _hierarchicalProjects: Project[] | null = null;
+
+export const getHierarchicalProjectsData = (): Project[] => {
+  // Always get fresh data, don't cache
+  _hierarchicalProjects = getHierarchicalProjects();
+  return _hierarchicalProjects;
+};
+
+// For backward compatibility
+export const hierarchicalProjects: Project[] = [];
+
+// Flatten hierarchical projects for display
+export const flattenProjects = (projects: Project[]): Project[] => {
+  const flattened: Project[] = [];
+  
+  const flatten = (projectList: Project[], level: number = 0) => {
+    projectList.forEach(project => {
+      flattened.push({ ...project, level });
+      if (project.children && project.isExpanded) {
+        flatten(project.children, level + 1);
+      }
+    });
+  };
+  
+  flatten(projects);
+  return flattened;
+};
+
+// Toggle project expansion
+export const toggleProject = (projects: Project[], projectId: string): Project[] => {
   return projects.map(project => {
-    // 대형 프로젝트 토글
     if (project.id === projectId) {
       return { ...project, isExpanded: !project.isExpanded };
     }
-    
-    // 대형 프로젝트의 자식(소형 프로젝트)들 확인
-    if (project.type === 'master' && project.children) {
-      const updatedChildren = project.children.map(subProject => {
-        // 소형 프로젝트 토글
-        if (subProject.id === projectId) {
-          return { ...subProject, isExpanded: !subProject.isExpanded };
-        }
-        return subProject;
-      });
-      
-      return { ...project, children: updatedChildren };
+    if (project.children) {
+      return { ...project, children: toggleProject(project.children, projectId) };
     }
-    
     return project;
   });
-}
+};

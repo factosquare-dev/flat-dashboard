@@ -2,7 +2,9 @@ import type { Schedule, Task, Participant } from '../../types/schedule';
 import type { Project } from '../../types/project';
 import { createScheduleFromProject, createSampleInProgressTasks } from '../../data/projectScheduleData';
 import { formatDateISO } from '../../utils/dateUtils';
-import { USE_MOCK_DATA } from './mockData';
+import { USE_MOCK_DATA } from '../../mocks/mockData';
+import { getDatabaseWithRetry } from '../../mocks/database/utils';
+import { scheduleAdapter } from '../../mocks/adapters/scheduleAdapter';
 
 /**
  * 프로젝트로부터 스케줄 생성 또는 조회
@@ -11,7 +13,35 @@ export const getOrCreateScheduleForProject = async (
   project: Project,
   existingSchedules: Map<string, Schedule>
 ): Promise<Schedule> => {
-  // 기존 스케줄 확인
+  // Use mock database if enabled
+  if (USE_MOCK_DATA) {
+    try {
+      const database = await getDatabaseWithRetry();
+      
+      if (database && database.schedules) {
+        const schedules = Array.from(database.schedules.values());
+        const existingSchedule = schedules.find(s => s.projectId === project.id);
+        
+        if (existingSchedule) {
+          // Convert to legacy format
+          const legacyData = scheduleAdapter.convertToLegacyFormat(existingSchedule);
+          return {
+            id: existingSchedule.id,
+            projectId: existingSchedule.projectId,
+            participants: legacyData.participants,
+            tasks: legacyData.tasks,
+            createdAt: existingSchedule.createdAt.toISOString(),
+            updatedAt: existingSchedule.updatedAt.toISOString()
+          };
+        }
+      }
+    } catch (error) {
+      console.error('[Schedule Operations] Error accessing mock database:', error);
+      // Fall through to old logic
+    }
+  }
+  
+  // Fallback to old logic for non-mock data
   const existingSchedule = Array.from(existingSchedules.values())
     .find(s => s.projectId === project.id);
   

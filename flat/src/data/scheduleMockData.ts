@@ -1,4 +1,5 @@
 import type { Task, Participant } from '../types/schedule';
+import { factories } from './factories';
 
 // 오늘 날짜 기준으로 날짜 계산
 const today = new Date();
@@ -15,118 +16,38 @@ const addDays = (date: Date, days: number): Date => {
   return result;
 };
 
-// Mock 공장 데이터
-export const mockFactories: Participant[] = [
-  {
-    id: 'cont-1',
-    name: '(주)연우',
-    type: '용기',
+// factories.ts데이터를 기반으로 Participant 생성
+const createParticipantsFromFactories = (): Participant[] => {
+  const colors = ['#EF4444', '#3B82F6', '#EAB308', '#06B6D4', '#10B981', '#F97316', '#14B8A6', '#6366F1', '#EC4899', '#6B7280'];
+  
+  const typeMapping: { [key: string]: string } = {
+    '제조': '제조',
+    '용기': '용기', 
+    '포장': '포장'
+  };
+  
+  return factories.map((factory, index) => ({
+    id: factory.id,
+    name: factory.name,
+    type: typeMapping[factory.type] || '제조',
     period: '2024-01 ~ 2024-12',
-    color: '#EF4444' // 레드
-  },
-  {
-    id: 'mfg-1',
-    name: '큐셀시스템',
-    type: '제조',
-    period: '2024-01 ~ 2024-12',
-    color: '#3B82F6' // 블루
-  },
-  {
-    id: 'pack-1',
-    name: '(주)네트모베이지',
-    type: '포장',
-    period: '2024-01 ~ 2024-12',
-    color: '#EAB308' // 옐로우
-  },
-  {
-    id: 'mfg-2',
-    name: '주식회사 코스모로스',
-    type: '제조',
-    period: '2024-01 ~ 2024-12',
-    color: '#06B6D4' // 시안
-  },
-  {
-    id: 'cont-2',
-    name: '삼화플라스틱',
-    type: '용기',
-    period: '2024-01 ~ 2024-12',
-    color: '#10B981' // 에메랄드
-  },
-  {
-    id: 'pack-2',
-    name: '서울포장산업(주)',
-    type: '포장',
-    period: '2024-01 ~ 2024-12',
-    color: '#F97316' // 오렌지
-  },
-  {
-    id: 'mfg-3',
-    name: '(주)뷰티팩토리',
-    type: '제조',
-    period: '2024-01 ~ 2024-12',
-    color: '#14B8A6' // 틸
-  },
-  {
-    id: 'cont-3',
-    name: '(주)에이치피씨',
-    type: '용기',
-    period: '2024-01 ~ 2024-12',
-    color: '#6366F1' // 인디고
-  },
-  {
-    id: 'mfg-4',
-    name: '코스메카코리아',
-    type: '제조',
-    period: '2024-01 ~ 2024-12',
-    color: '#EC4899' // 핑크
-  },
-  {
-    id: 'mfg-5',
-    name: '(주)아모레퍼시픽 오산공장',
-    type: '제조',
-    period: '2024-01 ~ 2024-12',
-    color: '#6B7280' // 그레이
-  },
-  {
-    id: 'factory-1',
-    name: '삼성전자 천안공장',
-    type: '제조',
-    period: '2024-01 ~ 2024-12',
-    color: '#3B82F6' // 블루
-  },
-  {
-    id: 'factory-2',
-    name: 'LG화학 오창공장',
-    type: '용기',
-    period: '2024-01 ~ 2024-12',
-    color: '#10B981' // 에메랄드
-  },
-  {
-    id: 'factory-3',
-    name: '아모레퍼시픽 대전공장',
-    type: '포장',
-    period: '2024-01 ~ 2024-12',
-    color: '#8B5CF6' // 바이올렛
-  },
-  {
-    id: 'factory-4',
-    name: '한국콜마 세종공장',
-    type: '제조',
-    period: '2024-01 ~ 2024-12',
-    color: '#F59E0B' // 앰버
-  }
-];
+    color: colors[index % colors.length]
+  }));
+};
+
+// Mock 공장 데이터 - factories.ts에서 생성
+export const mockFactories: Participant[] = createParticipantsFromFactories();
 
 // Mock 태스크 데이터 - 다양한 시나리오 포함 (아이콘 테스트용)
 export const mockTasks: Task[] = [
-  // (주)연우 태스크들
+  // 용기 공장 태스크들
   {
     id: 101,
     projectId: 'cont-1',
     title: '용기 디자인',
     startDate: formatDate(addDays(today, -3)),
     endDate: formatDate(addDays(today, -1)),
-    factory: '(주)연우',
+    factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
     assignee: '김영수',
     status: 'completed'
   },
@@ -136,7 +57,7 @@ export const mockTasks: Task[] = [
     title: '금형 제작',
     startDate: formatDate(addDays(today, -2)),
     endDate: formatDate(today),
-    factory: '(주)연우',
+    factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
     assignee: '이미나',
     status: 'in-progress'
   },
@@ -146,7 +67,7 @@ export const mockTasks: Task[] = [
     title: '시제품 제작',
     startDate: formatDate(addDays(today, -1)),
     endDate: formatDate(addDays(today, 1)),
-    factory: '(주)연우',
+    factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
     assignee: '박준호',
     status: 'in-progress'
   },
@@ -156,7 +77,7 @@ export const mockTasks: Task[] = [
     title: '사출 성형',
     startDate: formatDate(today),
     endDate: formatDate(addDays(today, 3)),
-    factory: '(주)연우',
+    factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
     assignee: '최서연',
     status: 'pending'
   },
@@ -166,7 +87,7 @@ export const mockTasks: Task[] = [
     title: '용기 검사',
     startDate: formatDate(addDays(today, 2)),
     endDate: formatDate(addDays(today, 4)),
-    factory: '(주)연우',
+    factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
     assignee: '김영수',
     status: 'pending'
   },
@@ -176,7 +97,7 @@ export const mockTasks: Task[] = [
     title: '품질 검사',
     startDate: formatDate(addDays(today, 3)),
     endDate: formatDate(addDays(today, 4)),
-    factory: '(주)연우',
+    factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
     assignee: '이미나',
     status: 'pending'
   },
@@ -186,18 +107,18 @@ export const mockTasks: Task[] = [
     title: '출하',
     startDate: formatDate(addDays(today, 4)),
     endDate: formatDate(addDays(today, 5)),
-    factory: '(주)연우',
+    factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
     assignee: '박준호',
     status: 'pending'
   },
-  // 큐셀시스템 태스크들
+  // 제조 공장 태스크들 
   {
     id: 1,
     projectId: 'mfg-1',
     title: '원료 수령',
     startDate: formatDate(addDays(today, -20)),
     endDate: formatDate(addDays(today, -17)),
-    factory: '큐셀시스템',
+    factory: mockFactories.find(f => f.name === '큐셀시스템')?.name || '큐셀시스템',
     assignee: '김철수',
     status: 'completed'
   },
@@ -207,7 +128,7 @@ export const mockTasks: Task[] = [
     title: '배합',
     startDate: formatDate(addDays(today, -16)),
     endDate: formatDate(addDays(today, -10)),
-    factory: '큐셀시스템',
+    factory: mockFactories.find(f => f.name === '큐셀시스템')?.name || '큐셀시스템',
     assignee: '김철수',
     status: 'completed'
   },
@@ -219,7 +140,7 @@ export const mockTasks: Task[] = [
     title: '금형 제작 (지연)',
     startDate: formatDate(addDays(today, -10)),
     endDate: formatDate(addDays(today, -3)),
-    factory: '삼화플라스틱',
+    factory: mockFactories.find(f => f.name.includes('삼화'))?.name || '삼화플라스틱',
     assignee: '이영희',
     status: 'in-progress'
   },
@@ -229,7 +150,7 @@ export const mockTasks: Task[] = [
     title: '디자인 검토 (지연)',
     startDate: formatDate(addDays(today, -15)),
     endDate: formatDate(addDays(today, -5)),
-    factory: '(주)네트모베이지',
+    factory: mockFactories.find(f => f.type === '포장')?.name || '(주)네트모베이지',
     assignee: '정수진',
     status: 'pending'
   },
@@ -241,7 +162,7 @@ export const mockTasks: Task[] = [
     title: '사출 성형',
     startDate: formatDate(addDays(today, -2)),
     endDate: formatDate(addDays(today, 5)),
-    factory: '삼화플라스틱',
+    factory: mockFactories.find(f => f.name.includes('삼화'))?.name || '삼화플라스틱',
     assignee: '이영희',
     status: 'in-progress'
   },
@@ -251,7 +172,7 @@ export const mockTasks: Task[] = [
     title: '원료 검수',
     startDate: formatDate(addDays(today, -1)),
     endDate: formatDate(addDays(today, 3)),
-    factory: '주식회사 코스모로스',
+    factory: mockFactories.find(f => f.name.includes('코스모로스'))?.name || '주식회사 코스모로스',
     assignee: '최현우',
     status: 'in-progress'
   },
@@ -263,7 +184,7 @@ export const mockTasks: Task[] = [
     title: '품질 검사',
     startDate: formatDate(addDays(today, -9)),
     endDate: formatDate(addDays(today, -7)),
-    factory: '큐셀시스템',
+    factory: mockFactories.find(f => f.name === '큐셀시스템')?.name || '큐셀시스템',
     assignee: '박민수',
     status: 'completed'
   },
@@ -273,7 +194,7 @@ export const mockTasks: Task[] = [
     title: '안정성 테스트',
     startDate: formatDate(addDays(today, -8)),
     endDate: formatDate(addDays(today, -4)),
-    factory: '주식회사 코스모로스',
+    factory: mockFactories.find(f => f.name.includes('코스모로스'))?.name || '주식회사 코스모로스',
     assignee: '최현우',
     status: 'completed'
   },
@@ -285,7 +206,7 @@ export const mockTasks: Task[] = [
     title: '인쇄 준비',
     startDate: formatDate(addDays(today, 3)),
     endDate: formatDate(addDays(today, 7)),
-    factory: '(주)네트모베이지',
+    factory: mockFactories.find(f => f.type === '포장')?.name || '(주)네트모베이지',
     assignee: '정수진',
     status: 'pending'
   },
@@ -295,7 +216,7 @@ export const mockTasks: Task[] = [
     title: '표면 처리',
     startDate: formatDate(addDays(today, 8)),
     endDate: formatDate(addDays(today, 12)),
-    factory: '삼화플라스틱',
+    factory: mockFactories.find(f => f.name.includes('삼화'))?.name || '삼화플라스틱',
     assignee: '이영희',
     status: 'pending'
   }

@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { Project } from '../../../types/project';
 import SearchBox from './SearchBox';
-import { customerContacts } from '../../../data/mockData';
+import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
 import { factories } from '../../../data/factories';
 
 interface SearchableCellProps {
@@ -12,17 +12,28 @@ interface SearchableCellProps {
 
 const SearchableCell: React.FC<SearchableCellProps> = ({ project, field, onUpdate }) => {
   const [showSearchBox, setShowSearchBox] = useState(false);
+  const [customerData, setCustomerData] = useState<any[]>([]);
   const cellRef = useRef<HTMLTableCellElement>(null);
+
+  // Load customer data from mock database
+  useEffect(() => {
+    if (field === 'client') {
+      const db = MockDatabaseImpl.getInstance();
+      const database = db.getDatabase();
+      const customers = Array.from(database.customers.values());
+      setCustomerData(customers);
+    }
+  }, [field]);
 
   // 필드에 따라 다른 데이터와 설정 사용
   const getSearchConfig = () => {
     if (field === 'client') {
       return {
-        data: customerContacts.map(c => ({
+        data: customerData.map(c => ({
           id: c.id,
-          name: c.company,
-          subText: `${c.name} (${c.position})`,
-          searchableText: `${c.company} ${c.name} ${c.position}`
+          name: c.name,
+          subText: `${c.contactPerson} - ${c.companyName}`,
+          searchableText: `${c.name} ${c.companyName} ${c.contactPerson}`
         })),
         placeholder: '고객 검색...',
         displayField: 'name' as const

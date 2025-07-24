@@ -5,6 +5,7 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ToastContainer } from './components/ui/Toast'
 import { queryCache } from './hooks/query/queryCache'
+import './utils/resetMockData' // Load reset utility for development
 import './App.css'
 
 function App() {

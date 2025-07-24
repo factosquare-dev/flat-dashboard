@@ -10,6 +10,7 @@ import CommentSection from '../CommentSection';
 import type { ProjectModalProps, ProjectData } from './types';
 import type { Comment } from '../../types/comment';
 import type { User } from '../../types/user';
+import { managerNames } from '../../data/mockData';
 
 const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, editData, mode }) => {
   const [formData, setFormData] = useState<ProjectData>({
@@ -36,24 +37,32 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
     avatar: ''
   };
 
+  // Mock DB에서 매니저 이름 가져오기
+  const getRandomManagerName = () => {
+    return managerNames.length > 0 ? managerNames[Math.floor(Math.random() * managerNames.length)] : '담당자';
+  };
+  
+  const manager1 = getRandomManagerName();
+  const manager2 = getRandomManagerName();
+  
   // Mock comments - 실제로는 API에서 가져와야 함
   const [comments, setComments] = useState<Comment[]>([
     {
       id: '1',
-      content: '이 프로젝트 진행 상황이 궁금합니다. @김철수 님 확인 부탁드려요.',
-      author: { id: '1', name: '이영희', avatar: '' },
+      content: `이 프로젝트 진행 상황이 궁금합니다. @${manager2} 님 확인 부탁드려요.`,
+      author: { id: '1', name: manager1, avatar: '' },
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
       projectId: editData?.id || '',
-      mentions: [{ id: '2', name: '김철수' }]
+      mentions: [{ id: '2', name: manager2 }]
     },
     {
       id: '2',
-      content: '@이영희 현재 제조 단계 진행 중입니다. 예정대로 진행되고 있어요.',
-      author: { id: '2', name: '김철수', avatar: '' },
+      content: `@${manager1} 현재 제조 단계 진행 중입니다. 예정대로 진행되고 있어요.`,
+      author: { id: '2', name: manager2, avatar: '' },
       createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
       parentId: '1',
       projectId: editData?.id || '',
-      mentions: [{ id: '1', name: '이영희' }]
+      mentions: [{ id: '1', name: manager1 }]
     }
   ]);
 

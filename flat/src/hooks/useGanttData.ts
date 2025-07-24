@@ -1,9 +1,15 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { Project } from '../components/GanttChart/types';
-import { GANTT_MOCK_PROJECTS } from '../data/ganttMockData';
+import { getGanttMockProjects } from '../data/ganttMockData';
 
 export const useGanttData = () => {
-  const [projects, setProjects] = useState<Project[]>(GANTT_MOCK_PROJECTS);
+  const [projects, setProjects] = useState<Project[]>(() => {
+    console.log('[useGanttData] 🚨 Initializing with getGanttMockProjects...');
+    const initialProjects = getGanttMockProjects();
+    console.log('[useGanttData] 🚨 Initial projects:', initialProjects);
+    console.log('[useGanttData] 🚨 Initial project names:', initialProjects.map(p => p.name));
+    return initialProjects;
+  });
 
   // Calculate total rows for grid layout - memoized for performance
   const totalRows = useMemo(() => {
@@ -86,6 +92,12 @@ export const useGanttData = () => {
     })));
   }, []);
 
+  // Refresh projects from mock data (for resetMockData)
+  const refreshProjects = useCallback(() => {
+    console.log('[useGanttData] Refreshing projects from mock data...');
+    setProjects(getGanttMockProjects());
+  }, []);
+
   return {
     projects,
     setProjects,
@@ -96,6 +108,7 @@ export const useGanttData = () => {
     deleteProject,
     addTask,
     updateTask,
-    deleteTask
+    deleteTask,
+    refreshProjects
   };
 };

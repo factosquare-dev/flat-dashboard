@@ -1,7 +1,8 @@
 import type { Project } from '../types/project';
 import type { Schedule, Task, Participant } from '../types/schedule';
-import { projectFactories } from './mockData';
+import { projectFactories, getRandomManager } from './mockData';
 import { formatDateISO } from '../utils/dateUtils';
+import { factories } from './factories';
 
 // 태스크 타입별 기간 (일)
 const TASK_DURATIONS = {
@@ -50,7 +51,19 @@ const FACTORY_TYPE_TASKS: { [key: string]: string[] } = {
   'default': ['샘플 제작', '디자인 검토', '품질 검사', '최종 승인']
 };
 
-// 공장별 태스크 목록 (특정 공장에 특화된 태스크)
+// factories.ts에서 공장별 태스크 목록 가져오기
+const getFactoryTasks = (factoryName: string, factoryType: string): string[] => {
+  // factories.ts에서 해당 공장의 서비스 또는 태스크 정보 가져오기
+  const factory = factories.find(f => f.name === factoryName);
+  if (factory && factory.services && factory.services.length > 0) {
+    return factory.services;
+  }
+  
+  // Fallback: 타입별 기본 태스크
+  return FACTORY_TYPE_TASKS[factoryType] || FACTORY_TYPE_TASKS['default'];
+};
+
+// 공장별 태스크 목록 (특정 공장에 특화된 태스크) - 백업용
 const FACTORY_TASKS: { [key: string]: string[] } = {
   '큐셀시스템': ['PCB 설계', 'SMT 작업', '최종 조립', '품질 검사', '포장'],
   '(주)연우': ['금형 제작', '사출 성형', '도장 작업', '조립', '검수'],
@@ -69,28 +82,33 @@ const formatDate = (date: Date): string => {
   return formatDateISO(date);
 };
 
-// 공장별 담당자 매핑
+// factories.ts에서 공장별 담당자 가져오기
 const getAssigneeForFactory = (factoryName: string): string => {
+  const factory = factories.find(f => f.name === factoryName);
+  if (factory && factory.contactPerson) {
+    return factory.contactPerson;
+  }
+  
+  // Fallback: 공장명에서 키워드를 찾아서 매핑
   const assigneeMap: { [key: string]: string } = {
     '큐셀시스템': '김철수',
     '(주)연우': '이영희',
     '(주)네트모베이지': '정수진',
     '주식회사 코스모로스': '최현우',
-    // 추가 공장들
     '삼성전자': '박민수',
     'LG화학': '홍길동',
     '아모레퍼시픽': '김영희',
     '한국콜마': '이철수'
   };
   
-  // 공장명에서 키워드를 찾아서 매핑
   for (const [key, assignee] of Object.entries(assigneeMap)) {
     if (factoryName.includes(key)) {
       return assignee;
     }
   }
   
-  return '담당자'; // 기본값
+  // 마지막 대안: 랜덤 매니저 선택
+  return getRandomManager();
 };
 
 // 프로젝트 진행률에 따른 태스크 생성
@@ -113,8 +131,8 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
     else if (factory.name === project.container) factoryType = '용기';
     else if (factory.name === project.packaging) factoryType = '포장';
     
-    // 특정 공장에 특화된 태스크가 있으면 사용, 없으면 타입별 태스크 사용
-    const factoryTasks = FACTORY_TASKS[factory.name] || FACTORY_TYPE_TASKS[factoryType] || FACTORY_TYPE_TASKS['default'];
+    // factories.ts에서 공장별 태스크 가져오기
+    const factoryTasks = getFactoryTasks(factory.name, factoryType);
     
     let taskStartDate = new Date(projectStartDate);
     
@@ -175,12 +193,17 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
 
 // 프로젝트에서 스케줄 생성
 export const createScheduleFromProject = (project: Project): Schedule => {
-  const factories = projectFactories[project.id] || [
-    { name: project.manufacturer, color: 'bg-blue-500' },
-    { name: project.container, color: 'bg-red-500' },
-    { name: project.packaging, color: 'bg-yellow-500' }
-  ];
+  // Get factory names from the project (these should already be resolved from database)
+  const factoryNames = [
+    project.manufacturer,
+    project.container,
+    project.packaging
+  ].filter(name => name && name !== 'Unknown');
   
+  const factories = factoryNames.map((name, index) => ({
+    name,
+    color: index === 0 ? 'bg-blue-500' : index === 1 ? 'bg-red-500' : 'bg-yellow-500'
+  }));
   
   const participants: Participant[] = factories.map(factory => ({
     id: factory.name,
@@ -195,10 +218,13 @@ export const createScheduleFromProject = (project: Project): Schedule => {
   // 고유한 스케줄 ID 생성
   const scheduleId = `schedule-${project.id}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   
+  // Use client property if available (from hierarchicalProjects), otherwise use a default
+  const projectName = project.client ? `${project.client} - ${project.productType}` : project.productType;
+  
   return {
     id: scheduleId,
     projectId: project.id,
-    name: `${project.client} - ${project.productType}`,
+    name: projectName,
     startDate: project.startDate,
     endDate: project.endDate,
     participants,

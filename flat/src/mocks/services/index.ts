@@ -93,3 +93,10 @@ export function getDatabaseStats() {
   const db = MockDatabaseImpl.getInstance();
   return db.getStats();
 }
+
+// Export service singletons for convenient access
+export const services = getServices();
+export const { users: userServiceInstance, factories: factoryServiceInstance, projects: projectServiceInstance, customers: customerServiceInstance } = services;
+
+// Convenience exports
+export { customerServiceInstance as customerService };
