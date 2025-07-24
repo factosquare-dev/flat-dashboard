@@ -41,14 +41,26 @@ export const getOrCreateScheduleForProject = async (
           // Get assigned factory IDs for this project
           const assignedFactoryIds = new Set<string>();
           if (projectData) {
+            console.log('[getOrCreateScheduleForProject] 9. Project factory assignments:', {
+              manufacturerId: projectData.manufacturerId,
+              containerId: projectData.containerId,
+              packagingId: projectData.packagingId
+            });
             if (projectData.manufacturerId) assignedFactoryIds.add(projectData.manufacturerId);
             if (projectData.containerId) assignedFactoryIds.add(projectData.containerId);
             if (projectData.packagingId) assignedFactoryIds.add(projectData.packagingId);
           }
+          console.log('[getOrCreateScheduleForProject] 10. Assigned factory IDs:', Array.from(assignedFactoryIds));
           
           // Get tasks for this schedule - filter by assigned factories
-          const scheduleTasks = Array.from(database.tasks.values())
-            .filter(task => task.scheduleId === existingSchedule.id && assignedFactoryIds.has(task.factoryId))
+          const allTasks = Array.from(database.tasks.values());
+          console.log('[getOrCreateScheduleForProject] 11. Total tasks in DB:', allTasks.length);
+          
+          const tasksForSchedule = allTasks.filter(task => task.scheduleId === existingSchedule.id);
+          console.log('[getOrCreateScheduleForProject] 12. Tasks for this schedule:', tasksForSchedule.length);
+          
+          const scheduleTasks = tasksForSchedule
+            .filter(task => assignedFactoryIds.has(task.factoryId))
             .map(task => {
               // Get factory name from factoryId
               const factory = database.factories.get(task.factoryId);
@@ -69,6 +81,8 @@ export const getOrCreateScheduleForProject = async (
                 color: factoryColor
               };
             });
+          
+          console.log('[getOrCreateScheduleForProject] 13. Tasks after factory filter:', scheduleTasks.length);
           
           // Get participants from project factories
           const participants = [];
@@ -111,7 +125,10 @@ export const getOrCreateScheduleForProject = async (
             }
           }
           
-          return {
+          console.log('[getOrCreateScheduleForProject] 14. Final participants:', participants.length);
+          console.log('[getOrCreateScheduleForProject] 15. Final tasks:', scheduleTasks.length);
+          
+          const result = {
             id: existingSchedule.id,
             projectId: existingSchedule.projectId,
             participants: participants,
@@ -121,6 +138,9 @@ export const getOrCreateScheduleForProject = async (
             createdAt: typeof existingSchedule.createdAt === 'string' ? existingSchedule.createdAt : existingSchedule.createdAt.toISOString(),
             updatedAt: typeof existingSchedule.updatedAt === 'string' ? existingSchedule.updatedAt : existingSchedule.updatedAt.toISOString()
           };
+          
+          console.log('[getOrCreateScheduleForProject] 16. Returning schedule:', result);
+          return result;
         }
       }
     } catch (error) {
