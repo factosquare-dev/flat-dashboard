@@ -71,6 +71,15 @@ export function calculateProgressFromTasks(tasks: Task[]): ProgressInfo {
                           task.status !== TaskStatus.APPROVED &&
                           task.status !== TaskStatus.REJECTED;
     
+    if (task.title) {
+      console.log('[progressCalculator] Task:', task.title, 
+        'Start:', startDate.toISOString().split('T')[0], 
+        'End:', endDate.toISOString().split('T')[0], 
+        'Today in period:', isTodayInTaskPeriod, 
+        'Not completed:', isNotCompleted,
+        'Status:', task.status);
+    }
+    
     return isTodayInTaskPeriod && isNotCompleted;
   });
   

@@ -29,17 +29,17 @@ export function debugHierarchyIssue() {
       console.log('✅ No MASTER projects have parentId');
     }
     
-    // 2. Check for SUB projects without parentId
-    console.log('\n2. Checking for SUB projects without parentId:');
+    // 2. Check for SUB projects without parentId (This is allowed - independent SUB projects)
+    console.log('\n2. Checking for independent SUB projects:');
     const subWithoutParent = projects.filter(p => p.type === 'SUB' && !p.parentId);
     if (subWithoutParent.length > 0) {
-      console.error('❌ Found SUB projects without parentId:', subWithoutParent.map(p => ({
+      console.log('ℹ️ Found independent SUB projects (without parentId):', subWithoutParent.map(p => ({
         id: p.id,
         name: p.name,
         type: p.type
       })));
     } else {
-      console.log('✅ All SUB projects have parentId');
+      console.log('ℹ️ No independent SUB projects found');
     }
     
     // 3. Check for SUB projects whose parent is not MASTER

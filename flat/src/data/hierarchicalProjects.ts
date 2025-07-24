@@ -69,8 +69,8 @@ const getHierarchicalProjects = (): Project[] => {
       manager: users.find(u => u.id === master.createdBy)?.name || 'Unknown',
       productType: master.product.name,
       serviceType: 'OEM' as any, // Default service type
-      currentStage: getStagesFromTasks(master.scheduleId).stages,
-      progress: getStagesFromTasks(master.scheduleId).progress,
+      currentStage: [], // MASTER projects don't show individual task stages
+      progress: getStagesFromTasks(master.scheduleId).progress, // Only show overall progress
       status: mapProjectStatus(master.status),
       startDate: master.startDate.toISOString().split('T')[0],
       endDate: master.endDate.toISOString().split('T')[0],
@@ -173,7 +173,7 @@ const mapProjectStatus = (status: string): string => {
 // Helper function to get stages from tasks
 const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[], progress: number } => {
   if (!scheduleId) {
-    return { stages: ['시작전'], progress: 0 };
+    return { stages: [], progress: 0 };
   }
   
   try {
@@ -182,23 +182,32 @@ const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[],
     
     // Get schedule from database
     const schedule = database.schedules.get(scheduleId);
-    if (!schedule || !schedule.tasks) {
-      return { stages: ['시작전'], progress: 0 };
+    if (!schedule) {
+      console.log('[getStagesFromTasks] No schedule found for:', scheduleId);
+      return { stages: [], progress: 0 };
     }
+    
+    // Get tasks for this schedule
+    const tasks = Array.from(database.tasks.values()).filter(task => task.scheduleId === scheduleId);
+    
+    if (tasks.length === 0) {
+      console.log('[getStagesFromTasks] No tasks found for schedule:', scheduleId);
+      return { stages: [], progress: 0 };
+    }
+    
+    console.log('[getStagesFromTasks] Found tasks:', tasks.length, 'for schedule:', scheduleId);
     
     // Calculate progress and current stages from actual tasks
-    const progressInfo = calculateProgressFromTasks(schedule.tasks as Task[]);
+    const progressInfo = calculateProgressFromTasks(tasks);
     
-    // If no current stages (no tasks today), return appropriate stage based on progress
+    // If no current stages (no tasks today), return empty array
+    // Let the UI decide how to display when there are no tasks today
     if (progressInfo.currentStages.length === 0) {
-      if (progressInfo.progress === 0) {
-        return { stages: ['시작전'], progress: 0 };
-      } else if (progressInfo.progress === 100) {
-        return { stages: ['완료'], progress: 100 };
-      } else {
-        return { stages: ['진행중'], progress: progressInfo.progress };
-      }
+      console.log('[getStagesFromTasks] No current stages found. Today tasks:', progressInfo.todayTasks?.length || 0);
+      return { stages: [], progress: progressInfo.progress };
     }
+    
+    console.log('[getStagesFromTasks] Current stages:', progressInfo.currentStages);
     
     return { 
       stages: progressInfo.currentStages, 
@@ -206,7 +215,7 @@ const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[],
     };
   } catch (error) {
     console.error('[getStagesFromTasks] Error calculating stages:', error);
-    return { stages: ['시작전'], progress: 0 };
+    return { stages: [], progress: 0 };
   }
 };
 

@@ -177,10 +177,18 @@ function calculateTaskTiming(
       const endDate = new Date(startDate.getTime() + pastDuration - 24 * 60 * 60 * 1000);
       return { startDate, endDate };
     } else if (taskIndex === completedTasks) {
-      // Current task - spans today
+      // Current task - spans today (ensure it's visible in UI)
       const today = new Date();
-      const startDate = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000); // Started 3 days ago
-      const endDate = new Date(today.getTime() + 4 * 24 * 60 * 60 * 1000); // Ends in 4 days
+      today.setHours(0, 0, 0, 0);
+      const startDate = new Date(today.getTime() - 5 * 24 * 60 * 60 * 1000); // Started 5 days ago
+      const endDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // Ends in 7 days
+      return { startDate, endDate };
+    } else if (taskIndex === completedTasks + 1 && completedTasks < totalTasks - 1) {
+      // Next task also spans today for better UX (shows multiple current stages)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startDate = new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000); // Started 2 days ago
+      const endDate = new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000); // Ends in 10 days
       return { startDate, endDate };
     } else {
       // Future tasks
@@ -189,6 +197,36 @@ function calculateTaskTiming(
       const futureDuration = remainingDuration / remainingTasks;
       const futureIndex = taskIndex - completedTasks;
       const startDate = new Date(new Date().getTime() + futureDuration * futureIndex);
+      const endDate = new Date(startDate.getTime() + futureDuration - 24 * 60 * 60 * 1000);
+      return { startDate, endDate };
+    }
+  }
+  
+  // For ON_HOLD projects, make the current task span today
+  if (project.status === ProjectStatus.ON_HOLD) {
+    const completedTasks = Math.floor((project.progress / 100) * totalTasks);
+    
+    if (taskIndex < completedTasks) {
+      // Completed tasks - distribute in past
+      const elapsedTime = new Date().getTime() - projectStart.getTime();
+      const pastDuration = elapsedTime / completedTasks;
+      const startDate = new Date(projectStart.getTime() + pastDuration * taskIndex);
+      const endDate = new Date(startDate.getTime() + pastDuration - 24 * 60 * 60 * 1000);
+      return { startDate, endDate };
+    } else if (taskIndex === completedTasks) {
+      // Task that was in progress when put on hold - make it span today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startDate = new Date(today.getTime() - 10 * 24 * 60 * 60 * 1000); // Started 10 days ago
+      const endDate = new Date(today.getTime() + 20 * 24 * 60 * 60 * 1000); // Would end in 20 days if resumed
+      return { startDate, endDate };
+    } else {
+      // Future tasks - not started yet
+      const remainingDuration = projectEnd.getTime() - new Date().getTime();
+      const remainingTasks = totalTasks - completedTasks - 1;
+      const futureDuration = remainingDuration / Math.max(remainingTasks, 1);
+      const futureIndex = taskIndex - completedTasks - 1;
+      const startDate = new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000 + futureDuration * futureIndex);
       const endDate = new Date(startDate.getTime() + futureDuration - 24 * 60 * 60 * 1000);
       return { startDate, endDate };
     }
