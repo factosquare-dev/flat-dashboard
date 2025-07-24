@@ -3,13 +3,17 @@
  */
 
 import React, { useMemo } from 'react';
-import { GANTT_CONSTANTS, baseDate, totalDays } from './constants';
+import { GANTT_CONSTANTS, getGanttDateRange, getTotalDays } from './constants';
 
 interface GanttHeaderProps {
   headerRef: React.RefObject<HTMLDivElement>;
 }
 
 const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
+  // Get dynamic date range from MockDB
+  const { baseDate } = getGanttDateRange();
+  const totalDays = getTotalDays();
+  
   // Render month headers
   const monthHeaders = useMemo(() => {
     const months: JSX.Element[] = [];
@@ -34,7 +38,7 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
                 width: monthDays * GANTT_CONSTANTS.CELL_WIDTH
               }}
             >
-              {new Date(2025, currentMonth).toLocaleString('ko-KR', { month: 'long' })}
+              {new Date(date.getFullYear(), currentMonth).toLocaleString('ko-KR', { month: 'long' })}
             </div>
           );
         }
@@ -57,13 +61,13 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
             width: monthDays * GANTT_CONSTANTS.CELL_WIDTH
           }}
         >
-          {new Date(2025, currentMonth).toLocaleString('ko-KR', { month: 'long' })}
+          {new Date(date.getFullYear(), currentMonth).toLocaleString('ko-KR', { month: 'long' })}
         </div>
       );
     }
     
     return months;
-  }, []);
+  }, [baseDate, totalDays]);
 
   // Render date headers
   const dateHeaders = useMemo(() => {
@@ -98,7 +102,7 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
     }
     
     return headers;
-  }, []);
+  }, [baseDate, totalDays]);
 
   // Today line position
   const todayLinePosition = useMemo(() => {
@@ -111,7 +115,7 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
     }
     
     return null;
-  }, []);
+  }, [baseDate, totalDays]);
 
   return (
     <>

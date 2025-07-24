@@ -4,7 +4,7 @@
 
 import React, { useMemo, useCallback } from 'react';
 import type { DragState } from './types';
-import { GANTT_CONSTANTS, totalDays, baseDate } from './constants';
+import { GANTT_CONSTANTS, getTotalDays, getGanttDateRange } from './constants';
 
 interface GanttGridProps {
   totalRows: number;
@@ -12,13 +12,16 @@ interface GanttGridProps {
 }
 
 const GanttGrid: React.FC<GanttGridProps> = ({ totalRows, dragState }) => {
+  const totalDays = getTotalDays();
+  const { baseDate } = getGanttDateRange();
+  
   // Get today's column index for highlighting
   const todayIndex = useMemo(() => {
     const today = new Date();
     const diffTime = today.getTime() - baseDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays >= 0 && diffDays < totalDays ? diffDays : -1;
-  }, []);
+  }, [baseDate, totalDays]);
 
   // Helper function to get grid cell class names
   const getGridCellClassName = useCallback((isWeekend: boolean, isTodayColumn: boolean, isHovered: boolean) => {
@@ -66,7 +69,7 @@ const GanttGrid: React.FC<GanttGridProps> = ({ totalRows, dragState }) => {
     }
     
     return cells;
-  }, [totalRows, todayIndex, dragState.hoveredCell, dragState.isDragging, getGridCellClassName]);
+  }, [totalRows, totalDays, todayIndex, dragState.hoveredCell, dragState.isDragging, getGridCellClassName]);
 
   // Today line
   const todayLine = useMemo(() => {

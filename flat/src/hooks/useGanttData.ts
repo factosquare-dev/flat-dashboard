@@ -13,7 +13,8 @@ const getProjectsFromMockDB = (): Project[] => {
     const projects = Array.from(database.projects.values());
     const tasks = Array.from(database.tasks.values());
     
-    return projects.slice(0, 5).map((project, index) => {
+    const MAX_GANTT_PROJECTS = 5; // Limit for performance
+    return projects.slice(0, MAX_GANTT_PROJECTS).map((project, index) => {
       // Get tasks for this project
       const projectTasks = tasks
         .filter(task => task.scheduleId === project.scheduleId || task.scheduleId?.includes(project.id))

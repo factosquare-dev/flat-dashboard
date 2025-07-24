@@ -9,6 +9,7 @@ import { Factory } from '@/types/factory';
 import { Project, ProjectType, ProjectStatus } from '@/types/project';
 import { Schedule, Task, TaskStatus, Participant } from '@/types/schedule';
 import { taskTypesByFactoryType } from '../../data/factories';
+import { TIME_CONSTANTS } from '../../constants/time';
 import type { Comment } from '@/types/comment';
 
 export const seedData = {
@@ -81,8 +82,8 @@ export const seedData = {
         profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
         permissions: ['all'],
         phoneNumber: '010-1234-5678',
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-01'),
+        createdAt: new Date(Date.now() - TIME_CONSTANTS.YEAR), // 1 year ago
+        updatedAt: new Date(Date.now() - TIME_CONSTANTS.YEAR),
         lastLoginAt: new Date(),
         isActive: true,
       },
@@ -97,8 +98,8 @@ export const seedData = {
         profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lee_manager',
         permissions: ['projects.manage', 'factories.view', 'users.view'],
         phoneNumber: '010-2345-6789',
-        createdAt: new Date('2024-01-15'),
-        updatedAt: new Date('2024-01-15'),
+        createdAt: new Date(Date.now() - (350 * TIME_CONSTANTS.DAY)), // ~350 days ago
+        updatedAt: new Date(Date.now() - (350 * TIME_CONSTANTS.DAY)),
         lastLoginAt: new Date(),
         isActive: true,
       },
@@ -113,8 +114,8 @@ export const seedData = {
         profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=park_factory',
         permissions: ['factories.manage', 'projects.view', 'schedules.manage'],
         phoneNumber: '010-3333-4444',
-        createdAt: new Date('2024-02-01'),
-        updatedAt: new Date('2024-02-01'),
+        createdAt: new Date(Date.now() - (330 * TIME_CONSTANTS.DAY)), // ~330 days ago
+        updatedAt: new Date(Date.now() - (330 * TIME_CONSTANTS.DAY)),
         lastLoginAt: new Date(),
         isActive: true,
       },
@@ -129,8 +130,8 @@ export const seedData = {
         profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jung_dev',
         permissions: ['projects.view', 'schedules.view'],
         phoneNumber: '010-4444-5555',
-        createdAt: new Date('2024-02-15'),
-        updatedAt: new Date('2024-02-15'),
+        createdAt: new Date(Date.now() - (315 * TIME_CONSTANTS.DAY)), // ~315 days ago
+        updatedAt: new Date(Date.now() - (315 * TIME_CONSTANTS.DAY)),
         lastLoginAt: new Date(),
         isActive: true,
       },
@@ -279,8 +280,8 @@ export const seedData = {
         businessNumber: '123-45-67890',
         industry: '화장품',
         isActive: true,
-        createdAt: new Date('2024-01-15'),
-        updatedAt: new Date('2024-01-15'),
+        createdAt: new Date(Date.now() - (350 * TIME_CONSTANTS.DAY)), // ~350 days ago
+        updatedAt: new Date(Date.now() - (350 * TIME_CONSTANTS.DAY)),
         createdBy: 'user-1',
         notes: 'VIP 고객사 - 프리미엄 라인 주력'
       },
@@ -350,7 +351,7 @@ export const seedData = {
         },
         capacity: 100,
         certifications: ['ISO 22716', 'CGMP', 'ISO 9001'],
-        establishedDate: new Date('2015-01-01'),
+        establishedDate: new Date(Date.now() - (10 * TIME_CONSTANTS.YEAR)), // 10 years ago
         isActive: true,
       },
       {
@@ -366,7 +367,7 @@ export const seedData = {
         },
         capacity: 200,
         certifications: ['ISO 9001', 'ISO 14001'],
-        establishedDate: new Date('2010-06-01'),
+        establishedDate: new Date(Date.now() - (14 * TIME_CONSTANTS.YEAR)), // 14 years ago
         isActive: true,
       },
       {
@@ -382,7 +383,7 @@ export const seedData = {
         },
         capacity: 150,
         certifications: ['ISO 9001', 'FSC'],
-        establishedDate: new Date('2012-03-15'),
+        establishedDate: new Date(Date.now() - (12 * TIME_CONSTANTS.YEAR)), // 12 years ago
         isActive: true,
       },
       {
@@ -398,7 +399,7 @@ export const seedData = {
         },
         capacity: 150,
         certifications: ['ISO 22716', 'CGMP', 'ISO 14001'],
-        establishedDate: new Date('2018-01-10'),
+        establishedDate: new Date(Date.now() - (7 * TIME_CONSTANTS.YEAR)), // 7 years ago
         isActive: true,
       },
     ];
@@ -423,20 +424,31 @@ export const seedData = {
    * NO MORE HARDCODED DATES!
    */
   createSynchronizedProjects(customer1: Customer, customer2: Customer, pmUser: User, currentDate: Date) {
-    // Fixed date approach for testing - use 2025-02-01 as base
-    const baseStartDate = new Date('2025-02-01');
+    // Use current date as base for dynamic date generation
+    const baseStartDate = new Date(currentDate);
+    baseStartDate.setDate(baseStartDate.getDate() + 30); // Start 30 days from now
 
-    // Master Project 1: exactly 90 days (2025-02-01 to 2025-05-02)
+    // Master Project 1: 90 days duration
+    const MASTER1_DURATION_DAYS = 90;
     const master1Start = new Date(baseStartDate);
-    const master1End = new Date('2025-05-02'); // Fixed end date
+    const master1End = new Date(master1Start);
+    master1End.setDate(master1End.getDate() + MASTER1_DURATION_DAYS);
 
-    // Sub Project: definitely within Master - starts Feb 21, ends Apr 12
-    const sub1Start = new Date('2025-02-21'); // 20 days after master start
-    const sub1End = new Date('2025-04-12');   // 20 days before master end
+    // Sub Project: within Master - starts 20 days after master, ends 20 days before master end
+    const SUB_START_OFFSET_DAYS = 20;
+    const SUB_END_OFFSET_DAYS = 20;
+    const sub1Start = new Date(master1Start);
+    sub1Start.setDate(sub1Start.getDate() + SUB_START_OFFSET_DAYS);
+    const sub1End = new Date(master1End);
+    sub1End.setDate(sub1End.getDate() - SUB_END_OFFSET_DAYS);
     
-    // Master Project 2: 60 days duration
-    const master2Start = new Date('2025-02-15');
-    const master2End = new Date('2025-04-16');
+    // Master Project 2: 60 days duration, starts 15 days after first project
+    const MASTER2_DURATION_DAYS = 60;
+    const MASTER2_START_OFFSET_DAYS = 15;
+    const master2Start = new Date(baseStartDate);
+    master2Start.setDate(master2Start.getDate() + MASTER2_START_OFFSET_DAYS);
+    const master2End = new Date(master2Start);
+    master2End.setDate(master2End.getDate() + MASTER2_DURATION_DAYS);
 
     // Validation: Ensure Sub project is within Master
     if (sub1Start < master1Start || sub1End > master1End) {

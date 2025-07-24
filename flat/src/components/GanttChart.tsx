@@ -12,7 +12,7 @@ import { useGanttDrag } from './GanttChart/hooks/useGanttDrag';
 import type { Project } from './GanttChart/types';
 import { useGanttData } from '../../hooks/useGanttData';
 import { getTotalRows } from './GanttChart/utils/ganttHelpers';
-import { GANTT_CONSTANTS, totalDays } from './GanttChart/constants';
+import { GANTT_CONSTANTS, getTotalDays } from './GanttChart/constants';
 
 // Scrollbar styles
 const ganttScrollbarStyles = `
@@ -49,6 +49,9 @@ const GanttChart: React.FC = () => {
 
   // Calculate total rows for grid
   const totalRows = useMemo(() => getTotalRows(projects), [projects]);
+  
+  // Calculate total days dynamically from MockDB projects
+  const totalDays = useMemo(() => getTotalDays(), []);
 
   // Synchronize horizontal scroll between header and timeline
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {

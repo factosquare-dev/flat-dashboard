@@ -4,7 +4,7 @@
 
 import React, { useCallback } from 'react';
 import type { Project, Task, DragState } from './types';
-import { GANTT_CONSTANTS, totalDays } from './constants';
+import { GANTT_CONSTANTS, getTotalDays } from './constants';
 import { getDateIndex, calculateTaskPosition } from './utils/ganttCalculations';
 
 interface TaskRendererProps {
@@ -20,6 +20,7 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
   onToggleProject,
   onMouseDown
 }) => {
+  const totalDays = getTotalDays();
   // Helper function to calculate task duration
   const getDuration = useCallback((startDate: string, endDate: string): number => {
     const start = getDateIndex(startDate);

@@ -6,6 +6,7 @@ import { useStore } from '../../store';
 
 const Dashboard: React.FC = () => {
   const { projects } = useStore();
+  const MAX_DASHBOARD_PROJECTS = 5; // Display limit for recent projects
 
   const stats = [
     {
@@ -19,7 +20,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Active Users',
-      value: '2,345',
+      value: '2,345', // TODO: Replace with actual user count from MockDB
       description: '+5% from last month',
       icon: Users,
       trend: 'up',
@@ -90,7 +91,7 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {projects.slice(0, 5).map((project) => (
+              {projects.slice(0, MAX_DASHBOARD_PROJECTS).map((project) => (
                 <div key={project.id} className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{project.name}</p>

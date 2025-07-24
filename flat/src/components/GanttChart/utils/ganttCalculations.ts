@@ -3,7 +3,7 @@
  */
 
 import { formatDateISO } from '../../../utils/dateUtils';
-import { baseDate, GANTT_CONSTANTS } from '../constants';
+import { getGanttDateRange, GANTT_CONSTANTS } from '../constants';
 
 export const dateToString = (date: Date): string => {
   return formatDateISO(date);
@@ -15,11 +15,13 @@ export const stringToDate = (dateStr: string): Date => {
 
 export const getDateIndex = (dateStr: string): number => {
   const date = stringToDate(dateStr);
+  const { baseDate } = getGanttDateRange();
   const diffTime = date.getTime() - baseDate.getTime();
   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 };
 
 export const getDateFromIndex = (index: number): string => {
+  const { baseDate } = getGanttDateRange();
   const date = new Date(baseDate);
   date.setDate(date.getDate() + index);
   return dateToString(date);

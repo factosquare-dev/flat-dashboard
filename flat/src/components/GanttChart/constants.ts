@@ -30,9 +30,10 @@ export const getDateRange = () => {
       const earliestStart = new Date(Math.min(...startDates.map(d => d.getTime())));
       const latestEnd = new Date(Math.max(...endDates.map(d => d.getTime())));
       
-      // Add 1 week padding on both sides
-      const baseDate = new Date(earliestStart.getTime() - (7 * 24 * 60 * 60 * 1000));
-      const endDate = new Date(latestEnd.getTime() + (7 * 24 * 60 * 60 * 1000));
+      // Add padding on both sides using TIME_CONSTANTS
+      const CHART_PADDING_DAYS = 7;
+      const baseDate = new Date(earliestStart.getTime() - (CHART_PADDING_DAYS * TIME_CONSTANTS.DAY));
+      const endDate = new Date(latestEnd.getTime() + (CHART_PADDING_DAYS * TIME_CONSTANTS.DAY));
       
       return { baseDate, endDate };
     }
@@ -41,15 +42,22 @@ export const getDateRange = () => {
   }
   
   // Fallback to current date range
+  const FALLBACK_PADDING_DAYS = 7;
+  const FALLBACK_MONTHS_AHEAD = 3;
   const today = new Date();
   const baseDate = new Date(today);
-  baseDate.setDate(baseDate.getDate() - 7);
+  baseDate.setDate(baseDate.getDate() - FALLBACK_PADDING_DAYS);
   
   const endDate = new Date(today);
-  endDate.setMonth(endDate.getMonth() + 3);
+  endDate.setMonth(endDate.getMonth() + FALLBACK_MONTHS_AHEAD);
   
   return { baseDate, endDate };
 };
 
-export const { baseDate, endDate } = getDateRange();
-export const totalDays = Math.floor((endDate.getTime() - baseDate.getTime()) / TIME_CONSTANTS.DAY) + 1;
+// Export functions instead of static values for dynamic calculation
+export const getGanttDateRange = getDateRange;
+
+export const getTotalDays = () => {
+  const { baseDate, endDate } = getDateRange();
+  return Math.floor((endDate.getTime() - baseDate.getTime()) / TIME_CONSTANTS.DAY) + 1;
+};
