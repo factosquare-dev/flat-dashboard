@@ -50,28 +50,39 @@ export const useScheduleState = (
   let endDate: Date;
   
   if (projectStartDate && projectEndDate) {
-    // 프로젝트 날짜가 제공된 경우, 앞뒤로 4일씩 여유 추가
+    // 프로젝트 기간에 따라 동적 패딩 계산 (no more magic numbers!)
     const projectStart = new Date(projectStartDate);
-    startDate = new Date(projectStart.getTime());
-    startDate.setDate(startDate.getDate() - 4);
-    
     const projectEnd = new Date(projectEndDate);
+    
+    // 프로젝트 기간 계산
+    const projectDuration = Math.ceil((projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // 동적 패딩: 프로젝트 기간의 10% (최소 2일, 최대 14일)
+    const dynamicPadding = Math.max(2, Math.min(14, Math.ceil(projectDuration * 0.1)));
+    
+    console.log(`[Schedule] 📅 Project duration: ${projectDuration} days, padding: ${dynamicPadding} days`);
+    
+    startDate = new Date(projectStart.getTime());
+    startDate.setDate(startDate.getDate() - dynamicPadding);
+    
     endDate = new Date(projectEnd.getTime());
-    endDate.setDate(endDate.getDate() + 4);
+    endDate.setDate(endDate.getDate() + dynamicPadding);
   } else {
-    // 날짜가 제공되지 않은 경우 기본값 사용 - 더 긴 기간으로 설정
+    // 프로젝트 날짜가 없는 경우 기본 범위 (3개월)
     startDate = new Date(today.getTime());
-    startDate.setDate(startDate.getDate() - 30);
+    startDate.setDate(startDate.getDate() - 14);
     
     endDate = new Date(today.getTime());
-    endDate.setMonth(endDate.getMonth() + 6);
+    endDate.setMonth(endDate.getMonth() + 3);
   }
 
   // Memoize days calculation to avoid unnecessary recalculation
   const days = useMemo(() => getDaysArray(startDate, endDate), [startDate, endDate]);
   
-  // cellWidth를 고정값으로 설정
-  const cellWidth = 50; // 고정 너비로 설정하여 스크롤 보장
+  // 일관된 사용자 경험을 위한 고정 셀 크기
+  const cellWidth = 50; // 모든 프로젝트에서 동일한 셀 크기 유지
+  
+  console.log(`[Schedule] 📅 Total days: ${days.length}, cellWidth: ${cellWidth}px (fixed for consistent UX)`);
 
   const dateRange: DateRange = {
     startDate,

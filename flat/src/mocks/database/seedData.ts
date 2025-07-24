@@ -8,6 +8,7 @@ import { Customer } from '@/types/customer';
 import { Factory } from '@/types/factory';
 import { Project, ProjectType, ProjectStatus } from '@/types/project';
 import { Schedule, Task, TaskStatus, Participant } from '@/types/schedule';
+import { taskTypesByFactoryType } from '../../data/factories';
 import type { Comment } from '@/types/comment';
 
 export const seedData = {
@@ -405,15 +406,51 @@ export const seedData = {
 
   createProjects(customers: Customer[], users: User[]): Project[] {
     const currentDate = new Date();
-    const nextMonth = new Date(currentDate);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
 
     // Find specific users for consistency
     const pmUser = users.find(u => u.role === UserRole.PRODUCT_MANAGER)!;
     const customer1 = customers.find(c => c.id === 'customer-1')!;
     const customer2 = customers.find(c => c.id === 'customer-2')!;
 
-    return [
+    // Create synchronized project dates dynamically (no more hardcoding!)
+    const { masterProjects, subProjects } = this.createSynchronizedProjects(customer1, customer2, pmUser, currentDate);
+
+    return [...masterProjects, ...subProjects];
+  },
+
+  /**
+   * Creates synchronized Master and Sub projects with proper date management
+   * NO MORE HARDCODED DATES!
+   */
+  createSynchronizedProjects(customer1: Customer, customer2: Customer, pmUser: User, currentDate: Date) {
+    // Calculate dynamic start dates based on current date + 1 week (realistic project planning)
+    const baseStartDate = new Date(currentDate);
+    baseStartDate.setDate(baseStartDate.getDate() + 7); // Projects start next week
+
+    console.log('[SeedData] 🗓️ Creating synchronized projects with dynamic dates (no hardcoding!)');
+
+    // Master Project 1: 프리미엄 화장품 라인 A (3 months duration)
+    const master1Start = new Date(baseStartDate);
+    const master1End = new Date(master1Start);
+    master1End.setMonth(master1End.getMonth() + 3); // 3 months duration
+
+    // Sub Project: Must fall within Master project dates
+    const sub1Start = new Date(master1Start);
+    sub1Start.setDate(sub1Start.getDate() + 30); // Start 1 month after master
+    const sub1End = new Date(master1End);
+    sub1End.setDate(sub1End.getDate() - 15); // End 2 weeks before master ends
+
+    // Master Project 2: 천연 샴푸 시리즈 (2 months duration)
+    const master2Start = new Date(baseStartDate);
+    master2Start.setDate(master2Start.getDate() + 14); // Start 2 weeks after first project
+    const master2End = new Date(master2Start);
+    master2End.setMonth(master2End.getMonth() + 2); // 2 months duration
+
+    console.log(`[SeedData] 🗓️ Master1: ${master1Start.toISOString().split('T')[0]} - ${master1End.toISOString().split('T')[0]}`);
+    console.log(`[SeedData] 🗓️ Sub1: ${sub1Start.toISOString().split('T')[0]} - ${sub1End.toISOString().split('T')[0]} (within Master1)`);
+    console.log(`[SeedData] 🗓️ Master2: ${master2Start.toISOString().split('T')[0]} - ${master2End.toISOString().split('T')[0]}`);
+
+    const masterProjects: Project[] = [
       {
         id: 'project-1',
         projectNumber: 'PRJ-2025-001',
@@ -437,8 +474,8 @@ export const seedData = {
         totalAmount: 350000000,
         depositAmount: 105000000,
         depositStatus: 'received',
-        startDate: new Date('2025-01-01'),
-        endDate: new Date('2025-03-31'),
+        startDate: master1Start,
+        endDate: master1End,
         manufacturerId: 'factory-1',
         containerId: 'factory-2',
         packagingId: 'factory-3',
@@ -446,43 +483,7 @@ export const seedData = {
         progress: 45,
         scheduleId: 'schedule-1',
         createdBy: pmUser.id,
-        createdAt: new Date('2024-12-15'),
-        updatedAt: currentDate,
-      },
-      {
-        id: 'project-2',
-        projectNumber: 'PRJ-2025-002',
-        name: '프리미엄 화장품 라인 A - 선크림',
-        type: ProjectType.SUB,
-        parentId: 'project-1',
-        status: ProjectStatus.PLANNING,
-        customerId: customer1.id,
-        customer: {
-          id: customer1.id, // SUB project inherits MASTER's customer
-          name: customer1.name,
-          contactPerson: customer1.contactPerson,
-          contactNumber: customer1.contactNumber,
-          email: customer1.email,
-        },
-        product: {
-          name: '선크림 SPF50+',
-          volume: '50ml',
-          unitPrice: 25000,
-        },
-        quantity: 15000,
-        totalAmount: 375000000,
-        depositAmount: 112500000,
-        depositStatus: 'pending',
-        startDate: new Date('2025-02-01'),
-        endDate: new Date('2025-04-30'),
-        manufacturerId: 'factory-1',
-        containerId: 'factory-2',
-        packagingId: 'factory-3',
-        priority: 'medium',
-        progress: 15,
-        scheduleId: 'schedule-2',
-        createdBy: pmUser.id,
-        createdAt: new Date('2025-01-05'),
+        createdAt: new Date(currentDate.getTime() - 30 * 24 * 60 * 60 * 1000), // Created 30 days ago
         updatedAt: currentDate,
       },
       {
@@ -508,8 +509,8 @@ export const seedData = {
         totalAmount: 360000000,
         depositAmount: 108000000,
         depositStatus: 'received',
-        startDate: new Date('2025-01-15'),
-        endDate: new Date('2025-02-28'),
+        startDate: master2Start,
+        endDate: master2End,
         manufacturerId: 'factory-4',
         containerId: 'factory-2',
         packagingId: 'factory-3',
@@ -517,10 +518,51 @@ export const seedData = {
         progress: 60,
         scheduleId: 'schedule-3',
         createdBy: pmUser.id,
-        createdAt: new Date('2025-01-10'),
+        createdAt: new Date(currentDate.getTime() - 25 * 24 * 60 * 60 * 1000), // Created 25 days ago
         updatedAt: currentDate,
       },
     ];
+
+    const subProjects: Project[] = [
+      {
+        id: 'project-2',
+        projectNumber: 'PRJ-2025-002',
+        name: '프리미엄 화장품 라인 A - 선크림',
+        type: ProjectType.SUB,
+        parentId: 'project-1',
+        status: ProjectStatus.PLANNING,
+        customerId: customer1.id,
+        customer: {
+          id: customer1.id, // SUB project inherits MASTER's customer
+          name: customer1.name,
+          contactPerson: customer1.contactPerson,
+          contactNumber: customer1.contactNumber,
+          email: customer1.email,
+        },
+        product: {
+          name: '선크림 SPF50+',
+          volume: '50ml',
+          unitPrice: 25000,
+        },
+        quantity: 15000,
+        totalAmount: 375000000,
+        depositAmount: 112500000,
+        depositStatus: 'pending',
+        startDate: sub1Start, // ✅ Synchronized with Master project
+        endDate: sub1End,     // ✅ Ends before Master project
+        manufacturerId: 'factory-1',
+        containerId: 'factory-2',
+        packagingId: 'factory-3',
+        priority: 'medium',
+        progress: 15,
+        scheduleId: 'schedule-2',
+        createdBy: pmUser.id,
+        createdAt: new Date(currentDate.getTime() - 20 * 24 * 60 * 60 * 1000), // Created 20 days ago
+        updatedAt: currentDate,
+      },
+    ];
+
+    return { masterProjects, subProjects };
   },
 
   createSchedulesAndTasks(projects: Project[], users: User[]): { schedules: Schedule[], tasks: Task[] } {
@@ -561,70 +603,102 @@ export const seedData = {
     qaUser: User
   ): Task[] {
     const tasks: Task[] = [];
-    const baseDate = new Date(project.startDate);
+    
+    // ✅ Use project's synchronized dates (no hardcoding!)
+    const projectStartDate = new Date(project.startDate);
+    const projectEndDate = new Date(project.endDate);
+    const projectDurationDays = Math.ceil((projectEndDate.getTime() - projectStartDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    // Define task templates with consistent participant assignment
-    const taskTemplates = [
-      {
-        title: '원료 조달',
-        type: 'material' as const,
-        duration: 7,
-        participants: [factoryManager.id, pmUser.id],
-      },
-      {
-        title: '제품 제조',
-        type: 'production' as const,
-        duration: 14,
-        participants: [factoryManager.id],
-        dependsOn: ['원료 조달'],
-      },
-      {
-        title: '품질 검사',
-        type: 'quality' as const,
-        duration: 3,
-        participants: [qaUser.id],
-        dependsOn: ['제품 제조'],
-      },
-      {
-        title: '포장 작업',
-        type: 'packaging' as const,
-        duration: 5,
-        participants: [factoryManager.id, pmUser.id],
-        dependsOn: ['품질 검사'],
-      },
-      {
-        title: '최종 검수',
-        type: 'inspection' as const,
-        duration: 2,
-        participants: [pmUser.id, qaUser.id],
-        dependsOn: ['포장 작업'],
-      },
-      {
-        title: '배송 준비',
-        type: 'shipping' as const,
-        duration: 1,
-        participants: [factoryManager.id],
-        dependsOn: ['최종 검수'],
-      },
-    ];
+    console.log(`[SeedData] 🏭 Creating tasks for ${project.product.name} (${projectDurationDays} days)`);
+    console.log(`[SeedData] 📅 Project dates: ${projectStartDate.toISOString().split('T')[0]} - ${projectEndDate.toISOString().split('T')[0]}`);
+    
+    // Collect all factory types and their tasks dynamically
+    const projectFactoryTypes: string[] = [];
+    
+    // Add manufacturing factory type if exists
+    if (project.manufacturerId) {
+      projectFactoryTypes.push('제조');
+    }
+    
+    // Add container factory type if exists  
+    if (project.containerId) {
+      projectFactoryTypes.push('용기');
+    }
+    
+    // Add packaging factory type if exists
+    if (project.packagingId) {
+      projectFactoryTypes.push('포장');
+    }
 
-    let currentStartDate = new Date(baseDate);
+    // Create tasks dynamically based on factory types
+    const taskTemplates: Array<{
+      title: string;
+      type: string;
+      duration: number;
+      participants: string[];
+      dependsOn?: string[];
+      factoryType: string;
+    }> = [];
+    
+    let previousTasks: string[] = [];
+    
+    projectFactoryTypes.forEach((factoryType, factoryIndex) => {
+      const factoryTasks = taskTypesByFactoryType[factoryType as keyof typeof taskTypesByFactoryType] || [];
+      
+      console.log(`[SeedData] 🏭 Adding ${factoryTasks.length} tasks for ${factoryType} factory`);
+      
+      factoryTasks.forEach((taskTitle, taskIndex) => {
+        const template = {
+          title: taskTitle,
+          type: this.mapTaskTitleToType(taskTitle),
+          duration: this.getTaskDuration(taskTitle),
+          participants: this.getTaskParticipants(taskTitle, pmUser.id, factoryManager.id, qaUser.id),
+          dependsOn: taskIndex === 0 ? previousTasks : [factoryTasks[taskIndex - 1]],
+          factoryType
+        };
+        
+        taskTemplates.push(template);
+      });
+      
+      // Set up dependency chain between factory types
+      if (factoryTasks.length > 0) {
+        previousTasks = [factoryTasks[factoryTasks.length - 1]];
+      }
+    });
+
+    // ✅ Calculate total task duration and scale to fit project timeline
+    const totalTaskDuration = taskTemplates.reduce((sum, template) => sum + template.duration, 0);
+    const scaleFactor = Math.max(0.8, Math.min(1.2, projectDurationDays / totalTaskDuration)); // 80%-120% scaling
+    
+    console.log(`[SeedData] ⚖️ Scaling tasks: ${totalTaskDuration} days -> ${Math.round(totalTaskDuration * scaleFactor)} days (factor: ${scaleFactor.toFixed(2)})`);
+
+    // ✅ Distribute tasks across project timeline with proper synchronization
+    let currentStartDate = new Date(projectStartDate);
     
     taskTemplates.forEach((template, index) => {
+      // Scale task duration to fit within project timeline
+      const scaledDuration = Math.max(1, Math.round(template.duration * scaleFactor));
+      const taskEndDate = new Date(currentStartDate.getTime() + scaledDuration * 24 * 60 * 60 * 1000);
+      
+      // ✅ Ensure task doesn't exceed project end date
+      if (taskEndDate > projectEndDate) {
+        taskEndDate.setTime(projectEndDate.getTime());
+      }
+
       const task: Task = {
         id: `task-${project.id}-${index + 1}`,
         scheduleId,
-        title: `${template.title} - ${project.product.name}`,
+        title: template.title,
         type: template.type,
         status: this.getTaskStatus(project.progress, index, taskTemplates.length),
         startDate: new Date(currentStartDate),
-        endDate: new Date(currentStartDate.getTime() + template.duration * 24 * 60 * 60 * 1000),
+        endDate: taskEndDate,
         progress: this.getTaskProgress(project.progress, index, taskTemplates.length),
         participants: template.participants.map(userId => ({
           userId,
           role: userId === pmUser.id ? 'manager' : 'member',
         } as Participant)),
-        factoryId: this.getFactoryForTask(template.type, project),
+        factoryId: this.getFactoryForTask(template.factoryType, project),
         priority: project.priority,
         dependsOn: template.dependsOn?.map(depTitle => 
           `task-${project.id}-${taskTemplates.findIndex(t => t.title === depTitle) + 1}`
@@ -635,9 +709,17 @@ export const seedData = {
       };
 
       tasks.push(task);
-      currentStartDate = new Date(task.endDate.getTime() + 24 * 60 * 60 * 1000); // Next day
+      
+      // ✅ Move to next task start date with 1-day buffer (unless we're at project end)
+      currentStartDate = new Date(taskEndDate.getTime() + 24 * 60 * 60 * 1000);
+      if (currentStartDate > projectEndDate) {
+        currentStartDate = new Date(projectEndDate);
+      }
     });
 
+    console.log(`[SeedData] 🏭 Created ${tasks.length} synchronized tasks for ${project.product.name}`);
+    console.log(`[SeedData] 📅 Tasks span: ${tasks[0]?.startDate.toISOString().split('T')[0]} - ${tasks[tasks.length - 1]?.endDate.toISOString().split('T')[0]}`);
+    
     return tasks;
   },
 
@@ -667,15 +749,17 @@ export const seedData = {
     }
   },
 
-  getFactoryForTask(taskType: string, project: Project): string {
-    switch (taskType) {
-      case 'production':
-      case 'material':
+  getFactoryForTask(factoryType: string, project: Project): string {
+    // Map factory types to project factory IDs
+    switch (factoryType) {
+      case '제조':
         return project.manufacturerId;
-      case 'packaging':
+      case '용기':
+        return project.containerId;
+      case '포장':
         return project.packagingId;
       default:
-        return project.manufacturerId;
+        return project.manufacturerId; // Fallback to manufacturing
     }
   },
 
@@ -966,5 +1050,109 @@ export const seedData = {
     });
     
     return relations;
+  },
+
+  // Helper functions for dynamic task creation (no more hardcoding!)
+  mapTaskTitleToType(title: string): string {
+    // Map task titles to types dynamically based on keywords
+    const typeMap: Record<string, string> = {
+      '원료': 'material',
+      '수령': 'material', 
+      '검사': 'quality',
+      '품질': 'quality',
+      '테스트': 'quality',
+      '제조': 'production',
+      '생산': 'production',
+      '혼합': 'production',
+      '배합': 'production',
+      '충전': 'production',
+      '성형': 'production',
+      '포장': 'packaging',
+      '라벨': 'packaging',
+      '박스': 'packaging',
+      '배송': 'shipping',
+      '출하': 'shipping',
+      '검수': 'inspection',
+      '승인': 'inspection',
+    };
+
+    // Find matching type based on keywords in title
+    for (const [keyword, type] of Object.entries(typeMap)) {
+      if (title.includes(keyword)) {
+        return type;
+      }
+    }
+    
+    return 'other'; // Default fallback
+  },
+
+  getTaskDuration(title: string): number {
+    // Dynamic duration based on task complexity (no hardcoded magic numbers!)
+    const durationMap: Record<string, number> = {
+      // Quick tasks (1-2 days)
+      '검수': 1,
+      '승인': 1,
+      '출하': 1,
+      '라벨': 2,
+      '준비': 2,
+      
+      // Medium tasks (3-5 days)
+      '검사': 3,
+      '품질': 3,
+      '포장': 4,
+      '작업': 4,
+      '처리': 3,
+      
+      // Complex tasks (5-10 days)
+      '제조': 7,
+      '생산': 7,
+      '혼합': 5,
+      '배합': 5,
+      '충전': 6,
+      '성형': 8,
+      '디자인': 5,
+      
+      // Very complex tasks (10+ days)
+      '금형': 12,
+      '개발': 14,
+      '테스트': 10,
+    };
+
+    // Find duration based on keywords in title
+    for (const [keyword, duration] of Object.entries(durationMap)) {
+      if (title.includes(keyword)) {
+        return duration;
+      }
+    }
+    
+    return 3; // Default duration
+  },
+
+  getTaskParticipants(title: string, pmUserId: string, factoryManagerId: string, qaUserId: string): string[] {
+    // Assign participants based on task type (no hardcoding!)
+    const participants: string[] = [];
+
+    // Quality-related tasks always include QA
+    if (title.includes('검사') || title.includes('품질') || title.includes('테스트')) {
+      participants.push(qaUserId);
+    }
+
+    // Management tasks include PM
+    if (title.includes('승인') || title.includes('검수') || title.includes('준비')) {
+      participants.push(pmUserId);
+    }
+
+    // Production tasks include factory manager
+    if (title.includes('제조') || title.includes('생산') || title.includes('작업') || 
+        title.includes('포장') || title.includes('충전') || title.includes('성형')) {
+      participants.push(factoryManagerId);
+    }
+
+    // If no specific participant assigned, default to factory manager + PM
+    if (participants.length === 0) {
+      participants.push(factoryManagerId, pmUserId);
+    }
+
+    return participants;
   },
 };

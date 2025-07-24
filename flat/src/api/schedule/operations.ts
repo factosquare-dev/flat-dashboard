@@ -41,31 +41,22 @@ export const getOrCreateScheduleForProject = async (
     }
   }
   
-  // Fallback to old logic for non-mock data
-  const existingSchedule = Array.from(existingSchedules.values())
-    .find(s => s.projectId === project.id);
+  // Fallback: Create empty schedule with no tasks
+  // Only use real Mock DB tasks, no hardcoded/sample tasks
+  console.log('[Schedule Operations] 🚫 No existing schedule found, creating empty schedule for project:', project.id);
   
-  if (existingSchedule) {
-    return existingSchedule;
-  }
+  const newSchedule: Schedule = {
+    id: `schedule-${project.id}-${Date.now()}`,
+    projectId: project.id,
+    participants: [], // Will be populated by scheduleAdapter from project's factories
+    tasks: [], // No hardcoded tasks - only real Mock DB tasks
+    startDate: project.startDate,
+    endDate: project.endDate,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
   
-  // 새 스케줄 생성
-  const newSchedule = createScheduleFromProject(project);
-  
-  // 진행 중인 프로젝트인 경우 현재 진행중인 태스크가 있는지 확인
-  if (project.status === '진행중') {
-    const hasInProgressTask = newSchedule.tasks.some(t => t.status === 'in-progress');
-    
-    // 진행중인 태스크가 없으면 샘플 태스크 추가
-    if (!hasInProgressTask) {
-      const inProgressTasks = createSampleInProgressTasks(
-        project.id,
-        new Date(project.startDate),
-        new Date(project.endDate)
-      );
-      newSchedule.tasks = [...newSchedule.tasks, ...inProgressTasks];
-    }
-  }
+  console.log('[Schedule Operations] 🏭 Created empty schedule with no hardcoded tasks');
   
   if (USE_MOCK_DATA) {
     existingSchedules.set(newSchedule.id, newSchedule);
