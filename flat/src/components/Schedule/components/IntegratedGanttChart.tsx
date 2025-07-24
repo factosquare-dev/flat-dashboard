@@ -76,6 +76,9 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
         }));
 
       console.log(`[IntegratedGanttChart] Factory '${participant.name}' (${participant.id}): ${projectTasks.length} tasks`);
+      if (projectTasks.length > 0) {
+        console.log('[IntegratedGanttChart] First few tasks for', participant.name, ':', projectTasks.slice(0, 3));
+      }
       
       return {
         id: participant.id,

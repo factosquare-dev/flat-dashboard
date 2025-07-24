@@ -70,12 +70,12 @@ export const getOrCreateScheduleForProject = async (
               
               return {
                 id: task.id,
-                projectId: task.projectId,
+                projectId: existingSchedule.projectId, // Use schedule's projectId instead of task's
                 factory: factory?.name || '',
                 factoryId: task.factoryId,
                 taskType: task.title,
-                startDate: typeof task.startDate === 'string' ? task.startDate : formatDateISO(task.startDate),
-                endDate: typeof task.endDate === 'string' ? task.endDate : formatDateISO(task.endDate),
+                startDate: typeof task.startDate === 'string' ? task.startDate : formatDateISO(new Date(task.startDate)),
+                endDate: typeof task.endDate === 'string' ? task.endDate : formatDateISO(new Date(task.endDate)),
                 status: task.status.toLowerCase().replace('_', '-'),
                 assignee: task.assignee || '',
                 color: factoryColor
@@ -83,13 +83,16 @@ export const getOrCreateScheduleForProject = async (
             });
           
           console.log('[getOrCreateScheduleForProject] 13. Tasks after factory filter:', scheduleTasks.length);
-          console.log('[getOrCreateScheduleForProject] 13a. Task details:', scheduleTasks.map(t => ({
+          // Log task details in a table format for better readability
+          console.log('[getOrCreateScheduleForProject] 13a. Task details:');
+          console.table(scheduleTasks.map(t => ({
             id: t.id,
             taskType: t.taskType,
             startDate: t.startDate,
             endDate: t.endDate,
             factoryId: t.factoryId,
-            factory: t.factory
+            factory: t.factory,
+            status: t.status
           })));
           
           // Get participants from project factories
