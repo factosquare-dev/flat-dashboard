@@ -9,6 +9,7 @@ interface ScheduleProps {
   startDate: string;
   endDate: string;
   projectName?: string;
+  projectId?: string;
   onBack?: () => void;
   isLoading?: boolean;
 }

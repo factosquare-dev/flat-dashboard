@@ -16,6 +16,7 @@ const Schedule: React.FC<ScheduleProps> = ({
   startDate: projectStartDate,
   endDate: projectEndDate,
   projectName,
+  projectId,
   className = '',
   onBack,
   isLoading = false
@@ -43,7 +44,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     setSliderValue,
     handleProjectSelect,
     handleSelectAll
-  } = useScheduleState(participants, projectStartDate, projectEndDate, gridWidth, initialTasks);
+  } = useScheduleState(participants, projectStartDate, projectEndDate, gridWidth, initialTasks, projectId);
 
   const { scrollToToday, handleSliderChange } = useScheduleEffects(
     dateRange.days,

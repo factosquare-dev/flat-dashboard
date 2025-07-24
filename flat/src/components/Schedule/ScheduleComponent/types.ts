@@ -6,6 +6,7 @@ export interface ScheduleProps {
   startDate: string;
   endDate: string;
   projectName?: string;
+  projectId?: string;
   className?: string;
   onBack?: () => void;
   isLoading?: boolean;

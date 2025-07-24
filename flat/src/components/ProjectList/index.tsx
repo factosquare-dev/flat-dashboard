@@ -75,6 +75,7 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
           startDate={projectSchedule.startDate}
           endDate={projectSchedule.endDate}
           projectName={`${selectedProject.client} - ${selectedProject.productType}`}
+          projectId={selectedProject.id}
           onBack={() => setSelectedProject(null)}
           isLoading={isLoadingSchedule}
         />

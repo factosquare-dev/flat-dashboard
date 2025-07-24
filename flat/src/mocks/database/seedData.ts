@@ -431,9 +431,9 @@ export const seedData = {
     const master1Start = new Date(baseStartDate);
     const master1End = new Date(master1Start.getTime() + (90 * 24 * 60 * 60 * 1000));
 
-    // Sub Project: within Master dates - starts with master, ends with master
-    const sub1Start = new Date(master1Start);
-    const sub1End = new Date(master1End);
+    // Sub Project: within Master dates - shorter period inside Master
+    const sub1Start = new Date(master1Start.getTime() + (20 * 24 * 60 * 60 * 1000)); // 20 days after master start
+    const sub1End = new Date(master1End.getTime() - (20 * 24 * 60 * 60 * 1000));   // 20 days before master end
 
     // Master Project 2: 60 days duration
     const master2Start = new Date(baseStartDate.getTime() + (14 * 24 * 60 * 60 * 1000));

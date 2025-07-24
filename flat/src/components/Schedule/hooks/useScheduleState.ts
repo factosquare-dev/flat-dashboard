@@ -5,6 +5,8 @@ import { formatDate } from '../../../utils/formatUtils';
 import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
 import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
 import { factories } from '../../../data/factories';
+import { getDatabaseWithRetry } from '../../../mocks/database/utils';
+import { ProjectType } from '../../../types/project';
 
 interface ModalState {
   showEmailModal: boolean;
@@ -40,33 +42,64 @@ export const useScheduleState = (
   projectStartDate: string,
   projectEndDate: string,
   gridWidth: number,
-  initialTasks?: Task[]
+  initialTasks?: Task[],
+  projectId?: string
 ) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // 프로젝트 시작일과 종료일 설정
+  // Master 프로젝트 날짜 찾기 (Sub 프로젝트인 경우 부모 Master 날짜 사용)
+  const masterProjectDates = useMemo(() => {
+    if (!projectId) {
+      return { startDate: projectStartDate, endDate: projectEndDate };
+    }
+
+    try {
+      // MockDB에서 현재 프로젝트 정보 가져오기
+      const database = JSON.parse(localStorage.getItem('flat_mock_db') || '{}');
+      const projects = database.projects || {};
+      
+      let targetProject = null;
+      for (const [id, project] of Object.entries(projects)) {
+        if (id === projectId) {
+          targetProject = project as any;
+          break;
+        }
+      }
+
+      if (targetProject && targetProject.type === ProjectType.SUB && targetProject.parentId) {
+        // Sub 프로젝트인 경우 부모 Master 프로젝트 날짜 사용
+        const masterProject = projects[targetProject.parentId] as any;
+        if (masterProject) {
+          return {
+            startDate: masterProject.startDate,
+            endDate: masterProject.endDate
+          };
+        }
+      }
+    } catch (error) {
+      console.warn('[Schedule] Failed to get master project dates, using current project dates');
+    }
+
+    return { startDate: projectStartDate, endDate: projectEndDate };
+  }, [projectId, projectStartDate, projectEndDate]);
+  
+  // 간트차트 크기를 Master 프로젝트 기간 기준으로 계산
   let startDate: Date;
   let endDate: Date;
   
-  if (projectStartDate && projectEndDate) {
-    // 프로젝트 기간에 따라 동적 패딩 계산 (no more magic numbers!)
-    const projectStart = new Date(projectStartDate);
-    const projectEnd = new Date(projectEndDate);
+  if (masterProjectDates.startDate && masterProjectDates.endDate) {
+    const projectStart = new Date(masterProjectDates.startDate);
+    const projectEnd = new Date(masterProjectDates.endDate);
     
     // 프로젝트 기간 계산
     const projectDuration = Math.ceil((projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24));
     
-    // 동적 패딩: 프로젝트 기간의 10% (최소 2일, 최대 14일)
-    const dynamicPadding = Math.max(2, Math.min(14, Math.ceil(projectDuration * 0.1)));
+    // 고정 패딩: Master 프로젝트 기간의 15% (최소 7일, 최대 21일)
+    const padding = Math.max(7, Math.min(21, Math.ceil(projectDuration * 0.15)));
     
-    console.log(`[Schedule] 📅 Project duration: ${projectDuration} days, padding: ${dynamicPadding} days`);
-    
-    startDate = new Date(projectStart.getTime());
-    startDate.setDate(startDate.getDate() - dynamicPadding);
-    
-    endDate = new Date(projectEnd.getTime());
-    endDate.setDate(endDate.getDate() + dynamicPadding);
+    startDate = new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000));
+    endDate = new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000));
   } else {
     // 프로젝트 날짜가 없는 경우 기본 범위 (3개월)
     startDate = new Date(today.getTime());
