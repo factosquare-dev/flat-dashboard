@@ -69,10 +69,8 @@ export const createDragHandlers = (
 
   const handleTaskDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    console.log('[DRAG DROP] Drop event triggered');
     
     if (!modalState.isDraggingTask || !modalState.draggedTask || !dragStateRef.current) {
-      console.log('[DRAG DROP] Invalid state - aborting drop');
       return;
     }
     
@@ -81,14 +79,12 @@ export const createDragHandlers = (
     const coords = calculator.getCoordinatesFromEvent(e, scrollRef);
     
     if (!coords) {
-      console.log('[DRAG DROP] Invalid coordinates - aborting drop');
       toastError('잘못된 위치입니다.');
       return;
     }
     
     const targetProject = findProjectFromEvent(e);
     if (!targetProject) {
-      console.log('[DRAG DROP] No target project found - aborting drop');
       toastError('대상 프로젝트를 찾을 수 없습니다.');
       return;
     }
@@ -101,13 +97,6 @@ export const createDragHandlers = (
     const newStartDateStr = formatDateISO(newStartDate);
     const newEndDateStr = formatDateISO(newEndDate);
     
-    console.log('[DRAG DROP] Calculated new dates:', {
-      original: { start: task.startDate, end: task.endDate },
-      new: { start: newStartDateStr, end: newEndDateStr },
-      duration,
-      targetProject
-    });
-    
     // Validate the drop
     const validation = validateTaskDrop(
       task,
@@ -118,7 +107,6 @@ export const createDragHandlers = (
     );
     
     if (!validation.isValid) {
-      console.log('[DRAG DROP] Validation failed:', validation.reason);
       toastError(validation.reason || '작업을 이동할 수 없습니다.');
       return;
     }
@@ -130,8 +118,6 @@ export const createDragHandlers = (
         endDate: newEndDateStr,
         factory: targetProject
       });
-      
-      console.log('[DRAG DROP] Task updated successfully');
     } catch (error) {
       console.error('[DRAG DROP] Failed to update task:', error);
       toastError('작업 업데이트에 실패했습니다.');
@@ -139,7 +125,6 @@ export const createDragHandlers = (
   };
 
   const handleTaskDragEnd = (e: React.DragEvent) => {
-    console.log('[DRAG END] Drag ended');
     
     // Stop auto-scroll
     stopAutoScroll();

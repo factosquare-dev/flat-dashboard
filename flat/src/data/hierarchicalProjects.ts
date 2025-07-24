@@ -26,14 +26,6 @@ const getHierarchicalProjects = (): Project[] => {
     const users = Array.from(database.users.values());
     const factories = Array.from(database.factories.values());
     
-    console.log('[hierarchicalProjects] Loaded data:', {
-      projectsCount: projects.length,
-      customersCount: customers.length,
-      usersCount: users.length,
-      factoriesCount: factories.length,
-      firstProject: projects[0],
-      customers: customers.map(c => ({id: c.id, name: c.name}))
-    });
     
     // Debug hierarchy issues
     debugHierarchyIssue();
@@ -183,7 +175,6 @@ const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[],
     // Get schedule from database
     const schedule = database.schedules.get(scheduleId);
     if (!schedule) {
-      console.log('[getStagesFromTasks] No schedule found for:', scheduleId);
       return { stages: [], progress: 0 };
     }
     
@@ -191,11 +182,9 @@ const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[],
     const tasks = Array.from(database.tasks.values()).filter(task => task.scheduleId === scheduleId);
     
     if (tasks.length === 0) {
-      console.log('[getStagesFromTasks] No tasks found for schedule:', scheduleId);
       return { stages: [], progress: 0 };
     }
     
-    console.log('[getStagesFromTasks] Found tasks:', tasks.length, 'for schedule:', scheduleId);
     
     // Calculate progress and current stages from actual tasks
     const progressInfo = calculateProgressFromTasks(tasks);
@@ -203,11 +192,9 @@ const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[],
     // If no current stages (no tasks today), return empty array
     // Let the UI decide how to display when there are no tasks today
     if (progressInfo.currentStages.length === 0) {
-      console.log('[getStagesFromTasks] No current stages found. Today tasks:', progressInfo.todayTasks?.length || 0);
       return { stages: [], progress: progressInfo.progress };
     }
     
-    console.log('[getStagesFromTasks] Current stages:', progressInfo.currentStages);
     
     return { 
       stages: progressInfo.currentStages, 

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Project } from '../../types/project';
 import type { Schedule as ScheduleType } from '../../types/schedule';
 import { scheduleApi } from '../../api/scheduleApi';
 import Schedule from '../Schedule';
 import ProjectListView from '../../features/projects/components/ProjectList';
-import ProjectListErrorBoundary from '../../features/projects/components/ProjectListErrorBoundary';
+import { ErrorBoundary, ProjectListErrorFallback } from '../ErrorBoundary';
 
 interface ProjectListContainerProps {
   className?: string;
@@ -15,6 +15,10 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
   const [projectSchedule, setProjectSchedule] = useState<ScheduleType | null>(null);
   const [isLoadingSchedule, setIsLoadingSchedule] = useState(false);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
+  
+  const handleBack = useCallback(() => {
+    setSelectedProject(null);
+  }, []);
   
   useEffect(() => {
     let isMounted = true;
@@ -57,7 +61,7 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
             <h3 className="text-lg font-semibold text-red-600 mb-2">오류 발생</h3>
             <p className="text-gray-600 mb-4">{scheduleError}</p>
             <button
-              onClick={() => setSelectedProject(null)}
+              onClick={handleBack}
               className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
               돌아가기
@@ -76,7 +80,7 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
           endDate={projectSchedule.endDate}
           projectName={`${selectedProject.client} - ${selectedProject.productType}`}
           projectId={selectedProject.id}
-          onBack={() => setSelectedProject(null)}
+          onBack={handleBack}
           isLoading={isLoadingSchedule}
         />
       );
@@ -84,12 +88,12 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
   }
   
   return (
-    <ProjectListErrorBoundary>
+    <ErrorBoundary fallback={ProjectListErrorFallback}>
       <ProjectListView
         onSelectProject={setSelectedProject}
         className={className}
       />
-    </ProjectListErrorBoundary>
+    </ErrorBoundary>
   );
 };
 

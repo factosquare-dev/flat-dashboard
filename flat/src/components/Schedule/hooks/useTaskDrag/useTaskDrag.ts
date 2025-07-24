@@ -97,35 +97,24 @@ export const useTaskDrag = ({
       updatePreview
     );
 
-    console.log('[DRAG] useEffect trigger check:', {
-      isDraggingTask: modalState.isDraggingTask,
-      draggedTaskId: modalState.draggedTask?.id,
-      hasScrollRef: !!scrollRef.current
-    });
-
     if (modalState.isDraggingTask) {
-      console.log('[DRAG] Setting up global dragover handler');
       // Set move cursor globally during drag
       document.body.style.cursor = 'move';
       
       document.addEventListener('dragover', handleGlobalDragOver);
       // Also add drop handler to prevent default behavior
       const handleGlobalDrop = (e: DragEvent) => {
-        console.log('[DRAG] Global drop detected, preventing default');
         e.preventDefault();
       };
       document.addEventListener('drop', handleGlobalDrop);
       
       return () => {
-        console.log('[DRAG] Cleaning up global handlers');
         document.removeEventListener('dragover', handleGlobalDragOver);
         document.removeEventListener('drop', handleGlobalDrop);
         stopAutoScroll();
         // Reset cursor
         document.body.style.cursor = '';
       };
-    } else {
-      console.log('[DRAG] Not setting up handlers - isDraggingTask is false');
     }
   }, [modalState.isDraggingTask, modalState.isResizingTask, modalState.draggedTask, scrollRef, cellWidth, days, handleAutoScroll, updateTooltip, findProjectFromEvent, updatePreview, stopAutoScroll]);
 

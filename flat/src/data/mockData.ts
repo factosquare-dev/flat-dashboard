@@ -1,6 +1,14 @@
 import type { ProjectFactory } from '../types/project';
 import { factories, getFactoriesByType } from './factories';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import { 
+  MOCK_COMPANY_NAMES, 
+  FACTORY_TYPES, 
+  CERTIFICATE_TYPE_OPTIONS,
+  SERVICE_TYPE_OPTIONS, 
+  PROJECT_STATUS_OPTIONS, 
+  PROJECT_PRIORITY_OPTIONS 
+} from '../constants';
 
 // 고객사 목록 - Mock DB에서 가져오기
 const getAllClients = () => {
@@ -10,23 +18,17 @@ const getAllClients = () => {
     const customers = Array.from(database.customers.values());
     return customers.map(customer => customer.name);
   } catch (error) {
-    console.warn('Failed to load clients from mock DB:', error);
     // Fallback to static data
-    return [
-      '뷰티코리아',
-      '그린코스메틱', 
-      '코스메디칼',
-      '퍼스트뷰티'
-    ];
+    return [...MOCK_COMPANY_NAMES];
   }
 };
 
 export const allClients = getAllClients();
 
 // factories.ts에서 가져온 공장 데이터를 기반으로 구성
-const manufacturingFactories = getFactoriesByType('제조');
-const containerFactories = getFactoriesByType('용기');
-const packagingFactories = getFactoriesByType('포장');
+const manufacturingFactories = getFactoriesByType(FACTORY_TYPES.MANUFACTURING);
+const containerFactories = getFactoriesByType(FACTORY_TYPES.CONTAINER);
+const packagingFactories = getFactoriesByType(FACTORY_TYPES.PACKAGING);
 
 // 공장별 태스크 목록
 export const tasksByFactory: { [key: string]: string[] } = {
@@ -37,10 +39,7 @@ export const tasksByFactory: { [key: string]: string[] } = {
 };
 
 // 사용 가능한 인증서 목록
-export const availableCertifications = [
-  'ISO 22716', 'CGMP', 'ISO 9001', 'ISO 14001', 'ISO 45001',
-  'FSC', 'VEGAN', 'HALAL', 'EWG', 'COSMOS', 'ECOCERT'
-];
+export const availableCertifications = [...CERTIFICATE_TYPE_OPTIONS];
 
 // 프로젝트 색상 팔레트
 export const projectColors = [
@@ -223,30 +222,10 @@ const getProductTypes = () => {
 
 export const productTypes = getProductTypes();
 
-// 서비스 타입
-export const serviceTypes = [
-  'OEM',
-  'ODM',
-  'OBM',
-  'Private Label',
-  'White Label',
-  '기타'
-];
-
-// 프로젝트 상태
-export const projectStatuses = [
-  '시작전',
-  '진행중',
-  '완료',
-  '중단'
-];
-
-// 우선순위
-export const priorities = [
-  '높음',
-  '보통',
-  '낮음'
-];
+// Re-export for backward compatibility
+export const serviceTypes = SERVICE_TYPE_OPTIONS;
+export const projectStatuses = PROJECT_STATUS_OPTIONS;
+export const priorities = PROJECT_PRIORITY_OPTIONS;
 
 // 현재 단계 옵션들
 export const currentStageOptions = [

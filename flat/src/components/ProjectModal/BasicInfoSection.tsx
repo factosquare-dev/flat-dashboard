@@ -1,7 +1,8 @@
 import React from 'react';
 import { Users } from 'lucide-react';
 import type { ProjectData } from './types';
-import { FormSection, FormRow, FormField, FormInput } from '../common/FormSection';
+import { FormSection, FormRow, FormField } from '../common/FormSection';
+import FormInput from '../common/FormInput';
 
 interface BasicInfoSectionProps {
   formData: ProjectData;

@@ -537,5 +537,4 @@ export function initializeMockApi() {
   const { initializeServices } = require('../services');
   initializeServices();
   
-  console.log('Mock API initialized successfully');
 }

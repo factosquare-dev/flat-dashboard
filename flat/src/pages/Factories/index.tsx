@@ -30,12 +30,10 @@ const FactoriesPage: React.FC = () => {
 
   const handleDeleteFactory = useCallback((factoryId: string) => {
     // TODO: API 연동 시 실제 삭제 로직 구현
-    console.log('Delete factory:', factoryId);
   }, []);
 
   const handleSaveFactory = useCallback((factoryData: FactoryFormData) => {
     // TODO: API 연동 시 실제 저장 로직 구현
-    console.log('Save factory:', factoryData);
     modalState.close();
   }, [modalState]);
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { CertificationType } from '../../../data/factories';
-import { availableCertifications } from '../../../data/mockData';
+import { CERTIFICATE_TYPE_OPTIONS, FACTORY_FORM_LABELS } from '../../../constants';
 
 interface CertificationFormProps {
   certifications: CertificationType[];
@@ -13,9 +13,9 @@ export const CertificationForm: React.FC<CertificationFormProps> = ({
 }) => {
   return (
     <div className="mb-8">
-      <h2 className="text-lg font-semibold mb-4">보유 인증</h2>
+      <h2 className="text-lg font-semibold mb-4">{FACTORY_FORM_LABELS.CERTIFICATIONS}</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {availableCertifications.map(cert => (
+        {CERTIFICATE_TYPE_OPTIONS.map(cert => (
           <label key={cert} className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"

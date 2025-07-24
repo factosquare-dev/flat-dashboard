@@ -92,7 +92,6 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
   
   const handleSelectRow = (projectId: string, checked: boolean, index?: number) => {
-    console.log('handleSelectRow called:', { projectId, checked, index });
     handleSelectItem(projectId, checked);
   };
 

@@ -8,6 +8,7 @@ import { UploadHandler } from './api/uploadHandler';
 import type { ApiResponse, RequestOptions } from './api/requestHandlers';
 import type { UploadOptions, UploadResponse } from './api/uploadHandler';
 import type { ApiError } from './api/errorHandling';
+import { apiConfig } from '../config';
 
 export interface ApiConfig {
   baseURL: string;
@@ -22,8 +23,8 @@ class ApiClient {
 
   constructor(config: Partial<ApiConfig> = {}) {
     this.config = {
-      baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
-      timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
+      baseURL: apiConfig.baseURL,
+      timeout: apiConfig.timeout,
       defaultHeaders: {
         'Content-Type': 'application/json',
       },
@@ -52,16 +53,16 @@ class ApiClient {
   /**
    * GET request
    */
-  async get<T = any>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async get<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
     return this.requestHandlers.get<T>(endpoint, options);
   }
 
   /**
    * POST request
    */
-  async post<T = any>(
+  async post<T, D = unknown>(
     endpoint: string,
-    data?: any,
+    data?: D,
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     return this.requestHandlers.post<T>(endpoint, data, options);
@@ -70,9 +71,9 @@ class ApiClient {
   /**
    * PUT request
    */
-  async put<T = any>(
+  async put<T, D = unknown>(
     endpoint: string,
-    data?: any,
+    data?: D,
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     return this.requestHandlers.put<T>(endpoint, data, options);
@@ -81,9 +82,9 @@ class ApiClient {
   /**
    * PATCH request
    */
-  async patch<T = any>(
+  async patch<T, D = unknown>(
     endpoint: string,
-    data?: any,
+    data?: D,
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     return this.requestHandlers.patch<T>(endpoint, data, options);
@@ -92,7 +93,7 @@ class ApiClient {
   /**
    * DELETE request
    */
-  async delete<T = any>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async delete<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
     return this.requestHandlers.delete<T>(endpoint, options);
   }
 
@@ -106,8 +107,8 @@ class ApiClient {
   /**
    * OPTIONS request
    */
-  async options(endpoint: string, options?: RequestOptions): Promise<ApiResponse<any>> {
-    return this.requestHandlers.options(endpoint, options);
+  async options<T = unknown>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.requestHandlers.options<T>(endpoint, options);
   }
 
   /**

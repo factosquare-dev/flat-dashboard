@@ -16,7 +16,6 @@ export const createGlobalDragOverHandler = (
   return (e: DragEvent) => {
     // CRITICAL: Skip if resizing to prevent conflicts
     if (modalState.isResizingTask) {
-      console.log('[DRAG] Skipping dragover - resize in progress');
       return;
     }
     
@@ -27,16 +26,6 @@ export const createGlobalDragOverHandler = (
       const rect = scrollRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left + scrollRef.current.scrollLeft - dragStateRef.current.offsetX;
       const mouseX = e.clientX - rect.left;
-      
-      console.log('[DRAG OVER] Global drag over:', {
-        clientX: e.clientX,
-        mouseX,
-        x,
-        hasScrollRef: !!scrollRef.current,
-        isDraggingTask: modalState.isDraggingTask,
-        hasDraggedTask: !!modalState.draggedTask,
-        hasDragState: !!dragStateRef.current
-      });
       
       // Handle auto-scroll
       handleAutoScroll(mouseX, rect.width);

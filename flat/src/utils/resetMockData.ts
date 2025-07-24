@@ -3,11 +3,13 @@
  * This function clears localStorage and resets the mock database
  */
 
+import { storageKeys } from '../config';
+
 export const resetMockData = () => {
   try {
     // Clear localStorage
     const keysToRemove = [
-      'flat_mock_db',
+      storageKeys.mockDbKey,
       'flat_users',
       'flat_projects',
       'flat_schedules',

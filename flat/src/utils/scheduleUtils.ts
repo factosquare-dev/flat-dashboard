@@ -104,15 +104,6 @@ export const validateTaskFactoryData = (tasks: Task[], factories: Participant[])
   
   if (tasksWithInvalidFactory.length > 0) {
     issues.push(`${tasksWithInvalidFactory.length} tasks have invalid factory names`);
-    // Debug: show mismatch details
-    console.log('[Factory Name Mismatch Debug]', {
-      participantNames: Array.from(factoryNames),
-      taskFactories: [...new Set(tasksWithInvalidFactory.map(t => t.factory))],
-      sampleMismatch: tasksWithInvalidFactory.slice(0, 3).map(t => ({
-        taskFactory: t.factory,
-        taskFactoryId: t.factoryId
-      }))
-    });
   }
   
   // Check factoryId consistency

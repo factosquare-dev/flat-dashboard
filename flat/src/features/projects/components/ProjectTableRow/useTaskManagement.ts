@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TASK_TEMPLATES } from '../../../../constants';
 
 interface Task {
   id: string;
@@ -11,13 +12,13 @@ export const useTaskManagement = () => {
   
   // Default tasks based on the image
   const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', name: '원료 준비', completed: true },
-    { id: '2', name: '혼합 및 제조', completed: true },
-    { id: '3', name: '금형 제작', completed: true },
-    { id: '4', name: '안정성 테스트', completed: false },
-    { id: '5', name: '시홍 성형', completed: false },
-    { id: '6', name: '디자인 작업', completed: false },
-    { id: '7', name: '포장 작업', completed: false }
+    { id: '1', name: TASK_TEMPLATES.RAW_MATERIAL_PREP, completed: true },
+    { id: '2', name: TASK_TEMPLATES.MIXING_MANUFACTURING, completed: true },
+    { id: '3', name: TASK_TEMPLATES.MOLD_MAKING, completed: true },
+    { id: '4', name: TASK_TEMPLATES.STABILITY_TEST, completed: false },
+    { id: '5', name: TASK_TEMPLATES.TRIAL_MOLDING, completed: false },
+    { id: '6', name: TASK_TEMPLATES.DESIGN_WORK, completed: false },
+    { id: '7', name: TASK_TEMPLATES.PACKAGING_WORK, completed: false }
   ]);
 
   const handleToggleTasks = (e: React.MouseEvent) => {

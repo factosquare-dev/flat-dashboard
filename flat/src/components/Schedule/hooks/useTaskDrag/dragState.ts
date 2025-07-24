@@ -11,8 +11,6 @@ export const initializeDragState = (
   setModalState: React.Dispatch<React.SetStateAction<ModalState>>,
   dragStateRef: React.MutableRefObject<DragState | null>
 ) => {
-  console.log('[DRAG START] Starting drag for task:', { taskId: task.id, title: task.title });
-  
   // Clear any resize state before starting drag
   setModalState((prev) => ({
     ...prev,
@@ -82,8 +80,6 @@ export const cleanupDragState = (
   dragStateRef: React.MutableRefObject<DragState | null>,
   cleanupTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>
 ) => {
-  console.log('[DRAG END] Cleaning up drag state');
-  
   // Clear timeout if it exists
   if (cleanupTimeoutRef.current) {
     clearTimeout(cleanupTimeoutRef.current);
@@ -131,10 +127,6 @@ export const shouldAllowDrop = (
   const isCompatible = sourceFactory.type === targetFactoryObj.type;
   
   if (!isCompatible) {
-    console.warn('[DRAG] Factory type mismatch:', {
-      source: sourceFactory.type,
-      target: targetFactoryObj.type
-    });
     return false;
   }
   

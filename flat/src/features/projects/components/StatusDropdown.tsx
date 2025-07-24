@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ProjectStatus } from '../../types/project';
+import { PROJECT_STATUS, PROJECT_STATUS_OPTIONS } from '../../../constants';
 
 interface StatusDropdownProps {
   value: ProjectStatus;
@@ -12,13 +13,13 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
 
   const getStatusStyle = (status: ProjectStatus) => {
     switch (status) {
-      case '시작전':
+      case PROJECT_STATUS.BEFORE_START:
         return 'bg-gray-100 text-gray-700 border-gray-300';
-      case '진행중':
+      case PROJECT_STATUS.IN_PROGRESS:
         return 'bg-blue-100 text-blue-700 border-blue-300';
-      case '완료':
+      case PROJECT_STATUS.COMPLETED:
         return 'bg-green-100 text-green-700 border-green-300';
-      case '중단':
+      case PROJECT_STATUS.SUSPENDED:
         return 'bg-red-100 text-red-700 border-red-300';
       default:
         return 'bg-gray-100 text-gray-700 border-gray-300';
@@ -36,7 +37,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const statuses: ProjectStatus[] = ['시작전', '진행중', '완료', '중단'];
+  const statuses: ProjectStatus[] = PROJECT_STATUS_OPTIONS as ProjectStatus[];
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>

@@ -1,7 +1,6 @@
 import type { Schedule } from '../../types/schedule';
 import { createMockSchedules } from '../../data/mockSchedules';
-
-export const USE_MOCK_DATA = true; // TODO: Set to false when backend is ready
+import { USE_MOCK_DATA } from '../../config/mock';
 
 // Mock 데이터 저장소
 export const mockSchedules = new Map<string, Schedule>();

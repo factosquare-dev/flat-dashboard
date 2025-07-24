@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
+import { apiConfig } from '../../src/config'
 
-const API_URL = 'http://localhost:8000/api/v1'
+const API_URL = apiConfig.baseURL
 
 export const handlers = [
   // Auth endpoints

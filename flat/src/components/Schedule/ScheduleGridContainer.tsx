@@ -183,17 +183,6 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     }
   };
 
-  // Debug log for data flow
-  console.log('[ScheduleGridContainer] Data Check:', {
-    projects: projects.map(p => ({ id: p.id, name: p.name })),
-    totalTasks: tasks.length,
-    taskSample: tasks.slice(0, 3).map(t => ({
-      id: t.id,
-      title: t.title || t.taskType,
-      factory: t.factory,
-      projectId: t.projectId
-    }))
-  });
 
   return (
     <div className="h-full overflow-y-auto">

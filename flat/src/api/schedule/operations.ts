@@ -45,7 +45,6 @@ export const getOrCreateScheduleForProject = async (
   }
   
   // Fallback: Create schedule with mock tasks for development
-  // console.log('[Schedule Operations] No existing schedule found, creating schedule with mock data for project:', project.id);
   
   // Get mock schedules and find tasks for similar projects
   const mockSchedules = createMockSchedules();
@@ -59,7 +58,6 @@ export const getOrCreateScheduleForProject = async (
   let globalTaskId = 1;
   const filteredTasks: any[] = [];
   
-  console.log('[Operations] Creating tasks for project:', project.id);
   
   if (mockSchedule) {
     // Group tasks by factory
@@ -77,7 +75,6 @@ export const getOrCreateScheduleForProject = async (
       const factory = mockSchedule.participants.find(p => p.name === factoryName);
       let lastEndDateForFactory = new Date(projectStart);
       
-      console.log(`[Operations] Processing ${factoryTasks.length} tasks for factory: ${factoryName}`);
       
       // Sort tasks by original start date
       const sortedFactoryTasks = [...factoryTasks].sort((a, b) => 
@@ -114,11 +111,6 @@ export const getOrCreateScheduleForProject = async (
             endDate: formatDateISO(newEndDate)
           };
           
-          console.log(`[Operations] Task ${index} for ${factoryName}:`, {
-            title: task.title || task.taskType,
-            dates: `${formatDateISO(newStartDate)} ~ ${formatDateISO(newEndDate)}`,
-            duration: taskDuration
-          });
           
           filteredTasks.push(newTask);
           
@@ -139,7 +131,6 @@ export const getOrCreateScheduleForProject = async (
     updatedAt: new Date().toISOString()
   };
   
-  // console.log('[Schedule Operations] Created schedule with', filteredTasks.length, 'mock tasks');
   
   if (USE_MOCK_DATA) {
     existingSchedules.set(newSchedule.id, newSchedule);

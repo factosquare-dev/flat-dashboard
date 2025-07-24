@@ -11,12 +11,13 @@ export {
 
 // Create a default instance
 import { ApiClient } from './ApiClient';
+import { apiConfig } from '../../config';
 
 export const apiClient = new ApiClient({
-  baseURL: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
-  timeout: 30000,
-  retries: 3,
-  retryDelay: 1000,
+  baseURL: apiConfig.baseURL,
+  timeout: apiConfig.timeout,
+  retries: apiConfig.retryAttempts,
+  retryDelay: apiConfig.retryDelay,
 });
 
 // Export convenience methods

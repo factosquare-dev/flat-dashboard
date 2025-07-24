@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { FileText, Mail } from 'lucide-react';
 import EmailModal from '../EmailModal/index';
 import BaseModal from '../common/BaseModal';
@@ -42,7 +42,7 @@ interface ProductRequestData {
   requirements: string;
 }
 
-const ProductRequestModal: React.FC<ProductRequestModalProps> = ({ 
+const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({ 
   isOpen, 
   onClose, 
   onSave, 
@@ -83,14 +83,14 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({
     }
   }, [isOpen]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (onSave) {
       onSave(formData);
       setIsSaved(true);
     }
-  };
+  }, [onSave, formData]);
 
-  const handleSendEmail = () => {
+  const handleSendEmail = useCallback(() => {
     if (!isSaved) {
       if (window.confirm('제품 개발 의뢰서를 먼저 저장하시겠습니까?')) {
         handleSave();
@@ -103,16 +103,16 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({
     setTimeout(() => {
       setShowEmailModal(true);
     }, 100);
-  };
+  }, [isSaved, handleSave, onClose]);
   
-  const handleEmailSend = (emailData: any) => {
+  const handleEmailSend = useCallback((emailData: any) => {
     setShowEmailModal(false);
     if (onSendEmail) {
       onSendEmail(formData);
     }
-  };
+  }, [onSendEmail, formData]);
 
-  const updateReceiptInfo = (field: string, value: string) => {
+  const updateReceiptInfo = useCallback((field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       receiptInfo: {
@@ -120,9 +120,9 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({
         [field]: value
       }
     }));
-  };
+  }, []);
 
-  const updateContentInfo = (field: string, value: string) => {
+  const updateContentInfo = useCallback((field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       contentInfo: {
@@ -130,14 +130,14 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({
         [field]: value
       }
     }));
-  };
+  }, []);
 
-  const updateMainField = (field: string, value: string) => {
+  const updateMainField = useCallback((field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-  };
+  }, []);
 
   return (
     <>
@@ -244,6 +244,8 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = ({
       />
     </>
   );
-};
+});
+
+ProductRequestModal.displayName = 'ProductRequestModal';
 
 export default ProductRequestModal;

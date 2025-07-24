@@ -84,70 +84,82 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
 
   return (
     <>
-      <EmailModal
-        isOpen={modalState.showEmailModal}
-        onClose={() => setModalState(prev => ({ ...prev, showEmailModal: false }))}
-        onSend={handleEmailSend}
-        defaultRecipients={modalState.selectedFactories?.length > 0 ? modalState.selectedFactories.join(', ') : ''}
-        availableFactories={
-          modalState.selectedFactories?.length > 0 ? 
-            // 선택된 공장들만 표시
-            modalState.selectedFactories.map(name => {
-              const factory = factories.find(f => f.name === name);
-              return {
-                name,
-                color: factory?.type === '제조' ? 'bg-blue-500' : 
-                       factory?.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
-                type: factory?.type || '공장'
-              };
-            }) : 
-            // 선택된 것이 없으면 현재 간트차트에 표시된 프로젝트(공장)들만 보여줌
-            projects.map(project => ({
-              name: project.name,
-              color: project.type === '제조' ? 'bg-blue-500' : 
-                     project.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
-              type: project.type || '공장'
-            }))
-        }
-      />
+      <Suspense fallback={null}>
+        <EmailModal
+          isOpen={modalState.showEmailModal}
+          onClose={() => setModalState(prev => ({ ...prev, showEmailModal: false }))}
+          onSend={handleEmailSend}
+          defaultRecipients={modalState.selectedFactories?.length > 0 ? modalState.selectedFactories.join(', ') : ''}
+          availableFactories={
+            modalState.selectedFactories?.length > 0 ? 
+              // 선택된 공장들만 표시
+              modalState.selectedFactories.map(name => {
+                const factory = factories.find(f => f.name === name);
+                return {
+                  name,
+                  color: factory?.type === '제조' ? 'bg-blue-500' : 
+                         factory?.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+                  type: factory?.type || '공장'
+                };
+              }) : 
+              // 선택된 것이 없으면 현재 간트차트에 표시된 프로젝트(공장)들만 보여줌
+              projects.map(project => ({
+                name: project.name,
+                color: project.type === '제조' ? 'bg-blue-500' : 
+                       project.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+                type: project.type || '공장'
+              }))
+          }
+        />
+      </Suspense>
 
-      <WorkflowModal
-        isOpen={modalState.showWorkflowModal}
-        onClose={handleWorkflowClose}
-        factories={factories}
-      />
+      <Suspense fallback={null}>
+        <WorkflowModal
+          isOpen={modalState.showWorkflowModal}
+          onClose={handleWorkflowClose}
+          factories={factories}
+        />
+      </Suspense>
 
       {modalState.selectedTask && (
-        <TaskEditModal
-          isOpen={modalState.showTaskEditModal}
-          onClose={handleTaskEditClose}
-          task={modalState.selectedTask}
-          onSave={onTaskSave}
-          onDelete={onTaskDelete}
-        />
+        <Suspense fallback={null}>
+          <TaskEditModal
+            isOpen={modalState.showTaskEditModal}
+            onClose={handleTaskEditClose}
+            task={modalState.selectedTask}
+            onSave={onTaskSave}
+            onDelete={onTaskDelete}
+          />
+        </Suspense>
       )}
 
-      <ProductRequestModal
-        isOpen={modalState.showProductRequestModal}
-        onClose={() => setModalState(prev => ({ ...prev, showProductRequestModal: false }))}
-        onSave={handleProductRequestSave}
-      />
+      <Suspense fallback={null}>
+        <ProductRequestModal
+          isOpen={modalState.showProductRequestModal}
+          onClose={() => setModalState(prev => ({ ...prev, showProductRequestModal: false }))}
+          onSave={handleProductRequestSave}
+        />
+      </Suspense>
 
-      <TaskCreateModal
-        isOpen={modalState.showTaskModal}
-        onClose={() => setModalState(prev => ({ ...prev, showTaskModal: false, selectedProjectId: null, selectedDate: null, selectedFactory: null }))}
-        onSave={handleTaskCreate}
-        availableFactories={projects.map(p => p.name)}
-        initialDate={modalState.selectedDate || undefined}
-        projectId={modalState.selectedProjectId || undefined}
-        selectedFactory={modalState.selectedFactory || undefined}
-      />
+      <Suspense fallback={null}>
+        <TaskCreateModal
+          isOpen={modalState.showTaskModal}
+          onClose={() => setModalState(prev => ({ ...prev, showTaskModal: false, selectedProjectId: null, selectedDate: null, selectedFactory: null }))}
+          onSave={handleTaskCreate}
+          availableFactories={projects.map(p => p.name)}
+          initialDate={modalState.selectedDate || undefined}
+          projectId={modalState.selectedProjectId || undefined}
+          selectedFactory={modalState.selectedFactory || undefined}
+        />
+      </Suspense>
 
-      <FactorySelectionModal
-        isOpen={modalState.showFactoryModal}
-        onClose={() => setModalState(prev => ({ ...prev, showFactoryModal: false }))}
-        onSelectFactories={handleFactoriesSelect}
-      />
+      <Suspense fallback={null}>
+        <FactorySelectionModal
+          isOpen={modalState.showFactoryModal}
+          onClose={() => setModalState(prev => ({ ...prev, showFactoryModal: false }))}
+          onSelectFactories={handleFactoriesSelect}
+        />
+      </Suspense>
     </>
   );
 };

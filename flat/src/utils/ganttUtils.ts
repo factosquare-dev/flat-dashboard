@@ -1,25 +1,18 @@
-import { formatDateISO, dateToString, stringToDate } from './dateUtils';
+import { formatDateISO, dateToString, getDateIndex as getDateIndexBase, getDateFromIndex as getDateFromIndexBase, getDuration as getDurationBase } from './dateUtils';
 import { GANTT_CONSTANTS, TOTAL_DAYS } from '../constants/gantt';
 import { TIME_CONSTANTS } from '../constants/time';
 
-// Date index calculations
+// Date index calculations with GANTT_CONSTANTS base date
 export const getDateIndex = (dateStr: string): number => {
-  const date = stringToDate(dateStr);
-  return Math.floor((date.getTime() - GANTT_CONSTANTS.BASE_DATE.getTime()) / TIME_CONSTANTS.DAY);
+  return getDateIndexBase(dateStr, GANTT_CONSTANTS.BASE_DATE);
 };
 
 export const getDateFromIndex = (index: number): string => {
-  const date = new Date(GANTT_CONSTANTS.BASE_DATE);
-  date.setDate(date.getDate() + index);
-  return dateToString(date);
+  return getDateFromIndexBase(index, GANTT_CONSTANTS.BASE_DATE);
 };
 
-// Duration calculations
-export const getDuration = (startDate: string, endDate: string): number => {
-  const start = stringToDate(startDate);
-  const end = stringToDate(endDate);
-  return Math.floor((end.getTime() - start.getTime()) / TIME_CONSTANTS.DAY) + 1;
-};
+// Re-export getDuration from dateUtils
+export const getDuration = getDurationBase;
 
 // Today utilities
 export const getTodayIndex = (): number => {

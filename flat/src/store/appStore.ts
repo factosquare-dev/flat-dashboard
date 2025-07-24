@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { storageKeys } from '../config';
 
 interface User {
   id: string;
@@ -83,7 +84,7 @@ export const useAppStore = create<AppStore>()(
             state.user = user;
             state.isAuthenticated = true;
             state.token = token;
-            localStorage.setItem('auth_token', token);
+            localStorage.setItem(storageKeys.tokenKey, token);
           }),
           
         logout: () =>
@@ -91,7 +92,7 @@ export const useAppStore = create<AppStore>()(
             state.user = null;
             state.isAuthenticated = false;
             state.token = null;
-            localStorage.removeItem('auth_token');
+            localStorage.removeItem(storageKeys.tokenKey);
           }),
           
         updateUser: (updates) =>

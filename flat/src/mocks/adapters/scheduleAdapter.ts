@@ -22,7 +22,6 @@ export class ScheduleAdapter {
     
     // Return empty data if database is not available
     if (!db) {
-      console.warn('[ScheduleAdapter] Database not available, returning empty data');
       return {
         participants: [],
         tasks: [],
@@ -40,24 +39,17 @@ export class ScheduleAdapter {
     
     // Get the project to find its associated factories
     const project = projects.get(schedule.projectId);
-    // console.log('[ScheduleAdapter] Project for schedule:', project);
     
     // Get factories from the project data (manufacturing, packaging, container)
     const factoryMap = new Map<string, any>();
     
     if (project) {
-      // console.log('[ScheduleAdapter] Project factory IDs:', {
-      //   manufacturerId: project.manufacturerId,
-      //   containerId: project.containerId,
-      //   packagingId: project.packagingId
-      // });
       
       // Add manufacturing factory
       if (project.manufacturerId) {
         const manufacturingFactory = factories.get(project.manufacturerId);
         if (manufacturingFactory) {
           factoryMap.set(manufacturingFactory.id, manufacturingFactory);
-          // console.log('[ScheduleAdapter] Added manufacturing factory:', manufacturingFactory.name);
         }
       }
       
@@ -66,7 +58,6 @@ export class ScheduleAdapter {
         const containerFactory = factories.get(project.containerId);
         if (containerFactory) {
           factoryMap.set(containerFactory.id, containerFactory);
-          // console.log('[ScheduleAdapter] Added container factory:', containerFactory.name);
         }
       }
       
@@ -75,7 +66,6 @@ export class ScheduleAdapter {
         const packagingFactory = factories.get(project.packagingId);
         if (packagingFactory) {
           factoryMap.set(packagingFactory.id, packagingFactory);
-          // console.log('[ScheduleAdapter] Added packaging factory:', packagingFactory.name);
         }
       }
     }
@@ -99,7 +89,6 @@ export class ScheduleAdapter {
       order: index
     }));
     
-    // console.log('[ScheduleAdapter] Final participants:', participants.map(p => p.name));
     
     // Convert tasks to legacy format
     const legacyTasks = tasks.map((task, index) => {

@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { ARIA_LABELS, focusManagement, KEYBOARD_KEYS } from '../../utils/accessibility';
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -31,21 +32,41 @@ const BaseModal: React.FC<BaseModalProps> = ({
   className = '',
   description
 }) => {
-  // ESC key handler
-  useEffect(() => {
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
+  // Focus management and ESC key handler
+  useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleEscKey);
+      // Store previously focused element
+      previouslyFocusedRef.current = document.activeElement as HTMLElement;
+      
+      // Focus first element in modal
+      setTimeout(() => {
+        if (modalRef.current) {
+          focusManagement.focusFirst(modalRef.current);
+        }
+      }, 0);
+
+      // Prevent body scroll
       document.body.style.overflow = 'hidden';
       
+      // Trap focus and handle ESC
+      const cleanup = modalRef.current ? focusManagement.trapFocus(modalRef.current) : undefined;
+      
+      const handleEscKey = (event: KeyboardEvent) => {
+        if (event.key === KEYBOARD_KEYS.ESCAPE) {
+          onClose();
+        }
+      };
+      
+      document.addEventListener('keydown', handleEscKey);
+      
       return () => {
+        cleanup?.();
         document.removeEventListener('keydown', handleEscKey);
         document.body.style.overflow = 'unset';
+        focusManagement.restoreFocus(previouslyFocusedRef.current);
       };
     }
   }, [isOpen, onClose]);
@@ -62,26 +83,31 @@ const BaseModal: React.FC<BaseModalProps> = ({
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-describedby={description ? "modal-description" : undefined}
     >
       <div 
+        ref={modalRef}
         className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} ${className || ''}`.trim()}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header - Standardized */}
         <div className="flex items-start justify-between p-6 border-b border-gray-200">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+            <h3 id="modal-title" className="text-xl font-semibold text-gray-900">{title}</h3>
             {description && (
-              <p className="mt-2 text-base text-gray-500">{description}</p>
+              <p id="modal-description" className="mt-2 text-base text-gray-500">{description}</p>
             )}
           </div>
           {showCloseButton && (
             <button 
               onClick={onClose}
               className="ml-4 p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              aria-label="Close modal"
+              aria-label={ARIA_LABELS.MODAL_CLOSE}
             >
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6" aria-hidden="true" />
             </button>
           )}
         </div>

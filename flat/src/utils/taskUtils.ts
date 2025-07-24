@@ -23,9 +23,8 @@ export const findOverlappingTasks = (
   return allTasks.filter(t => isTaskOverlapping(task, t));
 };
 
-// 태스크에 row 인덱스 할당 (겹치지 않도록)
-export const assignTaskRows = (tasks: Task[]): Map<number, number> => {
-  const taskRows = new Map<number, number>();
+// 태스크에 row 인덱스 할당 (겹치지 않도록) - Factory별로 독립적으로 처리
+export const assignTaskRows = (tasks: Task[], factoryId?: string, factoryName?: string): Task[] => {
   const sortedTasks = [...tasks].sort((a, b) => 
     new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );
@@ -44,12 +43,9 @@ export const assignTaskRows = (tasks: Task[]): Map<number, number> => {
       };
     });
     
-    console.log('[Task Row Assignment Debug]', {
-      totalTasks: tasks.length,
-      factory: tasks[0]?.factory,
-      overlapAnalysis: overlapAnalysis.filter(t => t.overlapsCount > 0)
-    });
   }
+  
+  const taskRows = new Map<number, number>();
   
   sortedTasks.forEach(task => {
     let row = 0;
@@ -76,7 +72,11 @@ export const assignTaskRows = (tasks: Task[]): Map<number, number> => {
     }
   });
   
-  return taskRows;
+  // Return tasks with assigned rowIndex
+  return sortedTasks.map(task => ({
+    ...task,
+    rowIndex: taskRows.get(task.id) || 0
+  }));
 };
 
 // 프로젝트별로 필요한 행 수 계산
@@ -98,8 +98,9 @@ export const getProjectRowCount = (
   const projectTasks = getTasksForFactory(tasks, factory);
   if (projectTasks.length === 0) return 1;
   
-  const taskRows = assignTaskRows(projectTasks);
-  return Math.max(...Array.from(taskRows.values())) + 1;
+  const tasksWithRows = assignTaskRows(projectTasks, projectId, projectName);
+  const maxRow = Math.max(...tasksWithRows.map(t => t.rowIndex || 0));
+  return maxRow + 1;
 };
 
 // 새 태스크가 기존 태스크와 겹치지 않는 날짜 찾기
@@ -153,7 +154,6 @@ export const findAvailableDateRange = (
   
   // 사용 가능한 날짜를 찾지 못한 경우 경고
   if (!foundValidRange) {
-    console.warn(`Could not find available date range for project ${projectId} within 1 year`);
   }
   
   return {

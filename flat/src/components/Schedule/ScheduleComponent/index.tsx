@@ -86,25 +86,10 @@ const Schedule: React.FC<ScheduleProps> = ({
     setModalState
   );
 
-  const handleToggleTableView = () => {
+  const handleToggleTableView = useCallback(() => {
     setViewMode(prevMode => prevMode === 'gantt' ? 'table' : 'gantt');
-  };
+  }, []);
   
-  // Debug log for main data
-  console.log('[Schedule Component] Main Data:', {
-    projects: projects.map(p => ({ id: p.id, name: p.name })),
-    totalTasks: taskControls.tasks.length,
-    viewMode,
-    initialTasks: initialTasks?.length || 0,
-    taskFactories: [...new Set(taskControls.tasks.map(t => t.factory))],
-    taskSample: taskControls.tasks.slice(0, 5).map(t => ({
-      id: t.id,
-      factory: t.factory,
-      factoryId: t.factoryId,
-      projectId: t.projectId,
-      title: t.title
-    }))
-  });
   
   // Data consistency check between Table and Gantt views
   React.useEffect(() => {
@@ -126,28 +111,8 @@ const Schedule: React.FC<ScheduleProps> = ({
       message: 'Both Table and Gantt views use the same data source (taskControls.tasks)'
     };
     
-    console.log('[Data Consistency Check]', dataIntegrityCheck);
-    
-    if (!validation.isValid) {
-      console.warn('[Data Validation Issues]', {
-        issues: validation.issues,
-        summary: validation.summary,
-        projects: projects.map(p => ({ id: p.id, name: p.name })),
-        remainingTasks: taskControls.tasks.filter(t => {
-          const hasMatchingProject = projects.some(p => 
-            p.id === t.projectId || 
-            p.name === t.factory || 
-            p.id === t.factoryId
-          );
-          return !hasMatchingProject;
-        }).map(t => ({
-          id: t.id,
-          title: t.title,
-          factory: t.factory,
-          factoryId: t.factoryId,
-          projectId: t.projectId
-        }))
-      });
+    // Only log in development mode
+    if (import.meta.env.DEV) {
     }
   }, [viewMode, taskControls.tasks, projects]);
 

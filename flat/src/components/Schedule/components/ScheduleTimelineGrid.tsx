@@ -66,12 +66,6 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
       totalRenderedTasks += projectTasks.length;
     });
     
-    console.log('[Gantt Chart Total Render Count]', {
-      totalTasksReceived: props.tasks.length,
-      totalTasksRendered: totalRenderedTasks,
-      tasksByProject,
-      allTaskFactories: [...new Set(props.tasks.map(t => t.factory))]
-    });
   }, [props.tasks, props.projects]);
   const {
     projects,

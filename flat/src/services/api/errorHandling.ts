@@ -3,6 +3,12 @@
  */
 
 import { logger } from '../../utils/logger';
+import { 
+  AppError, 
+  ERROR_CODES, 
+  httpStatusToErrorCode,
+  ERROR_MESSAGES 
+} from '../../utils/error/errorHandler';
 
 export interface ApiError {
   message: string;
@@ -19,14 +25,18 @@ export class ApiErrorHandler {
     statusText?: string,
     data?: any,
     requestId?: string
-  ): ApiError {
-    return {
-      message,
-      status,
+  ): AppError {
+    const errorCode = status ? httpStatusToErrorCode(status) : ERROR_CODES.UNKNOWN_ERROR;
+    const errorMessage = message || ERROR_MESSAGES[errorCode];
+    
+    const appError = new AppError(errorMessage, errorCode, status, {
       statusText,
       data,
-      requestId
-    };
+      requestId,
+      originalMessage: message,
+    });
+    
+    return appError;
   }
 
   static async handleResponse(response: Response, requestId: string): Promise<any> {
@@ -71,7 +81,7 @@ export class ApiErrorHandler {
     return data;
   }
 
-  static handleNetworkError(error: Error, requestId: string, url: string): ApiError {
+  static handleNetworkError(error: Error, requestId: string, url: string): AppError {
     logger.error('Network error occurred', {
       requestId,
       url,
@@ -79,21 +89,37 @@ export class ApiErrorHandler {
       stack: error.stack
     });
 
-    let message = 'Network error occurred';
+    let errorCode = ERROR_CODES.NETWORK_ERROR;
+    let message = ERROR_MESSAGES.NETWORK_ERROR;
     
     if (error.name === 'AbortError') {
-      message = 'Request was cancelled';
-    } else if (error.message.includes('Failed to fetch')) {
-      message = 'Unable to connect to server. Please check your internet connection.';
+      errorCode = ERROR_CODES.TIMEOUT_ERROR;
+      message = '요청이 취소되었습니다.';
     } else if (error.message.includes('timeout')) {
-      message = 'Request timed out. Please try again.';
+      errorCode = ERROR_CODES.TIMEOUT_ERROR;
+      message = ERROR_MESSAGES.TIMEOUT_ERROR;
     }
 
-    return this.createError(message, undefined, undefined, undefined, requestId);
+    return new AppError(message, errorCode, undefined, {
+      requestId,
+      url,
+      originalError: error.message,
+    });
   }
 
-  static isRetryableError(error: ApiError): boolean {
-    // Retry on network errors or 5xx server errors
+  static isRetryableError(error: AppError | ApiError): boolean {
+    // Check if it's an AppError with retryable code
+    if (error instanceof AppError) {
+      const retryableCodes = [
+        ERROR_CODES.NETWORK_ERROR,
+        ERROR_CODES.TIMEOUT_ERROR,
+        ERROR_CODES.SERVER_ERROR,
+        ERROR_CODES.SERVICE_UNAVAILABLE,
+      ];
+      return retryableCodes.includes(error.code as any);
+    }
+    
+    // Legacy check for ApiError
     return !error.status || (error.status >= 500 && error.status < 600);
   }
 
@@ -104,7 +130,7 @@ export class ApiErrorHandler {
     return Math.min(delay + jitter, 30000); // Max 30 seconds
   }
 
-  static shouldRetry(error: ApiError, attempt: number, maxRetries: number): boolean {
+  static shouldRetry(error: AppError | ApiError, attempt: number, maxRetries: number): boolean {
     return attempt < maxRetries && this.isRetryableError(error);
   }
 

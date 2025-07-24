@@ -30,7 +30,6 @@ export function initializeServices() {
   factoryService = new FactoryService();
   projectService = new ProjectService();
   
-  console.log('Mock services initialized successfully');
 }
 
 /**

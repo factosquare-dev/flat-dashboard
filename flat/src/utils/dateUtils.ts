@@ -84,17 +84,10 @@ export const isDateInRange = (date: Date, startDate: Date, endDate: Date): boole
   return targetTime >= startTime && targetTime <= endTime;
 };
 
-export const addDays = (date: Date, days: number): Date => {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-};
-
-export const isSameDate = (date1: Date, date2: Date): boolean => {
-  return date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate();
-};
+// These functions are now available from date-fns via utils/date/index.ts
+// export const addDays = (date: Date, days: number): Date => { ... }
+// export const isSameDate = (date1: Date, date2: Date): boolean => { ... }
+// Use addDays and isSameDay from date-fns instead
 
 // Format date to Korean locale string
 export function formatDate(date: string | Date, format: 'short' | 'long' | 'full' = 'short'): string {
@@ -141,7 +134,7 @@ export function formatDateRange(startDate: string | Date, endDate: string | Date
   return `${start} ~ ${end}`;
 }
 
-// Calculate days between dates
+// Calculate days between dates - Use differenceInDays from date-fns for new code
 export function getDaysBetween(startDate: string | Date, endDate: string | Date): number {
   const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
   const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
@@ -151,6 +144,78 @@ export function getDaysBetween(startDate: string | Date, endDate: string | Date)
   
   return diffDays;
 }
+
+// Resize-specific date calculation with snap zones
+export const calculateResizeDateFromX = (
+  x: number, 
+  cellWidth: number, 
+  days: Date[], 
+  isEndDate: boolean = false
+): Date => {
+  const safeCellWidth = cellWidth || 1; // Guard against division by zero
+  const cellIndex = Math.floor(x / safeCellWidth);
+  const cellOffset = x % safeCellWidth;
+  const snapThreshold = safeCellWidth * 0.5;
+  
+  if (isEndDate) {
+    // For end dates, snap to cell end boundaries
+    const targetIndex = cellOffset < snapThreshold 
+      ? Math.max(0, cellIndex - 1)  // Snap to end of previous day
+      : Math.min(cellIndex, days.length - 1); // Snap to end of current day
+    
+    // Bounds check
+    if (targetIndex < 0 || targetIndex >= days.length) {
+      return new Date(days[Math.max(0, Math.min(days.length - 1, targetIndex))]);
+    }
+    
+    return new Date(days[targetIndex]);
+  } else {
+    // For start dates, snap to cell start boundaries  
+    const targetIndex = cellOffset < snapThreshold
+      ? cellIndex  // Snap to start of current day
+      : Math.min(cellIndex + 1, days.length - 1); // Snap to start of next day
+    
+    // Bounds check
+    if (targetIndex < 0 || targetIndex >= days.length) {
+      return new Date(days[Math.max(0, Math.min(days.length - 1, targetIndex))]);
+    }
+    
+    return new Date(days[targetIndex]);
+  }
+};
+
+// Calculate hovered date index for resize operations
+export const calculateHoveredDateIndex = (x: number, cellWidth: number, days: Date[]): number => {
+  const isEndDate = false; // For hover, we use start date logic
+  const newDate = calculateResizeDateFromX(x, cellWidth, days, isEndDate);
+  const dateStr = formatDateISO(newDate);
+  
+  return days.findIndex(day => formatDateISO(day) === dateStr);
+};
+
+// Calculate snap indicator position
+export const calculateSnapIndicatorX = (hoveredIndex: number, cellWidth: number, isEndDate: boolean): number => {
+  return isEndDate ? (hoveredIndex + 1) * cellWidth : hoveredIndex * cellWidth;
+};
+
+// Date index calculations (for Gantt chart)
+export const getDateIndex = (dateStr: string, baseDate: Date): number => {
+  const date = stringToDate(dateStr);
+  return Math.floor((date.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
+};
+
+export const getDateFromIndex = (index: number, baseDate: Date): string => {
+  const date = new Date(baseDate);
+  date.setDate(date.getDate() + index);
+  return formatDateISO(date);
+};
+
+// Duration calculation
+export const getDuration = (startDate: string, endDate: string): number => {
+  const start = stringToDate(startDate);
+  const end = stringToDate(endDate);
+  return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+};
 
 // String to Date conversion
 export const stringToDate = (dateStr: string): Date => {

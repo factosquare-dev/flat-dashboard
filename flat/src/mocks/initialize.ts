@@ -17,7 +17,6 @@ export function ensureMockSystemInitialized(): boolean {
   
   if (USE_MOCK_DATA) {
     try {
-      console.log('[Mock System] Initializing...');
       
       // Ensure database is loaded
       const db = MockDatabaseImpl.getInstance();
@@ -32,8 +31,6 @@ export function ensureMockSystemInitialized(): boolean {
       // Initialize services
       initializeServices();
       
-      console.log('[Mock System] Initialized successfully');
-      console.log('[Mock System] Database stats:', db.getStats());
       
       initialized = true;
       return true;

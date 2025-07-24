@@ -13,13 +13,14 @@ import {
   DbStats
 } from './types';
 import { seedData } from './seedData';
+import { storageKeys } from '../../config';
 
 export class MockDatabaseImpl {
   private static instance: MockDatabaseImpl;
   private db: MockDatabase;
   private listeners: Map<string, Set<(event: DbEvent) => void>>;
   private transactions: Map<string, DbTransaction>;
-  private readonly STORAGE_KEY = 'flat_mock_db';
+  private readonly STORAGE_KEY = storageKeys.mockDbKey;
   private readonly VERSION = '1.0.0';
 
   private constructor() {

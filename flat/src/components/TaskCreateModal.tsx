@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { factories, taskTypesByFactoryType, getFactoryByName } from '../data/factories';
 import BaseModal from './common/BaseModal';
 import FormInput from './common/FormInput';
@@ -67,16 +67,21 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   }, []);
 
   // 사용 가능한 공장 목록 필터링
-  const availableFactoryList = availableFactories.length > 0 
-    ? factories.filter(f => availableFactories.includes(f.name))
-    : factories;
+  const availableFactoryList = useMemo(() => 
+    availableFactories.length > 0 
+      ? factories.filter(f => availableFactories.includes(f.name))
+      : factories,
+    [availableFactories]
+  );
 
-  const currentFactory = getFactoryByName(factory);
-  const availableTaskTypes = currentFactory 
-    ? taskTypesByFactoryType[currentFactory.type] 
-    : [];
+  const currentFactory = useMemo(() => getFactoryByName(factory), [factory]);
+  
+  const availableTaskTypes = useMemo(() => 
+    currentFactory ? taskTypesByFactoryType[currentFactory.type] : [],
+    [currentFactory]
+  );
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     // Input validation with proper error messages
     if (!factory?.trim()) {
       toastError('공장 선택 오류', '공장을 선택해주세요.');
@@ -113,9 +118,9 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       startDate,
       endDate
     });
-  };
+  }, [factory, taskType, startDate, endDate, onSave, toastError]);
   
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     // Clear any existing timeout
     if (cleanupTimeoutRef.current) {
       clearTimeout(cleanupTimeoutRef.current);
@@ -130,7 +135,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       cleanupTimeoutRef.current = null;
     }, UI_DELAYS.MODAL_CLEANUP);
     onClose();
-  };
+  }, [onClose]);
   
   // 컴포넌트 언마운트 시 cleanup
   React.useEffect(() => {
@@ -142,21 +147,27 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     };
   }, []);
 
-  const handleFactoryChange = (newFactory: string) => {
+  const handleFactoryChange = useCallback((newFactory: string) => {
     setFactory(newFactory);
     setTaskType(''); // 공장 변경 시 태스크 타입 초기화
-  };
+  }, []);
 
 
-  const factoryOptions = availableFactoryList.map(f => ({
-    value: f.name,
-    label: `${f.name} (${f.type})`
-  }));
+  const factoryOptions = useMemo(() => 
+    availableFactoryList.map(f => ({
+      value: f.name,
+      label: `${f.name} (${f.type})`
+    })), 
+    [availableFactoryList]
+  );
 
-  const taskTypeOptions = availableTaskTypes.map(type => ({
-    value: type,
-    label: type
-  }));
+  const taskTypeOptions = useMemo(() => 
+    availableTaskTypes.map(type => ({
+      value: type,
+      label: type
+    })), 
+    [availableTaskTypes]
+  );
 
   return (
     <BaseModal
@@ -223,4 +234,4 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   );
 };
 
-export default TaskCreateModal;
+export default React.memo(TaskCreateModal);

@@ -69,8 +69,6 @@ export const useTaskResize = (
   useEffect(() => {
     if (!modalState.isResizingTask) return;
     
-    console.log('[RESIZE] Setting up global mouse listeners');
-    
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (handleMouseMoveRef.current) {
         handleMouseMoveRef.current(e);
@@ -78,7 +76,6 @@ export const useTaskResize = (
     };
     
     const handleGlobalMouseUp = (e: MouseEvent) => {
-      console.log('[RESIZE] MouseUp caught');
       if (handleMouseUpRef.current) {
         handleMouseUpRef.current();
       }
@@ -93,7 +90,6 @@ export const useTaskResize = (
     window.addEventListener('mouseup', handleGlobalMouseUp, true);
     
     return () => {
-      console.log('[RESIZE] Cleaning up mouse listeners');
       document.removeEventListener('mousemove', handleGlobalMouseMove, true);
       document.removeEventListener('mouseup', handleGlobalMouseUp, true);
       window.removeEventListener('mouseup', handleGlobalMouseUp, true);

@@ -7,6 +7,7 @@ import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
 import { factories } from '../../../data/factories';
 import { getDatabaseWithRetry } from '../../../mocks/database/utils';
 import { ProjectType } from '../../../types/project';
+import { storageKeys } from '../../../config';
 
 interface ModalState {
   showEmailModal: boolean;
@@ -63,7 +64,7 @@ export const useScheduleState = (
 
     try {
       // MockDB에서 프로젝트 정보 가져오기
-      const database = JSON.parse(localStorage.getItem('flat_mock_db') || '{}');
+      const database = JSON.parse(localStorage.getItem(storageKeys.mockDbKey) || '{}');
       const projects = database.projects || {};
       
       let targetProject = null;

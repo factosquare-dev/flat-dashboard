@@ -19,13 +19,11 @@ export function getSafeDatabase(): MockDatabase | null {
     
     // Check if instance is properly initialized
     if (!instance || typeof instance.getDatabase !== 'function') {
-      console.warn('[Database Utils] MockDatabase not properly initialized');
       return null;
     }
     
     const db = instance.getDatabase();
     if (!db) {
-      console.warn('[Database Utils] Database returned null');
       return null;
     }
     

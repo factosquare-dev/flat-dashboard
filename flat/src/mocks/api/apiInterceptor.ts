@@ -131,7 +131,6 @@ export async function interceptApiRequest<T = any>(
     const { pattern, params } = parseEndpoint(method, url);
     
     if (!pattern || !endpointMappings[pattern]) {
-      console.warn(`No mock handler for ${method} ${url}`);
       return null as any;
     }
     
@@ -181,5 +180,4 @@ export function isMockApiEnabled(): boolean {
  */
 export function setMockApiEnabled(enabled: boolean): void {
   (window as any).__USE_MOCK_API__ = enabled;
-  console.log(`Mock API ${enabled ? 'enabled' : 'disabled'}`);
 }

@@ -50,8 +50,6 @@ export const createTaskMouseDownHandler = (
   
   // Set global interaction state
   setInteractionMode('resizing');
-  
-  console.log('[RESIZE START] Starting resize (cleared drag state):', { taskId: task.id, direction });
 };
 
 export const createMouseMoveHandler = (
@@ -65,7 +63,6 @@ export const createMouseMoveHandler = (
 ) => (e: MouseEvent) => {
   // CRITICAL: Skip if dragging to prevent conflicts
   if (modalState.isDraggingTask) {
-    console.log('[RESIZE] Skipping mousemove - drag in progress');
     return;
   }
   
@@ -141,33 +138,13 @@ export const createMouseUpHandler = (
   setHoveredDateIndex: React.Dispatch<React.SetStateAction<number | null>>,
   setSnapIndicatorX: React.Dispatch<React.SetStateAction<number | null>>
 ) => () => {
-  console.log('[RESIZE] ========== MOUSE UP - ENDING RESIZE ==========');
-  
   // CRITICAL: Skip if dragging to prevent conflicts
   if (modalState.isDraggingTask) {
-    console.log('[RESIZE] Skipping mouseup - drag in progress');
     return;
   }
   
-  console.log('[RESIZE] Current state:', {
-    isResizingTask: modalState.isResizingTask,
-    hasResizingTask: !!modalState.resizingTask,
-    hasResizePreview: !!resizePreview,
-    taskId: modalState.resizingTask?.id,
-    previewDates: resizePreview ? {
-      startDate: resizePreview.startDate,
-      endDate: resizePreview.endDate
-    } : null
-  });
-  
   if (modalState.isResizingTask && modalState.resizingTask && resizePreview) {
     // Apply the preview dates directly since we already validated them during resize
-    console.log('[RESIZE] Applying resize:', {
-      taskId: modalState.resizingTask.id,
-      startDate: resizePreview.startDate,
-      endDate: resizePreview.endDate
-    });
-    
     taskUpdateFn(modalState.resizingTask.id, {
       startDate: resizePreview.startDate,
       endDate: resizePreview.endDate

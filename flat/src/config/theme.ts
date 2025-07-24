@@ -3,6 +3,8 @@
  * This file provides TypeScript access to CSS variables defined in theme.css
  */
 
+import { PROJECT_STATUS, PROJECT_PRIORITY } from '../constants';
+
 export const theme = {
   colors: {
     primary: {
@@ -188,17 +190,17 @@ export const factoryColors = [
 
 // Status color mappings
 export const statusColors = {
-  '시작전': theme.colors.status.pending,
-  '진행중': theme.colors.status.inProgress,
-  '완료': theme.colors.status.completed,
-  '중단': theme.colors.status.stopped,
+  [PROJECT_STATUS.BEFORE_START]: theme.colors.status.pending,
+  [PROJECT_STATUS.IN_PROGRESS]: theme.colors.status.inProgress,
+  [PROJECT_STATUS.COMPLETED]: theme.colors.status.completed,
+  [PROJECT_STATUS.SUSPENDED]: theme.colors.status.stopped,
 } as const;
 
 // Priority color mappings
 export const priorityColors = {
-  '높음': theme.colors.priority.high,
-  '보통': theme.colors.priority.medium,
-  '낮음': theme.colors.priority.low,
+  [PROJECT_PRIORITY.HIGH]: theme.colors.priority.high,
+  [PROJECT_PRIORITY.MEDIUM]: theme.colors.priority.medium,
+  [PROJECT_PRIORITY.LOW]: theme.colors.priority.low,
 } as const;
 
 // Helper function to get CSS variable value

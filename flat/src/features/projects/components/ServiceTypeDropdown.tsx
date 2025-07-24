@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ServiceType } from '../../../types/project';
+import { SERVICE_TYPE_OPTIONS } from '../../../constants';
 
 interface ServiceTypeDropdownProps {
   value: ServiceType;
@@ -21,7 +22,7 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const serviceTypes: ServiceType[] = ['OEM', 'ODM', 'OBM', 'Private Label', 'White Label', '기타'];
+  const serviceTypes: ServiceType[] = SERVICE_TYPE_OPTIONS as ServiceType[];
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>

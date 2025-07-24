@@ -1,5 +1,6 @@
 import type { ApiResponse } from '../types';
 import { logger } from '../../../utils/logger';
+import { apiConfig } from '../../../config';
 
 interface RequestConfig extends RequestInit {
   params?: Record<string, any>;
@@ -21,7 +22,7 @@ class ApiClient {
     endpoint: string,
     config: RequestConfig = {}
   ): Promise<ApiResponse<T>> {
-    const { params, timeout = 30000, ...fetchConfig } = config;
+    const { params, timeout = apiConfig.timeout, ...fetchConfig } = config;
     
     // Build URL with query parameters
     const url = new URL(`${this.baseURL}${endpoint}`);
@@ -131,5 +132,4 @@ class ApiClient {
 }
 
 // Create singleton instance
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
-export const apiClient = new ApiClient(API_BASE_URL);
+export const apiClient = new ApiClient(apiConfig.baseURL);

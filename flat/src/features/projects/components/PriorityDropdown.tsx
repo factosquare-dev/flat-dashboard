@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Priority } from '../../../types/project';
+import { PROJECT_PRIORITY, PROJECT_PRIORITY_OPTIONS } from '../../../constants';
 
 interface PriorityDropdownProps {
   value: Priority;
@@ -12,19 +13,19 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
 
   const getPriorityIcon = (priority: Priority) => {
     switch (priority) {
-      case '높음':
+      case PROJECT_PRIORITY.HIGH:
         return (
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
           </svg>
         );
-      case '보통':
+      case PROJECT_PRIORITY.MEDIUM:
         return (
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
           </svg>
         );
-      case '낮음':
+      case PROJECT_PRIORITY.LOW:
         return (
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -35,11 +36,11 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
 
   const getPriorityStyle = (priority: Priority) => {
     switch (priority) {
-      case '높음':
+      case PROJECT_PRIORITY.HIGH:
         return 'bg-red-100 text-red-700 border-red-300';
-      case '보통':
+      case PROJECT_PRIORITY.MEDIUM:
         return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-      case '낮음':
+      case PROJECT_PRIORITY.LOW:
         return 'bg-green-100 text-green-700 border-green-300';
       default:
         return 'bg-gray-100 text-gray-700 border-gray-300';
@@ -57,7 +58,7 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const priorities: Priority[] = ['높음', '보통', '낮음'];
+  const priorities: Priority[] = PROJECT_PRIORITY_OPTIONS as Priority[];
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>

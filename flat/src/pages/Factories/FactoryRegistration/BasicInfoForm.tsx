@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FactoryFormData } from './types';
+import { FACTORY_TYPE_OPTIONS, FACTORY_FORM_LABELS } from '../../../constants';
 
 interface BasicInfoFormProps {
   formData: FactoryFormData;
@@ -9,11 +10,11 @@ interface BasicInfoFormProps {
 export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange }) => {
   return (
     <div className="mb-8">
-      <h2 className="text-lg font-semibold mb-4">기본 정보</h2>
+      <h2 className="text-lg font-semibold mb-4">{FACTORY_FORM_LABELS.BASIC_INFO}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            공장명 <span className="text-red-500">*</span>
+            {FACTORY_FORM_LABELS.FACTORY_NAME} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -27,7 +28,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            공장 유형 <span className="text-red-500">*</span>
+            {FACTORY_FORM_LABELS.FACTORY_TYPE} <span className="text-red-500">*</span>
           </label>
           <select
             name="type"
@@ -36,15 +37,15 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="제조">제조</option>
-            <option value="용기">용기</option>
-            <option value="포장">포장</option>
+            {FACTORY_TYPE_OPTIONS.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
           </select>
         </div>
 
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            주소 <span className="text-red-500">*</span>
+            {FACTORY_FORM_LABELS.ADDRESS} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -58,7 +59,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            연락처 <span className="text-red-500">*</span>
+            {FACTORY_FORM_LABELS.CONTACT} <span className="text-red-500">*</span>
           </label>
           <input
             type="tel"
@@ -73,7 +74,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            이메일 <span className="text-red-500">*</span>
+            {FACTORY_FORM_LABELS.EMAIL} <span className="text-red-500">*</span>
           </label>
           <input
             type="email"

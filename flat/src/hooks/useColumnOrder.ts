@@ -60,11 +60,9 @@ export const useColumnOrder = () => {
           const newColumns = DEFAULT_COLUMNS.filter(col => !savedIds.includes(col.id));
           return [...parsed, ...newColumns];
         } else {
-          console.warn('Invalid column data format in localStorage, using defaults');
           return DEFAULT_COLUMNS;
         }
       } catch (error) {
-        console.warn('Failed to parse column data from localStorage:', error);
         return DEFAULT_COLUMNS;
       }
     }
