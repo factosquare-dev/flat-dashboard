@@ -1,1 +1,0 @@
-console.log('현재 프로젝트 날짜 확인:'); const db = JSON.parse(localStorage.getItem('flat_mock_db') || '{}'); Object.values(db.projects || {}).forEach(p => console.log(`${p.name}: ${p.startDate} ~ ${p.endDate} (Type: ${p.type})`));

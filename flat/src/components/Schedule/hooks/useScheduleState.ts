@@ -78,7 +78,7 @@ export const useScheduleState = (
         }
       }
     } catch (error) {
-      console.warn('[Schedule] Failed to get master project dates, using current project dates');
+      // Silently fall back to current project dates
     }
 
     return { startDate: projectStartDate, endDate: projectEndDate };
@@ -98,10 +98,6 @@ export const useScheduleState = (
     // 고정 패딩: Master 프로젝트 기간의 15% (최소 7일, 최대 21일)
     const padding = Math.max(7, Math.min(21, Math.ceil(projectDuration * 0.15)));
     
-    console.log(`[Schedule] Using Master project dates for Gantt chart:`);
-    console.log(`[Schedule] Master: ${projectStart.toISOString().split('T')[0]} - ${projectEnd.toISOString().split('T')[0]} (${projectDuration} days)`);
-    console.log(`[Schedule] Gantt chart: ${new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]} - ${new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]} (padding: ${padding} days)`);
-    
     startDate = new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000));
     endDate = new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000));
   } else {
@@ -118,8 +114,6 @@ export const useScheduleState = (
   
   // 일관된 사용자 경험을 위한 고정 셀 크기
   const cellWidth = 50; // 모든 프로젝트에서 동일한 셀 크기 유지
-  
-  console.log(`[Schedule] 📅 Total days: ${days.length}, cellWidth: ${cellWidth}px (fixed for consistent UX)`);
 
   const dateRange: DateRange = {
     startDate,

@@ -439,18 +439,11 @@ export const seedData = {
     const master2Start = new Date(baseStartDate.getTime() + (14 * 24 * 60 * 60 * 1000));
     const master2End = new Date(master2Start.getTime() + (60 * 24 * 60 * 60 * 1000));
 
-    // Force debug output to verify dates are calculated correctly
-    console.log('[SeedData] Date verification:');
-    console.log(`Master1: ${master1Start.toISOString().split('T')[0]} - ${master1End.toISOString().split('T')[0]} (${Math.ceil((master1End.getTime() - master1Start.getTime()) / (1000 * 60 * 60 * 24))} days)`);
-    console.log(`Sub1: ${sub1Start.toISOString().split('T')[0]} - ${sub1End.toISOString().split('T')[0]} (${Math.ceil((sub1End.getTime() - sub1Start.getTime()) / (1000 * 60 * 60 * 24))} days)`);
-    
     // Validation: Ensure Sub project is within Master
     if (sub1Start < master1Start || sub1End > master1End) {
-      console.error('[SeedData] ERROR: Sub project dates are outside Master project range!');
+      console.error('[SeedData] Sub project dates are outside Master project range');
       console.error(`Master1: ${master1Start.toISOString().split('T')[0]} - ${master1End.toISOString().split('T')[0]}`);
       console.error(`Sub1: ${sub1Start.toISOString().split('T')[0]} - ${sub1End.toISOString().split('T')[0]}`);
-    } else {
-      console.log('[SeedData] SUCCESS: Sub project is within Master project dates');
     }
 
     const masterProjects: Project[] = [
