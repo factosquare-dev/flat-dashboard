@@ -45,17 +45,24 @@ export const useScheduleState = (
   initialTasks?: Task[],
   projectId?: string
 ) => {
+  console.log('[useScheduleState] Received dates:', { projectStartDate, projectEndDate });
+  
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Master 프로젝트 날짜 찾기 (Sub 프로젝트인 경우 부모 Master 날짜 사용)
-  const masterProjectDates = useMemo(() => {
+  // Sub 프로젝트들의 날짜 범위 찾기 (Master는 그룹이므로 Sub들의 전체 범위 사용)
+  const projectDateRange = useMemo(() => {
+    // 먼저 전달받은 날짜가 있으면 사용
+    if (projectStartDate && projectEndDate) {
+      return { startDate: projectStartDate, endDate: projectEndDate };
+    }
+    
     if (!projectId) {
       return { startDate: projectStartDate, endDate: projectEndDate };
     }
 
     try {
-      // MockDB에서 현재 프로젝트 정보 가져오기
+      // MockDB에서 프로젝트 정보 가져오기
       const database = JSON.parse(localStorage.getItem('flat_mock_db') || '{}');
       const projects = database.projects || {};
       
@@ -67,30 +74,51 @@ export const useScheduleState = (
         }
       }
 
-      if (targetProject && targetProject.type === ProjectType.SUB && targetProject.parentId) {
-        // Sub 프로젝트인 경우 부모 Master 프로젝트 날짜 사용
-        const masterProject = projects[targetProject.parentId] as any;
-        if (masterProject) {
-          return {
-            startDate: masterProject.startDate,
-            endDate: masterProject.endDate
-          };
+      if (targetProject) {
+        // Master 프로젝트인 경우 하위 Sub 프로젝트들의 날짜 범위 계산
+        if (targetProject.type === ProjectType.MASTER) {
+          const subProjects = Object.values(projects).filter((p: any) => 
+            p.parentId === projectId && p.type === ProjectType.SUB
+          );
+          
+          if (subProjects.length > 0) {
+            const dates = subProjects.flatMap((p: any) => [
+              new Date(p.startDate),
+              new Date(p.endDate)
+            ]);
+            
+            const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+            const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+            
+            return {
+              startDate: minDate.toISOString().split('T')[0],
+              endDate: maxDate.toISOString().split('T')[0]
+            };
+          }
         }
+        
+        // Sub 프로젝트이거나 하위 프로젝트가 없는 경우 현재 프로젝트 날짜 사용
+        return {
+          startDate: targetProject.startDate,
+          endDate: targetProject.endDate
+        };
       }
     } catch (error) {
-      // Silently fall back to current project dates
+      console.error('[useScheduleState] Error getting project dates:', error);
     }
 
     return { startDate: projectStartDate, endDate: projectEndDate };
   }, [projectId, projectStartDate, projectEndDate]);
   
-  // 간트차트 크기를 Master 프로젝트 기간 기준으로 계산
+  // 간트차트 크기를 프로젝트 기간 기준으로 계산
   let startDate: Date;
   let endDate: Date;
   
-  if (masterProjectDates.startDate && masterProjectDates.endDate) {
-    const projectStart = new Date(masterProjectDates.startDate);
-    const projectEnd = new Date(masterProjectDates.endDate);
+  console.log('[useScheduleState] Using project date range:', projectDateRange);
+  
+  if (projectDateRange.startDate && projectDateRange.endDate) {
+    const projectStart = new Date(projectDateRange.startDate);
+    const projectEnd = new Date(projectDateRange.endDate);
     
     // 프로젝트 기간 계산
     const projectDuration = Math.ceil((projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24));
@@ -131,6 +159,12 @@ export const useScheduleState = (
     days,
     cellWidth
   };
+  
+  console.log('[useScheduleState] Final date range:', {
+    startDate: startDate.toISOString().split('T')[0],
+    endDate: endDate.toISOString().split('T')[0],
+    daysCount: days.length
+  });
 
   // 색상 배열 정의 (실제 색상 값) - useMemo로 최적화
   const colors = useMemo(() => [
@@ -150,8 +184,8 @@ export const useScheduleState = (
   const initialProjects = participants && participants.length > 0 ? participants : 
     factories.slice(0, 10).map((factory, index) => {
       // 프로젝트 기간 내에서 공장별 작업 기간 분배
-      const projectStart = new Date(masterProjectDates.startDate || projectStartDate);
-      const projectEnd = new Date(masterProjectDates.endDate || projectEndDate);
+      const projectStart = new Date(projectDateRange.startDate || projectStartDate);
+      const projectEnd = new Date(projectDateRange.endDate || projectEndDate);
       const projectDuration = (projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24);
       
       // 각 공장의 작업을 프로젝트 기간 내에 균등 분배

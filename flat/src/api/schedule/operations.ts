@@ -30,6 +30,8 @@ export const getOrCreateScheduleForProject = async (
             projectId: existingSchedule.projectId,
             participants: legacyData.participants,
             tasks: legacyData.tasks,
+            startDate: legacyData.startDate,
+            endDate: legacyData.endDate,
             createdAt: existingSchedule.createdAt.toISOString(),
             updatedAt: existingSchedule.updatedAt.toISOString()
           };
