@@ -423,34 +423,28 @@ export const seedData = {
    * NO MORE HARDCODED DATES!
    */
   createSynchronizedProjects(customer1: Customer, customer2: Customer, pmUser: User, currentDate: Date) {
-    console.log('[SeedData] 🗓️ Creating synchronized projects with PROPER date hierarchy (no hardcoding!)');
-
-    // Calculate dynamic start dates based on current date + 1 week (realistic project planning)
+    // Calculate dynamic start dates based on current date + 1 week
     const baseStartDate = new Date(currentDate);
-    baseStartDate.setDate(baseStartDate.getDate() + 7); // Projects start next week
+    baseStartDate.setDate(baseStartDate.getDate() + 7);
 
-    // ✅ Master Project 1: 프리미엄 화장품 라인 A (90 days = 3 months)
+    // Master Project 1: 90 days duration
     const master1Start = new Date(baseStartDate);
-    const master1End = new Date(master1Start.getTime() + (90 * 24 * 60 * 60 * 1000)); // Safe 90 days addition
+    const master1End = new Date(master1Start.getTime() + (90 * 24 * 60 * 60 * 1000));
 
-    // ✅ Sub Project: MUST be within Master dates - starts 30 days after master, ends 15 days before master
-    const sub1Start = new Date(master1Start.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days after master start
-    const sub1End = new Date(master1End.getTime() - (15 * 24 * 60 * 60 * 1000));   // 15 days before master end
+    // Sub Project: within Master dates - starts with master, ends with master
+    const sub1Start = new Date(master1Start);
+    const sub1End = new Date(master1End);
 
-    // ✅ Master Project 2: 천연 샴푸 시리즈 (60 days = 2 months)
-    const master2Start = new Date(baseStartDate.getTime() + (14 * 24 * 60 * 60 * 1000)); // 14 days after base
-    const master2End = new Date(master2Start.getTime() + (60 * 24 * 60 * 60 * 1000));    // Safe 60 days addition
+    // Master Project 2: 60 days duration
+    const master2Start = new Date(baseStartDate.getTime() + (14 * 24 * 60 * 60 * 1000));
+    const master2End = new Date(master2Start.getTime() + (60 * 24 * 60 * 60 * 1000));
 
-    // ✅ Validation: Ensure Sub project is within Master
+    // Validation: Ensure Sub project is within Master
     if (sub1Start < master1Start || sub1End > master1End) {
-      console.error('❌ [SeedData] Sub project dates are outside Master project range!');
+      console.error('[SeedData] Sub project dates are outside Master project range');
       console.error(`Master1: ${master1Start.toISOString().split('T')[0]} - ${master1End.toISOString().split('T')[0]}`);
       console.error(`Sub1: ${sub1Start.toISOString().split('T')[0]} - ${sub1End.toISOString().split('T')[0]}`);
     }
-
-    console.log(`[SeedData] ✅ Master1: ${master1Start.toISOString().split('T')[0]} - ${master1End.toISOString().split('T')[0]} (90 days)`);
-    console.log(`[SeedData] ✅ Sub1: ${sub1Start.toISOString().split('T')[0]} - ${sub1End.toISOString().split('T')[0]} (within Master1)`);
-    console.log(`[SeedData] ✅ Master2: ${master2Start.toISOString().split('T')[0]} - ${master2End.toISOString().split('T')[0]} (60 days)`);
 
     const masterProjects: Project[] = [
       {
@@ -611,9 +605,6 @@ export const seedData = {
     const projectEndDate = new Date(project.endDate);
     const projectDurationDays = Math.ceil((projectEndDate.getTime() - projectStartDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    console.log(`[SeedData] 🏭 Creating tasks for ${project.product.name} (${projectDurationDays} days)`);
-    console.log(`[SeedData] 📅 Project dates: ${projectStartDate.toISOString().split('T')[0]} - ${projectEndDate.toISOString().split('T')[0]}`);
-    
     // Collect all factory types and their tasks dynamically
     const projectFactoryTypes: string[] = [];
     
@@ -647,7 +638,6 @@ export const seedData = {
     projectFactoryTypes.forEach((factoryType, factoryIndex) => {
       const factoryTasks = taskTypesByFactoryType[factoryType as keyof typeof taskTypesByFactoryType] || [];
       
-      console.log(`[SeedData] 🏭 Adding ${factoryTasks.length} tasks for ${factoryType} factory`);
       
       factoryTasks.forEach((taskTitle, taskIndex) => {
         const template = {
@@ -672,9 +662,7 @@ export const seedData = {
     const totalTaskDuration = taskTemplates.reduce((sum, template) => sum + template.duration, 0);
     const scaleFactor = Math.max(0.8, Math.min(1.2, projectDurationDays / totalTaskDuration)); // 80%-120% scaling
     
-    console.log(`[SeedData] ⚖️ Scaling tasks: ${totalTaskDuration} days -> ${Math.round(totalTaskDuration * scaleFactor)} days (factor: ${scaleFactor.toFixed(2)})`);
-
-    // ✅ Distribute tasks across project timeline with proper synchronization
+    // Distribute tasks across project timeline with proper synchronization
     let currentStartDate = new Date(projectStartDate);
     
     taskTemplates.forEach((template, index) => {
@@ -719,9 +707,6 @@ export const seedData = {
       }
     });
 
-    console.log(`[SeedData] 🏭 Created ${tasks.length} synchronized tasks for ${project.product.name}`);
-    console.log(`[SeedData] 📅 Tasks span: ${tasks[0]?.startDate.toISOString().split('T')[0]} - ${tasks[tasks.length - 1]?.endDate.toISOString().split('T')[0]}`);
-    
     return tasks;
   },
 
