@@ -35,6 +35,9 @@ export const getOrCreateScheduleForProject = async (
         if (existingSchedule) {
           console.log('[getOrCreateScheduleForProject] 8. Returning existing schedule from DB');
           
+          // Get project data first
+          const projectData = database.projects.get(existingSchedule.projectId);
+          
           // Get assigned factory IDs for this project
           const assignedFactoryIds = new Set<string>();
           if (projectData) {
@@ -69,7 +72,6 @@ export const getOrCreateScheduleForProject = async (
           
           // Get participants from project factories
           const participants = [];
-          const projectData = database.projects.get(existingSchedule.projectId);
           
           if (projectData) {
             if (projectData.manufacturerId && projectData.manufacturerId !== null) {
