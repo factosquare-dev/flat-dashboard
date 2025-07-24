@@ -184,11 +184,11 @@ function calculateTaskTiming(
       const endDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // Ends in 7 days
       return { startDate, endDate };
     } else if (taskIndex === completedTasks + 1 && completedTasks < totalTasks - 1) {
-      // Next task also spans today for better UX (shows multiple current stages)
+      // Next task starts after current task ends (no overlap)
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const startDate = new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000); // Started 2 days ago
-      const endDate = new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000); // Ends in 10 days
+      const startDate = new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000); // Starts after current task ends
+      const endDate = new Date(today.getTime() + 20 * 24 * 60 * 60 * 1000); // Ends in 20 days
       return { startDate, endDate };
     } else {
       // Future tasks

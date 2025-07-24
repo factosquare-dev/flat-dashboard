@@ -9,6 +9,47 @@ import { createMockSchedules } from '../../data/mockSchedules';
 import { mockDataService } from '../../services/mockDataService';
 
 /**
+ * Fix overlapping tasks by adjusting their dates
+ */
+function fixOverlappingTasks(tasks: any[]): any[] {
+  if (tasks.length === 0) return tasks;
+  
+  // Sort tasks by start date
+  const sortedTasks = [...tasks].sort((a, b) => 
+    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  );
+  
+  // Fix overlaps
+  for (let i = 1; i < sortedTasks.length; i++) {
+    const prevTask = sortedTasks[i - 1];
+    const currentTask = sortedTasks[i];
+    
+    const prevEnd = new Date(prevTask.endDate);
+    const currentStart = new Date(currentTask.startDate);
+    
+    // If tasks overlap, adjust current task to start after previous ends
+    if (currentStart <= prevEnd) {
+      const newStartDate = new Date(prevEnd);
+      newStartDate.setDate(newStartDate.getDate() + 1); // Add 1 day gap
+      
+      const duration = Math.ceil(
+        (new Date(currentTask.endDate).getTime() - new Date(currentTask.startDate).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      
+      const newEndDate = new Date(newStartDate);
+      newEndDate.setDate(newEndDate.getDate() + duration);
+      
+      currentTask.startDate = formatDateISO(newStartDate);
+      currentTask.endDate = formatDateISO(newEndDate);
+      
+      console.log(`[fixOverlappingTasks] Adjusted task ${currentTask.id} to avoid overlap with ${prevTask.id}`);
+    }
+  }
+  
+  return sortedTasks;
+}
+
+/**
  * 프로젝트로부터 스케줄 생성 또는 조회
  */
 export const getOrCreateScheduleForProject = async (
@@ -83,9 +124,13 @@ export const getOrCreateScheduleForProject = async (
             });
           
           console.log('[getOrCreateScheduleForProject] 13. Tasks after factory filter:', scheduleTasks.length);
+          
+          // Fix overlapping tasks
+          const fixedTasks = fixOverlappingTasks(scheduleTasks);
+          
           // Log task details in a table format for better readability
           console.log('[getOrCreateScheduleForProject] 13a. Task details:');
-          console.table(scheduleTasks.map(t => ({
+          console.table(fixedTasks.map(t => ({
             id: t.id,
             taskType: t.taskType,
             startDate: t.startDate,
@@ -137,13 +182,13 @@ export const getOrCreateScheduleForProject = async (
           }
           
           console.log('[getOrCreateScheduleForProject] 14. Final participants:', participants.length);
-          console.log('[getOrCreateScheduleForProject] 15. Final tasks:', scheduleTasks.length);
+          console.log('[getOrCreateScheduleForProject] 15. Final tasks:', fixedTasks.length);
           
           const result = {
             id: existingSchedule.id,
             projectId: existingSchedule.projectId,
             participants: participants,
-            tasks: scheduleTasks,
+            tasks: fixedTasks,
             startDate: typeof existingSchedule.startDate === 'string' ? existingSchedule.startDate : formatDateISO(new Date(existingSchedule.startDate)),
             endDate: typeof existingSchedule.endDate === 'string' ? existingSchedule.endDate : formatDateISO(new Date(existingSchedule.endDate)),
             createdAt: typeof existingSchedule.createdAt === 'string' ? existingSchedule.createdAt : existingSchedule.createdAt.toISOString(),
