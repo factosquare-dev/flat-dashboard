@@ -1,14 +1,32 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { Project } from '../components/GanttChart/types';
-import { getGanttMockProjects } from '../data/ganttMockData';
+import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+
+// Helper to get projects from MockDB
+const getProjectsFromMockDB = (): Project[] => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    if (!database?.projects) return [];
+    
+    const projects = Array.from(database.projects.values());
+    return projects.slice(0, 5).map((project, index) => ({
+      id: project.id,
+      name: `${project.name} - ${project.product.name}`,
+      color: ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-cyan-500'][index % 5],
+      expanded: false,
+      tasks: []
+    }));
+  } catch (error) {
+    console.error('[useGanttData] Error loading from MockDB:', error);
+    return [];
+  }
+};
 
 export const useGanttData = () => {
   const [projects, setProjects] = useState<Project[]>(() => {
-    console.log('[useGanttData] 🚨 Initializing with getGanttMockProjects...');
-    const initialProjects = getGanttMockProjects();
-    console.log('[useGanttData] 🚨 Initial projects:', initialProjects);
-    console.log('[useGanttData] 🚨 Initial project names:', initialProjects.map(p => p.name));
-    return initialProjects;
+    return getProjectsFromMockDB();
   });
 
   // Calculate total rows for grid layout - memoized for performance
@@ -94,8 +112,7 @@ export const useGanttData = () => {
 
   // Refresh projects from mock data (for resetMockData)
   const refreshProjects = useCallback(() => {
-    console.log('[useGanttData] Refreshing projects from mock data...');
-    setProjects(getGanttMockProjects());
+    setProjects(getProjectsFromMockDB());
   }, []);
 
   return {

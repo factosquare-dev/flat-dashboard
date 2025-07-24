@@ -12,6 +12,17 @@ export const GANTT_CONSTANTS: GanttConstants = {
   SIDEBAR_WIDTH: 192, // w-48 = 12rem = 192px
 };
 
-export const baseDate = new Date("2025-07-01");
-export const endDate = new Date("2025-08-31");
+// Dynamic dates - will be calculated based on project data
+export const getDateRange = () => {
+  const today = new Date();
+  const baseDate = new Date(today);
+  baseDate.setDate(baseDate.getDate() - 7); // Start 1 week ago
+  
+  const endDate = new Date(today);
+  endDate.setMonth(endDate.getMonth() + 3); // End 3 months from now
+  
+  return { baseDate, endDate };
+};
+
+export const { baseDate, endDate } = getDateRange();
 export const totalDays = Math.floor((endDate.getTime() - baseDate.getTime()) / TIME_CONSTANTS.DAY) + 1;

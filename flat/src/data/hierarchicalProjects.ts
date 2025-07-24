@@ -1,6 +1,5 @@
 import type { Project } from '../types/project';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { staticHierarchicalProjects } from './hierarchicalProjectsStatic';
 
 // Get projects from mock database instead of hardcoded data
 const getHierarchicalProjects = (): Project[] => {
@@ -9,14 +8,14 @@ const getHierarchicalProjects = (): Project[] => {
     
     // Check if database is properly initialized
     if (!db || typeof db.getDatabase !== 'function') {
-      console.warn('[hierarchicalProjects] Mock database not initialized, using static data');
-      return staticHierarchicalProjects;
+      console.error('[hierarchicalProjects] Mock database not initialized');
+      return [];
     }
     
     const database = db.getDatabase();
     if (!database || !database.projects || database.projects.size === 0) {
-      console.warn('[hierarchicalProjects] Database projects not available, using static data');
-      return staticHierarchicalProjects;
+      console.error('[hierarchicalProjects] Database projects not available');
+      return [];
     }
     
     const projects = Array.from(database.projects.values());
@@ -104,7 +103,7 @@ const getHierarchicalProjects = (): Project[] => {
   });
   } catch (error) {
     console.error('[hierarchicalProjects] Error getting hierarchical projects:', error);
-    return staticHierarchicalProjects;
+    return [];
   }
 };
 
