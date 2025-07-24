@@ -10,6 +10,12 @@ import { User } from '@/types/user';
 import { Factory } from '@/types/factory';
 import { Schedule, Task } from '@/types/schedule';
 import type { Comment } from '@/types/comment';
+import { 
+  validateSubProjectSync, 
+  syncSubWithMaster, 
+  updateSubProjectsFromMaster,
+  MASTER_SUB_SYNC_FIELDS
+} from '@/utils/projectValidation';
 
 export interface ProjectWithRelations extends Project {
   users?: Array<User & { role: string; assignedAt: Date }>;
@@ -62,6 +68,38 @@ export class ProjectService extends BaseService<Project> {
       };
     }
     
+    // If creating SUB project with parentId, validate and sync fields from MASTER
+    if (validatedData.type === ProjectType.SUB && validatedData.parentId) {
+      const masterResult = await this.getById(validatedData.parentId);
+      if (!masterResult.success || !masterResult.data) {
+        return {
+          success: false,
+          error: 'Parent MASTER project not found',
+        };
+      }
+      
+      const masterProject = masterResult.data;
+      if (masterProject.type !== ProjectType.MASTER) {
+        return {
+          success: false,
+          error: 'Parent project must be a MASTER project',
+        };
+      }
+      
+      // Validate SUB project fields against MASTER
+      const validation = validateSubProjectSync(validatedData, masterProject);
+      if (!validation.isValid) {
+        return {
+          success: false,
+          error: `SUB project validation failed: ${validation.errors.join(', ')}`,
+        };
+      }
+      
+      // Sync required fields from MASTER
+      const syncedData = syncSubWithMaster(validatedData, masterProject);
+      return super.create(syncedData as Omit<Project, 'id' | 'createdAt' | 'updatedAt'>);
+    }
+    
     return super.create(validatedData);
   }
 
@@ -69,6 +107,14 @@ export class ProjectService extends BaseService<Project> {
    * Override update to add validation for project type and parentId
    */
   async update(id: string, data: Partial<Project>): Promise<DbResponse<Project>> {
+    // Get current project to check its type
+    const currentProjectResult = await this.getById(id);
+    if (!currentProjectResult.success || !currentProjectResult.data) {
+      return currentProjectResult;
+    }
+    
+    const currentProject = currentProjectResult.data;
+    
     // Validate project type and parentId relationship
     const validatedData = { ...data };
     
@@ -91,6 +137,54 @@ export class ProjectService extends BaseService<Project> {
         success: false,
         error: 'Only SUB projects can have a parent project',
       };
+    }
+    
+    // If updating a MASTER project, cascade sync fields to all SUB projects
+    if (currentProject.type === ProjectType.MASTER) {
+      const hasChangedSyncFields = MASTER_SUB_SYNC_FIELDS.some(
+        field => validatedData[field] !== undefined
+      );
+      
+      if (hasChangedSyncFields || validatedData.startDate || validatedData.endDate) {
+        // Get all projects to find SUB projects
+        const allProjectsResult = await this.getAll();
+        if (allProjectsResult.success && allProjectsResult.data) {
+          const updates = updateSubProjectsFromMaster(
+            { ...currentProject, ...validatedData },
+            validatedData,
+            allProjectsResult.data
+          );
+          
+          // Apply updates to all affected SUB projects
+          for (const { project: subProject, updates: subUpdates } of updates) {
+            await super.update(subProject.id, subUpdates);
+          }
+        }
+      }
+    }
+    
+    // If updating SUB project with parentId, validate against MASTER
+    if (currentProject.type === ProjectType.SUB && currentProject.parentId) {
+      const masterResult = await this.getById(currentProject.parentId);
+      if (masterResult.success && masterResult.data) {
+        const masterProject = masterResult.data;
+        
+        // Create merged data for validation
+        const mergedData = { ...currentProject, ...validatedData };
+        
+        // Validate SUB project fields against MASTER
+        const validation = validateSubProjectSync(mergedData, masterProject);
+        if (!validation.isValid) {
+          return {
+            success: false,
+            error: `SUB project validation failed: ${validation.errors.join(', ')}`,
+          };
+        }
+        
+        // Sync required fields from MASTER
+        const syncedData = syncSubWithMaster(validatedData, masterProject);
+        return super.update(id, syncedData);
+      }
     }
     
     return super.update(id, validatedData);
@@ -649,6 +743,142 @@ export class ProjectService extends BaseService<Project> {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch user projects',
+      };
+    }
+  }
+
+  /**
+   * Sync all SUB projects when MASTER project changes
+   */
+  async syncSubProjectsWithMaster(masterId: string): Promise<DbResponse<number>> {
+    try {
+      const masterResult = await this.getById(masterId);
+      if (!masterResult.success || !masterResult.data) {
+        return {
+          success: false,
+          error: 'MASTER project not found',
+        };
+      }
+      
+      const masterProject = masterResult.data;
+      if (masterProject.type !== ProjectType.MASTER) {
+        return {
+          success: false,
+          error: 'Project is not a MASTER project',
+        };
+      }
+      
+      // Get all SUB projects of this MASTER
+      const subProjectsResult = await this.getSubProjects(masterId);
+      if (!subProjectsResult.success || !subProjectsResult.data) {
+        return {
+          success: true,
+          data: 0, // No SUB projects to sync
+        };
+      }
+      
+      let syncedCount = 0;
+      
+      // Sync each SUB project
+      for (const subProject of subProjectsResult.data) {
+        const syncedData = syncSubWithMaster(subProject, masterProject);
+        
+        // Check if any fields need updating
+        const needsUpdate = MASTER_SUB_SYNC_FIELDS.some(
+          field => syncedData[field] !== subProject[field]
+        );
+        
+        if (needsUpdate || 
+            syncedData.startDate !== subProject.startDate || 
+            syncedData.endDate !== subProject.endDate) {
+          const updateResult = await super.update(subProject.id, syncedData);
+          if (updateResult.success) {
+            syncedCount++;
+          }
+        }
+      }
+      
+      return {
+        success: true,
+        data: syncedCount,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to sync SUB projects',
+      };
+    }
+  }
+
+  /**
+   * Validate MASTER-SUB field consistency
+   */
+  async validateMasterSubConsistency(projectId: string): Promise<DbResponse<{ isValid: boolean; errors: string[] }>> {
+    try {
+      const projectResult = await this.getById(projectId);
+      if (!projectResult.success || !projectResult.data) {
+        return {
+          success: false,
+          error: 'Project not found',
+        };
+      }
+      
+      const project = projectResult.data;
+      
+      // If it's a SUB project with parent, validate against MASTER
+      if (project.type === ProjectType.SUB && project.parentId) {
+        const masterResult = await this.getById(project.parentId);
+        if (!masterResult.success || !masterResult.data) {
+          return {
+            success: false,
+            error: 'Parent MASTER project not found',
+          };
+        }
+        
+        const validation = validateSubProjectSync(project, masterResult.data);
+        return {
+          success: true,
+          data: validation,
+        };
+      }
+      
+      // If it's a MASTER project, validate all SUB projects
+      if (project.type === ProjectType.MASTER) {
+        const subProjectsResult = await this.getSubProjects(project.id);
+        if (!subProjectsResult.success || !subProjectsResult.data) {
+          return {
+            success: true,
+            data: { isValid: true, errors: [] },
+          };
+        }
+        
+        const allErrors: string[] = [];
+        
+        for (const subProject of subProjectsResult.data) {
+          const validation = validateSubProjectSync(subProject, project);
+          if (!validation.isValid) {
+            allErrors.push(`${subProject.name}: ${validation.errors.join(', ')}`);
+          }
+        }
+        
+        return {
+          success: true,
+          data: {
+            isValid: allErrors.length === 0,
+            errors: allErrors,
+          },
+        };
+      }
+      
+      // Independent projects are always valid
+      return {
+        success: true,
+        data: { isValid: true, errors: [] },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to validate consistency',
       };
     }
   }
