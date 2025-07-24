@@ -423,21 +423,20 @@ export const seedData = {
    * NO MORE HARDCODED DATES!
    */
   createSynchronizedProjects(customer1: Customer, customer2: Customer, pmUser: User, currentDate: Date) {
-    // Calculate dynamic start dates based on current date + 1 week
-    const baseStartDate = new Date(currentDate);
-    baseStartDate.setDate(baseStartDate.getDate() + 7);
+    // Fixed date approach for testing - use 2025-02-01 as base
+    const baseStartDate = new Date('2025-02-01');
 
-    // Master Project 1: 90 days duration
+    // Master Project 1: exactly 90 days (2025-02-01 to 2025-05-02)
     const master1Start = new Date(baseStartDate);
-    const master1End = new Date(master1Start.getTime() + (90 * 24 * 60 * 60 * 1000));
+    const master1End = new Date('2025-05-02'); // Fixed end date
 
-    // Sub Project: within Master dates - shorter period inside Master
-    const sub1Start = new Date(master1Start.getTime() + (20 * 24 * 60 * 60 * 1000)); // 20 days after master start
-    const sub1End = new Date(master1End.getTime() - (20 * 24 * 60 * 60 * 1000));   // 20 days before master end
-
+    // Sub Project: definitely within Master - starts Feb 21, ends Apr 12
+    const sub1Start = new Date('2025-02-21'); // 20 days after master start
+    const sub1End = new Date('2025-04-12');   // 20 days before master end
+    
     // Master Project 2: 60 days duration
-    const master2Start = new Date(baseStartDate.getTime() + (14 * 24 * 60 * 60 * 1000));
-    const master2End = new Date(master2Start.getTime() + (60 * 24 * 60 * 60 * 1000));
+    const master2Start = new Date('2025-02-15');
+    const master2End = new Date('2025-04-16');
 
     // Validation: Ensure Sub project is within Master
     if (sub1Start < master1Start || sub1End > master1End) {
