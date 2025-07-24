@@ -2,22 +2,39 @@ import { useState, useCallback, useMemo } from 'react';
 import type { Project } from '../components/GanttChart/types';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 
-// Helper to get projects from MockDB
+// Helper to get projects from MockDB with real dates and tasks
 const getProjectsFromMockDB = (): Project[] => {
   try {
     const db = MockDatabaseImpl.getInstance();
     const database = db.getDatabase();
     
-    if (!database?.projects) return [];
+    if (!database?.projects || !database?.tasks) return [];
     
     const projects = Array.from(database.projects.values());
-    return projects.slice(0, 5).map((project, index) => ({
-      id: project.id,
-      name: `${project.name} - ${project.product.name}`,
-      color: ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-cyan-500'][index % 5],
-      expanded: false,
-      tasks: []
-    }));
+    const tasks = Array.from(database.tasks.values());
+    
+    return projects.slice(0, 5).map((project, index) => {
+      // Get tasks for this project
+      const projectTasks = tasks
+        .filter(task => task.scheduleId === project.scheduleId || task.scheduleId?.includes(project.id))
+        .map(task => ({
+          id: task.id,
+          title: task.title,
+          projectId: project.id,
+          startDate: task.startDate.toISOString().split('T')[0],
+          endDate: task.endDate.toISOString().split('T')[0],
+          status: task.status,
+          progress: task.progress
+        }));
+
+      return {
+        id: project.id,
+        name: `${project.name} - ${project.product.name}`,
+        color: ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-cyan-500'][index % 5],
+        expanded: false,
+        tasks: projectTasks
+      };
+    });
   } catch (error) {
     console.error('[useGanttData] Error loading from MockDB:', error);
     return [];
