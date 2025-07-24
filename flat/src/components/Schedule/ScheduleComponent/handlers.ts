@@ -7,12 +7,60 @@ import { projectColors } from '../../../data/mockData';
 export const createProjectHandlers = (
   projects: Participant[],
   setProjects: React.Dispatch<React.SetStateAction<Participant[]>>,
-  taskControls: any
+  taskControls: any,
+  currentProjectId?: string
 ) => {
   const handleDeleteProject = (projectId: string) => {
     if (confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) {
+      // 삭제할 프로젝트 찾기
+      const projectToDelete = projects.find(p => p.id === projectId);
+      if (!projectToDelete) return;
+      
+      console.log('[Delete Project] Deleting:', {
+        projectId,
+        projectName: projectToDelete.name,
+        currentTasks: taskControls.tasks.length
+      });
+      
+      // 프로젝트 삭제
       setProjects(projects.filter(p => p.id !== projectId));
-      taskControls.setTasks(taskControls.tasks.filter((t: Task) => t.projectId !== projectId));
+      
+      // 안전성을 위해 projectId와 factoryId 모두 확인
+      const remainingTasks = taskControls.tasks.filter((t: Task) => {
+        // 1. 다른 프로젝트의 태스크 보호
+        // currentProjectId가 있고, 태스크의 projectId가 현재 프로젝트와 다르면 보호
+        if (currentProjectId && t.projectId && t.projectId !== currentProjectId) {
+          console.log('[Delete Project] Protecting task from different project:', {
+            taskId: t.id,
+            taskProjectId: t.projectId,
+            currentProjectId: currentProjectId
+          });
+          return true; // 다른 프로젝트의 태스크는 유지
+        }
+        
+        // 2. factoryId가 일치하는 태스크만 삭제
+        const shouldRemove = t.factoryId === projectId;
+          
+        if (shouldRemove) {
+          console.log('[Delete Project] Removing task:', {
+            taskId: t.id,
+            taskTitle: t.title,
+            taskProjectId: t.projectId,
+            taskFactoryId: t.factoryId,
+            deletingFactoryId: projectId,
+            currentProjectId: currentProjectId
+          });
+        }
+        
+        return !shouldRemove;
+      });
+      
+      console.log('[Delete Project] Result:', {
+        tasksRemoved: taskControls.tasks.length - remainingTasks.length,
+        remainingTasks: remainingTasks.length
+      });
+      
+      taskControls.setTasks(remainingTasks);
     }
   };
 

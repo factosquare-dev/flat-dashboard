@@ -107,7 +107,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
 
   return (
     <div 
-      className="bg-white flex h-full overflow-hidden relative"
+      className="bg-white flex h-full relative"
       onMouseMove={props.onMouseMove}
       onMouseUp={props.onMouseUp}
     >

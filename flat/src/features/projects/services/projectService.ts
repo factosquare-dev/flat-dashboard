@@ -1,6 +1,7 @@
 import { apiClient } from '../../common/services';
 import type { Project, ProjectFilter, ProjectFormData, ProjectMetrics } from '../types';
 import type { ApiResponse, PaginationParams, SortParams } from '../../common/types';
+import type { Project as ProjectModel, ProjectType } from '../../../types/project';
 
 class ProjectService {
   private readonly basePath = '/projects';
@@ -28,8 +29,26 @@ class ProjectService {
     return apiClient.post(this.basePath, data);
   }
 
-  async updateProject(id: string, data: Partial<ProjectFormData>): Promise<ApiResponse<Project>> {
-    return apiClient.patch(`${this.basePath}/${id}`, data);
+  async updateProject(id: string, data: Partial<ProjectModel>): Promise<ApiResponse<Project>> {
+    // Validate project type and parentId relationship
+    const validatedData = { ...data };
+    
+    // If updating to MASTER type, ensure parentId is removed
+    if (validatedData.type === ProjectType.MASTER && validatedData.parentId) {
+      delete validatedData.parentId;
+    }
+    
+    // If project has parentId but type is MASTER, throw error
+    if (validatedData.type === ProjectType.MASTER && validatedData.parentId !== undefined && validatedData.parentId !== null) {
+      throw new Error('MASTER projects cannot have a parent project');
+    }
+    
+    // Only SUB projects can have parentId
+    if (validatedData.parentId && validatedData.type && validatedData.type !== ProjectType.SUB) {
+      throw new Error('Only SUB projects can have a parent project');
+    }
+    
+    return apiClient.patch(`${this.basePath}/${id}`, validatedData);
   }
 
   async deleteProject(id: string): Promise<ApiResponse<void>> {

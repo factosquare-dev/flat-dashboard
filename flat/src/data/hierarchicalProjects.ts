@@ -1,5 +1,8 @@
 import type { Project } from '../types/project';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import { calculateProgressFromTasks } from '../utils/progressCalculator';
+import type { Task } from '../types/schedule';
+import { debugHierarchyIssue } from '../utils/debugHierarchy';
 
 // Get projects from mock database instead of hardcoded data
 const getHierarchicalProjects = (): Project[] => {
@@ -31,12 +34,21 @@ const getHierarchicalProjects = (): Project[] => {
       firstProject: projects[0],
       customers: customers.map(c => ({id: c.id, name: c.name}))
     });
+    
+    // Debug hierarchy issues
+    debugHierarchyIssue();
   
   // Build hierarchical structure
-  const masterProjects = projects.filter(p => p.type === 'MASTER');
+  // MASTER projects should never have a parentId
+  const masterProjects = projects.filter(p => p.type === 'MASTER' && !p.parentId);
   
-  return masterProjects.map(master => {
-    const subProjects = projects.filter(p => p.parentId === master.id);
+  // Independent SUB projects (no parentId)
+  const independentSubProjects = projects.filter(p => p.type === 'SUB' && !p.parentId);
+  
+  // First, add all MASTER projects with their children
+  const hierarchicalProjects = masterProjects.map(master => {
+    // Only get SUB projects as children
+    const subProjects = projects.filter(p => p.type === 'SUB' && p.parentId === master.id);
     
     // Get customer from database
     const masterCustomer = customers.find(c => c.id === master.customerId);
@@ -57,7 +69,8 @@ const getHierarchicalProjects = (): Project[] => {
       manager: users.find(u => u.id === master.createdBy)?.name || 'Unknown',
       productType: master.product.name,
       serviceType: 'OEM' as any, // Default service type
-      currentStage: getStagesFromProgress(master.progress),
+      currentStage: getStagesFromTasks(master.scheduleId).stages,
+      progress: getStagesFromTasks(master.scheduleId).progress,
       status: mapProjectStatus(master.status),
       startDate: master.startDate.toISOString().split('T')[0],
       endDate: master.endDate.toISOString().split('T')[0],
@@ -85,7 +98,8 @@ const getHierarchicalProjects = (): Project[] => {
           manager: users.find(u => u.id === sub.createdBy)?.name || 'Unknown',
           productType: sub.product.name,
           serviceType: 'OEM' as any,
-          currentStage: getStagesFromProgress(sub.progress),
+          currentStage: getStagesFromTasks(sub.scheduleId).stages,
+          progress: getStagesFromTasks(sub.scheduleId).progress,
           status: mapProjectStatus(sub.status),
           startDate: sub.startDate.toISOString().split('T')[0],
           endDate: sub.endDate.toISOString().split('T')[0],
@@ -101,6 +115,43 @@ const getHierarchicalProjects = (): Project[] => {
     
     return mappedMaster;
   });
+  
+  // Then, add independent SUB projects as top-level items
+  const independentSubsAsMaster = independentSubProjects.map(sub => {
+    // Get customer from database
+    const subCustomer = customers.find(c => c.id === sub.customerId);
+    const customerName = subCustomer?.name || 'Unknown Customer';
+    
+    // Get factory names for sub project
+    const manufacturerFactory = factories.find(f => f.id === sub.manufacturerId);
+    const containerFactory = factories.find(f => f.id === sub.containerId);
+    const packagingFactory = factories.find(f => f.id === sub.packagingId);
+    
+    return {
+      ...sub,
+      type: 'sub' as any, // Keep as 'sub' to differentiate from real masters
+      level: 0, // Top level
+      isExpanded: false, // SUB projects don't have children
+      client: customerName,
+      manager: users.find(u => u.id === sub.createdBy)?.name || 'Unknown',
+      productType: sub.product.name,
+      serviceType: 'OEM' as any,
+      currentStage: getStagesFromTasks(sub.scheduleId).stages,
+      progress: getStagesFromTasks(sub.scheduleId).progress,
+      status: mapProjectStatus(sub.status),
+      startDate: sub.startDate.toISOString().split('T')[0],
+      endDate: sub.endDate.toISOString().split('T')[0],
+      manufacturer: manufacturerFactory?.name || sub.manufacturerId,
+      container: containerFactory?.name || sub.containerId,
+      packaging: packagingFactory?.name || sub.packagingId,
+      priority: sub.priority,
+      depositPaid: sub.depositStatus === 'received',
+      children: [] // Independent SUB projects don't have children
+    };
+  });
+  
+  // Return combined list: MASTER projects with children + independent SUB projects
+  return [...hierarchicalProjects, ...independentSubsAsMaster];
   } catch (error) {
     console.error('[hierarchicalProjects] Error getting hierarchical projects:', error);
     return [];
@@ -119,14 +170,44 @@ const mapProjectStatus = (status: string): string => {
   return statusMap[status] || status;
 };
 
-// Helper function to get stages from progress
-const getStagesFromProgress = (progress: number): string[] => {
-  if (progress === 0) return ['시작전'];
-  if (progress < 30) return ['설계'];
-  if (progress < 60) return ['설계', '제조'];
-  if (progress < 90) return ['설계', '제조', '포장'];
-  if (progress === 100) return ['완료'];
-  return ['진행중'];
+// Helper function to get stages from tasks
+const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[], progress: number } => {
+  if (!scheduleId) {
+    return { stages: ['시작전'], progress: 0 };
+  }
+  
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    // Get schedule from database
+    const schedule = database.schedules.get(scheduleId);
+    if (!schedule || !schedule.tasks) {
+      return { stages: ['시작전'], progress: 0 };
+    }
+    
+    // Calculate progress and current stages from actual tasks
+    const progressInfo = calculateProgressFromTasks(schedule.tasks as Task[]);
+    
+    // If no current stages (no tasks today), return appropriate stage based on progress
+    if (progressInfo.currentStages.length === 0) {
+      if (progressInfo.progress === 0) {
+        return { stages: ['시작전'], progress: 0 };
+      } else if (progressInfo.progress === 100) {
+        return { stages: ['완료'], progress: 100 };
+      } else {
+        return { stages: ['진행중'], progress: progressInfo.progress };
+      }
+    }
+    
+    return { 
+      stages: progressInfo.currentStages, 
+      progress: progressInfo.progress 
+    };
+  } catch (error) {
+    console.error('[getStagesFromTasks] Error calculating stages:', error);
+    return { stages: ['시작전'], progress: 0 };
+  }
 };
 
 // Lazy load hierarchical projects to avoid initialization issues

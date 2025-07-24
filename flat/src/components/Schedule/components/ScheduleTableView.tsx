@@ -6,14 +6,35 @@ interface ScheduleTableViewProps {
   tasks: Task[];
   onTaskClick?: (task: Task) => void;
   onDeleteProject?: (projectId: string) => void;
+  onTaskDelete?: (taskId: string) => void;
+  onTaskCreate?: () => void;
+  onFactoryDelete?: (factoryId: string) => void;
 }
 
 const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
   projects,
   tasks,
   onTaskClick,
-  onDeleteProject
+  onDeleteProject,
+  onTaskDelete,
+  onTaskCreate,
+  onFactoryDelete
 }) => {
+  // Data validation for Table View
+  React.useEffect(() => {
+    console.log('[Table View Data Update]', {
+      totalTasksReceived: tasks.length,
+      tasksRendered: tasks.length,
+      taskFactories: [...new Set(tasks.map(t => t.factory))],
+      projectsAvailable: projects.map(p => ({ id: p.id, name: p.name })),
+      tasksDetail: tasks.slice(0, 3).map(t => ({
+        id: t.id,
+        factory: t.factory,
+        factoryId: t.factoryId,
+        projectId: t.projectId
+      }))
+    });
+  }, [tasks, projects]);
   // Sort all tasks by start date
   const sortedTasks = useMemo(
     () => [...tasks].sort((a, b) => 
@@ -99,6 +120,11 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
                 담당자
               </span>
             </th>
+            <th className="px-4 py-3 text-center">
+              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                작업
+              </span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -141,7 +167,7 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
                 {/* 담당 공장 */}
                 <td className="px-4 py-3">
                   {project ? (
-                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
+                    <div className="group inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
                          style={{ 
                            backgroundColor: `${project.color}15`,
                            color: project.color
@@ -151,6 +177,22 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
                         style={{ backgroundColor: project.color }}
                       />
                       {project.name}
+                      {onFactoryDelete && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm(`${project.name} 공장과 관련된 모든 작업이 삭제됩니다. 계속하시겠습니까?`)) {
+                              onFactoryDelete(project.id);
+                            }
+                          }}
+                          className="opacity-0 group-hover:opacity-100 ml-1 w-3.5 h-3.5 flex items-center justify-center rounded hover:bg-red-100 transition-opacity"
+                          title="공장 삭제"
+                        >
+                          <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   ) : task.factory ? (
                     <div className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">
@@ -179,12 +221,30 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
                     <span className="text-gray-400 text-xs">-</span>
                   )}
                 </td>
+                
+                {/* 작업 버튼 */}
+                <td className="px-4 py-3 text-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onTaskDelete && confirm('이 작업을 삭제하시겠습니까?')) {
+                        onTaskDelete(task.id);
+                      }
+                    }}
+                    className="inline-flex items-center justify-center w-7 h-7 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="작업 삭제"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </td>
               </tr>
             );
           })}
           {sortedTasks.length === 0 && (
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center">
+              <td colSpan={6} className="px-4 py-8 text-center">
                 <div className="text-gray-500">
                   <div className="text-sm mb-1">등록된 작업이 없습니다</div>
                   <div className="text-xs text-gray-400">새로운 작업을 추가해보세요</div>

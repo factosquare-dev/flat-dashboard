@@ -20,13 +20,26 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
         const x = daysSinceStart * cellWidth;
         const width = Math.max(cellWidth, taskDuration * cellWidth);
         
+        // factoryId가 없는 경우 factory 이름으로 participant 찾기
+        let factoryId = task.factoryId;
+        if (!factoryId && task.factory && participants.length > 0) {
+          const participant = participants.find(p => 
+            p.name === task.factory || 
+            p.name.replace(/\s*\([^)]*\)\s*$/, '').trim() === task.factory
+          );
+          if (participant) {
+            factoryId = participant.id;
+          }
+        }
+        
         return {
           ...task,
           x,
           width,
           color: task.color || 'bg-blue-500',
           originalStartDate: task.startDate,
-          originalEndDate: task.endDate
+          originalEndDate: task.endDate,
+          factoryId: factoryId
         };
       });
     }
@@ -39,7 +52,7 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
     return 1;
   });
 
-  const calculateTaskPosition = (taskStartDate: Date, taskEndDate: Date) => {
+  const calculateTaskPosition = (taskStartDate: Date, taskEndDate: Date): { x: number; width: number } => {
     const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const daysSinceStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const taskDuration = Math.ceil((taskEndDate.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
@@ -55,6 +68,18 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
     const taskEndDate = new Date(task.endDate);
     const { x, width } = calculateTaskPosition(taskStartDate, taskEndDate);
     
+    // factory로 participant 찾기
+    let factoryId = task.factoryId;
+    if (!factoryId && task.factory) {
+      const participant = participants.find(p => 
+        p.name === task.factory || 
+        p.name.replace(/\s*\([^)]*\)\s*$/, '').trim() === task.factory
+      );
+      if (participant) {
+        factoryId = participant.id;
+      }
+    }
+    
     const newTask: Task = {
       ...task,
       id: nextTaskId,
@@ -62,7 +87,8 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
       width,
       color: generateTaskColor(tasks.length),
       originalStartDate: task.startDate,
-      originalEndDate: task.endDate
+      originalEndDate: task.endDate,
+      factoryId: factoryId // factory의 ID만 사용
     };
     
     setTasks([...tasks, newTask]);

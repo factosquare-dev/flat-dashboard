@@ -2,6 +2,7 @@ import React from 'react';
 import type { Participant, Task, ResizePreview } from '../../../types/schedule';
 import { isToday } from '../../../utils/dateUtils';
 import { getProjectRowCount } from '../../../utils/taskUtils';
+import { getTasksForFactory } from '../../../utils/scheduleUtils';
 import TimelineHeader from '../TimelineHeader';
 import ProjectRow from './ProjectRow';
 import DragPreview from './DragPreview';
@@ -54,6 +55,24 @@ const scrollbarStyles = `
 `;
 
 const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
+  // Count total tasks being rendered across all projects
+  React.useEffect(() => {
+    let totalRenderedTasks = 0;
+    const tasksByProject: Record<string, number> = {};
+    
+    props.projects.forEach(project => {
+      const projectTasks = getTasksForFactory(props.tasks, project);
+      tasksByProject[project.name] = projectTasks.length;
+      totalRenderedTasks += projectTasks.length;
+    });
+    
+    console.log('[Gantt Chart Total Render Count]', {
+      totalTasksReceived: props.tasks.length,
+      totalTasksRendered: totalRenderedTasks,
+      tasksByProject,
+      allTaskFactories: [...new Set(props.tasks.map(t => t.factory))]
+    });
+  }, [props.tasks, props.projects]);
   const {
     projects,
     tasks,
@@ -78,13 +97,6 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
     onTaskDelete
   } = props;
 
-  // Debug dragPreview state
-  console.log('[ScheduleTimelineGrid] DragPreview Debug:', {
-    hasDragPreview: !!dragPreview,
-    dragPreview,
-    hasDraggedTask: !!draggedTask,
-    draggedTask: draggedTask ? { id: draggedTask.id, title: draggedTask.title } : null
-  });
 
   // Find today's position for today line
   const todayIndex = days.findIndex(day => isToday(day));
@@ -101,20 +113,6 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
 
   const allRows = [...projects, addFactoryProject];
 
-  // Debug scroll container
-  React.useEffect(() => {
-    if (scrollRef.current) {
-      console.log('[SCROLL DEBUG] Container dimensions:', {
-        scrollWidth: scrollRef.current.scrollWidth,
-        clientWidth: scrollRef.current.clientWidth,
-        offsetWidth: scrollRef.current.offsetWidth,
-        scrollHeight: scrollRef.current.scrollHeight,
-        clientHeight: scrollRef.current.clientHeight,
-        needsScroll: scrollRef.current.scrollWidth > scrollRef.current.clientWidth,
-        style: window.getComputedStyle(scrollRef.current).overflow
-      });
-    }
-  }, [projects, tasks, days]);
 
   return (
     <>
@@ -181,7 +179,7 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
           
           const projectIndex = allRows.findIndex(p => p.id === dragPreview.projectId);
           const totalHeightAbove = allRows.slice(0, projectIndex).reduce((sum, p) => {
-            const rowCount = p.id === 'ADD_FACTORY_ROW_ID' ? 1 : getProjectRowCount(p.id, tasks);
+            const rowCount = p.id === 'ADD_FACTORY_ROW_ID' ? 1 : getProjectRowCount(p.id, tasks, p.name);
             const height = p.id === 'ADD_FACTORY_ROW_ID' ? 50 : Math.max(50, rowCount * 40 + 20);
             return sum + height;
           }, 0);

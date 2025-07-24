@@ -45,7 +45,7 @@ export const useScheduleState = (
   initialTasks?: Task[],
   projectId?: string
 ) => {
-  console.log('[useScheduleState] Received dates:', { projectStartDate, projectEndDate });
+  // console.log('[useScheduleState] Received dates:', { projectStartDate, projectEndDate });
   
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -92,7 +92,7 @@ export const useScheduleState = (
   let startDate: Date;
   let endDate: Date;
   
-  console.log('[useScheduleState] Using project date range:', projectDateRange);
+  // console.log('[useScheduleState] Using project date range:', projectDateRange);
   
   if (projectDateRange.startDate && projectDateRange.endDate) {
     const projectStart = new Date(projectDateRange.startDate);
@@ -138,11 +138,11 @@ export const useScheduleState = (
     cellWidth
   };
   
-  console.log('[useScheduleState] Final date range:', {
-    startDate: startDate.toISOString().split('T')[0],
-    endDate: endDate.toISOString().split('T')[0],
-    daysCount: days.length
-  });
+  // console.log('[useScheduleState] Final date range:', {
+  //   startDate: startDate.toISOString().split('T')[0],
+  //   endDate: endDate.toISOString().split('T')[0],
+  //   daysCount: days.length
+  // });
 
   // 색상 배열 정의 (실제 색상 값) - useMemo로 최적화
   const colors = useMemo(() => [

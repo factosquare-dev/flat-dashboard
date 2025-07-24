@@ -51,6 +51,8 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
     
     // Add last month
     if (monthDays > 0) {
+      const lastDate = new Date(baseDate);
+      lastDate.setDate(lastDate.getDate() + totalDays - 1);
       months.push(
         <div
           key={`month-${currentMonth}`}
@@ -61,7 +63,7 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
             width: monthDays * GANTT_CONSTANTS.CELL_WIDTH
           }}
         >
-          {new Date(date.getFullYear(), currentMonth).toLocaleString('ko-KR', { month: 'long' })}
+          {new Date(lastDate.getFullYear(), currentMonth).toLocaleString('ko-KR', { month: 'long' })}
         </div>
       );
     }

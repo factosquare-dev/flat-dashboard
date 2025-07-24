@@ -3,10 +3,12 @@ import type { ScheduleProps, ViewMode } from './types';
 import { useScheduleState } from '../hooks/useScheduleState';
 import { useScheduleEffects } from '../hooks/useScheduleEffects';
 import { useDynamicLayout } from '../hooks/useDynamicLayout';
+import { validateTaskFactoryData } from '../../../utils/scheduleUtils';
 import ScheduleLayout from '../components/ScheduleLayout';
 import ScheduleGridContainer from '../ScheduleGridContainer';
 import ScheduleModals from '../ScheduleModals';
 import ScheduleTableView from '../components/ScheduleTableView';
+import IntegratedGanttChart from '../components/IntegratedGanttChart';
 import { useToast } from '../../../hooks/useToast';
 import { createProjectHandlers, createTaskHandlers, createModalHandlers } from './handlers';
 
@@ -56,7 +58,8 @@ const Schedule: React.FC<ScheduleProps> = ({
   const { handleDeleteProject, handleAddFactory } = createProjectHandlers(
     projects,
     setProjects,
-    taskControls
+    taskControls,
+    projectId
   );
 
   const {
@@ -86,6 +89,67 @@ const Schedule: React.FC<ScheduleProps> = ({
   const handleToggleTableView = () => {
     setViewMode(prevMode => prevMode === 'gantt' ? 'table' : 'gantt');
   };
+  
+  // Debug log for main data
+  console.log('[Schedule Component] Main Data:', {
+    projects: projects.map(p => ({ id: p.id, name: p.name })),
+    totalTasks: taskControls.tasks.length,
+    viewMode,
+    initialTasks: initialTasks?.length || 0,
+    taskFactories: [...new Set(taskControls.tasks.map(t => t.factory))],
+    taskSample: taskControls.tasks.slice(0, 5).map(t => ({
+      id: t.id,
+      factory: t.factory,
+      factoryId: t.factoryId,
+      projectId: t.projectId,
+      title: t.title
+    }))
+  });
+  
+  // Data consistency check between Table and Gantt views
+  React.useEffect(() => {
+    // Validate task-factory data consistency
+    const validation = validateTaskFactoryData(taskControls.tasks, projects);
+    
+    const dataIntegrityCheck = {
+      viewMode,
+      dataSource: 'taskControls.tasks',
+      totalTasks: taskControls.tasks.length,
+      taskIds: taskControls.tasks.map(t => t.id).sort(),
+      tasksByFactory: taskControls.tasks.reduce((acc, task) => {
+        const factory = task.factory || 'Unknown';
+        if (!acc[factory]) acc[factory] = 0;
+        acc[factory]++;
+        return acc;
+      }, {} as Record<string, number>),
+      validation,
+      message: 'Both Table and Gantt views use the same data source (taskControls.tasks)'
+    };
+    
+    console.log('[Data Consistency Check]', dataIntegrityCheck);
+    
+    if (!validation.isValid) {
+      console.warn('[Data Validation Issues]', {
+        issues: validation.issues,
+        summary: validation.summary,
+        projects: projects.map(p => ({ id: p.id, name: p.name })),
+        remainingTasks: taskControls.tasks.filter(t => {
+          const hasMatchingProject = projects.some(p => 
+            p.id === t.projectId || 
+            p.name === t.factory || 
+            p.id === t.factoryId
+          );
+          return !hasMatchingProject;
+        }).map(t => ({
+          id: t.id,
+          title: t.title,
+          factory: t.factory,
+          factoryId: t.factoryId,
+          projectId: t.projectId
+        }))
+      });
+    }
+  }, [viewMode, taskControls.tasks, projects]);
 
   return (
     <>
@@ -132,6 +196,11 @@ const Schedule: React.FC<ScheduleProps> = ({
               }));
             }}
             onDeleteProject={handleDeleteProject}
+            onTaskDelete={(taskId) => {
+              taskControls.deleteTask(taskId);
+            }}
+            onTaskCreate={handleAddTask}
+            onFactoryDelete={handleDeleteProject}
           />
         )}
       </ScheduleLayout>

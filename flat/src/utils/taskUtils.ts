@@ -1,9 +1,10 @@
-import type { Task } from '../types/schedule';
+import type { Task, Participant } from '../types/schedule';
+import { getTasksForFactory } from './scheduleUtils';
 import { formatDateISO } from './dateUtils';
 
 // 두 태스크가 날짜 범위에서 겹치는지 확인
 export const isTaskOverlapping = (task1: Task, task2: Task): boolean => {
-  if (task1.projectId !== task2.projectId) return false;
+  // Remove projectId check - we're checking overlap within the same factory row
   if (task1.id === task2.id) return false;
   
   const start1 = new Date(task1.startDate).getTime();
@@ -29,10 +30,31 @@ export const assignTaskRows = (tasks: Task[]): Map<number, number> => {
     new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );
   
+  // Debug: log task overlap analysis
+  if (tasks.length > 5) {
+    const overlapAnalysis = sortedTasks.map(task => {
+      const overlappingTasks = sortedTasks.filter(t => 
+        t.id !== task.id && isTaskOverlapping(task, t)
+      );
+      return {
+        taskId: task.id,
+        title: task.title || task.taskType,
+        dates: `${task.startDate} ~ ${task.endDate}`,
+        overlapsCount: overlappingTasks.length
+      };
+    });
+    
+    console.log('[Task Row Assignment Debug]', {
+      totalTasks: tasks.length,
+      factory: tasks[0]?.factory,
+      overlapAnalysis: overlapAnalysis.filter(t => t.overlapsCount > 0)
+    });
+  }
+  
   sortedTasks.forEach(task => {
     let row = 0;
     let foundRow = false;
-    const maxRows = 100; // 최대 100개 행까지만 검색
+    const maxRows = 10; // Reduce max rows to prevent excessive height
     
     while (!foundRow && row < maxRows) {
       // 현재 row에 있는 태스크들과 충돌 확인
@@ -59,10 +81,21 @@ export const assignTaskRows = (tasks: Task[]): Map<number, number> => {
 
 // 프로젝트별로 필요한 행 수 계산
 export const getProjectRowCount = (
-  projectId: string,
-  tasks: Task[]
+  projectId: string,  // This is actually factoryId in the Schedule context
+  tasks: Task[],
+  projectName?: string
 ): number => {
-  const projectTasks = tasks.filter(t => t.projectId === projectId);
+  // Create a temporary participant object for filtering
+  const factory: Participant = {
+    id: projectId,
+    name: projectName || '',
+    period: '',
+    color: '',
+    type: ''
+  };
+  
+  // Use common filtering logic
+  const projectTasks = getTasksForFactory(tasks, factory);
   if (projectTasks.length === 0) return 1;
   
   const taskRows = assignTaskRows(projectTasks);

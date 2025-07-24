@@ -35,6 +35,68 @@ export class ProjectService extends BaseService<Project> {
   }
 
   /**
+   * Override create to add validation for project type and parentId
+   */
+  async create(data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<DbResponse<Project>> {
+    // Validate project type and parentId relationship
+    const validatedData = { ...data };
+    
+    // If creating MASTER type, ensure parentId is removed
+    if (validatedData.type === ProjectType.MASTER && validatedData.parentId) {
+      delete validatedData.parentId;
+    }
+    
+    // If project has parentId but type is MASTER, throw error
+    if (validatedData.type === ProjectType.MASTER && validatedData.parentId !== undefined && validatedData.parentId !== null) {
+      return {
+        success: false,
+        error: 'MASTER projects cannot have a parent project',
+      };
+    }
+    
+    // Only SUB projects can have parentId
+    if (validatedData.parentId && validatedData.type && validatedData.type !== ProjectType.SUB) {
+      return {
+        success: false,
+        error: 'Only SUB projects can have a parent project',
+      };
+    }
+    
+    return super.create(validatedData);
+  }
+
+  /**
+   * Override update to add validation for project type and parentId
+   */
+  async update(id: string, data: Partial<Project>): Promise<DbResponse<Project>> {
+    // Validate project type and parentId relationship
+    const validatedData = { ...data };
+    
+    // If updating to MASTER type, ensure parentId is removed
+    if (validatedData.type === ProjectType.MASTER && validatedData.parentId) {
+      delete validatedData.parentId;
+    }
+    
+    // If project has parentId but type is MASTER, throw error
+    if (validatedData.type === ProjectType.MASTER && validatedData.parentId !== undefined && validatedData.parentId !== null) {
+      return {
+        success: false,
+        error: 'MASTER projects cannot have a parent project',
+      };
+    }
+    
+    // Only SUB projects can have parentId
+    if (validatedData.parentId && validatedData.type && validatedData.type !== ProjectType.SUB) {
+      return {
+        success: false,
+        error: 'Only SUB projects can have a parent project',
+      };
+    }
+    
+    return super.update(id, validatedData);
+  }
+
+  /**
    * Create project with all relationships
    */
   async createWithRelations(data: CreateProjectData): Promise<DbResponse<ProjectWithRelations>> {

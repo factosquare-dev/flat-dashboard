@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Participant, Task } from '../../../types/schedule';
 import { getProjectRowCount, assignTaskRows } from '../../../utils/taskUtils';
+import { getTasksForFactory } from '../../../utils/scheduleUtils';
 import { GridCoordinateCalculator } from '../utils/dragCalculations';
 import { getInteractionState } from '../utils/globalState';
 import { formatDateISO } from '../../../utils/dateUtils';
@@ -56,9 +57,51 @@ const ProjectRow: React.FC<ProjectRowProps> = React.memo(({
   onTaskHover,
   onTaskDelete
 }) => {
-  const projectTasks = tasks.filter(t => t.projectId === project.id);
-  const rowCount = isAddFactoryRow ? 1 : getProjectRowCount(project.id, tasks);
+  // Use common filtering logic for consistency with Table View
+  const projectTasks = getTasksForFactory(tasks, project);
+  
+  // Debug log for data validation
+  console.log('[ProjectRow Debug]', {
+    factoryId: project.id,  // This is actually the factory ID
+    factoryName: project.name,
+    totalTasks: tasks.length,
+    filteredTasks: projectTasks.length,
+    taskDetails: projectTasks.map(t => ({
+      id: t.id,
+      factory: t.factory,
+      factoryId: t.factoryId,
+      projectId: t.projectId,  // This should be the actual project ID
+      title: t.title || t.taskType
+    }))
+  });
+  
+  // Data rendering validation
+  React.useEffect(() => {
+    if (projectTasks.length > 0) {
+      console.log('[Gantt Rendering Validation]', {
+        factoryName: project.name,
+        tasksToRender: projectTasks.length,
+        taskPositions: projectTasks.map(t => ({
+          id: t.id,
+          x: t.x,
+          width: t.width,
+          hasPosition: t.x !== undefined && t.width !== undefined
+        }))
+      });
+    }
+  }, [projectTasks, project.name]);
+  const rowCount = isAddFactoryRow ? 1 : getProjectRowCount(project.id, tasks, project.name);
   const projectHeight = isAddFactoryRow ? 50 : Math.max(50, rowCount * 40 + 20);
+  
+  // Debug row height calculation
+  if (!isAddFactoryRow && projectTasks.length > 0) {
+    console.log('[Row Height Debug]', {
+      factoryName: project.name,
+      rowCount,
+      projectHeight,
+      tasksCount: projectTasks.length
+    });
+  }
 
   return (
     <div

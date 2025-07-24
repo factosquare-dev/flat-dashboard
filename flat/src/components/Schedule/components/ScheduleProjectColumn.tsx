@@ -66,7 +66,7 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
         {projects.map((project, index) => {
         if (!project) return null;
         
-        const rowCount = getProjectRowCount(project.id, tasks);
+        const rowCount = getProjectRowCount(project.id, tasks, project.name);
         const projectHeight = Math.max(50, rowCount * 40 + 20);
         
         return (
