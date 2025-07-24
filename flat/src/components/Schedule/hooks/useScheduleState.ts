@@ -101,12 +101,22 @@ export const useScheduleState = (
     startDate = new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000));
     endDate = new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000));
   } else {
-    // 프로젝트 날짜가 없는 경우 기본 범위 (3개월)
-    startDate = new Date(today.getTime());
-    startDate.setDate(startDate.getDate() - 14);
-    
-    endDate = new Date(today.getTime());
-    endDate.setMonth(endDate.getMonth() + 3);
+    // 프로젝트 날짜가 없는 경우 전달받은 프로젝트 날짜 사용
+    if (projectStartDate && projectEndDate) {
+      const projectStart = new Date(projectStartDate);
+      const projectEnd = new Date(projectEndDate);
+      const projectDuration = Math.ceil((projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24));
+      const padding = Math.max(7, Math.min(21, Math.ceil(projectDuration * 0.15)));
+      
+      startDate = new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000));
+      endDate = new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000));
+    } else {
+      // 정말로 날짜가 없는 경우만 현재 날짜 사용
+      startDate = new Date(today.getTime());
+      startDate.setMonth(startDate.getMonth() - 1);
+      endDate = new Date(today.getTime());
+      endDate.setMonth(endDate.getMonth() + 2);
+    }
   }
 
   // Memoize days calculation to avoid unnecessary recalculation
@@ -136,15 +146,29 @@ export const useScheduleState = (
     "#06b6d4"  // cyan-500
   ], []);
 
-  // 공장 데이터를 기반으로 초기 프로젝트 생성
+  // 공장 데이터를 기반으로 초기 프로젝트 생성 - 프로젝트 날짜 기준
   const initialProjects = participants && participants.length > 0 ? participants : 
-    factories.slice(0, 10).map((factory, index) => ({
-      id: factory.id,
-      name: factory.name,
-      type: factory.type,
-      period: `${formatDate(new Date(today.getTime() + (index - 5) * 7 * 24 * 60 * 60 * 1000))} ~ ${formatDate(new Date(today.getTime() + ((index - 5) * 7 + 30 + index * 10) * 24 * 60 * 60 * 1000))}`,
-      color: colors[index % colors.length],
-    }));
+    factories.slice(0, 10).map((factory, index) => {
+      // 프로젝트 기간 내에서 공장별 작업 기간 분배
+      const projectStart = new Date(masterProjectDates.startDate || projectStartDate);
+      const projectEnd = new Date(masterProjectDates.endDate || projectEndDate);
+      const projectDuration = (projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24);
+      
+      // 각 공장의 작업을 프로젝트 기간 내에 균등 분배
+      const factoryStartOffset = Math.floor((projectDuration / 10) * index);
+      const factoryDuration = Math.floor(projectDuration / 10 * 0.8); // 80% 기간 사용
+      
+      const factoryStart = new Date(projectStart.getTime() + (factoryStartOffset * 24 * 60 * 60 * 1000));
+      const factoryEnd = new Date(factoryStart.getTime() + (factoryDuration * 24 * 60 * 60 * 1000));
+      
+      return {
+        id: factory.id,
+        name: factory.name,
+        type: factory.type,
+        period: `${formatDate(factoryStart)} ~ ${formatDate(factoryEnd)}`,
+        color: colors[index % colors.length],
+      };
+    });
 
   const [projects, setProjects] = useState<Participant[]>(initialProjects);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
