@@ -50,9 +50,9 @@ export const useScheduleState = (
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Sub 프로젝트들의 날짜 범위 찾기 (Master는 그룹이므로 Sub들의 전체 범위 사용)
+  // 프로젝트 날짜 범위 찾기 (전달받은 날짜가 없는 경우 MockDB에서 가져옴)
   const projectDateRange = useMemo(() => {
-    // 먼저 전달받은 날짜가 있으면 사용
+    // 먼저 전달받은 날짜가 있으면 사용 (Master/Sub 모두 해당)
     if (projectStartDate && projectEndDate) {
       return { startDate: projectStartDate, endDate: projectEndDate };
     }
@@ -75,29 +75,7 @@ export const useScheduleState = (
       }
 
       if (targetProject) {
-        // Master 프로젝트인 경우 하위 Sub 프로젝트들의 날짜 범위 계산
-        if (targetProject.type === ProjectType.MASTER) {
-          const subProjects = Object.values(projects).filter((p: any) => 
-            p.parentId === projectId && p.type === ProjectType.SUB
-          );
-          
-          if (subProjects.length > 0) {
-            const dates = subProjects.flatMap((p: any) => [
-              new Date(p.startDate),
-              new Date(p.endDate)
-            ]);
-            
-            const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
-            const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
-            
-            return {
-              startDate: minDate.toISOString().split('T')[0],
-              endDate: maxDate.toISOString().split('T')[0]
-            };
-          }
-        }
-        
-        // Sub 프로젝트이거나 하위 프로젝트가 없는 경우 현재 프로젝트 날짜 사용
+        // Master든 Sub든 현재 프로젝트의 날짜를 사용
         return {
           startDate: targetProject.startDate,
           endDate: targetProject.endDate
