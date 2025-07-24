@@ -35,9 +35,17 @@ export const getOrCreateScheduleForProject = async (
         if (existingSchedule) {
           console.log('[getOrCreateScheduleForProject] 8. Returning existing schedule from DB');
           
-          // Get tasks for this schedule
+          // Get assigned factory IDs for this project
+          const assignedFactoryIds = new Set<string>();
+          if (projectData) {
+            if (projectData.manufacturerId) assignedFactoryIds.add(projectData.manufacturerId);
+            if (projectData.containerId) assignedFactoryIds.add(projectData.containerId);
+            if (projectData.packagingId) assignedFactoryIds.add(projectData.packagingId);
+          }
+          
+          // Get tasks for this schedule - filter by assigned factories
           const scheduleTasks = Array.from(database.tasks.values())
-            .filter(task => task.scheduleId === existingSchedule.id)
+            .filter(task => task.scheduleId === existingSchedule.id && assignedFactoryIds.has(task.factoryId))
             .map(task => {
               // Get factory name from factoryId
               const factory = database.factories.get(task.factoryId);
@@ -64,7 +72,7 @@ export const getOrCreateScheduleForProject = async (
           const projectData = database.projects.get(existingSchedule.projectId);
           
           if (projectData) {
-            if (projectData.manufacturerId) {
+            if (projectData.manufacturerId && projectData.manufacturerId !== null) {
               const factory = database.factories.get(projectData.manufacturerId);
               if (factory) {
                 participants.push({
@@ -76,7 +84,7 @@ export const getOrCreateScheduleForProject = async (
               }
             }
             
-            if (projectData.containerId) {
+            if (projectData.containerId && projectData.containerId !== null) {
               const factory = database.factories.get(projectData.containerId);
               if (factory) {
                 participants.push({
@@ -88,7 +96,7 @@ export const getOrCreateScheduleForProject = async (
               }
             }
             
-            if (projectData.packagingId) {
+            if (projectData.packagingId && projectData.packagingId !== null) {
               const factory = database.factories.get(projectData.packagingId);
               if (factory) {
                 participants.push({
@@ -166,9 +174,41 @@ export const getOrCreateScheduleForProject = async (
     
     console.log('[getOrCreateScheduleForProject] 23. Filtered tasks for project', project.id, ':', projectTasks.length);
     
+    // Get assigned factories for this project
+    const assignedFactoryIds = new Set<string>();
+    if (project.manufacturer) {
+      const factory = allFactories.find(f => f.id === project.manufacturer || f.name === project.manufacturer);
+      if (factory) assignedFactoryIds.add(factory.id);
+    }
+    if (project.container) {
+      const factory = allFactories.find(f => f.id === project.container || f.name === project.container);
+      if (factory) assignedFactoryIds.add(factory.id);
+    }
+    if (project.packaging) {
+      const factory = allFactories.find(f => f.id === project.packaging || f.name === project.packaging);
+      if (factory) assignedFactoryIds.add(factory.id);
+    }
+    
+    console.log('[getOrCreateScheduleForProject] 24. Assigned factory IDs:', Array.from(assignedFactoryIds));
+    
+    // Filter tasks to only include those from assigned factories
+    const validProjectTasks = projectTasks.filter(task => {
+      if (!task.factoryId) {
+        console.warn('[getOrCreateScheduleForProject] Task', task.id, 'has no factoryId');
+        return false;
+      }
+      const isValid = assignedFactoryIds.has(task.factoryId);
+      if (!isValid) {
+        console.log('[getOrCreateScheduleForProject] Filtering out task', task.id, 'from factory', task.factoryId, 'not assigned to project');
+      }
+      return isValid;
+    });
+    
+    console.log('[getOrCreateScheduleForProject] 25. Valid tasks after factory filtering:', validProjectTasks.length);
+    
     // Group tasks by factory
     const tasksByFactory = new Map<string, any[]>();
-    projectTasks.forEach(task => {
+    validProjectTasks.forEach(task => {
       const factory = task.factory || 'Unknown';
       if (!tasksByFactory.has(factory)) {
         tasksByFactory.set(factory, []);
@@ -232,9 +272,9 @@ export const getOrCreateScheduleForProject = async (
   
   try {
     allFactories = mockDataService.getAllFactories();
-    console.log('[getOrCreateScheduleForProject] 24. All factories:', allFactories.length);
+    console.log('[getOrCreateScheduleForProject] 26. All factories:', allFactories.length);
   } catch (error) {
-    console.log('[getOrCreateScheduleForProject] 25. Error getting factories:', error);
+    console.log('[getOrCreateScheduleForProject] 27. Error getting factories:', error);
   }
   
   if (project.manufacturer && project.manufacturer !== 'null') {
@@ -287,9 +327,9 @@ export const getOrCreateScheduleForProject = async (
     updatedAt: new Date().toISOString()
   };
   
-  console.log('[getOrCreateScheduleForProject] 26. Created schedule with', participants.length, 'participants and', filteredTasks.length, 'tasks');
-  console.log('[getOrCreateScheduleForProject] 27. Participants:', participants.map(p => ({ id: p.id, name: p.name })));
-  console.log('[getOrCreateScheduleForProject] 28. Project factories - manufacturer:', project.manufacturer, 'container:', project.container, 'packaging:', project.packaging);
+  console.log('[getOrCreateScheduleForProject] 28. Created schedule with', participants.length, 'participants and', filteredTasks.length, 'tasks');
+  console.log('[getOrCreateScheduleForProject] 29. Participants:', participants.map(p => ({ id: p.id, name: p.name })));
+  console.log('[getOrCreateScheduleForProject] 30. Project factories - manufacturer:', project.manufacturer, 'container:', project.container, 'packaging:', project.packaging);
   
   
   if (USE_MOCK_DATA) {

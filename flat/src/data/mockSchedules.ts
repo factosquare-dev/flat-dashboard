@@ -41,9 +41,7 @@ export const createMockSchedules = (): Schedule[] => {
       startDate: formatDate(addDays(today, -30)),
       endDate: formatDate(addDays(today, 60)),
       participants: [
-        manufacturingFactories[0] && { id: manufacturingFactories[0].id, name: manufacturingFactories[0].name, period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'blue' },
-        containerFactories[0] && { id: containerFactories[0].id, name: containerFactories[0].name, period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'red' },
-        packagingFactories[0] && { id: packagingFactories[0].id, name: packagingFactories[0].name, period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'yellow' }
+        manufacturingFactories[0] && { id: manufacturingFactories[0].id, name: manufacturingFactories[0].name, period: `${formatDate(addDays(today, -30))} ~ ${formatDate(addDays(today, 60))}`, color: 'blue' }
       ].filter(Boolean),
       tasks: [
         // 제조 공장 태스크들
@@ -78,43 +76,6 @@ export const createMockSchedules = (): Schedule[] => {
           endDate: formatDate(addDays(today, -15)), 
           color: 'blue', 
           status: 'in-progress', 
-          projectId: 'sub-1-1'
-        }] : []),
-        
-        // 용기 공장 태스크들
-        ...(containerFactories[0] ? [{
-          id: 104, 
-          factory: containerFactories[0].name, 
-          factoryId: containerFactories[0].id, 
-          taskType: TASK_TYPES.CONTAINER.MOLD_MAKING, 
-          startDate: formatDate(addDays(today, -14)), 
-          endDate: formatDate(addDays(today, -10)), 
-          color: 'red', 
-          status: 'in-progress', 
-          projectId: 'sub-1-1'
-        },
-        {
-          id: 105, 
-          factory: containerFactories[0].name, 
-          factoryId: containerFactories[0].id, 
-          taskType: TASK_TYPES.CONTAINER.INJECTION_MOLDING, 
-          startDate: formatDate(addDays(today, -9)), 
-          endDate: formatDate(addDays(today, -5)), 
-          color: 'red', 
-          status: 'pending', 
-          projectId: 'sub-1-1'
-        }] : []),
-        
-        // 포장 공장 태스크들
-        ...(packagingFactories[0] ? [{
-          id: 106, 
-          factory: packagingFactories[0].name, 
-          factoryId: packagingFactories[0].id, 
-          taskType: TASK_TYPES.PACKAGING.DESIGN, 
-          startDate: formatDate(addDays(today, 5)), 
-          endDate: formatDate(addDays(today, 9)), 
-          color: 'yellow', 
-          status: 'pending', 
           projectId: 'sub-1-1'
         }] : [])
       ],
