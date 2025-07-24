@@ -16,11 +16,7 @@ export const createProjectHandlers = (
       const projectToDelete = projects.find(p => p.id === projectId);
       if (!projectToDelete) return;
       
-      console.log('[Delete Project] Deleting:', {
-        projectId,
-        projectName: projectToDelete.name,
-        currentTasks: taskControls.tasks.length
-      });
+      // Project deletion logging removed for cleaner console
       
       // 프로젝트 삭제
       setProjects(projects.filter(p => p.id !== projectId));
@@ -30,35 +26,19 @@ export const createProjectHandlers = (
         // 1. 다른 프로젝트의 태스크 보호
         // currentProjectId가 있고, 태스크의 projectId가 현재 프로젝트와 다르면 보호
         if (currentProjectId && t.projectId && t.projectId !== currentProjectId) {
-          console.log('[Delete Project] Protecting task from different project:', {
-            taskId: t.id,
-            taskProjectId: t.projectId,
-            currentProjectId: currentProjectId
-          });
+          // Task protection logging removed for cleaner console
           return true; // 다른 프로젝트의 태스크는 유지
         }
         
         // 2. factoryId가 일치하는 태스크만 삭제
         const shouldRemove = t.factoryId === projectId;
           
-        if (shouldRemove) {
-          console.log('[Delete Project] Removing task:', {
-            taskId: t.id,
-            taskTitle: t.title,
-            taskProjectId: t.projectId,
-            taskFactoryId: t.factoryId,
-            deletingFactoryId: projectId,
-            currentProjectId: currentProjectId
-          });
-        }
+        // Task removal logging removed for cleaner console
         
         return !shouldRemove;
       });
       
-      console.log('[Delete Project] Result:', {
-        tasksRemoved: taskControls.tasks.length - remainingTasks.length,
-        remainingTasks: remainingTasks.length
-      });
+      // Project deletion result logging removed for cleaner console
       
       taskControls.setTasks(remainingTasks);
     }
@@ -101,7 +81,7 @@ export const createTaskHandlers = (
         await taskControls.updateTask(modalState.selectedTask.id, updatedTask);
         setModalState((prev: any) => ({ ...prev, showTaskEditModal: false, selectedTask: null }));
       } catch (error) {
-        console.error('[Schedule] Failed to update task:', error);
+        // Task update error logging removed for cleaner console
         // Keep modal open on error
         toastError('태스크 업데이트 실패', '태스크 업데이트 중 오류가 발생했습니다.');
       }
@@ -116,7 +96,7 @@ export const createTaskHandlers = (
   };
 
   const handleQuickTaskCreate = (taskData: TaskData & { projectId: string }) => {
-    const factory = factories.find(f => f.name === taskData.factory);
+    const factory = factories.find(f => f.name === taskData.factory || f.id === taskData.factoryId);
     const defaultTaskType = factory ? taskTypesByFactoryType[factory.type]?.[0] || '태스크' : '태스크';
     
     const duration = Math.ceil((new Date(taskData.endDate).getTime() - new Date(taskData.startDate).getTime()) / (1000 * 60 * 60 * 24));
@@ -130,9 +110,11 @@ export const createTaskHandlers = (
     taskControls.addTask({
       projectId: taskData.projectId,
       title: defaultTaskType,
+      taskType: defaultTaskType,
       startDate: availableRange.startDate,
       endDate: availableRange.endDate,
-      factory: taskData.factory
+      factory: taskData.factory || factory?.name,
+      factoryId: taskData.factoryId || factory?.id
     });
   };
   
@@ -150,9 +132,11 @@ export const createTaskHandlers = (
     taskControls.addTask({
       projectId: projectId,
       title: taskData.taskType || '태스크',
+      taskType: taskData.taskType || '태스크',
       startDate: availableRange.startDate,
       endDate: availableRange.endDate,
-      factory: taskData.factory
+      factory: taskData.factory,
+      factoryId: taskData.factoryId
     });
     
     setModalState((prev: any) => ({ ...prev, showTaskModal: false, selectedProjectId: null, selectedDate: null }));

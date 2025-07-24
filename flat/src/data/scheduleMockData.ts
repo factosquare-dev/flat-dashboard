@@ -1,5 +1,6 @@
 import type { Task, Participant } from '../types/schedule';
 import { factories } from './factories';
+import { TASK_TYPES, FACTORY_TYPES } from '../constants/factory';
 
 // 오늘 날짜 기준으로 날짜 계산
 const today = new Date();
@@ -44,70 +45,84 @@ export const mockTasks: Task[] = [
   {
     id: 101,
     projectId: 'cont-1',
-    title: '용기 디자인',
+    title: TASK_TYPES.CONTAINER.DESIGN,
+    taskType: TASK_TYPES.CONTAINER.DESIGN,
     startDate: formatDate(addDays(today, -3)),
     endDate: formatDate(addDays(today, -1)),
     factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
+    factoryId: mockFactories.find(f => f.type === '용기')?.id || 'cont-1',
     assignee: '김영수',
     status: 'completed'
   },
   {
     id: 102,
     projectId: 'cont-1',
-    title: '금형 제작',
+    title: TASK_TYPES.CONTAINER.MOLD_MAKING,
+    taskType: TASK_TYPES.CONTAINER.MOLD_MAKING,
     startDate: formatDate(addDays(today, -2)),
     endDate: formatDate(today),
     factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
+    factoryId: mockFactories.find(f => f.type === '용기')?.id || 'cont-1',
     assignee: '이미나',
     status: 'in-progress'
   },
   {
     id: 103,
     projectId: 'cont-1',
-    title: '시제품 제작',
+    title: TASK_TYPES.CONTAINER.PROTOTYPE_MAKING,
+    taskType: TASK_TYPES.CONTAINER.PROTOTYPE_MAKING,
     startDate: formatDate(addDays(today, -1)),
     endDate: formatDate(addDays(today, 1)),
     factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
+    factoryId: mockFactories.find(f => f.type === '용기')?.id || 'cont-1',
     assignee: '박준호',
     status: 'in-progress'
   },
   {
     id: 104,
     projectId: 'cont-1',
-    title: '사출 성형',
+    title: TASK_TYPES.CONTAINER.INJECTION_MOLDING,
+    taskType: TASK_TYPES.CONTAINER.INJECTION_MOLDING,
     startDate: formatDate(today),
     endDate: formatDate(addDays(today, 3)),
     factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
+    factoryId: mockFactories.find(f => f.type === '용기')?.id || 'cont-1',
     assignee: '최서연',
     status: 'pending'
   },
   {
     id: 105,
     projectId: 'cont-1',
-    title: '용기 검사',
+    title: TASK_TYPES.CONTAINER.CONTAINER_INSPECTION,
+    taskType: TASK_TYPES.CONTAINER.CONTAINER_INSPECTION,
     startDate: formatDate(addDays(today, 2)),
     endDate: formatDate(addDays(today, 4)),
     factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
+    factoryId: mockFactories.find(f => f.type === '용기')?.id || 'cont-1',
     assignee: '김영수',
     status: 'pending'
   },
   {
     id: 106,
     projectId: 'cont-1',
-    title: '품질 검사',
+    title: TASK_TYPES.CONTAINER.QUALITY_CHECK,
+    taskType: TASK_TYPES.CONTAINER.QUALITY_CHECK,
     startDate: formatDate(addDays(today, 3)),
     endDate: formatDate(addDays(today, 4)),
     factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
+    factoryId: mockFactories.find(f => f.type === '용기')?.id || 'cont-1',
     assignee: '이미나',
     status: 'pending'
   },
   {
     id: 107,
     projectId: 'cont-1',
-    title: '출하',
+    title: TASK_TYPES.CONTAINER.SHIPPING,
+    taskType: TASK_TYPES.CONTAINER.SHIPPING,
     startDate: formatDate(addDays(today, 4)),
     endDate: formatDate(addDays(today, 5)),
     factory: mockFactories.find(f => f.type === '용기')?.name || '(주)연우',
+    factoryId: mockFactories.find(f => f.type === '용기')?.id || 'cont-1',
     assignee: '박준호',
     status: 'pending'
   },
@@ -115,20 +130,24 @@ export const mockTasks: Task[] = [
   {
     id: 1,
     projectId: 'mfg-1',
-    title: '원료 수령',
+    title: TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT,
+    taskType: TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT,
     startDate: formatDate(addDays(today, -20)),
     endDate: formatDate(addDays(today, -17)),
     factory: mockFactories.find(f => f.name === '큐셀시스템')?.name || '큐셀시스템',
+    factoryId: mockFactories.find(f => f.name === '큐셀시스템')?.id || 'mfg-1',
     assignee: '김철수',
     status: 'completed'
   },
   {
     id: 2,
     projectId: 'mfg-1',
-    title: '배합',
+    title: TASK_TYPES.MANUFACTURING.MIXING,
+    taskType: TASK_TYPES.MANUFACTURING.MIXING,
     startDate: formatDate(addDays(today, -16)),
     endDate: formatDate(addDays(today, -10)),
     factory: mockFactories.find(f => f.name === '큐셀시스템')?.name || '큐셀시스템',
+    factoryId: mockFactories.find(f => f.name === '큐셀시스템')?.id || 'mfg-1',
     assignee: '김철수',
     status: 'completed'
   },
@@ -150,7 +169,8 @@ export const mockTasks: Task[] = [
     title: '디자인 검토 (지연)',
     startDate: formatDate(addDays(today, -15)),
     endDate: formatDate(addDays(today, -5)),
-    factory: mockFactories.find(f => f.type === '포장')?.name || '(주)네트모베이지',
+    factory: mockFactories.find(f => f.id === 'pack-1')?.name || '(주)네트모베이지',
+    factoryId: 'pack-1',
     assignee: '정수진',
     status: 'pending'
   },
@@ -184,7 +204,8 @@ export const mockTasks: Task[] = [
     title: '품질 검사',
     startDate: formatDate(addDays(today, -9)),
     endDate: formatDate(addDays(today, -7)),
-    factory: mockFactories.find(f => f.name === '큐셀시스템')?.name || '큐셀시스템',
+    factory: mockFactories.find(f => f.id === 'mfg-1')?.name || '큐셀시스템',
+    factoryId: 'mfg-1',
     assignee: '박민수',
     status: 'completed'
   },
@@ -206,7 +227,8 @@ export const mockTasks: Task[] = [
     title: '인쇄 준비',
     startDate: formatDate(addDays(today, 3)),
     endDate: formatDate(addDays(today, 7)),
-    factory: mockFactories.find(f => f.type === '포장')?.name || '(주)네트모베이지',
+    factory: mockFactories.find(f => f.id === 'pack-1')?.name || '(주)네트모베이지',
+    factoryId: 'pack-1',
     assignee: '정수진',
     status: 'pending'
   },
@@ -216,7 +238,8 @@ export const mockTasks: Task[] = [
     title: '표면 처리',
     startDate: formatDate(addDays(today, 8)),
     endDate: formatDate(addDays(today, 12)),
-    factory: mockFactories.find(f => f.name.includes('삼화'))?.name || '삼화플라스틱',
+    factory: mockFactories.find(f => f.id === 'cont-2')?.name || '삼화플라스틱',
+    factoryId: 'cont-2',
     assignee: '이영희',
     status: 'pending'
   }

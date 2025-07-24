@@ -3,7 +3,8 @@ import { factories, getFactoriesByType } from './factories';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 import { 
   MOCK_COMPANY_NAMES, 
-  FACTORY_TYPES, 
+  FACTORY_TYPES,
+  TASK_TYPES,
   CERTIFICATE_TYPE_OPTIONS,
   SERVICE_TYPE_OPTIONS, 
   PROJECT_STATUS_OPTIONS, 
@@ -30,13 +31,38 @@ const manufacturingFactories = getFactoriesByType(FACTORY_TYPES.MANUFACTURING);
 const containerFactories = getFactoriesByType(FACTORY_TYPES.CONTAINER);
 const packagingFactories = getFactoriesByType(FACTORY_TYPES.PACKAGING);
 
-// 공장별 태스크 목록
-export const tasksByFactory: { [key: string]: string[] } = {
-  '큐셀시스템': ['PCB 설계', 'SMT 작업', '최종 조립', '품질 검사', '포장'],
-  '(주)연우': ['금형 제작', '사출 성형', '도장 작업', '조립', '검수'],
-  '(주)네트모베이지': ['회로 설계', '펌웨어 개발', '하드웨어 테스트', '인증 시험'],
-  '주식회사 코스모로스': ['기구 설계', '시제품 제작', '성능 테스트', '양산 준비']
+// 공장별 태스크 목록 (Factory ID 기반)
+export const tasksByFactoryId: { [key: string]: string[] } = {
+  'mfg-1': [  // 큐셀시스템
+    TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT,
+    TASK_TYPES.MANUFACTURING.MIXING,
+    TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK,
+    TASK_TYPES.MANUFACTURING.FINAL_INSPECTION,
+    TASK_TYPES.MANUFACTURING.SHIPPING_PREP
+  ],
+  'cont-1': [  // (주)연우
+    TASK_TYPES.CONTAINER.MOLD_MAKING,
+    TASK_TYPES.CONTAINER.INJECTION_MOLDING,
+    TASK_TYPES.CONTAINER.SURFACE_TREATMENT,
+    TASK_TYPES.CONTAINER.ASSEMBLY,
+    TASK_TYPES.CONTAINER.QUALITY_CHECK
+  ],
+  'pack-1': [  // (주)네트모베이지
+    TASK_TYPES.PACKAGING.DESIGN,
+    TASK_TYPES.PACKAGING.PRINT_PREP,
+    TASK_TYPES.PACKAGING.PACKAGING_WORK,
+    TASK_TYPES.PACKAGING.LABEL_ATTACHMENT,
+    TASK_TYPES.PACKAGING.PACKAGING_INSPECTION
+  ],
+  'mfg-2': [  // 주식회사 코스모로스
+    TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT,
+    TASK_TYPES.MANUFACTURING.MATERIAL_INSPECTION,
+    TASK_TYPES.MANUFACTURING.MIXING,
+    TASK_TYPES.MANUFACTURING.STABILITY_TEST,
+    TASK_TYPES.MANUFACTURING.SHIPPING_PREP
+  ]
 };
+
 
 // 사용 가능한 인증서 목록
 export const availableCertifications = [...CERTIFICATE_TYPE_OPTIONS];
@@ -91,34 +117,20 @@ const colorPalette = [
   'bg-teal-500'
 ];
 
-// 프로젝트별 공장 매핑 (제조, 용기, 포장 각 1개씩)
-export const projectFactories: { [key: string]: ProjectFactory[] } = {
-  '1': [
-    { name: '큐셀시스템', color: 'bg-blue-500', type: 'manufacturing' },
-    { name: '(주)연우', color: 'bg-red-500', type: 'container' },
-    { name: '(주)네트모베이지', color: 'bg-yellow-500', type: 'packaging' }
+// 프로젝트별 공장 매핑 (제조, 용기, 포장 각 1개씩) - Factory ID 기반
+export const projectFactoriesByProjectId: { [key: string]: ProjectFactory[] } = {
+  'proj-001': [
+    { id: 'mfg-1', name: '큐셀시스템', color: 'bg-blue-500', type: 'manufacturing' },
+    { id: 'cont-1', name: '(주)연우', color: 'bg-red-500', type: 'container' },
+    { id: 'pack-1', name: '(주)네트모베이지', color: 'bg-yellow-500', type: 'packaging' }
   ],
-  '2': [
-    { name: '주식회사 코스모로스', color: 'bg-green-500', type: 'manufacturing' },
-    { name: '삼화플라스틱', color: 'bg-purple-500', type: 'container' },
-    { name: '서울포장산업(주)', color: 'bg-pink-500', type: 'packaging' }
-  ],
-  '3': [
-    { name: '(주)뷰티팩토리', color: 'bg-indigo-500', type: 'manufacturing' },
-    { name: '(주)에이치피씨', color: 'bg-cyan-500', type: 'container' },
-    { name: '(주)한솔피엔에스', color: 'bg-orange-500', type: 'packaging' }
-  ],
-  '4': [
-    { name: '코스메카코리아', color: 'bg-teal-500', type: 'manufacturing' },
-    { name: '태성산업(주)', color: 'bg-blue-500', type: 'container' },
-    { name: '대림포장(주)', color: 'bg-red-500', type: 'packaging' }
-  ],
-  '5': [
-    { name: '(주)아모레퍼시픽 오산공장', color: 'bg-yellow-500', type: 'manufacturing' },
-    { name: '(주)펌텍코리아', color: 'bg-green-500', type: 'container' },
-    { name: '(주)새한패키지', color: 'bg-purple-500', type: 'packaging' }
+  'proj-002': [
+    { id: 'mfg-2', name: '주식회사 코스모로스', color: 'bg-purple-500', type: 'manufacturing' },
+    { id: 'cont-2', name: '삼화플라스틱', color: 'bg-green-500', type: 'container' },
+    { id: 'pack-2', name: '서울포장산업(주)', color: 'bg-orange-500', type: 'packaging' }
   ]
 };
+
 
 // 공장 타입 한글명
 export const factoryTypeNames = {
@@ -159,7 +171,7 @@ const getCustomerContacts = () => {
       };
     });
   } catch (error) {
-    console.warn('Failed to load customer contacts from mock DB:', error);
+    // Mock DB load failed, using fallback data
     // Mock DB 초기화 재시도
     try {
       const db = MockDatabaseImpl.getInstance();
@@ -188,7 +200,7 @@ const getManagers = () => {
       .filter(user => user.role === 'manager' || user.role === 'admin')
       .map(user => user.name);
   } catch (error) {
-    console.warn('Failed to load managers from mock DB:', error);
+    // Mock DB load failed, using fallback data
     return ['김철수', '이영희', '박민수', '정수진', '최지훈', '김프로', '이매니저', '박팀장'];
   }
 };
@@ -207,7 +219,7 @@ const getProductTypes = () => {
       return productTypes;
     }
   } catch (error) {
-    console.warn('Failed to load product types from mock DB:', error);
+    // Mock DB load failed, using fallback data
   }
   
   // Fallback

@@ -77,6 +77,7 @@ export interface Project {
 export type FactoryType = 'manufacturing' | 'container' | 'packaging';
 
 export interface ProjectFactory {
+  id: string;
   name: string;
   color: string;
   type?: FactoryType;

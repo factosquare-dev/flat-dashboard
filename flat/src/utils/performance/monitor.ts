@@ -24,9 +24,7 @@ export class PerformanceMonitor {
       const end = performance.now();
       const duration = end - start;
 
-      if (process.env.NODE_ENV === 'development' && duration > 16) {
-        console.warn(`🐌 ${name} took ${duration.toFixed(2)}ms (>16ms threshold)`);
-      }
+      // Performance logging removed for cleaner console
 
       this.measurements.set(name, duration);
       return result;
@@ -44,9 +42,7 @@ export class PerformanceMonitor {
       const end = performance.now();
       const duration = end - start;
 
-      if (process.env.NODE_ENV === 'development' && duration > 100) {
-        console.warn(`🐌 ${name} took ${duration.toFixed(2)}ms (>100ms threshold)`);
-      }
+      // Performance logging removed for cleaner console
 
       this.measurements.set(name, duration);
       return result;
@@ -89,9 +85,7 @@ export class PerformanceMonitor {
       const entries = list.getEntries();
       const lcpEntry = entries[entries.length - 1];
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🚀 LCP:', lcpEntry.startTime);
-      }
+      // LCP logging removed for cleaner console
     }).observe({ entryTypes: ['largest-contentful-paint'] });
 
     // Monitor FID (First Input Delay)
@@ -100,9 +94,7 @@ export class PerformanceMonitor {
       entries.forEach((entry: any) => {
         const fid = entry.processingStart - entry.startTime;
         
-        if (process.env.NODE_ENV === 'development') {
-          console.log('⚡ FID:', fid);
-        }
+        // FID logging removed for cleaner console
       });
     }).observe({ entryTypes: ['first-input'] });
 
@@ -116,9 +108,7 @@ export class PerformanceMonitor {
         }
       });
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log('📐 CLS:', clsScore);
-      }
+      // CLS logging removed for cleaner console
     }).observe({ entryTypes: ['layout-shift'] });
   }
 
@@ -190,9 +180,7 @@ export function withRenderPerformance<P extends object>(
       const renderEnd = performance.now();
       const renderTime = renderEnd - renderStart;
       
-      if (process.env.NODE_ENV === 'development' && renderTime > 16) {
-        console.warn(`🎨 ${name} render took ${renderTime.toFixed(2)}ms`);
-      }
+      // Render performance logging removed for cleaner console
     });
     
     return React.createElement(Component, { ...props, ref });

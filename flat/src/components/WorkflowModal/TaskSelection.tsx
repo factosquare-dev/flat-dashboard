@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckSquare } from 'lucide-react';
-import { tasksByFactory } from '../../data/mockData';
+import { mockDataService } from '../../services/mockDataService';
 
 interface TaskSelectionProps {
   selectedFactory: string;
@@ -38,7 +38,13 @@ export const TaskSelection: React.FC<TaskSelectionProps> = ({
         {/* 태스크 드롭다운 */}
         {showTaskDropdown && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-            {tasksByFactory[selectedFactory]?.map((task) => (
+            {(() => {
+              // selectedFactory가 공장 이름인 경우 factory ID로 변환
+              const factories = mockDataService.getAllFactories();
+              const factory = factories.find(f => f.name === selectedFactory);
+              const factoryId = factory?.id || selectedFactory;
+              const taskTypes = mockDataService.getTaskTypesForFactory(factoryId);
+              return taskTypes.map((task) => (
               <button
                 key={task}
                 onClick={() => onTaskSelect(task)}
@@ -46,7 +52,8 @@ export const TaskSelection: React.FC<TaskSelectionProps> = ({
               >
                 {task}
               </button>
-            ))}
+            ));
+            })()}
           </div>
         )}
       </div>

@@ -1,61 +1,96 @@
 import type { Project } from '../types/project';
 import type { Schedule, Task, Participant } from '../types/schedule';
-import { projectFactories, getRandomManager } from './mockData';
+import type { Factory } from '../types/factory';
+import { projectFactoriesByProjectId, getRandomManager } from './mockData';
 import { formatDateISO } from '../utils/dateUtils';
 import { factories } from './factories';
+import { TASK_TYPES, FACTORY_TYPES } from '../constants/factory';
+import { mockDataService } from '../services/mockDataService';
 
 // 태스크 타입별 기간 (일)
-const TASK_DURATIONS = {
-  'PCB 설계': 7,
-  'SMT 작업': 5,
-  '최종 조립': 3,
-  '품질 검사': 2,
-  '포장': 2,
-  '금형 제작': 10,
-  '사출 성형': 7,
-  '도장 작업': 4,
-  '조립': 3,
-  '검수': 2,
-  '회로 설계': 8,
-  '펌웨어 개발': 14,
-  '하드웨어 테스트': 5,
-  '인증 시험': 7,
-  '기구 설계': 10,
-  '시제품 제작': 5,
-  '성능 테스트': 3,
-  '양산 준비': 7,
-  '샘플 제작': 5,
-  '디자인 검토': 3,
-  '최종 승인': 2,
+const TASK_DURATIONS: { [key: string]: number } = {
   // 제조 공장 태스크
-  '원료 준비': 3,
-  '혼합 및 제조': 7,
-  '안정성 테스트': 5,
+  [TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT]: 3,
+  [TASK_TYPES.MANUFACTURING.MATERIAL_INSPECTION]: 2,
+  [TASK_TYPES.MANUFACTURING.MIXING]: 7,
+  [TASK_TYPES.MANUFACTURING.BLENDING]: 5,
+  [TASK_TYPES.MANUFACTURING.AGING]: 3,
+  [TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK]: 2,
+  [TASK_TYPES.MANUFACTURING.FILLING]: 3,
+  [TASK_TYPES.MANUFACTURING.SECOND_QUALITY_CHECK]: 2,
+  [TASK_TYPES.MANUFACTURING.STABILITY_TEST]: 5,
+  [TASK_TYPES.MANUFACTURING.FINAL_INSPECTION]: 2,
+  [TASK_TYPES.MANUFACTURING.SHIPPING_PREP]: 2,
+  
   // 용기 공장 태스크
-  '표면 처리': 3,
-  '품질 검수': 2,
-  '포장 준비': 2,
+  [TASK_TYPES.CONTAINER.DESIGN]: 5,
+  [TASK_TYPES.CONTAINER.MOLD_MAKING]: 10,
+  [TASK_TYPES.CONTAINER.PROTOTYPE_MAKING]: 5,
+  [TASK_TYPES.CONTAINER.INJECTION_MOLDING]: 7,
+  [TASK_TYPES.CONTAINER.CONTAINER_INSPECTION]: 2,
+  [TASK_TYPES.CONTAINER.PRINTING_LABELING]: 3,
+  [TASK_TYPES.CONTAINER.SURFACE_TREATMENT]: 3,
+  [TASK_TYPES.CONTAINER.ASSEMBLY]: 3,
+  [TASK_TYPES.CONTAINER.PACKAGING_PREP]: 2,
+  [TASK_TYPES.CONTAINER.QUALITY_CHECK]: 2,
+  [TASK_TYPES.CONTAINER.SHIPPING]: 1,
+  
   // 포장 공장 태스크
-  '디자인 작업': 5,
-  '인쇄 준비': 3,
-  '포장 작업': 4,
-  '라벨링': 2,
-  '최종 품질 검사': 2
+  [TASK_TYPES.PACKAGING.DESIGN]: 5,
+  [TASK_TYPES.PACKAGING.PRINT_PREP]: 3,
+  [TASK_TYPES.PACKAGING.MATERIAL_MAKING]: 4,
+  [TASK_TYPES.PACKAGING.PACKAGING_WORK]: 4,
+  [TASK_TYPES.PACKAGING.LABEL_ATTACHMENT]: 2,
+  [TASK_TYPES.PACKAGING.BOX_PACKAGING]: 3,
+  [TASK_TYPES.PACKAGING.SHRINK_WRAP]: 2,
+  [TASK_TYPES.PACKAGING.PACKAGING_INSPECTION]: 2,
+  [TASK_TYPES.PACKAGING.PALLET_LOADING]: 2,
+  [TASK_TYPES.PACKAGING.SHIPPING_PREP]: 2,
+  [TASK_TYPES.PACKAGING.DELIVERY]: 1
 };
 
 // 공장 타입별 태스크 목록
 const FACTORY_TYPE_TASKS: { [key: string]: string[] } = {
-  '제조': ['원료 준비', '혼합 및 제조', '품질 검사', '안정성 테스트', '최종 승인'],
-  '용기': ['금형 제작', '사출 성형', '표면 처리', '품질 검수', '포장 준비'],
-  '포장': ['디자인 작업', '인쇄 준비', '포장 작업', '라벨링', '최종 품질 검사'],
-  'default': ['샘플 제작', '디자인 검토', '품질 검사', '최종 승인']
+  [FACTORY_TYPES.MANUFACTURING]: [
+    TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT,
+    TASK_TYPES.MANUFACTURING.MIXING,
+    TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK,
+    TASK_TYPES.MANUFACTURING.STABILITY_TEST,
+    TASK_TYPES.MANUFACTURING.FINAL_INSPECTION
+  ],
+  [FACTORY_TYPES.CONTAINER]: [
+    TASK_TYPES.CONTAINER.MOLD_MAKING,
+    TASK_TYPES.CONTAINER.INJECTION_MOLDING,
+    TASK_TYPES.CONTAINER.SURFACE_TREATMENT,
+    TASK_TYPES.CONTAINER.QUALITY_CHECK,
+    TASK_TYPES.CONTAINER.PACKAGING_PREP
+  ],
+  [FACTORY_TYPES.PACKAGING]: [
+    TASK_TYPES.PACKAGING.DESIGN,
+    TASK_TYPES.PACKAGING.PRINT_PREP,
+    TASK_TYPES.PACKAGING.PACKAGING_WORK,
+    TASK_TYPES.PACKAGING.LABEL_ATTACHMENT,
+    TASK_TYPES.PACKAGING.PACKAGING_INSPECTION
+  ],
+  'default': [
+    TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT,
+    TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK,
+    TASK_TYPES.MANUFACTURING.FINAL_INSPECTION,
+    TASK_TYPES.MANUFACTURING.SHIPPING_PREP
+  ]
 };
 
-// factories.ts에서 공장별 태스크 목록 가져오기
-const getFactoryTasks = (factoryName: string, factoryType: string): string[] => {
+// Factory ID로 태스크 목록 가져오기
+const getFactoryTasksById = (factoryId: string, factoryType: string): string[] => {
+  // Factory ID로 특정 태스크가 있는지 확인
+  if (FACTORY_TASKS_BY_ID[factoryId]) {
+    return FACTORY_TASKS_BY_ID[factoryId];
+  }
+  
   // factories.ts에서 해당 공장의 서비스 또는 태스크 정보 가져오기
-  const factory = factories.find(f => f.name === factoryName);
+  const factory = factories.find(f => f.id === factoryId);
   if (factory && factory.services && factory.services.length > 0) {
+    // 서비스 이름을 TASK_TYPES에 매핑하는 로직이 필요할 수 있음
     return factory.services;
   }
   
@@ -63,12 +98,36 @@ const getFactoryTasks = (factoryName: string, factoryType: string): string[] => 
   return FACTORY_TYPE_TASKS[factoryType] || FACTORY_TYPE_TASKS['default'];
 };
 
-// 공장별 태스크 목록 (특정 공장에 특화된 태스크) - 백업용
-const FACTORY_TASKS: { [key: string]: string[] } = {
-  '큐셀시스템': ['PCB 설계', 'SMT 작업', '최종 조립', '품질 검사', '포장'],
-  '(주)연우': ['금형 제작', '사출 성형', '도장 작업', '조립', '검수'],
-  '(주)네트모베이지': ['회로 설계', '펌웨어 개발', '하드웨어 테스트', '인증 시험'],
-  '주식회사 코스모로스': ['기구 설계', '시제품 제작', '성능 테스트', '양산 준비']
+
+// 공장별 태스크 목록 (특정 공장에 특화된 태스크) - Factory ID 기반
+const FACTORY_TASKS_BY_ID: { [key: string]: string[] } = {
+  'mfg-1': [ // 큐셀시스템
+    TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT,
+    TASK_TYPES.MANUFACTURING.MIXING,
+    TASK_TYPES.MANUFACTURING.FINAL_INSPECTION,
+    TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK,
+    TASK_TYPES.MANUFACTURING.SHIPPING_PREP
+  ],
+  'cont-1': [ // (주)연우
+    TASK_TYPES.CONTAINER.MOLD_MAKING,
+    TASK_TYPES.CONTAINER.INJECTION_MOLDING,
+    TASK_TYPES.CONTAINER.SURFACE_TREATMENT,
+    TASK_TYPES.CONTAINER.ASSEMBLY,
+    TASK_TYPES.CONTAINER.QUALITY_CHECK
+  ],
+  'pack-1': [ // (주)네트모베이지
+    TASK_TYPES.PACKAGING.DESIGN,
+    TASK_TYPES.PACKAGING.PRINT_PREP,
+    TASK_TYPES.PACKAGING.PACKAGING_WORK,
+    TASK_TYPES.PACKAGING.PACKAGING_INSPECTION,
+    TASK_TYPES.PACKAGING.SHIPPING_PREP
+  ],
+  'mfg-2': [ // 주식회사 코스모로스
+    TASK_TYPES.MANUFACTURING.MATERIAL_INSPECTION,
+    TASK_TYPES.MANUFACTURING.BLENDING,
+    TASK_TYPES.MANUFACTURING.STABILITY_TEST,
+    TASK_TYPES.MANUFACTURING.SHIPPING_PREP
+  ]
 };
 
 // 날짜 계산 함수
@@ -82,37 +141,15 @@ const formatDate = (date: Date): string => {
   return formatDateISO(date);
 };
 
-// factories.ts에서 공장별 담당자 가져오기
-const getAssigneeForFactory = (factoryName: string): string => {
-  const factory = factories.find(f => f.name === factoryName);
-  if (factory && factory.contactPerson) {
-    return factory.contactPerson;
-  }
-  
-  // Fallback: 공장명에서 키워드를 찾아서 매핑
-  const assigneeMap: { [key: string]: string } = {
-    '큐셀시스템': '김철수',
-    '(주)연우': '이영희',
-    '(주)네트모베이지': '정수진',
-    '주식회사 코스모로스': '최현우',
-    '삼성전자': '박민수',
-    'LG화학': '홍길동',
-    '아모레퍼시픽': '김영희',
-    '한국콜마': '이철수'
-  };
-  
-  for (const [key, assignee] of Object.entries(assigneeMap)) {
-    if (factoryName.includes(key)) {
-      return assignee;
-    }
-  }
-  
-  // 마지막 대안: 랜덤 매니저 선택
-  return getRandomManager();
+// 공장 ID로 담당자 가져오기
+const getAssigneeForFactoryId = (factoryId: string): string => {
+  // Mock DB에서 담당자 정보 가져오기
+  return mockDataService.getAssigneeForFactoryId(factoryId);
 };
 
+
 // 프로젝트 진행률에 따른 태스크 생성
-export const generateTasksForProject = (project: Project, factories: ProjectFactory[]): Task[] => {
+export const generateTasksForProject = (project: Project, projectFactories: ProjectFactory[]): Task[] => {
   const tasks: Task[] = [];
   let taskId = 1;
   const projectStartDate = new Date(project.startDate);
@@ -124,15 +161,23 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
   const isProjectStarted = today >= projectStartDate;
   const isProjectEnded = today > projectEndDate;
   
-  factories.forEach((factory, factoryIndex) => {
-    // 공장 타입 확인 (제조/용기/포장)
-    let factoryType = 'default';
-    if (factory.name === project.manufacturer) factoryType = '제조';
-    else if (factory.name === project.container) factoryType = '용기';
-    else if (factory.name === project.packaging) factoryType = '포장';
+  // 프로젝트에 할당된 공장 ID들 가져오기
+  const manufacturerFactory = mockDataService.getAllFactories().find(f => f.name === project.manufacturer);
+  const containerFactory = mockDataService.getAllFactories().find(f => f.name === project.container);
+  const packagingFactory = mockDataService.getAllFactories().find(f => f.name === project.packaging);
+  
+  const assignedFactories = [
+    manufacturerFactory,
+    containerFactory,
+    packagingFactory
+  ].filter(f => f !== undefined) as Factory[];
+  
+  assignedFactories.forEach((factory, factoryIndex) => {
+    // 공장 타입은 factory 객체에서 직접 가져오기
+    const factoryType = factory.type;
     
     // factories.ts에서 공장별 태스크 가져오기
-    const factoryTasks = getFactoryTasks(factory.name, factoryType);
+    const factoryTasks = getFactoryTasksById(factory.id, factoryType);
     
     let taskStartDate = new Date(projectStartDate);
     
@@ -178,7 +223,7 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
         color: factory.color.replace('bg-', '').replace('-500', ''),
         status: status,
         projectId: project.id,
-        assignee: getAssigneeForFactory(factory.name),
+        assignee: getAssigneeForFactoryId(factory.id),
         x: 0,
         width: 0
       });
@@ -193,26 +238,26 @@ export const generateTasksForProject = (project: Project, factories: ProjectFact
 
 // 프로젝트에서 스케줄 생성
 export const createScheduleFromProject = (project: Project): Schedule => {
-  // Get factory names from the project (these should already be resolved from database)
-  const factoryNames = [
-    project.manufacturer,
-    project.container,
-    project.packaging
-  ].filter(name => name && name !== 'Unknown');
+  // Get factory objects from the project names
+  const allFactories = mockDataService.getAllFactories();
+  const manufacturerFactory = allFactories.find(f => f.name === project.manufacturer);
+  const containerFactory = allFactories.find(f => f.name === project.container);
+  const packagingFactory = allFactories.find(f => f.name === project.packaging);
   
-  const factories = factoryNames.map((name, index) => ({
-    name,
-    color: index === 0 ? 'bg-blue-500' : index === 1 ? 'bg-red-500' : 'bg-yellow-500'
-  }));
+  const projectFactories = [
+    manufacturerFactory && { ...manufacturerFactory, color: 'bg-blue-500' },
+    containerFactory && { ...containerFactory, color: 'bg-red-500' },
+    packagingFactory && { ...packagingFactory, color: 'bg-yellow-500' }
+  ].filter(Boolean) as (Factory & { color: string })[];
   
-  const participants: Participant[] = factories.map(factory => ({
-    id: factory.name,
+  const participants: Participant[] = projectFactories.map(factory => ({
+    id: factory.id,
     name: factory.name,
     period: `${project.startDate} ~ ${project.endDate}`,
     color: factory.color.replace('bg-', '').replace('-500', '')
   }));
   
-  const tasks = generateTasksForProject(project, factories);
+  const tasks = generateTasksForProject(project, projectFactories);
   
   
   // 고유한 스케줄 ID 생성
@@ -242,63 +287,87 @@ export const createSchedulesFromProjects = (projects: Project[]): Schedule[] => 
 // 진행 중인 태스크 샘플 생성
 export const createSampleInProgressTasks = (): Task[] => {
   const today = new Date();
-  const tasks: Task[] = [
-    {
+  const allFactories = mockDataService.getAllFactories();
+  
+  // 공장 ID로 가져오기
+  const mfgFactory1 = allFactories.find(f => f.id === 'mfg-1');
+  const contFactory1 = allFactories.find(f => f.id === 'cont-1');
+  const packFactory1 = allFactories.find(f => f.id === 'pack-1');
+  const mfgFactory2 = allFactories.find(f => f.id === 'mfg-2');
+  
+  const tasks: Task[] = [];
+  
+  if (mfgFactory1) {
+    tasks.push({
       id: 101,
-      factory: '큐셀시스템',
-      taskType: 'SMT 작업',
+      factory: mfgFactory1.name,
+      factoryId: mfgFactory1.id,
+      taskType: TASK_TYPES.MANUFACTURING.MIXING,
       startDate: formatDate(addDays(today, -2)),
       endDate: formatDate(addDays(today, 3)),
       color: 'blue',
       status: 'in-progress',
       projectId: '1'
-    },
-    {
-      id: 102,
-      factory: '(주)연우',
-      taskType: '사출 성형',
-      startDate: formatDate(addDays(today, -1)),
-      endDate: formatDate(addDays(today, 6)),
-      color: 'red',
-      status: 'in-progress',
-      projectId: '1'
-    },
-    {
-      id: 103,
-      factory: '(주)네트모베이지',
-      taskType: '펌웨어 개발',
-      startDate: formatDate(addDays(today, -5)),
-      endDate: formatDate(addDays(today, 9)),
-      color: 'yellow',
-      status: 'in-progress',
-      projectId: '2'
-    },
-    {
-      id: 104,
-      factory: '주식회사 코스모로스',
-      taskType: '시제품 제작',
-      startDate: formatDate(today),
-      endDate: formatDate(addDays(today, 5)),
-      color: 'cyan',
-      status: 'in-progress',
-      projectId: '3'
-    },
-    {
+    });
+    
+    tasks.push({
       id: 105,
-      factory: '큐셀시스템',
-      taskType: '품질 검사',
+      factory: mfgFactory1.name,
+      factoryId: mfgFactory1.id,
+      taskType: TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK,
       startDate: formatDate(addDays(today, -1)),
       endDate: formatDate(addDays(today, 1)),
       color: 'blue',
       status: 'in-progress',
       projectId: '3'
-    }
-  ];
+    });
+  }
+  
+  if (contFactory1) {
+    tasks.push({
+      id: 102,
+      factory: contFactory1.name,
+      factoryId: contFactory1.id,
+      taskType: TASK_TYPES.CONTAINER.INJECTION_MOLDING,
+      startDate: formatDate(addDays(today, -1)),
+      endDate: formatDate(addDays(today, 6)),
+      color: 'red',
+      status: 'in-progress',
+      projectId: '1'
+    });
+  }
+  
+  if (packFactory1) {
+    tasks.push({
+      id: 103,
+      factory: packFactory1.name,
+      factoryId: packFactory1.id,
+      taskType: TASK_TYPES.PACKAGING.PACKAGING_WORK,
+      startDate: formatDate(addDays(today, -5)),
+      endDate: formatDate(addDays(today, 9)),
+      color: 'yellow',
+      status: 'in-progress',
+      projectId: '2'
+    });
+  }
+  
+  if (mfgFactory2) {
+    tasks.push({
+      id: 104,
+      factory: mfgFactory2.name,
+      factoryId: mfgFactory2.id,
+      taskType: TASK_TYPES.MANUFACTURING.STABILITY_TEST,
+      startDate: formatDate(today),
+      endDate: formatDate(addDays(today, 5)),
+      color: 'cyan',
+      status: 'in-progress',
+      projectId: '3'
+    });
+  }
   
   return tasks;
 };
 
-interface ProjectFactory {
-  name: string;
+interface ProjectFactory extends Factory {
   color: string;
 }

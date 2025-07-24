@@ -5,21 +5,25 @@
 import type { Task, Participant } from '../../../../types/schedule';
 import { findAvailableDateRange } from '../../../../utils/taskUtils';
 import { factories } from '../../../../data/factories';
+import { mockDataService } from '../../../../services/mockDataService';
 
 export const validateFactoryCompatibility = (
   task: Task,
-  targetFactory: string,
+  targetFactoryId: string,
   projects: Participant[]
 ): { isCompatible: boolean; reason?: string } => {
-  const taskFactory = task.factory;
+  const taskFactoryId = task.factoryId || task.factory; // Fallback to name if ID not available
   
-  if (!taskFactory || !targetFactory) {
+  if (!taskFactoryId || !targetFactoryId) {
     return { isCompatible: true };
   }
   
-  // Find factory objects
-  const sourceFactory = factories.find(f => f.name === taskFactory);
-  const targetFactoryObj = factories.find(f => f.name === targetFactory);
+  // Find factory objects by ID first, then by name as fallback
+  const allFactories = mockDataService.getAllFactories();
+  const sourceFactory = allFactories.find(f => f.id === taskFactoryId) || 
+                       allFactories.find(f => f.name === taskFactoryId);
+  const targetFactoryObj = allFactories.find(f => f.id === targetFactoryId) || 
+                          allFactories.find(f => f.name === targetFactoryId);
   
   if (!sourceFactory || !targetFactoryObj) {
     return { 
@@ -39,7 +43,7 @@ export const validateFactoryCompatibility = (
   }
   
   // Check capacity constraints (if applicable)
-  const targetProject = projects.find(p => p.name === targetFactory);
+  const targetProject = projects.find(p => p.id === targetFactoryId || p.name === targetFactoryObj.name);
   if (targetProject) {
     // Add capacity validation logic here if needed
     // For now, just return compatible
@@ -52,11 +56,11 @@ export const validateFactoryCompatibility = (
 export const validateDateRange = (
   startDate: string,
   endDate: string,
-  targetFactory: string,
+  targetFactoryId: string,
   task: Task,
   projects: Participant[]
 ): { isValid: boolean; reason?: string } => {
-  const targetProject = projects.find(p => p.name === targetFactory);
+  const targetProject = projects.find(p => p.id === targetFactoryId);
   
   if (!targetProject) {
     return { isValid: false, reason: '대상 프로젝트를 찾을 수 없습니다.' };
@@ -93,19 +97,19 @@ export const validateDateRange = (
 
 export const validateTaskDrop = (
   task: Task,
-  targetFactory: string,
+  targetFactoryId: string,
   startDate: string,
   endDate: string,
   projects: Participant[]
 ): { isValid: boolean; reason?: string } => {
   // Validate factory compatibility
-  const factoryValidation = validateFactoryCompatibility(task, targetFactory, projects);
+  const factoryValidation = validateFactoryCompatibility(task, targetFactoryId, projects);
   if (!factoryValidation.isCompatible) {
     return { isValid: false, reason: factoryValidation.reason };
   }
   
   // Validate date range
-  const dateValidation = validateDateRange(startDate, endDate, targetFactory, task, projects);
+  const dateValidation = validateDateRange(startDate, endDate, targetFactoryId, task, projects);
   if (!dateValidation.isValid) {
     return { isValid: false, reason: dateValidation.reason };
   }
@@ -117,10 +121,10 @@ export const validateTaskDrop = (
 
 export const getDropFeedback = (
   task: Task,
-  targetFactory: string,
+  targetFactoryId: string,
   projects: Participant[]
 ): { canDrop: boolean; message?: string; style?: string } => {
-  const validation = validateFactoryCompatibility(task, targetFactory, projects);
+  const validation = validateFactoryCompatibility(task, targetFactoryId, projects);
   
   if (!validation.isCompatible) {
     return {

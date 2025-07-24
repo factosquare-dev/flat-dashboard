@@ -15,6 +15,7 @@ export interface ScheduleProps {
 export interface TaskData {
   projectId?: string;
   factory: string;
+  factoryId?: string;
   taskType?: string;
   startDate: string;
   endDate: string;

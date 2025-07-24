@@ -48,9 +48,8 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
         <TableHeader />
         <tbody role="rowgroup">
           {sortedTasks.map((task) => {
-            // projectId로 매칭되는 프로젝트를 찾거나, factory 이름으로 찾기
-            const project = projectMap.get(task.projectId) || 
-                           projects.find(p => p.name === task.factory);
+            // 오직 projectId로만 매칭 (factory name 매칭 제거)
+            const project = projectMap.get(task.projectId);
             
             return (
               <TaskRow

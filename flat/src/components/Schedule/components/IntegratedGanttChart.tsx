@@ -51,13 +51,9 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
     const colorMap = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-cyan-500'];
     
     return participants.map((participant, index) => {
-      // Get tasks for this participant
+      // Get tasks for this participant - 오직 factoryId로만 매칭 (가장 안전)
       const projectTasks = tasks
-        .filter(task => 
-          task.projectId === participant.id || 
-          task.factory === participant.name ||
-          task.factoryId === participant.id
-        )
+        .filter(task => task.factoryId === participant.id)
         .map(task => ({
           id: task.id,
           title: task.title || task.taskType || '태스크',

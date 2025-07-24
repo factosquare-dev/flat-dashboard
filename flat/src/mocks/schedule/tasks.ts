@@ -1,5 +1,6 @@
 import type { Task, Schedule } from '../../types/schedule';
 import { formatDate, addDays, getToday } from './utils';
+import { TASK_TYPES } from '../../constants/factory';
 
 const today = getToday();
 
@@ -11,30 +12,36 @@ export const mockTasks: Task[] = [
   {
     id: 101,
     projectId: 'cont-1',
-    title: '용기 디자인',
+    title: TASK_TYPES.CONTAINER.DESIGN,
+    taskType: TASK_TYPES.CONTAINER.DESIGN,
     startDate: formatDate(addDays(today, -3)),
     endDate: formatDate(addDays(today, -1)),
     factory: '(주)연우',
+    factoryId: 'cont-1',
     assignee: '김영수',
     status: 'completed'
   },
   {
     id: 102,
     projectId: 'cont-1',
-    title: '금형 제작',
+    title: TASK_TYPES.CONTAINER.MOLD_MAKING,
+    taskType: TASK_TYPES.CONTAINER.MOLD_MAKING,
     startDate: formatDate(addDays(today, -2)),
     endDate: formatDate(today),
     factory: '(주)연우',
+    factoryId: 'cont-1',
     assignee: '이미나',
     status: 'in-progress'
   },
   {
     id: 103,
     projectId: 'cont-1',
-    title: '시제품 제작',
+    title: TASK_TYPES.CONTAINER.PROTOTYPE_MAKING,
+    taskType: TASK_TYPES.CONTAINER.PROTOTYPE_MAKING,
     startDate: formatDate(addDays(today, -1)),
     endDate: formatDate(addDays(today, 1)),
     factory: '(주)연우',
+    factoryId: 'cont-1',
     assignee: '박준호',
     status: 'in-progress'
   }
@@ -76,11 +83,16 @@ export const createInProgressTasks = (schedule: Schedule): Task[] => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 3); // 3일 후 종료
     
-    const taskTypes = ['품질 검사', '사출 성형', '포장 작업'];
+    const taskTypes = [
+      TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK,
+      TASK_TYPES.CONTAINER.INJECTION_MOLDING,
+      TASK_TYPES.PACKAGING.PACKAGING_WORK
+    ];
     
     inProgressTasks.push({
       id: taskId++,
       factory: participant.name,
+      factoryId: participant.id,
       taskType: taskTypes[index] || taskTypes[0],
       startDate: formatDate(startDate),
       endDate: formatDate(endDate),
