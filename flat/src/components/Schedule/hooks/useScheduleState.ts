@@ -98,6 +98,10 @@ export const useScheduleState = (
     // 고정 패딩: Master 프로젝트 기간의 15% (최소 7일, 최대 21일)
     const padding = Math.max(7, Math.min(21, Math.ceil(projectDuration * 0.15)));
     
+    console.log(`[Schedule] Using Master project dates for Gantt chart:`);
+    console.log(`[Schedule] Master: ${projectStart.toISOString().split('T')[0]} - ${projectEnd.toISOString().split('T')[0]} (${projectDuration} days)`);
+    console.log(`[Schedule] Gantt chart: ${new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]} - ${new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]} (padding: ${padding} days)`);
+    
     startDate = new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000));
     endDate = new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000));
   } else {
