@@ -3,6 +3,7 @@ import { Calendar, Mail } from 'lucide-react';
 import type { Priority, ServiceType, ProjectStatus } from '../../types/project';
 import DateRangeFilter from './DateRangeFilter';
 import { getStatusStyles, getAllStatuses } from '../../../utils/statusUtils';
+import '../../../design-system/styles/button.css';
 
 interface ProjectFiltersProps {
   selectedPriority: Priority | 'all';
@@ -33,14 +34,17 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
     <div className="space-y-2">
       {/* 검색 영역 */}
       <div className="relative">
+        <label htmlFor="project-search" className="sr-only">프로젝트 검색</label>
         <input
+          id="project-search"
           type="text"
           placeholder="프로젝트명, 고객명, 공장명으로 검색..."
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
           className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs transition-all hover:bg-white"
+          aria-label="프로젝트 검색"
         />
-        <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
@@ -55,29 +59,41 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
         </div>
         
         {/* Status Filters */}
-        <div className="flex gap-1">
-          {getAllStatuses('project').map(statusInfo => (
-            <button
-              key={statusInfo.code}
-              onClick={() => onStatusFilterToggle(statusInfo.displayName as ProjectStatus)}
-              className={`px-3 py-1.5 rounded-full font-medium text-xs transition-all border ${
-                statusFilters.includes(statusInfo.displayName as ProjectStatus)
-                  ? `${getStatusStyles(statusInfo.code, 'project')} shadow-sm`
-                  : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
-              }`}
-            >
-              {statusInfo.displayName}
-            </button>
-          ))}
+        <div className="flex gap-1" role="group" aria-label="상태 필터">
+          {getAllStatuses('project').map(statusInfo => {
+            const isSelected = statusFilters.includes(statusInfo.displayName as ProjectStatus);
+            const isPlanningStatus = statusInfo.code.toUpperCase() === 'PLANNING';
+            
+            return (
+              <button
+                key={statusInfo.code}
+                onClick={() => onStatusFilterToggle(statusInfo.displayName as ProjectStatus)}
+                className={`px-3 py-1.5 h-8 rounded-full text-xs font-medium transition-all border ${
+                  isSelected
+                    ? isPlanningStatus
+                      ? 'bg-gray-600 text-white border-gray-700 shadow-sm'
+                      : `${getStatusStyles(statusInfo.code, 'project')} shadow-sm`
+                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                }`}
+                aria-pressed={isSelected}
+                aria-label={`${statusInfo.displayName} 상태 필터 ${isSelected ? '선택됨' : '선택 안됨'}`}
+              >
+                {statusInfo.displayName}
+              </button>
+            );
+          })}
         </div>
         
         <div className="h-4 w-px bg-gray-300" />
         
         {/* Priority Filter */}
+        <label htmlFor="priority-filter" className="sr-only">우선순위 필터</label>
         <select 
+          id="priority-filter"
           value={selectedPriority}
           onChange={(e) => onPriorityChange(e.target.value as Priority | 'all')}
           className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg font-medium text-xs text-gray-700 hover:bg-gray-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="우선순위 필터 선택"
       >
         <option value="all">모든 우선순위</option>
         <option value="높음">높음</option>
@@ -86,10 +102,13 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
       </select>
 
         {/* Service Type Filter */}
+        <label htmlFor="service-type-filter" className="sr-only">서비스 유형 필터</label>
         <select 
+          id="service-type-filter"
           value={selectedServiceType}
           onChange={(e) => onServiceTypeChange(e.target.value as ServiceType | 'all')}
           className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg font-medium text-xs text-gray-700 hover:bg-gray-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="서비스 유형 필터 선택"
       >
         <option value="all">모든 서비스 유형</option>
         <option value="OEM">OEM</option>

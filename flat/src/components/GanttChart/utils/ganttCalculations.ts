@@ -19,20 +19,6 @@ export const getDateIndex = (dateStr: string): number => {
   const { baseDate } = getGanttDateRange();
   const index = differenceInDays(date, startOfDay(baseDate));
   
-  // Debug for 원료 수령
-  if (dateStr === '2025-07-04') {
-    console.log('[getDateIndex] Debug for 원료 수령 (2025-07-04):');
-    console.log('  - Input string:', dateStr);
-    console.log('  - Parsed date:', date);
-    console.log('  - Base date:', baseDate);
-    console.log('  - Base date formatted:', formatDateISO(baseDate));
-    console.log('  - Calculated index:', index);
-    
-    // Manually calculate what date this index represents
-    const calculatedDate = addDays(startOfDay(baseDate), index);
-    console.log('  - Index', index, 'represents date:', formatDateISO(calculatedDate));
-  }
-  
   return index;
 };
 

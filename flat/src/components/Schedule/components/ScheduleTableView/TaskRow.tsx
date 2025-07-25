@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import type { Task, Participant } from '../../../../types/schedule';
 import { APP_CONSTANTS } from '../../../../config/constants';
+import { gridColors } from '../../../../design-system/colors/grid';
 import TaskStatusIcons from './TaskStatusIcons';
 import TaskSchedule from './TaskSchedule';
 import TaskFactory from './TaskFactory';
@@ -28,12 +29,12 @@ const TaskRow: React.FC<TaskRowProps> = ({
     onTaskClick?.(task);
   }, [onTaskClick, task]);
   return (
-    <tr className="hover:bg-gray-50/50 transition-colors border-b border-gray-100" role="row">
+    <tr className={`${gridColors.row.hover} transition-colors border-b ${gridColors.row.border}`} role="row">
       {/* {APP_CONSTANTS.TEXT.TASK.NAME} */}
       <td className="px-4 py-3" role="gridcell">
         <button
           onClick={handleTaskClick}
-          className="text-left hover:text-blue-600 transition-colors font-medium text-sm text-gray-900 flex items-center"
+          className={`text-left ${gridColors.task.textHover} transition-colors font-medium text-sm ${gridColors.task.text} flex items-center`}
           aria-label={`작업 ${task.name} 세부정보 보기`}
         >
           <TaskStatusIcons task={task} />

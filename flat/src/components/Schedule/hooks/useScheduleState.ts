@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import type { Participant, Task } from '../../../types/schedule';
-import { getDaysArray } from '../../../utils/dateUtils';
-import { formatDate } from '../../../utils/formatUtils';
+import { getDaysArray } from '../../../utils/scheduleUtils';
+import { formatDate } from '../../../utils/coreUtils';
 import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
 import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
 import { useScheduleTasksWithStore } from '../../../hooks/useScheduleTasksWithStore';
@@ -10,6 +10,8 @@ import { factories } from '../../../data/factories';
 import { getDatabaseWithRetry } from '../../../mocks/database/utils';
 import { ProjectType } from '../../../types/project';
 import { storageKeys } from '../../../config';
+import { parseScheduleDate } from '../../../utils/scheduleDateParsing';
+import { addDays, startOfDay } from 'date-fns';
 
 interface ModalState {
   showEmailModal: boolean;
@@ -48,10 +50,8 @@ export const useScheduleState = (
   initialTasks?: Task[],
   projectId?: string
 ) => {
-  // console.log('[useScheduleState] Received dates:', { projectStartDate, projectEndDate });
   
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = startOfDay(new Date());
   
   // 프로젝트 날짜 범위 찾기 (전달받은 날짜가 없는 경우 MockDB에서 가져옴)
   const projectDateRange = useMemo(() => {
@@ -85,7 +85,7 @@ export const useScheduleState = (
         };
       }
     } catch (error) {
-      console.error('[useScheduleState] Error getting project dates:', error);
+      // Error getting project dates
     }
 
     return { startDate: projectStartDate, endDate: projectEndDate };
@@ -95,45 +95,37 @@ export const useScheduleState = (
   let startDate: Date;
   let endDate: Date;
   
-  // console.log('[useScheduleState] Using project date range:', projectDateRange);
+  // Use unified date parsing
+  const parseLocalDate = parseScheduleDate;
+  
   
   if (projectDateRange.startDate && projectDateRange.endDate) {
-    const projectStart = new Date(projectDateRange.startDate);
-    const projectEnd = new Date(projectDateRange.endDate);
+    // Use local date parsing to avoid timezone issues
+    const projectStart = parseLocalDate(projectDateRange.startDate);
+    const projectEnd = parseLocalDate(projectDateRange.endDate);
     
     // 프로젝트 기간 계산
     const projectDuration = Math.ceil((projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24));
     
-    // 고정 패딩: Master 프로젝트 기간의 15% (최소 7일, 최대 21일)
-    const padding = Math.max(7, Math.min(21, Math.ceil(projectDuration * 0.15)));
+    // 패딩 제거 - 프로젝트 날짜와 그리드 날짜를 동일하게 설정
+    startDate = startOfDay(projectStart);
+    endDate = startOfDay(projectEnd);
     
-    startDate = new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000));
-    endDate = new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000));
     
-    console.log('[useScheduleState] Date calculation:', {
-      projectStart: projectStart.toISOString().split('T')[0],
-      projectEnd: projectEnd.toISOString().split('T')[0],
-      projectDuration,
-      padding,
-      gridStartDate: startDate.toISOString().split('T')[0],
-      gridEndDate: endDate.toISOString().split('T')[0]
-    });
   } else {
     // 프로젝트 날짜가 없는 경우 전달받은 프로젝트 날짜 사용
     if (projectStartDate && projectEndDate) {
-      const projectStart = new Date(projectStartDate);
-      const projectEnd = new Date(projectEndDate);
-      const projectDuration = Math.ceil((projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24));
-      const padding = Math.max(7, Math.min(21, Math.ceil(projectDuration * 0.15)));
+      const projectStart = parseLocalDate(projectStartDate);
+      const projectEnd = parseLocalDate(projectEndDate);
       
-      startDate = new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000));
-      endDate = new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000));
+      // 패딩 제거 - 프로젝트 날짜와 그리드 날짜를 동일하게 설정
+      startDate = startOfDay(projectStart);
+      endDate = startOfDay(projectEnd);
     } else {
       // 정말로 날짜가 없는 경우만 현재 날짜 사용
-      startDate = new Date(today.getTime());
-      startDate.setMonth(startDate.getMonth() - 1);
-      endDate = new Date(today.getTime());
-      endDate.setMonth(endDate.getMonth() + 2);
+      // Use date-fns for date calculations
+      startDate = startOfDay(addDays(today, -30)); // 1 month before
+      endDate = startOfDay(addDays(today, 60)); // 2 months after
     }
   }
 
@@ -150,11 +142,6 @@ export const useScheduleState = (
     cellWidth
   };
   
-  // console.log('[useScheduleState] Final date range:', {
-  //   startDate: startDate.toISOString().split('T')[0],
-  //   endDate: endDate.toISOString().split('T')[0],
-  //   daysCount: days.length
-  // });
 
   // 색상 배열 정의 (실제 색상 값) - useMemo로 최적화
   const colors = useMemo(() => [
@@ -174,8 +161,8 @@ export const useScheduleState = (
   const initialProjects = participants && participants.length > 0 ? participants : 
     factories.slice(0, 10).map((factory, index) => {
       // 프로젝트 기간 내에서 공장별 작업 기간 분배
-      const projectStart = new Date(projectDateRange.startDate || projectStartDate);
-      const projectEnd = new Date(projectDateRange.endDate || projectEndDate);
+      const projectStart = parseLocalDate(projectDateRange.startDate || projectStartDate);
+      const projectEnd = parseLocalDate(projectDateRange.endDate || projectEndDate);
       const projectDuration = (projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24);
       
       // 각 공장의 작업을 프로젝트 기간 내에 균등 분배
@@ -223,8 +210,8 @@ export const useScheduleState = (
   const dragControls = useScheduleDrag();
   
   // Use store-based task controls if projectId is provided
-  const storeTaskControls = useScheduleTasksWithStore(projects, startDate, endDate, projectId, cellWidth);
-  const localTaskControls = useScheduleTasks(projects, startDate, endDate, initialTasks, cellWidth);
+  const storeTaskControls = useScheduleTasksWithStore(projects, startDate, endDate, projectId, cellWidth, days);
+  const localTaskControls = useScheduleTasks(projects, startDate, endDate, initialTasks, cellWidth, days);
   
   // Use store controls if projectId exists, otherwise use local controls
   const taskControls = projectId ? storeTaskControls : localTaskControls;

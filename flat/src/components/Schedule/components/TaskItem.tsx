@@ -83,6 +83,11 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
         willChange: isResizing ? 'left, width' : 'auto',
         zIndex: isDragging ? 100 : 500 // Above grid but below preview and factory names
       }}
+      data-task-id={task.id}
+      data-task-name={task.title || task.name || task.taskType}
+      data-task-date={`${task.startDate}~${task.endDate}`}
+      data-task-x={left}
+      data-expected-x={task.x}
       draggable={!isResizing}
       onClick={(e) => {
         // Always stop propagation to prevent grid cell clicks

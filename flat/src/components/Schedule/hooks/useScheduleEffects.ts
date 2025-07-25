@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { isToday } from '../../../utils/dateUtils';
+import { isToday } from '../../../utils/coreUtils';
 
 export const useScheduleEffects = (
   days: Date[],
@@ -35,17 +35,13 @@ export const useScheduleEffects = (
 
   // 초기 로드 시에만 오늘 날짜로 스크롤
   useEffect(() => {
-    // days가 새로 로드되면 스크롤 플래그 리셋
-    hasScrolledToToday.current = false;
-    
     const scrollElement = scrollRef.current;
-    if (scrollElement && days.length > 0) {
+    if (scrollElement && days.length > 0 && !hasScrolledToToday.current) {
       const todayIndex = days.findIndex(day => isToday(day));
       if (todayIndex >= 0) {
         // setTimeout으로 초기 렌더링 후 스크롤
         setTimeout(() => {
-          if (!scrollRef.current) {
-            console.log('scrollRef not available');
+          if (!scrollRef.current || hasScrolledToToday.current) {
             return;
           }
           
@@ -74,7 +70,7 @@ export const useScheduleEffects = (
         }, 300);
       }
     }
-  }, [days, scrollRef]); // days 배열이 변경될 때마다 실행
+  }, [days.length]); // days 길이가 변경될 때만 실행
 
   const handleSliderChange = (value: number) => {
     setSliderValue(value);

@@ -1,5 +1,5 @@
 import type { Schedule, Task } from '../types/schedule';
-import { formatDateISO } from '../utils/dateUtils';
+import { formatDateISO } from '../utils/coreUtils';
 import { getRandomManager, getRandomProductType, allClients, managerNames } from './mockData';
 import { mockFactories } from './scheduleMockData';
 import { validateSchedule, TASK_CONSTRAINTS } from '../utils/taskValidation';

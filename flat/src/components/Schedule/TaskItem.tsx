@@ -28,6 +28,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onTaskHover,
   projectId
 }) => {
+
   return (
     <div
       className={`absolute flex items-center justify-center text-white text-xs font-medium rounded cursor-pointer transition-all ${

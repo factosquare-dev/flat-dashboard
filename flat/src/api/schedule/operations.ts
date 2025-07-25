@@ -1,7 +1,7 @@
 import type { Schedule, Task, Participant } from '../../types/schedule';
 import type { Project } from '../../types/project';
 import { createScheduleFromProject, createSampleInProgressTasks } from '../../data/projectScheduleData';
-import { formatDateISO } from '../../utils/dateUtils';
+import { formatDate } from '../../utils/coreUtils';
 import { USE_MOCK_DATA } from '../../mocks/mockData';
 import { getDatabaseWithRetry } from '../../mocks/database/utils';
 // Removed deprecated scheduleAdapter import
@@ -37,7 +37,6 @@ function fixOverlappingTasks(tasks: any[], projectStartDate?: string, projectEnd
       taskStart = new Date(projectStart);
       taskEnd = new Date(taskStart);
       taskEnd.setDate(taskEnd.getDate() + duration);
-      console.log(`[fixOverlappingTasks] Adjusted task ${currentTask.id} start date to project start`);
     }
     
     // Check for overlap with previous task
@@ -48,7 +47,6 @@ function fixOverlappingTasks(tasks: any[], projectStartDate?: string, projectEnd
         taskStart.setDate(taskStart.getDate() + 1); // Add 1 day gap
         taskEnd = new Date(taskStart);
         taskEnd.setDate(taskEnd.getDate() + duration);
-        console.log(`[fixOverlappingTasks] Adjusted task ${currentTask.id} to avoid overlap with ${prevTask.id}`);
       }
     }
     
@@ -71,9 +69,8 @@ function fixOverlappingTasks(tasks: any[], projectStartDate?: string, projectEnd
           
           // If there's no space at all, mark for removal
           if (taskStart >= projectEnd) {
-            console.log(`[fixOverlappingTasks] Task ${currentTask.id} cannot fit within project bounds - will be removed`);
-            currentTask.startDate = formatDateISO(projectEnd);
-            currentTask.endDate = formatDateISO(projectEnd);
+            currentTask.startDate = formatDate(projectEnd, 'iso');
+            currentTask.endDate = formatDate(projectEnd, 'iso');
             continue;
           }
         } else {
@@ -88,12 +85,11 @@ function fixOverlappingTasks(tasks: any[], projectStartDate?: string, projectEnd
         taskStart = new Date(projectStart);
       }
       
-      console.log(`[fixOverlappingTasks] Adjusted task ${currentTask.id} to fit within project end date`);
     }
     
     // Update task dates
-    currentTask.startDate = formatDateISO(taskStart);
-    currentTask.endDate = formatDateISO(taskEnd);
+    currentTask.startDate = formatDate(taskStart, 'iso');
+    currentTask.endDate = formatDate(taskEnd, 'iso');
   }
   
   // Filter out tasks that don't fit within project bounds at all
@@ -102,11 +98,9 @@ function fixOverlappingTasks(tasks: any[], projectStartDate?: string, projectEnd
     const taskEnd = new Date(task.endDate);
     
     if (projectStart && taskEnd < projectStart) {
-      console.log(`[fixOverlappingTasks] Removing task ${task.id} - ends before project start`);
       return false;
     }
     if (projectEnd && taskStart > projectEnd) {
-      console.log(`[fixOverlappingTasks] Removing task ${task.id} - starts after project end`);
       return false;
     }
     return true;
@@ -122,25 +116,17 @@ export const getOrCreateScheduleForProject = async (
   project: Project,
   existingSchedules: Map<string, Schedule>
 ): Promise<Schedule> => {
-  console.log('[getOrCreateScheduleForProject] 1. Called for project:', project.id, project.client ? `${project.client} - ${project.productType}` : 'No name');
-  console.log('[getOrCreateScheduleForProject] 2. USE_MOCK_DATA:', USE_MOCK_DATA);
   
   // Use mock database if enabled
   if (USE_MOCK_DATA) {
-    console.log('[getOrCreateScheduleForProject] 3. Trying to get database...');
     try {
       const database = await getDatabaseWithRetry();
-      console.log('[getOrCreateScheduleForProject] 4. Got database:', !!database);
       
       if (database && database.schedules) {
-        console.log('[getOrCreateScheduleForProject] 5. Database has schedules');
         const schedules = Array.from(database.schedules.values());
-        console.log('[getOrCreateScheduleForProject] 6. Number of schedules in DB:', schedules.length);
         const existingSchedule = schedules.find(s => s.projectId === project.id);
-        console.log('[getOrCreateScheduleForProject] 7. Found existing schedule:', !!existingSchedule);
         
         if (existingSchedule) {
-          console.log('[getOrCreateScheduleForProject] 8. Returning existing schedule from DB');
           
           // Get project data first
           const projectData = database.projects.get(existingSchedule.projectId);
@@ -148,23 +134,15 @@ export const getOrCreateScheduleForProject = async (
           // Get assigned factory IDs for this project
           const assignedFactoryIds = new Set<string>();
           if (projectData) {
-            console.log('[getOrCreateScheduleForProject] 9. Project factory assignments:', {
-              manufacturerId: projectData.manufacturerId,
-              containerId: projectData.containerId,
-              packagingId: projectData.packagingId
-            });
             if (projectData.manufacturerId) assignedFactoryIds.add(projectData.manufacturerId);
             if (projectData.containerId) assignedFactoryIds.add(projectData.containerId);
             if (projectData.packagingId) assignedFactoryIds.add(projectData.packagingId);
           }
-          console.log('[getOrCreateScheduleForProject] 10. Assigned factory IDs:', Array.from(assignedFactoryIds));
           
           // Get tasks for this schedule - filter by assigned factories
           const allTasks = Array.from(database.tasks.values());
-          console.log('[getOrCreateScheduleForProject] 11. Total tasks in DB:', allTasks.length);
           
           const tasksForSchedule = allTasks.filter(task => task.scheduleId === existingSchedule.id);
-          console.log('[getOrCreateScheduleForProject] 12. Tasks for this schedule:', tasksForSchedule.length);
           
           const scheduleTasks = tasksForSchedule
             .filter(task => assignedFactoryIds.has(task.factoryId))
@@ -181,30 +159,18 @@ export const getOrCreateScheduleForProject = async (
                 factory: factory?.name || '',
                 factoryId: task.factoryId,
                 taskType: task.title,
-                startDate: typeof task.startDate === 'string' ? task.startDate : formatDateISO(new Date(task.startDate)),
-                endDate: typeof task.endDate === 'string' ? task.endDate : formatDateISO(new Date(task.endDate)),
+                startDate: typeof task.startDate === 'string' ? task.startDate : formatDate(new Date(task.startDate), 'iso'),
+                endDate: typeof task.endDate === 'string' ? task.endDate : formatDate(new Date(task.endDate), 'iso'),
                 status: task.status.toLowerCase().replace('_', '-'),
                 assignee: task.assignee || '',
                 color: factoryColor
               };
             });
           
-          console.log('[getOrCreateScheduleForProject] 13. Tasks after factory filter:', scheduleTasks.length);
           
           // Fix overlapping tasks and ensure within project bounds
           const fixedTasks = fixOverlappingTasks(scheduleTasks, existingSchedule.startDate, existingSchedule.endDate);
           
-          // Log task details in a table format for better readability
-          console.log('[getOrCreateScheduleForProject] 13a. Task details:');
-          console.table(fixedTasks.map(t => ({
-            id: t.id,
-            taskType: t.taskType,
-            startDate: t.startDate,
-            endDate: t.endDate,
-            factoryId: t.factoryId,
-            factory: t.factory,
-            status: t.status
-          })));
           
           // Get participants from project factories
           const participants = [];
@@ -214,11 +180,11 @@ export const getOrCreateScheduleForProject = async (
               const factory = database.factories.get(projectData.manufacturerId);
               if (factory) {
                 const startDateStr = typeof existingSchedule.startDate === 'string' ? 
-                  formatDateISO(new Date(existingSchedule.startDate)) : 
-                  formatDateISO(existingSchedule.startDate);
+                  formatDate(new Date(existingSchedule.startDate)) : 
+                  formatDate(existingSchedule.startDate);
                 const endDateStr = typeof existingSchedule.endDate === 'string' ? 
-                  formatDateISO(new Date(existingSchedule.endDate)) : 
-                  formatDateISO(existingSchedule.endDate);
+                  formatDate(new Date(existingSchedule.endDate)) : 
+                  formatDate(existingSchedule.endDate);
                 
                 participants.push({
                   id: factory.id,
@@ -233,11 +199,11 @@ export const getOrCreateScheduleForProject = async (
               const factory = database.factories.get(projectData.containerId);
               if (factory) {
                 const startDateStr = typeof existingSchedule.startDate === 'string' ? 
-                  formatDateISO(new Date(existingSchedule.startDate)) : 
-                  formatDateISO(existingSchedule.startDate);
+                  formatDate(new Date(existingSchedule.startDate)) : 
+                  formatDate(existingSchedule.startDate);
                 const endDateStr = typeof existingSchedule.endDate === 'string' ? 
-                  formatDateISO(new Date(existingSchedule.endDate)) : 
-                  formatDateISO(existingSchedule.endDate);
+                  formatDate(new Date(existingSchedule.endDate)) : 
+                  formatDate(existingSchedule.endDate);
                 
                 participants.push({
                   id: factory.id,
@@ -252,11 +218,11 @@ export const getOrCreateScheduleForProject = async (
               const factory = database.factories.get(projectData.packagingId);
               if (factory) {
                 const startDateStr = typeof existingSchedule.startDate === 'string' ? 
-                  formatDateISO(new Date(existingSchedule.startDate)) : 
-                  formatDateISO(existingSchedule.startDate);
+                  formatDate(new Date(existingSchedule.startDate)) : 
+                  formatDate(existingSchedule.startDate);
                 const endDateStr = typeof existingSchedule.endDate === 'string' ? 
-                  formatDateISO(new Date(existingSchedule.endDate)) : 
-                  formatDateISO(existingSchedule.endDate);
+                  formatDate(new Date(existingSchedule.endDate)) : 
+                  formatDate(existingSchedule.endDate);
                 
                 participants.push({
                   id: factory.id,
@@ -268,76 +234,58 @@ export const getOrCreateScheduleForProject = async (
             }
           }
           
-          console.log('[getOrCreateScheduleForProject] 14. Final participants:', participants.length);
-          console.log('[getOrCreateScheduleForProject] 15. Final tasks:', fixedTasks.length);
           
           const result = {
             id: existingSchedule.id,
             projectId: existingSchedule.projectId,
             participants: participants,
             tasks: fixedTasks,
-            startDate: typeof existingSchedule.startDate === 'string' ? existingSchedule.startDate : formatDateISO(new Date(existingSchedule.startDate)),
-            endDate: typeof existingSchedule.endDate === 'string' ? existingSchedule.endDate : formatDateISO(new Date(existingSchedule.endDate)),
+            startDate: typeof existingSchedule.startDate === 'string' ? existingSchedule.startDate : formatDate(new Date(existingSchedule.startDate)),
+            endDate: typeof existingSchedule.endDate === 'string' ? existingSchedule.endDate : formatDate(new Date(existingSchedule.endDate)),
             createdAt: typeof existingSchedule.createdAt === 'string' ? existingSchedule.createdAt : existingSchedule.createdAt.toISOString(),
             updatedAt: typeof existingSchedule.updatedAt === 'string' ? existingSchedule.updatedAt : existingSchedule.updatedAt.toISOString()
           };
           
-          console.log('[getOrCreateScheduleForProject] 16. Returning schedule:', result);
           return result;
         }
       }
     } catch (error) {
-      console.log('[getOrCreateScheduleForProject] 9. Error in mock database section:', error);
       // Fall through to old logic
     }
   }
   
-  console.log('[getOrCreateScheduleForProject] 10. Continuing to fallback logic...');
   
   // Fallback: Create schedule with mock tasks for development
   
   // Get mock schedules and find tasks for this specific project
-  console.log('[getOrCreateScheduleForProject] 11. About to create mock schedules...');
   let mockSchedules: Schedule[] = [];
   try {
     mockSchedules = createMockSchedules();
-    console.log('[getOrCreateScheduleForProject] 12. Created mock schedules:', mockSchedules.length);
-    console.log('[getOrCreateScheduleForProject] 13. Available mock schedules:', mockSchedules.map(s => ({ id: s.id, projectId: s.projectId, name: s.name })));
   } catch (error) {
-    console.log('[getOrCreateScheduleForProject] 14. Error creating mock schedules:', error);
   }
   
-  console.log('[getOrCreateScheduleForProject] 15. Looking for mockSchedule with projectId:', project.id);
   const mockSchedule = mockSchedules.find(s => s.projectId === project.id);
   
   if (!mockSchedule) {
-    console.log('[getOrCreateScheduleForProject] 16. No mockSchedule found for projectId:', project.id);
   } else {
-    console.log('[getOrCreateScheduleForProject] 17. Found mockSchedule:', mockSchedule.id);
   }
   
-  console.log('[getOrCreateScheduleForProject] 18. Setting up project dates...');
   // Filter tasks to fit within project dates
   const projectStart = new Date(project.startDate);
   const projectEnd = new Date(project.endDate);
-  console.log('[getOrCreateScheduleForProject] 19. Project dates:', project.startDate, 'to', project.endDate);
   
-  console.log('[getOrCreateScheduleForProject] 20. Creating task arrays...');
   // Create non-overlapping tasks within each factory
   let globalTaskId = 1;
   const filteredTasks: any[] = [];
   
   
   if (mockSchedule) {
-    console.log('[getOrCreateScheduleForProject] 21. Found mockSchedule:', mockSchedule.id);
-    console.log('[getOrCreateScheduleForProject] 22. mockSchedule.tasks:', mockSchedule.tasks.length);
     
     // Filter tasks that belong to this project only
     const projectTasks = mockSchedule.tasks.filter(task => 
       task.projectId === project.id
     );
     
-    console.log('[getOrCreateScheduleForProject] 23. Filtered tasks for project', project.id, ':', projectTasks.length);
     
     // Get assigned factories for this project
     const assignedFactoryIds = new Set<string>();
@@ -354,22 +302,18 @@ export const getOrCreateScheduleForProject = async (
       if (factory) assignedFactoryIds.add(factory.id);
     }
     
-    console.log('[getOrCreateScheduleForProject] 24. Assigned factory IDs:', Array.from(assignedFactoryIds));
     
     // Filter tasks to only include those from assigned factories
     const validProjectTasks = projectTasks.filter(task => {
       if (!task.factoryId) {
-        console.warn('[getOrCreateScheduleForProject] Task', task.id, 'has no factoryId');
         return false;
       }
       const isValid = assignedFactoryIds.has(task.factoryId);
       if (!isValid) {
-        console.log('[getOrCreateScheduleForProject] Filtering out task', task.id, 'from factory', task.factoryId, 'not assigned to project');
       }
       return isValid;
     });
     
-    console.log('[getOrCreateScheduleForProject] 25. Valid tasks after factory filtering:', validProjectTasks.length);
     
     // Group tasks by factory
     const tasksByFactory = new Map<string, any[]>();
@@ -418,14 +362,13 @@ export const getOrCreateScheduleForProject = async (
             id: globalTaskId++,
             projectId: project.id,
             factoryId: factory?.id || `factory-unknown`,
-            startDate: formatDateISO(newStartDate),
-            endDate: formatDateISO(newEndDate)
+            startDate: formatDate(newStartDate, 'iso'),
+            endDate: formatDate(newEndDate)
           };
           
           filteredTasks.push(newTask);
           lastEndDateForFactory = newEndDate;
         } else {
-          console.log(`[getOrCreateScheduleForProject] Task ${task.taskType} excluded - extends beyond project end date`);
         }
       });
     });
@@ -437,17 +380,15 @@ export const getOrCreateScheduleForProject = async (
   
   try {
     allFactories = mockDataService.getAllFactories();
-    console.log('[getOrCreateScheduleForProject] 26. All factories:', allFactories.length);
   } catch (error) {
-    console.log('[getOrCreateScheduleForProject] 27. Error getting factories:', error);
   }
   
   if (project.manufacturer && project.manufacturer !== 'null') {
     // Try to find by ID first, then by name
     const factory = allFactories.find(f => f.id === project.manufacturer || f.name === project.manufacturer);
     if (factory) {
-      const startDateStr = formatDateISO(new Date(project.startDate));
-      const endDateStr = formatDateISO(new Date(project.endDate));
+      const startDateStr = formatDate(new Date(project.startDate), 'iso');
+      const endDateStr = formatDate(new Date(project.endDate), 'iso');
       participants.push({
         id: factory.id,
         name: factory.name,
@@ -461,8 +402,8 @@ export const getOrCreateScheduleForProject = async (
     // Try to find by ID first, then by name
     const factory = allFactories.find(f => f.id === project.container || f.name === project.container);
     if (factory) {
-      const startDateStr = formatDateISO(new Date(project.startDate));
-      const endDateStr = formatDateISO(new Date(project.endDate));
+      const startDateStr = formatDate(new Date(project.startDate), 'iso');
+      const endDateStr = formatDate(new Date(project.endDate), 'iso');
       participants.push({
         id: factory.id,
         name: factory.name,
@@ -476,8 +417,8 @@ export const getOrCreateScheduleForProject = async (
     // Try to find by ID first, then by name
     const factory = allFactories.find(f => f.id === project.packaging || f.name === project.packaging);
     if (factory) {
-      const startDateStr = formatDateISO(new Date(project.startDate));
-      const endDateStr = formatDateISO(new Date(project.endDate));
+      const startDateStr = formatDate(new Date(project.startDate), 'iso');
+      const endDateStr = formatDate(new Date(project.endDate), 'iso');
       participants.push({
         id: factory.id,
         name: factory.name,
@@ -498,9 +439,6 @@ export const getOrCreateScheduleForProject = async (
     updatedAt: new Date().toISOString()
   };
   
-  console.log('[getOrCreateScheduleForProject] 28. Created schedule with', participants.length, 'participants and', filteredTasks.length, 'tasks');
-  console.log('[getOrCreateScheduleForProject] 29. Participants:', participants.map(p => ({ id: p.id, name: p.name })));
-  console.log('[getOrCreateScheduleForProject] 30. Project factories - manufacturer:', project.manufacturer, 'container:', project.container, 'packaging:', project.packaging);
   
   
   if (USE_MOCK_DATA) {

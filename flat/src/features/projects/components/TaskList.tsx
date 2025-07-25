@@ -17,7 +17,7 @@ const TaskList: React.FC<TaskListProps> = React.memo(({ projectId, tasks, onTask
   const completedCount = tasks.filter(t => t.completed).length;
   
   return (
-    <div className="relative bg-white px-4 py-2">
+    <div className="relative bg-white px-4 py-2 ml-10">
       {/* Modern accent line */}
       <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-gradient-to-b from-blue-400 to-purple-400 rounded-r"></div>
       
@@ -35,7 +35,7 @@ const TaskList: React.FC<TaskListProps> = React.memo(({ projectId, tasks, onTask
       </div>
       
       {/* Task list */}
-      <div className="space-y-0.5">
+      <div className="space-y-0.5 ml-6">
         {tasks.map((task, index) => (
           <div 
             key={task.id} 

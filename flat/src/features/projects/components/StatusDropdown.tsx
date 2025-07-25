@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { ProjectStatus } from '../../../types/project';
 import { getStatusDisplayName, getStatusStyles, getStatusIcon, getAllStatuses } from '../../../utils/statusUtils';
+import '../../../design-system/styles/dropdown.css';
 
 interface StatusDropdownProps {
   value: ProjectStatus;
@@ -25,38 +26,39 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
 
   const statuses = getAllStatuses('project');
 
+  const handleToggle = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsOpen(prev => !prev);
+  }, []);
+
+  const handleSelect = useCallback((status: ProjectStatus) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(status);
+    setIsOpen(false);
+  }, [onChange]);
+
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
-        }}
-        className={`flex items-center gap-1.5 px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all
-          border ${getStatusStyles(value, 'project')}`}
+        onClick={handleToggle}
+        className={`dropdown-trigger ${getStatusStyles(value, 'project')}`}
       >
         {getStatusIcon(value, 'project')}
         {getStatusDisplayName(value, 'project')}
-        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <svg className="w-3 h-3 text-current opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="dropdown-chevron">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
       </button>
       
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <div className="dropdown-menu dropdown-menu-md">
           {statuses.map((statusInfo) => (
             <button
               key={statusInfo.code}
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange(statusInfo.code as ProjectStatus);
-                setIsOpen(false);
-              }}
-              className={`w-full flex items-center gap-2 px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all
-                ${getStatusStyles(statusInfo.code, 'project')}`}
+              onClick={handleSelect(statusInfo.code as ProjectStatus)}
+              className={`dropdown-item ${getStatusStyles(statusInfo.code, 'project')}`}
             >
               {getStatusIcon(statusInfo.code, 'project')}
               {statusInfo.displayName}

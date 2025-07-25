@@ -13,7 +13,8 @@ const formatDate = (date: Date): string => {
 
 const addDays = (date: Date, days: number): Date => {
   const result = new Date(date);
-  result.setDate(result.getDate() + days);
+  result.setUTCDate(result.getUTCDate() + days);
+  result.setUTCHours(0, 0, 0, 0);
   return result;
 };
 

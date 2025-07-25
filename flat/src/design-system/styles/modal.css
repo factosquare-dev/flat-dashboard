@@ -1,0 +1,468 @@
+/* Unified Modal Styles */
+
+/* Modal backdrop/overlay */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50;
+  @apply z-[1030] overflow-y-auto;
+  @apply transition-opacity duration-300;
+}
+
+.modal-backdrop.fade-enter {
+  @apply opacity-0;
+}
+
+.modal-backdrop.fade-enter-active {
+  @apply opacity-100;
+}
+
+.modal-backdrop.fade-exit {
+  @apply opacity-100;
+}
+
+.modal-backdrop.fade-exit-active {
+  @apply opacity-0;
+}
+
+/* Modal container wrapper */
+.modal-wrapper {
+  @apply flex min-h-full items-center justify-center p-4;
+}
+
+/* Base modal container */
+.modal {
+  @apply relative bg-white rounded-lg shadow-xl;
+  @apply flex flex-col max-h-[90vh];
+  @apply transform transition-all duration-300;
+  @apply focus:outline-none;
+}
+
+/* Modal animations */
+.modal.fade-enter {
+  @apply opacity-0 scale-95 translate-y-4;
+}
+
+.modal.fade-enter-active {
+  @apply opacity-100 scale-100 translate-y-0;
+}
+
+.modal.fade-exit {
+  @apply opacity-100 scale-100 translate-y-0;
+}
+
+.modal.fade-exit-active {
+  @apply opacity-0 scale-95 translate-y-4;
+}
+
+/* Modal sizes */
+.modal-sm {
+  @apply w-full max-w-sm;
+}
+
+.modal-md {
+  @apply w-full max-w-md;
+}
+
+.modal-lg {
+  @apply w-full max-w-3xl;
+}
+
+.modal-xl {
+  @apply w-full max-w-5xl;
+}
+
+.modal-full {
+  @apply w-full max-w-[95vw] h-[95vh];
+}
+
+/* Modal sections */
+.modal-header {
+  @apply flex items-start justify-between p-4 border-b border-gray-200;
+  @apply flex-shrink-0;
+}
+
+.modal-title {
+  @apply text-lg font-semibold text-gray-900;
+  @apply pr-2;
+}
+
+.modal-body {
+  @apply p-4 overflow-y-auto flex-1;
+  @apply text-sm text-gray-600;
+}
+
+.modal-footer {
+  @apply flex items-center justify-end gap-3 p-4 border-t border-gray-200;
+  @apply flex-shrink-0;
+}
+
+/* Modal close button */
+.modal-close {
+  @apply inline-flex items-center justify-center;
+  @apply w-8 h-8 rounded-md;
+  @apply text-gray-400 hover:text-gray-500 hover:bg-gray-100;
+  @apply transition-all duration-200;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500;
+}
+
+.modal-close:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.modal-close svg {
+  @apply w-5 h-5;
+}
+
+/* Modal variants */
+
+/* Default modal */
+.modal-default {
+  @apply border border-gray-200;
+}
+
+.modal-default .modal-header {
+  @apply bg-gray-50 border-gray-200;
+}
+
+/* Confirmation modal */
+.modal-confirmation {
+  @apply border border-blue-200;
+}
+
+.modal-confirmation .modal-header {
+  @apply bg-blue-50 border-blue-200;
+}
+
+.modal-confirmation .modal-title {
+  @apply text-blue-900;
+}
+
+.modal-confirmation .modal-body {
+  @apply text-blue-700;
+}
+
+/* Alert/Danger modal */
+.modal-alert {
+  @apply border border-red-200;
+}
+
+.modal-alert .modal-header {
+  @apply bg-red-50 border-red-200;
+}
+
+.modal-alert .modal-title {
+  @apply text-red-900;
+}
+
+.modal-alert .modal-body {
+  @apply text-red-700;
+}
+
+/* Success modal */
+.modal-success {
+  @apply border border-green-200;
+}
+
+.modal-success .modal-header {
+  @apply bg-green-50 border-green-200;
+}
+
+.modal-success .modal-title {
+  @apply text-green-900;
+}
+
+.modal-success .modal-body {
+  @apply text-green-700;
+}
+
+/* Warning modal */
+.modal-warning {
+  @apply border border-yellow-200;
+}
+
+.modal-warning .modal-header {
+  @apply bg-yellow-50 border-yellow-200;
+}
+
+.modal-warning .modal-title {
+  @apply text-yellow-900;
+}
+
+.modal-warning .modal-body {
+  @apply text-yellow-700;
+}
+
+/* Nested modal support */
+.modal-nested {
+  @apply z-[1040];
+}
+
+.modal-nested .modal-backdrop {
+  @apply z-[1040];
+}
+
+/* Increase z-index for each nested level */
+.modal-nested-2 {
+  @apply z-[1050];
+}
+
+.modal-nested-2 .modal-backdrop {
+  @apply z-[1050];
+}
+
+.modal-nested-3 {
+  @apply z-[1060];
+}
+
+.modal-nested-3 .modal-backdrop {
+  @apply z-[1060];
+}
+
+/* Modal with icon */
+.modal-icon {
+  @apply flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center;
+  @apply mb-4 mx-auto;
+}
+
+.modal-default .modal-icon {
+  @apply bg-gray-100 text-gray-600;
+}
+
+.modal-confirmation .modal-icon {
+  @apply bg-blue-100 text-blue-600;
+}
+
+.modal-alert .modal-icon {
+  @apply bg-red-100 text-red-600;
+}
+
+.modal-success .modal-icon {
+  @apply bg-green-100 text-green-600;
+}
+
+.modal-warning .modal-icon {
+  @apply bg-yellow-100 text-yellow-600;
+}
+
+.modal-icon svg {
+  @apply w-6 h-6;
+}
+
+/* Centered content modal */
+.modal-centered .modal-body {
+  @apply text-center;
+}
+
+/* Modal without padding */
+.modal-flush .modal-body {
+  @apply p-0;
+}
+
+/* Scrollable modal body */
+.modal-scrollable .modal-body {
+  @apply max-h-[60vh] overflow-y-auto;
+}
+
+/* Static backdrop (non-dismissible) */
+.modal-static {
+  @apply cursor-not-allowed;
+}
+
+.modal-static .modal-wrapper {
+  @apply cursor-auto;
+}
+
+/* Shake animation for static modal */
+@keyframes modal-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+.modal-static-shake {
+  animation: modal-shake 0.5s ease-in-out;
+}
+
+/* Side modals */
+.modal-side-left {
+  @apply fixed left-0 top-0 h-full max-h-full rounded-none;
+  @apply transform transition-transform duration-300;
+}
+
+.modal-side-left.fade-enter {
+  @apply -translate-x-full opacity-0;
+}
+
+.modal-side-left.fade-enter-active {
+  @apply translate-x-0 opacity-100;
+}
+
+.modal-side-left.fade-exit {
+  @apply translate-x-0 opacity-100;
+}
+
+.modal-side-left.fade-exit-active {
+  @apply -translate-x-full opacity-0;
+}
+
+.modal-side-right {
+  @apply fixed right-0 top-0 h-full max-h-full rounded-none;
+  @apply transform transition-transform duration-300;
+}
+
+.modal-side-right.fade-enter {
+  @apply translate-x-full opacity-0;
+}
+
+.modal-side-right.fade-enter-active {
+  @apply translate-x-0 opacity-100;
+}
+
+.modal-side-right.fade-exit {
+  @apply translate-x-0 opacity-100;
+}
+
+.modal-side-right.fade-exit-active {
+  @apply translate-x-full opacity-0;
+}
+
+/* Full screen modal */
+.modal-fullscreen {
+  @apply fixed inset-0 w-full h-full max-w-none max-h-none rounded-none;
+  @apply m-0;
+}
+
+.modal-fullscreen .modal-body {
+  @apply max-h-none;
+}
+
+/* Modal divider */
+.modal-divider {
+  @apply border-t border-gray-200 my-4;
+}
+
+/* Modal action buttons alignment */
+.modal-footer-left {
+  @apply justify-start;
+}
+
+.modal-footer-center {
+  @apply justify-center;
+}
+
+.modal-footer-between {
+  @apply justify-between;
+}
+
+/* Loading state for modal */
+.modal-loading {
+  @apply relative pointer-events-none;
+}
+
+.modal-loading::after {
+  @apply absolute inset-0 bg-white bg-opacity-75;
+  @apply flex items-center justify-center;
+  @apply content-[''];
+  @apply rounded-lg;
+}
+
+.modal-loading-spinner {
+  @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+  @apply w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full;
+  @apply animate-spin;
+}
+
+/* Responsive modal */
+@media (max-width: 640px) {
+  .modal-responsive {
+    @apply w-full h-full max-w-none max-h-none rounded-none;
+    @apply m-0;
+  }
+  
+  .modal-wrapper {
+    @apply p-0;
+  }
+  
+  .modal-responsive .modal-body {
+    @apply max-h-none;
+  }
+}
+
+/* Modal transitions for different effects */
+
+/* Slide up animation */
+.modal-slide-up.fade-enter {
+  @apply translate-y-full;
+}
+
+.modal-slide-up.fade-enter-active {
+  @apply translate-y-0;
+}
+
+.modal-slide-up.fade-exit {
+  @apply translate-y-0;
+}
+
+.modal-slide-up.fade-exit-active {
+  @apply translate-y-full;
+}
+
+/* Zoom animation */
+.modal-zoom.fade-enter {
+  @apply scale-0;
+}
+
+.modal-zoom.fade-enter-active {
+  @apply scale-100;
+}
+
+.modal-zoom.fade-exit {
+  @apply scale-100;
+}
+
+.modal-zoom.fade-exit-active {
+  @apply scale-0;
+}
+
+/* Blur backdrop effect */
+.modal-backdrop-blur {
+  @apply backdrop-blur-sm;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .modal {
+    @apply bg-gray-800 text-gray-100;
+  }
+  
+  .modal-header {
+    @apply border-gray-700;
+  }
+  
+  .modal-title {
+    @apply text-gray-100;
+  }
+  
+  .modal-body {
+    @apply text-gray-300;
+  }
+  
+  .modal-footer {
+    @apply border-gray-700;
+  }
+  
+  .modal-close {
+    @apply text-gray-400 hover:text-gray-300 hover:bg-gray-700;
+  }
+  
+  .modal-default {
+    @apply border-gray-700;
+  }
+  
+  .modal-default .modal-header {
+    @apply bg-gray-900 border-gray-700;
+  }
+  
+  .modal-divider {
+    @apply border-gray-700;
+  }
+}

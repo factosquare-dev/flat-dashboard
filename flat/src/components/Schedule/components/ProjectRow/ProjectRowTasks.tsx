@@ -92,7 +92,7 @@ export const ProjectRowTasks: React.FC<ProjectRowTasksProps> = React.memo(({
             task={task}
             startDate={new Date(task.startDate)}
             endDate={new Date(task.endDate)}
-            left={task.x || 0}
+            left={0}
             width={task.width || 0}
             top={10 + (task.rowIndex || 0) * 40}
             isDragging={draggedTask?.id === task.id}

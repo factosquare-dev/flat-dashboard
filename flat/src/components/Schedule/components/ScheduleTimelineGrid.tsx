@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Participant, Task, ResizePreview } from '../../../types/schedule';
-import { isToday } from '../../../utils/dateUtils';
+import { isToday } from '../../../utils/coreUtils';
 import { getProjectRowCount } from '../../../utils/taskUtils';
 import { getTasksForFactory } from '../../../utils/scheduleUtils';
 import TimelineHeader from '../TimelineHeader';

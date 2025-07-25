@@ -1,5 +1,6 @@
 import React from 'react';
-import { isWeekend, isToday, formatDateISO } from '../../../utils/dateUtils';
+import { isWeekend, isToday, formatDateISO } from '../../../utils/coreUtils';
+import { getCellBackgroundClasses, getCellHoverClasses, gridColors } from '../../../design-system/colors/grid';
 
 interface GridCellProps {
   day: Date;
@@ -28,9 +29,7 @@ const GridCell: React.FC<GridCellProps> = ({
   if (isAddFactoryRow) {
     return (
       <div
-        className={`${
-          isTodayCell ? 'bg-blue-100/20' : isWeekendDay ? 'bg-gray-100/50' : ''
-        }`}
+        className={getCellBackgroundClasses(isTodayCell, isWeekendDay, true)}
         style={{ width: `${cellWidth}px` }}
       />
     );
@@ -38,13 +37,9 @@ const GridCell: React.FC<GridCellProps> = ({
 
   return (
     <div
-      className={`cursor-pointer transition-colors relative border-r border-gray-100 ${
-        isTodayCell 
-          ? 'bg-blue-50/30 hover:bg-blue-100/40' 
-          : isWeekendDay 
-          ? 'bg-gray-50/80 hover:bg-gray-100' 
-          : 'bg-white/50 hover:bg-blue-50/30'
-      }`}
+      className={`cursor-pointer transition-colors relative border-r ${gridColors.border.cell} ${
+        getCellBackgroundClasses(isTodayCell, isWeekendDay)
+      } ${getCellHoverClasses(isTodayCell, isWeekendDay)}`}
       style={{ 
         width: `${cellWidth}px`, 
         height: '100%'

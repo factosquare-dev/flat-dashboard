@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { factories } from '../../../data/factories';
-import { formatDateISO } from '../../../utils/dateUtils';
+import { formatDateISO } from '../../../utils/coreUtils';
 
 export const useDragPreview = (projects: any[]) => {
   const [dragPreview, setDragPreview] = useState<{ projectId: string; startDate: string; endDate: string } | null>(null);
@@ -38,7 +38,7 @@ export const useDragPreview = (projects: any[]) => {
           startDate: newStartDate,
           endDate: newEndDate
         };
-        console.log('[DRAG PREVIEW] Updating dates with last valid project:', updatedPreview);
+        // Preview updated with last valid project
         setDragPreview(updatedPreview);
       }
       return;
@@ -53,7 +53,7 @@ export const useDragPreview = (projects: any[]) => {
           startDate: newStartDate,
           endDate: newEndDate
         };
-        console.log('[DRAG PREVIEW] Project not found, updating dates only:', updatedPreview);
+        // Project not found, updating dates only
         setDragPreview(updatedPreview);
       }
       return;
@@ -68,7 +68,7 @@ export const useDragPreview = (projects: any[]) => {
           startDate: newStartDate,
           endDate: newEndDate
         };
-        console.log('[DRAG PREVIEW] Factory incompatible, keeping last valid project but updating dates:', updatedPreview);
+        // Factory incompatible, keeping last valid project but updating dates
         setDragPreview(updatedPreview);
       }
       return;
@@ -81,7 +81,7 @@ export const useDragPreview = (projects: any[]) => {
       startDate: newStartDate,
       endDate: newEndDate
     };
-    console.log('[DRAG PREVIEW] Updating preview with new project and dates:', preview);
+    // Updating preview with new project and dates
     setDragPreview(preview);
   };
 
@@ -112,7 +112,7 @@ export const useDragPreview = (projects: any[]) => {
         startDate: draggedTask.startDate,
         endDate: draggedTask.endDate
       };
-      console.log('[DRAG PREVIEW] Initializing preview:', preview);
+      // Initializing preview
       setDragPreview(preview);
     }
   };

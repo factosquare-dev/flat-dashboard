@@ -49,12 +49,6 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   onTaskCreate,
   onGridWidthChange
 }) => {
-  console.log('[ScheduleGridContainer] Rendered with:', {
-    projectsCount: projects.length,
-    tasksCount: tasks.length,
-    daysCount: days.length,
-    cellWidth
-  });
   // Task drag hooks
   const {
     dragTooltip,

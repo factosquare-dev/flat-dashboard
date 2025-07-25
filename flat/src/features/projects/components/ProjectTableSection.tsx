@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { Project } from '../../../types/project';
 import type { Priority, ServiceType, ProjectStatus } from '../../../types/project';
 import DraggableProjectTable from './DraggableProjectTable';
 import HierarchicalProjectTable from './HierarchicalProjectTable';
 import OptionsMenu from './OptionsMenu';
-import LoadingIndicator from './components/LoadingIndicator';
-import InfiniteScrollTrigger from './components/InfiniteScrollTrigger';
+import LoadingIndicator from './shared/LoadingIndicator';
+import InfiniteScrollTrigger from './shared/InfiniteScrollTrigger';
 import { useInfiniteScroll } from '../../../hooks/useInfiniteScroll';
 import { useDragSelection } from '../../../hooks/useDragSelection';
 import { getHierarchicalProjectsData } from '../../../data/hierarchicalProjects';
+import { useProjectHierarchy } from '../../../hooks/useProjectHierarchy';
 
 interface ProjectFilters {
   sortField: keyof Project | null;
@@ -44,7 +45,11 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   const [showOptionsMenu, setShowOptionsMenu] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{top: number, left: number} | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { makeIndependent } = useProjectHierarchy();
   
   const sortField = filters?.sortField || null;
   const sortDirection = filters?.sortDirection || 'asc';
@@ -144,6 +149,42 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     }
   };
 
+
+  const handleContainerDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const projectId = e.dataTransfer.getData('projectId');
+    
+    // 컨테이너에 직접 드롭됐다면 (MASTER 프로젝트가 아닌 곳) 독립 프로젝트로
+    if (projectId) {
+      makeIndependent(projectId);
+    }
+    setIsDraggingOver(false);
+  };
+
+  const handleContainerDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    
+    // 현재 드래그 중인 프로젝트 확인
+    if (draggedProjectId) {
+      const draggedProject = projects.find(p => p.id === draggedProjectId);
+      // 이미 독립 프로젝트(parentId가 null)인 경우에는 드롭 영역 표시하지 않음
+      if (draggedProject && draggedProject.parentId === null) {
+        e.dataTransfer.dropEffect = 'none';
+        return;
+      }
+    }
+    
+    e.dataTransfer.dropEffect = 'move';
+    setIsDraggingOver(true);
+  };
+
+  const handleContainerDragLeave = (e: React.DragEvent) => {
+    // 컨테이너를 벗어날 때만 처리
+    if (e.currentTarget === e.target) {
+      setIsDraggingOver(false);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div 
@@ -151,8 +192,11 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
         className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 project-table-container"
         onMouseUp={handleEndDrag}
         onMouseLeave={handleEndDrag}
+        onDrop={handleContainerDrop}
+        onDragOver={handleContainerDragOver}
+        onDragLeave={handleContainerDragLeave}
       >
-        {/* 임시로 계층 구조 테이블 사용 */}
+        {/* 계층형 프로젝트 테이블 */}
         <HierarchicalProjectTable
           projects={getHierarchicalProjectsData()}
           selectedRows={selectedRows}
@@ -167,6 +211,8 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           onEdit={handleEditProject}
           onDelete={handleDeleteProject}
           onDuplicate={handleDuplicateProject}
+          onDragStart={(projectId: string) => setDraggedProjectId(projectId)}
+          onDragEnd={() => setDraggedProjectId(null)}
         />
         
         <LoadingIndicator isLoading={isLoading} />
@@ -176,6 +222,15 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           isLoading={isLoading}
           loadMoreRef={loadMoreRef}
         />
+        
+        {isDraggingOver && !hasMore && (
+          <div className="text-center py-4 text-blue-600">
+            <p className="font-medium">
+              여기에 놓아 독립 프로젝트로 만들기
+            </p>
+          </div>
+        )}
+        
       </div>
       
       {showOptionsMenu && dropdownPosition && (

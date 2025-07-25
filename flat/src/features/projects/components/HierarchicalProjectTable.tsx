@@ -20,6 +20,8 @@ interface HierarchicalProjectTableProps {
   onEdit: (project: Project) => void;
   onDelete: (projectId: string) => void;
   onDuplicate: (project: Project) => void;
+  onDragStart?: (projectId: string) => void;
+  onDragEnd?: () => void;
 }
 
 const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props) => {
@@ -35,8 +37,22 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
     setProjectData(toggled);
   };
 
-  // 평면화된 프로젝트 리스트 생성
-  const flatProjects = flattenProjects(projectData);
+  // 평면화된 프로젝트 리스트 생성 (그룹 지원)
+  const flatProjects = React.useMemo(() => {
+    const flattened: any[] = [];
+    
+    const flatten = (items: any[], level: number = 0) => {
+      items.forEach(item => {
+        flattened.push({ ...item, level });
+        if (item.children && item.isExpanded) {
+          flatten(item.children, level + 1);
+        }
+      });
+    };
+    
+    flatten(projectData);
+    return flattened;
+  }, [projectData]);
 
   // DraggableProjectTable에 전달할 props 수정
   const modifiedProps = {
@@ -44,17 +60,19 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
     projects: flatProjects,
     onSelectRow: (projectId: string, checked: boolean, index?: number) => {
       const project = flatProjects.find(p => p.id === projectId);
-      if (project && !isProjectType(project.type, ProjectTypeEnum.TASK)) {
-        // 대형/소형 프로젝트 클릭 시 확장/축소
-        handleToggleProject(projectId);
-      } else {
-        // 태스크는 기존 선택 로직 사용
-        props.onSelectRow(projectId, checked, index);
+      if (project) {
+        if (!isProjectType(project.type, ProjectTypeEnum.TASK)) {
+          // 대형/소형 프로젝트 클릭 시 확장/축소
+          handleToggleProject(projectId);
+        } else {
+          // 태스크는 기존 선택 로직 사용
+          props.onSelectRow(projectId, checked, index);
+        }
       }
     }
   };
 
-  return <DraggableProjectTable {...modifiedProps} />;
+  return <DraggableProjectTable {...modifiedProps} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd} />;
 };
 
 export default HierarchicalProjectTable;

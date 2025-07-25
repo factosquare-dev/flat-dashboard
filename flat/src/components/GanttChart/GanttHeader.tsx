@@ -82,10 +82,6 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       const isToday = date.toDateString() === new Date().toDateString();
       
-      // Debug: Log dates around July 15
-      if (date.getMonth() === 6 && (date.getDate() === 4 || date.getDate() === 15)) {
-        console.log(`[GanttHeader] Date ${date.toISOString().split('T')[0]} is at index ${i}, left position: ${i * GANTT_CONSTANTS.CELL_WIDTH}px`);
-      }
       
       headers.push(
         <div

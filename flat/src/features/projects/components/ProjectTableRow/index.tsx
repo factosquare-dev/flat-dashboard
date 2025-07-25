@@ -7,6 +7,8 @@ import type { Column } from '../../../../hooks/useColumnOrder';
 import { useTaskManagement } from './useTaskManagement';
 import SelectionCell from './SelectionCell';
 import * as cellRenderers from './cellRenderers';
+import { ProjectTypeEnum } from '../../../../types/enums';
+import { isProjectType } from '../../../../utils/projectTypeUtils';
 
 interface ProjectTableRowProps {
   project: Project;
@@ -20,6 +22,10 @@ interface ProjectTableRowProps {
   onMouseEnter?: () => void;
   isDragging?: boolean;
   onStartDrag?: (index: number) => void;
+  onDragStart?: (e: React.DragEvent, projectId: string) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent, project: Project) => void;
 }
 
 const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
@@ -33,10 +39,15 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
   onShowOptionsMenu,
   onMouseEnter,
   isDragging,
-  onStartDrag
+  onStartDrag,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop
 }) => {
   const editableCell = useEditableCell();
   const { isExpanded, tasks, handleToggleTasks, handleTaskToggle } = useTaskManagement({ project });
+  const [isDragOver, setIsDragOver] = React.useState(false);
 
   const handleRowClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -104,11 +115,34 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
     <>
       <tr 
         data-id={project.id}
-        className="group hover:bg-gray-50/30 transition-all duration-200 cursor-pointer border-b border-gray-50"
+        data-project-type={project.type}
+        className={`group hover:bg-gray-50/30 transition-all duration-200 border-b border-gray-50 ${
+          isProjectType(project.type, ProjectTypeEnum.MASTER) && isDragOver ? 'bg-blue-100' : ''
+        } ${
+          isProjectType(project.type, ProjectTypeEnum.SUB) && project.parentId !== null ? 'cursor-move' : 'cursor-pointer'
+        }`}
         onClick={handleRowClick}
         onMouseEnter={onMouseEnter}
         role="row"
         tabIndex={0}
+        draggable={isProjectType(project.type, ProjectTypeEnum.SUB) && project.parentId !== null}
+        onDragStart={onDragStart && isProjectType(project.type, ProjectTypeEnum.SUB) && project.parentId !== null ? (e) => {
+          e.dataTransfer.effectAllowed = 'move';
+          onDragStart(e, project.id);
+        } : undefined}
+        onDragEnd={onDragEnd}
+        onDragOver={isProjectType(project.type, ProjectTypeEnum.MASTER) ? (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          setIsDragOver(true);
+          if (onDragOver) onDragOver(e);
+        } : undefined}
+        onDragLeave={isProjectType(project.type, ProjectTypeEnum.MASTER) ? () => setIsDragOver(false) : undefined}
+        onDrop={isProjectType(project.type, ProjectTypeEnum.MASTER) && onDrop ? (e) => {
+          e.preventDefault();
+          setIsDragOver(false);
+          onDrop(e, project);
+        } : undefined}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();

@@ -48,7 +48,6 @@ export const useUserManagement = () => {
         setUsers(userData);
       }
     } catch (error) {
-      console.error('Failed to load users:', error);
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +84,6 @@ export const useUserManagement = () => {
         return newUserData;
       }
     } catch (error) {
-      console.error('Failed to add user:', error);
     }
     return null;
   }, []);
@@ -116,7 +114,6 @@ export const useUserManagement = () => {
         return true;
       }
     } catch (error) {
-      console.error('Failed to update user:', error);
     }
     return false;
   }, []);
@@ -129,7 +126,6 @@ export const useUserManagement = () => {
         return true;
       }
     } catch (error) {
-      console.error('Failed to delete user:', error);
     }
     return false;
   }, []);

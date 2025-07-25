@@ -1,25 +1,32 @@
 import { useState } from 'react';
 import type { Task, Participant } from '../types/schedule';
+import { calculateTaskPositionByDate } from '../utils/scheduleDateCalculation';
 
 const generateTaskColor = (index: number): string => {
   // 모든 태스크에 동일한 파란색 사용
   return 'bg-blue-500';
 };
 
-export const useScheduleTasks = (participants: Participant[], startDate: Date, endDate: Date, initialTasks?: Task[], cellWidth: number = 50) => {
+export const useScheduleTasks = (participants: Participant[], startDate: Date, endDate: Date, initialTasks?: Task[], cellWidth: number = 50, days?: Date[]) => {
   const [tasks, setTasks] = useState<Task[]>(() => {
     if (initialTasks && initialTasks.length > 0) {
       // 초기 태스크가 있으면 위치 계산 후 설정
       return initialTasks.map(task => {
-        const taskStartDate = new Date(task.startDate);
-        const taskEndDate = new Date(task.endDate);
+        // If days array is provided, use date-based calculation
+        let x = 0;
+        let width = cellWidth;
         
-        // Calculate days from grid start (not project start) for positioning
-        const daysSinceGridStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        const taskDuration = Math.ceil((taskEndDate.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-        
-        const x = daysSinceGridStart * cellWidth;
-        const width = Math.max(cellWidth, taskDuration * cellWidth);
+        if (days && days.length > 0) {
+          const position = calculateTaskPositionByDate(
+            task.startDate,
+            task.endDate,
+            days,
+            cellWidth
+          );
+          x = position.x;
+          width = position.width;
+          
+        }
         
         // factoryId가 없는 경우 factory 이름으로 participant 찾기
         let factoryId = task.factoryId;
@@ -53,21 +60,24 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
     return 1;
   });
 
-  const calculateTaskPosition = (taskStartDate: Date, taskEndDate: Date): { x: number; width: number } => {
-    // Calculate days from grid start for positioning
-    const daysSinceGridStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const taskDuration = Math.ceil((taskEndDate.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  const calculateTaskPosition = (taskStartDateStr: string, taskEndDateStr: string): { x: number; width: number } => {
+    // Use date-based calculation if days array is available
+    if (days && days.length > 0) {
+      const position = calculateTaskPositionByDate(
+        taskStartDateStr,
+        taskEndDateStr,
+        days,
+        cellWidth
+      );
+      return { x: position.x, width: position.width };
+    }
     
-    const x = daysSinceGridStart * cellWidth;
-    const width = Math.max(cellWidth, taskDuration * cellWidth);
-    
-    return { x, width };
+    // Fallback to old calculation (should not happen if days is provided)
+    return { x: 0, width: cellWidth };
   };
 
   const addTask = (task: Omit<Task, 'id' | 'x' | 'width' | 'color'>) => {
-    const taskStartDate = new Date(task.startDate);
-    const taskEndDate = new Date(task.endDate);
-    const { x, width } = calculateTaskPosition(taskStartDate, taskEndDate);
+    const { x, width } = calculateTaskPosition(task.startDate, task.endDate);
     
     // factory로 participant 찾기
     let factoryId = task.factoryId;
@@ -105,9 +115,10 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
         
         // Recalculate position if dates changed
         if (updates.startDate || updates.endDate) {
-          const taskStartDate = new Date(updates.startDate || task.startDate);
-          const taskEndDate = new Date(updates.endDate || task.endDate);
-          const { x, width } = calculateTaskPosition(taskStartDate, taskEndDate);
+          const { x, width } = calculateTaskPosition(
+            updates.startDate || task.startDate,
+            updates.endDate || task.endDate
+          );
           updatedTask.x = x;
           updatedTask.width = width;
         }

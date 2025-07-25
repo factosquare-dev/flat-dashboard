@@ -4,7 +4,7 @@ import BaseModal from './common/BaseModal';
 import FormInput from './common/FormInput';
 import FormSelect from './common/FormSelect';
 import { Button } from './ui/Button';
-import { formatDateISO } from '../utils/dateUtils';
+import { formatDateISO } from '../utils/coreUtils';
 import { UI_DELAYS } from '../constants/time';
 import { useToast } from '../hooks/useToast';
 import { validateTask, TASK_CONSTRAINTS, dateUtils } from '../utils/taskValidation';

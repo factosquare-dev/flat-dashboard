@@ -55,20 +55,12 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
     const baseDateStr = baseDate.toISOString().split('T')[0];
     const endDateStr = endDate.toISOString().split('T')[0];
     
-    console.log('[IntegratedGanttChart] Creating projects');
-    console.log('[IntegratedGanttChart] Gantt date range:', baseDateStr, 'to', endDateStr);
-    console.log('[IntegratedGanttChart] Participants:', participants);
-    console.log('[IntegratedGanttChart] Total tasks:', tasks.length);
-    console.log('[IntegratedGanttChart] Tasks detail:', tasks);
     
     return participants.map((participant, index) => {
       // Get tasks for this participant - 오직 factoryId로만 매칭 (가장 안전)
       const projectTasks = tasks
         .filter(task => {
           const matches = task.factoryId === participant.id;
-          if (!matches && task.factory === participant.name) {
-            console.warn(`[IntegratedGanttChart] Task ${task.id} has factory name '${task.factory}' but no factoryId, participant.id: ${participant.id}`);
-          }
           return matches;
         })
         .filter(task => {
@@ -79,9 +71,6 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
           // Task is visible if it overlaps with the rendered date range at all
           const isVisible = taskEndDate >= baseDateStr && taskStartDate <= endDateStr;
           
-          if (!isVisible) {
-            console.log(`[IntegratedGanttChart] Task ${task.id} filtered out - outside rendered range:`, taskStartDate, 'to', taskEndDate);
-          }
           
           return isVisible;
         })
@@ -96,23 +85,10 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
             progress: task.progress || 0
           };
           
-          // Debug specific task
-          if (mappedTask.title === '원료 수령') {
-            console.log('[IntegratedGanttChart] 원료 수령 task data:', {
-              original: task,
-              mapped: mappedTask,
-              startDate: mappedTask.startDate,
-              endDate: mappedTask.endDate
-            });
-          }
           
           return mappedTask;
         });
 
-      console.log(`[IntegratedGanttChart] Factory '${participant.name}' (${participant.id}): ${projectTasks.length} tasks`);
-      if (projectTasks.length > 0) {
-        console.log('[IntegratedGanttChart] First few tasks for', participant.name, ':', projectTasks.slice(0, 3));
-      }
       
       return {
         id: participant.id,

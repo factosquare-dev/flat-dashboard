@@ -15,13 +15,13 @@ interface CellRenderProps {
 }
 
 export const renderProductType = (project: Project) => (
-  <td className="px-1.5 py-1.5 text-xs text-gray-900 truncate" title={project.productType}>
+  <td className="px-3 py-1.5 text-xs text-gray-900 truncate" title={project.productType}>
     {project.productType}
   </td>
 );
 
 export const renderServiceType = ({ project, onUpdateField }: CellRenderProps) => (
-  <td className="px-1.5 py-1.5">
+  <td className="px-3 py-1.5">
     <ServiceTypeDropdown
       value={project.serviceType}
       onChange={(value) => onUpdateField(project.id, 'serviceType', value)}
@@ -30,7 +30,7 @@ export const renderServiceType = ({ project, onUpdateField }: CellRenderProps) =
 );
 
 export const renderCurrentStage = (project: Project) => (
-  <td className="px-1.5 py-1.5">
+  <td className="px-3 py-1.5">
     <div className="flex flex-wrap gap-1">
       {project.currentStage.length > 0 ? (
         project.currentStage.map((stage, index) => (
@@ -49,7 +49,7 @@ export const renderCurrentStage = (project: Project) => (
 );
 
 export const renderStatus = ({ project, onUpdateField }: CellRenderProps) => (
-  <td className="px-1.5 py-1.5">
+  <td className="px-3 py-1.5">
     <StatusDropdown
       value={project.status}
       onChange={(value) => onUpdateField(project.id, 'status', value)}
@@ -58,7 +58,7 @@ export const renderStatus = ({ project, onUpdateField }: CellRenderProps) => (
 );
 
 export const renderProgress = (project: Project) => (
-  <td className="px-1.5 py-1.5">
+  <td className="px-3 py-1.5">
     <ProgressBar progress={project.progress} />
   </td>
 );
@@ -100,7 +100,7 @@ export const renderCurrency = (field: 'sales' | 'purchase', { project, editableC
 );
 
 export const renderDepositPaid = ({ project, onUpdateField }: CellRenderProps) => (
-  <td className="px-1.5 py-1.5 text-center">
+  <td className="px-3 py-1.5 text-center">
     <input
       type="checkbox"
       checked={project.depositPaid || false}
@@ -114,7 +114,7 @@ export const renderDepositPaid = ({ project, onUpdateField }: CellRenderProps) =
 );
 
 export const renderPriority = ({ project, onUpdateField }: CellRenderProps) => (
-  <td className="px-1.5 py-1.5">
+  <td className="px-3 py-1.5">
     <PriorityDropdown 
       value={project.priority}
       onChange={(value) => onUpdateField(project.id, 'priority', value)}
@@ -123,7 +123,7 @@ export const renderPriority = ({ project, onUpdateField }: CellRenderProps) => (
 );
 
 export const renderDefault = () => (
-  <td className="px-1.5 py-1.5 text-xs text-gray-400">
+  <td className="px-3 py-1.5 text-xs text-gray-400">
     -
   </td>
 );

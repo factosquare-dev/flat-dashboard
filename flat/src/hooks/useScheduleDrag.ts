@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { isToday } from '../utils/dateUtils';
+import { isToday } from '../utils/coreUtils';
 
 export const useScheduleDrag = (
   days?: Date[],

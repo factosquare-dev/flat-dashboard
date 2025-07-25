@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { createSelector } from 'reselect';
 import type { Task, Schedule } from '../types/schedule';
 import type { Project } from '../types/project';
 import { scheduleApi } from '../api/schedule';
@@ -22,6 +23,129 @@ interface TaskStore {
   setSelectedProject: (projectId: string | null) => void;
   clearError: () => void;
 }
+
+// Selectors
+const selectSchedules = (state: TaskStore) => state.schedules;
+const selectSelectedProjectId = (state: TaskStore) => state.selectedProjectId;
+
+// Memoized selector for getting tasks by project
+export const selectTasksForProject = createSelector(
+  [selectSchedules, (_: TaskStore, projectId: string) => projectId],
+  (schedules, projectId) => {
+    const schedule = Array.from(schedules.values()).find(s => s.projectId === projectId);
+    return schedule?.tasks || [];
+  }
+);
+
+// Memoized selector for getting schedule by project
+export const selectScheduleForProject = createSelector(
+  [selectSchedules, (_: TaskStore, projectId: string) => projectId],
+  (schedules, projectId) => {
+    return Array.from(schedules.values()).find(s => s.projectId === projectId) || null;
+  }
+);
+
+// Memoized selector for getting current project's tasks
+export const selectCurrentProjectTasks = createSelector(
+  [selectSchedules, selectSelectedProjectId],
+  (schedules, selectedProjectId) => {
+    if (!selectedProjectId) return [];
+    const schedule = Array.from(schedules.values()).find(s => s.projectId === selectedProjectId);
+    return schedule?.tasks || [];
+  }
+);
+
+// Memoized selector for completed tasks count
+export const selectCompletedTasksCount = createSelector(
+  [selectTasksForProject],
+  (tasks) => tasks.filter(task => task.status === 'completed').length
+);
+
+// Memoized selector for tasks by status
+export const selectTasksByStatus = createSelector(
+  [selectTasksForProject, (_: TaskStore, __: string, status: string) => status],
+  (tasks, status) => tasks.filter(task => task.status === status)
+);
+
+// Memoized selector for task statistics
+export const selectTaskStats = createSelector(
+  [selectTasksForProject],
+  (tasks) => {
+    const total = tasks.length;
+    const completed = tasks.filter(task => task.status === 'completed').length;
+    const inProgress = tasks.filter(task => task.status === 'in_progress').length;
+    const pending = tasks.filter(task => task.status === 'pending').length;
+    const overdue = tasks.filter(task => {
+      if (task.status === 'completed') return false;
+      return task.dueDate && new Date(task.dueDate) < new Date();
+    }).length;
+    
+    return {
+      total,
+      completed,
+      inProgress,
+      pending,
+      overdue,
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
+    };
+  }
+);
+
+// Memoized selector for tasks grouped by assignee
+export const selectTasksByAssignee = createSelector(
+  [selectTasksForProject],
+  (tasks) => {
+    return tasks.reduce((groups, task) => {
+      const assignee = task.assigneeId || 'unassigned';
+      if (!groups[assignee]) groups[assignee] = [];
+      groups[assignee].push(task);
+      return groups;
+    }, {} as Record<string, Task[]>);
+  }
+);
+
+// Memoized selector for tasks sorted by priority and due date
+export const selectPrioritizedTasks = createSelector(
+  [selectTasksForProject],
+  (tasks) => {
+    const priorityOrder = { high: 3, medium: 2, low: 1, none: 0 };
+    
+    return [...tasks].sort((a, b) => {
+      // First sort by priority
+      const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || 0;
+      const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || 0;
+      
+      if (aPriority !== bPriority) {
+        return bPriority - aPriority; // Higher priority first
+      }
+      
+      // Then sort by due date
+      if (a.dueDate && b.dueDate) {
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }
+      
+      if (a.dueDate) return -1; // Tasks with due dates come first
+      if (b.dueDate) return 1;
+      
+      return 0;
+    });
+  }
+);
+
+// Memoized selector for upcoming tasks (due within 7 days)
+export const selectUpcomingTasks = createSelector(
+  [selectTasksForProject],
+  (tasks) => {
+    const now = new Date();
+    const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    return tasks.filter(task => {
+      if (task.status === 'completed' || !task.dueDate) return false;
+      const dueDate = new Date(task.dueDate);
+      return dueDate >= now && dueDate <= sevenDaysFromNow;
+    });
+  }
+);
 
 export const useTaskStore = create<TaskStore>()(
   devtools(
@@ -57,21 +181,14 @@ export const useTaskStore = create<TaskStore>()(
         }
       },
 
-      // 프로젝트의 태스크 가져오기
+      // 프로젝트의 태스크 가져오기 (selector 사용)
       getTasksForProject: (projectId: string) => {
-        const { schedules } = get();
-        
-        // 프로젝트 ID로 스케줄 찾기
-        const schedule = Array.from(schedules.values()).find(s => s.projectId === projectId);
-        
-        return schedule?.tasks || [];
+        return selectTasksForProject(get(), projectId);
       },
 
-      // 프로젝트의 스케줄 가져오기
+      // 프로젝트의 스케줄 가져오기 (selector 사용)
       getScheduleForProject: (projectId: string) => {
-        const { schedules } = get();
-        
-        return Array.from(schedules.values()).find(s => s.projectId === projectId) || null;
+        return selectScheduleForProject(get(), projectId);
       },
 
       // 태스크 추가

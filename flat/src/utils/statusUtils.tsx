@@ -63,9 +63,9 @@ export const getStatusDisplayName = (status: string, type: 'project' | 'task' = 
 };
 
 // Get status style classes
-export const getStatusStyles = (status: string, type: 'project' | 'task' = 'project'): string => {
+export const getStatusStyles = (status: string, type: 'project' | 'task' = 'project', isSelected: boolean = false): string => {
   const info = getStatusInfo(status, type);
-  return getStatusStylesByCode(info.code);
+  return getStatusStylesByCode(info.code, isSelected);
 };
 
 // Get status icon
@@ -155,7 +155,10 @@ export const getStatusBorderClass = (status: string, type: 'project' | 'task' = 
 };
 
 // Private helper functions
-function getStatusStylesByCode(code: string): string {
+function getStatusStylesByCode(code: string, isSelected: boolean = false): string {
+  if (isSelected) {
+    return getSelectedStatusStylesByCode(code);
+  }
   const bgClass = getStatusBgClassByCode(code);
   const textClass = getStatusTextClassByCode(code);
   const borderClass = getStatusBorderClassByCode(code);
@@ -236,6 +239,25 @@ function getStatusBorderClassByCode(code: string): string {
   }
   
   return 'border-gray-300'; // default
+}
+
+function getSelectedStatusStylesByCode(code: string): string {
+  const upperCode = code.toUpperCase();
+  
+  if (upperCode === ProjectStatusEnum.PLANNING || upperCode === TaskStatusEnum.PLANNING.toUpperCase()) {
+    return 'bg-gray-600 text-white border-gray-700';
+  }
+  if (upperCode === ProjectStatusEnum.IN_PROGRESS || upperCode === TaskStatusEnum.IN_PROGRESS.toUpperCase().replace('-', '_')) {
+    return 'bg-blue-600 text-white border-blue-700';
+  }
+  if (upperCode === ProjectStatusEnum.COMPLETED || upperCode === TaskStatusEnum.COMPLETED.toUpperCase()) {
+    return 'bg-green-600 text-white border-green-700';
+  }
+  if (upperCode === ProjectStatusEnum.CANCELLED || upperCode === TaskStatusEnum.CANCELLED.toUpperCase()) {
+    return 'bg-red-600 text-white border-red-700';
+  }
+  
+  return 'bg-gray-600 text-white border-gray-700'; // default
 }
 
 // Clear cache when needed

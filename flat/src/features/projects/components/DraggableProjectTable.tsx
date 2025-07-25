@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Project } from '../../../types/project';
 import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '../../../hooks/useColumnOrder';
 import type { Column } from '../../../hooks/useColumnOrder';
 import { ProjectTypeEnum } from '../../../types/enums';
 import { isProjectType } from '../../../utils/projectTypeUtils';
+import { useProjectHierarchy } from '../../../hooks/useProjectHierarchy';
 
 interface DraggableProjectTableProps {
   projects: Project[];
@@ -20,6 +21,8 @@ interface DraggableProjectTableProps {
   onMouseEnterRow?: (index: number) => void;
   isDragging?: boolean;
   onStartDrag?: (index: number) => void;
+  onDragStart?: (projectId: string) => void;
+  onDragEnd?: () => void;
 }
 
 const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
@@ -35,7 +38,9 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   onShowOptionsMenu,
   onMouseEnterRow,
   isDragging,
-  onStartDrag
+  onStartDrag,
+  onDragStart,
+  onDragEnd
 }) => {
   const {
     columns,
@@ -46,6 +51,44 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     handleDrop,
     resetColumnOrder
   } = useColumnOrder();
+  
+  const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
+  const { moveToMaster, canBeMoved, canAcceptChildren } = useProjectHierarchy();
+
+  const handleProjectDragStart = (e: React.DragEvent, projectId: string) => {
+    setDraggedProjectId(projectId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('projectId', projectId);
+    if (onDragStart) {
+      onDragStart(projectId);
+    }
+  };
+
+  const handleProjectDragEnd = (e: React.DragEvent) => {
+    // 드래그 종료 시 정리
+    setDraggedProjectId(null);
+    if (onDragEnd) {
+      onDragEnd();
+    }
+  };
+
+  const handleProjectDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleProjectDrop = (e: React.DragEvent, targetProject: Project) => {
+    e.preventDefault();
+    e.stopPropagation(); // 이벤트 버블링 중지
+    if (!draggedProjectId || draggedProjectId === targetProject.id) return;
+    
+    // 드롭 대상이 MASTER 프로젝트인 경우
+    if (isProjectType(targetProject.type, ProjectTypeEnum.MASTER)) {
+      moveToMaster(draggedProjectId, targetProject.id);
+    }
+    
+    setDraggedProjectId(null);
+  };
 
   const renderHeaderCell = (column: Column) => {
     const isDraggable = column.id !== 'checkbox' && column.id !== 'options';
@@ -77,8 +120,9 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     );
   };
 
+
   return (
-    <table className="w-full min-w-[1800px] table-fixed" role="table">
+    <table className="w-full min-w-[1800px]" role="table">
         <thead className="sticky top-0 z-10 bg-gray-50 border-b border-gray-100">
           <tr role="row">
             <th className="w-16 px-1 py-1.5 text-left" scope="col">
@@ -115,6 +159,10 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 onMouseEnter={onMouseEnterRow ? () => onMouseEnterRow(index) : undefined}
                 isDragging={isDragging}
                 onStartDrag={onStartDrag ? () => onStartDrag(index) : undefined}
+                onDragStart={handleProjectDragStart}
+                onDragEnd={handleProjectDragEnd}
+                onDragOver={handleProjectDragOver}
+                onDrop={handleProjectDrop}
               />
             </React.Fragment>
           ))}

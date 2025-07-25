@@ -158,11 +158,7 @@ export const createLogger = (storeName: string) => {
   return (config: StateCreator<any>) => (set: any, get: any, api: any) => {
     return config(
       (...args: any[]) => {
-        console.group(`[${storeName}] State Update`);
-        console.log('Previous State:', get());
         set(...args);
-        console.log('Next State:', get());
-        console.groupEnd();
       },
       get,
       api

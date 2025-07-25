@@ -1,6 +1,6 @@
 import type { Task, Participant } from '../types/schedule';
 import { getTasksForFactory } from './scheduleUtils';
-import { formatDateISO } from './dateUtils';
+import { formatDateISO } from './coreUtils';
 
 // 두 태스크가 날짜 범위에서 겹치는지 확인
 export const isTaskOverlapping = (task1: Task, task2: Task): boolean => {

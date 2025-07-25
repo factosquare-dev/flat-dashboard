@@ -8,7 +8,7 @@ import type { Schedule } from '../../types/schedule';
 import { factories } from '../../data/factories';
 import { scheduleApi } from '../../api/scheduleApi';
 import { extractProjectFromSchedule } from '../../data/mockSchedules';
-import { formatDateISO } from '../../utils/dateUtils';
+import { formatDateISO } from '../../utils/coreUtils';
 
 // Helper functions
 const getRelativeDate = (daysOffset: number): string => {

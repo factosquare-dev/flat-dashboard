@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Project } from '../../../types/project';
-import { formatCurrency, parseCurrency } from '../../../utils/currency';
+import { formatCurrency, parseCurrency } from '../../../utils/coreUtils';
 import { factoriesByType } from '../../../data/mockData';
 import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
 

@@ -3,6 +3,22 @@
  */
 
 import type { Task, Participant } from '../types/schedule';
+import { eachDayOfInterval, startOfDay } from 'date-fns';
+
+/**
+ * Generate an array of dates between start and end date using date-fns
+ * @param startDate - The start date
+ * @param endDate - The end date
+ * @returns Array of Date objects for each day in the range
+ */
+export const getDaysArray = (startDate: Date, endDate: Date): Date[] => {
+  // Ensure both dates are at start of day
+  const start = startOfDay(startDate);
+  const end = startOfDay(endDate);
+  
+  // Generate array of dates using date-fns
+  return eachDayOfInterval({ start, end });
+};
 
 /**
  * Filter tasks for a specific factory/participant

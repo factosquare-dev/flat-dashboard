@@ -1,35 +1,19 @@
 /**
- * Utilities export barrel
+ * Utilities export barrel - Consolidated and optimized
  */
 
-// Re-export existing utilities
-export * from './apiClient';
-export { formatCurrency, parseCurrency } from './currency';
-export { getDayNumber, formatDayNumberRange, getDaysFromToday, isDateInRange } from './dateUtils';
+// Export all core utilities (combines common functions from multiple files)
+export * from './coreUtils';
+
+// Specialized utilities that don't have duplicates
 export * from './scheduleUtils';
 export * from './taskUtils';
-
-// Export new utilities
-export * from './arrayUtils';
 export * from './filterUtils';
-export { 
-  formatDate,
-  formatDateRange,
-  getDaysBetween,
-  formatNumber,
-  formatPercentage,
-  formatFileSize,
-  truncateText,
-  formatPhoneNumber,
-  getRelativeTime,
-  getInitials
-} from './formatUtils';
-export * from './validationUtils';
+export * from './ganttUtils';
+export * from './progressCalculator';
 
-// Re-export logger
-export { logger } from './logger';
-
-// Export error handling utilities
+// Re-export logger and error handling
+export { logger, PerformanceLogger } from './logger';
 export { 
   ErrorHandler,
   handleApiError,
@@ -37,3 +21,15 @@ export {
   handleAsync,
   retryOperation
 } from './errorHandler';
+
+// Re-export API client
+export * from './apiClient';
+
+// CSS utilities
+export { cn } from './cn';
+
+// Performance utilities
+export * from './performance';
+
+// Accessibility utilities
+export * from './accessibility';

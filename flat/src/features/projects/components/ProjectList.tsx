@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { Project } from '../../../types/project';
 import { useDynamicLayout } from '../../../components/Schedule/hooks/useDynamicLayout';
 import { useProjectListState } from './hooks/useProjectListState';
-import ProjectListLayout from './components/ProjectListLayout';
+import ProjectListLayout from './shared/ProjectListLayout';
 import ProjectTableSection from './ProjectTableSection';
 import ProjectModals from './ProjectModals';
 import { factories } from '../../../data/factories';
@@ -33,50 +33,100 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     filtersHook
   } = useProjectListState();
 
+  // Memoize filtered and sorted projects
+  const filteredProjects = useMemo(() => 
+    filtersHook.getFilteredAndSortedProjects(projectsHook.projects),
+    [filtersHook, projectsHook.projects]
+  );
+
+  // Memoize layout props to prevent unnecessary re-renders
+  const layoutProps = useMemo(() => ({
+    containerStyle,
+    onRefresh: handleRefresh,
+    onSendEmail: handleSendEmail,
+    onSearch: handleSearch,
+    onCreateProject: handleCreateProject,
+    selectedPriority: filtersHook.selectedPriority,
+    selectedServiceType: filtersHook.selectedServiceType,
+    statusFilters: filtersHook.statusFilters,
+    searchValue: filtersHook.searchValue,
+    dateRange: filtersHook.dateRange,
+    totalProjects: projectsHook.projects.length,
+    onPriorityChange: filtersHook.setSelectedPriority,
+    onServiceTypeChange: filtersHook.setSelectedServiceType,
+    onStatusFilterToggle: filtersHook.handleStatusFilterToggle,
+    onDateRangeChange: filtersHook.setDateRange,
+  }), [
+    containerStyle,
+    handleRefresh,
+    handleSendEmail,
+    handleSearch,
+    handleCreateProject,
+    filtersHook.selectedPriority,
+    filtersHook.selectedServiceType,
+    filtersHook.statusFilters,
+    filtersHook.searchValue,
+    filtersHook.dateRange,
+    projectsHook.projects.length,
+    filtersHook.setSelectedPriority,
+    filtersHook.setSelectedServiceType,
+    filtersHook.handleStatusFilterToggle,
+    filtersHook.setDateRange,
+  ]);
+
+  // Memoize table section props
+  const tableSectionProps = useMemo(() => ({
+    projects: filteredProjects,
+    isLoading: projectsHook.isLoading,
+    hasMore: projectsHook.hasMore,
+    filters: filtersHook,
+    onEdit: handleEditProject,
+    onDelete: handleDeleteProject,
+    onDuplicate: handleDuplicateProject,
+    onSelectProject,
+    onUpdateProject: projectsHook.updateProjectBatch,
+    loadMoreRef: projectsHook.loadMoreRef,
+  }), [
+    filteredProjects,
+    projectsHook.isLoading,
+    projectsHook.hasMore,
+    filtersHook,
+    handleEditProject,
+    handleDeleteProject,
+    handleDuplicateProject,
+    onSelectProject,
+    projectsHook.updateProjectBatch,
+    projectsHook.loadMoreRef,
+  ]);
+
+  // Memoize modal props
+  const modalProps = useMemo(() => ({
+    showEmailModal,
+    showProjectModal,
+    modalMode,
+    editingProject,
+    availableFactories: factories,
+    onCloseEmailModal: () => setShowEmailModal(false),
+    onCloseProjectModal: () => setShowProjectModal(false),
+    onSaveProject: handleSaveProject,
+    onSendEmail: () => setShowEmailModal(false),
+  }), [
+    showEmailModal,
+    showProjectModal,
+    modalMode,
+    editingProject,
+    setShowEmailModal,
+    setShowProjectModal,
+    handleSaveProject,
+  ]);
+
   return (
     <>
-      <ProjectListLayout
-        containerStyle={containerStyle}
-        onRefresh={handleRefresh}
-        onSendEmail={handleSendEmail}
-        onSearch={handleSearch}
-        onCreateProject={handleCreateProject}
-        selectedPriority={filtersHook.selectedPriority}
-        selectedServiceType={filtersHook.selectedServiceType}
-        statusFilters={filtersHook.statusFilters}
-        searchValue={filtersHook.searchValue}
-        dateRange={filtersHook.dateRange}
-        totalProjects={projectsHook.projects.length}
-        onPriorityChange={filtersHook.setSelectedPriority}
-        onServiceTypeChange={filtersHook.setSelectedServiceType}
-        onStatusFilterToggle={filtersHook.handleStatusFilterToggle}
-        onDateRangeChange={filtersHook.setDateRange}
-      >
-        <ProjectTableSection
-          projects={filtersHook.getFilteredAndSortedProjects(projectsHook.projects)}
-          isLoading={projectsHook.isLoading}
-          hasMore={projectsHook.hasMore}
-          filters={filtersHook}
-          onEdit={handleEditProject}
-          onDelete={handleDeleteProject}
-          onDuplicate={handleDuplicateProject}
-          onSelectProject={onSelectProject}
-          onUpdateProject={projectsHook.updateProjectBatch}
-          loadMoreRef={projectsHook.loadMoreRef}
-        />
+      <ProjectListLayout {...layoutProps}>
+        <ProjectTableSection {...tableSectionProps} />
       </ProjectListLayout>
       
-      <ProjectModals
-        showEmailModal={showEmailModal}
-        showProjectModal={showProjectModal}
-        modalMode={modalMode}
-        editingProject={editingProject}
-        availableFactories={factories}
-        onCloseEmailModal={() => setShowEmailModal(false)}
-        onCloseProjectModal={() => setShowProjectModal(false)}
-        onSaveProject={handleSaveProject}
-        onSendEmail={() => setShowEmailModal(false)}
-      />
+      <ProjectModals {...modalProps} />
     </>
   );
 });

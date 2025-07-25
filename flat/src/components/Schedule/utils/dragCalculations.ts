@@ -1,5 +1,5 @@
 // Unified coordinate calculation utilities for consistent grid positioning
-import { formatDateISO } from '../../../utils/dateUtils';
+import { formatDateISO } from '../../../utils/coreUtils';
 
 export interface GridCoordinates {
   x: number;
@@ -45,15 +45,7 @@ export class GridCoordinateCalculator {
     const daysFromStart = Math.floor(gridX / safeCellWidth);
     const clampedDays = Math.max(0, Math.min(daysFromStart, days.length - 1));
     
-    console.log('[GRID CALC] mouseXToDate:', {
-      mouseX,
-      gridX,
-      scrollLeft,
-      cellWidth,
-      daysFromStart,
-      clampedDays,
-      resultDate: days[clampedDays] ? formatDateISO(days[clampedDays]) : undefined
-    });
+    // Mouse position to date calculation
     
     return new Date(days[clampedDays] || days[0]);
   }

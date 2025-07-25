@@ -20,6 +20,9 @@ export const useDynamicLayout = () => {
     sidebarWidth: 0,
     sidebarClasses: ''
   });
+  
+  // Force recalculation when sidebar state changes
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
     let rafId: number | null = null;
@@ -40,45 +43,60 @@ export const useDynamicLayout = () => {
         const headerHeight = header ? header.getBoundingClientRect().height : 64;
         
         // Find sidebar width
-        const sidebarSelectors = [
-          '.flex-1.flex.flex-col.overflow-y-auto',
-          'aside',
-          '[role="navigation"]',
-          '.sidebar',
-          '[data-sidebar]',
-          '.side-nav',
-          '.navigation',
-          '#sidebar'
-        ];
-        
-        let sidebar = null;
+        let sidebarWidth = 256;
+        let sidebarClasses = '';
         let foundSelector = '';
-        for (const selector of sidebarSelectors) {
-          sidebar = document.querySelector(selector);
-          if (sidebar) {
-            foundSelector = selector;
-            break;
+        
+        // First check main element's margin-left as it reflects sidebar state
+        const main = document.querySelector('main');
+        if (main) {
+          const computedStyle = window.getComputedStyle(main);
+          const marginLeft = parseFloat(computedStyle.marginLeft);
+          if (marginLeft > 0) {
+            sidebarWidth = marginLeft;
+            foundSelector = 'main.margin-left';
+            sidebarClasses = 'detected from main margin';
           }
         }
         
-        let sidebarWidth = 256;
-        let sidebarClasses = '';
-        
-        if (sidebar) {
-          const rect = sidebar.getBoundingClientRect();
-          sidebarWidth = rect.width;
-          sidebarClasses = sidebar.className || sidebar.getAttribute('class') || 'no classes';
+        // Fallback to finding sidebar directly
+        if (!foundSelector) {
+          const sidebarSelectors = [
+            '.flex-1.flex.flex-col.overflow-y-auto',
+            'aside',
+            '[role="navigation"]',
+            '.sidebar',
+            '[data-sidebar]',
+            '.side-nav',
+            '.navigation',
+            '#sidebar'
+          ];
           
-          // Check collapsed state
-          const isCollapsed = 
-            sidebar.classList.contains('collapsed') ||
-            sidebar.classList.contains('closed') ||
-            sidebar.getAttribute('data-collapsed') === 'true' ||
-            sidebar.getAttribute('aria-expanded') === 'false' ||
-            rect.width < 100;
+          let sidebar = null;
+          for (const selector of sidebarSelectors) {
+            sidebar = document.querySelector(selector);
+            if (sidebar) {
+              foundSelector = selector;
+              break;
+            }
+          }
           
-          if (isCollapsed) {
-            sidebarWidth = rect.width > 0 ? rect.width : 64;
+          if (sidebar) {
+            const rect = sidebar.getBoundingClientRect();
+            sidebarWidth = rect.width;
+            sidebarClasses = sidebar.className || sidebar.getAttribute('class') || 'no classes';
+            
+            // Check collapsed state
+            const isCollapsed = 
+              sidebar.classList.contains('collapsed') ||
+              sidebar.classList.contains('closed') ||
+              sidebar.getAttribute('data-collapsed') === 'true' ||
+              sidebar.getAttribute('aria-expanded') === 'false' ||
+              rect.width < 100;
+            
+            if (isCollapsed) {
+              sidebarWidth = rect.width > 0 ? rect.width : 64;
+            }
           }
         } else {
           // Fallback: search for sidebar-like elements
@@ -132,10 +150,21 @@ export const useDynamicLayout = () => {
     window.addEventListener('resize', calculateMargins);
     
     // ResizeObserver for more efficient sidebar size tracking
-    const resizeObserver = new ResizeObserver(calculateMargins);
+    const resizeObserver = new ResizeObserver(() => {
+      calculateMargins();
+      setForceUpdate(prev => prev + 1);
+    });
+    
+    // Watch for main element margin changes (sidebar state indicator)
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      resizeObserver.observe(mainElement);
+    }
+    
     const sidebar = document.querySelector('aside') || 
                    document.querySelector('[role="navigation"]') || 
-                   document.querySelector('.sidebar');
+                   document.querySelector('.sidebar') ||
+                   document.querySelector('.flex-1.flex.flex-col.overflow-y-auto');
     if (sidebar) {
       resizeObserver.observe(sidebar);
     }
@@ -173,7 +202,11 @@ export const useDynamicLayout = () => {
     }, 500);
     
     // MutationObserver for sidebar changes
-    const observer = new MutationObserver(calculateMargins);
+    const observer = new MutationObserver(() => {
+      calculateMargins();
+      setForceUpdate(prev => prev + 1);
+    });
+    
     const sidebarElement = document.querySelector('aside') || 
                           document.querySelector('[role="navigation"]') || 
                           document.querySelector('.sidebar');
@@ -188,6 +221,20 @@ export const useDynamicLayout = () => {
         childList: true,
         subtree: true 
       });
+    }
+    
+    // Listen for transition events on main element
+    if (mainElement) {
+      const handleTransition = () => {
+        calculateMargins();
+        setForceUpdate(prev => prev + 1);
+      };
+      mainElement.addEventListener('transitionend', handleTransition);
+      mainElement.addEventListener('transitionstart', handleTransition);
+      
+      // Cleanup
+      sidebarEventListeners.push({ element: mainElement, event: 'transitionend', handler: handleTransition });
+      sidebarEventListeners.push({ element: mainElement, event: 'transitionstart', handler: handleTransition });
     }
     
     return () => {

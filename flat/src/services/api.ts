@@ -3,7 +3,7 @@
  */
 
 import { logger, PerformanceLogger } from '../utils/logger';
-import { RequestHandlers } from './api/requestHandlers';
+import { CachedRequestHandlers } from './api/cachedRequestHandlers';
 import { UploadHandler } from './api/uploadHandler';
 import type { ApiResponse, RequestOptions } from './api/requestHandlers';
 import type { UploadOptions, UploadResponse } from './api/uploadHandler';
@@ -18,7 +18,7 @@ export interface ApiConfig {
 
 class ApiClient {
   private config: ApiConfig;
-  private requestHandlers: RequestHandlers;
+  private requestHandlers: CachedRequestHandlers;
   private uploadHandler: UploadHandler;
 
   constructor(config: Partial<ApiConfig> = {}) {
@@ -32,7 +32,7 @@ class ApiClient {
     };
 
     // Initialize handlers with configuration
-    this.requestHandlers = new RequestHandlers(
+    this.requestHandlers = new CachedRequestHandlers(
       this.config.baseURL,
       this.config.defaultHeaders,
       this.config.timeout
@@ -167,7 +167,7 @@ class ApiClient {
   setAuthToken(token: string): void {
     this.config.defaultHeaders['Authorization'] = `Bearer ${token}`;
     // Update handlers with new headers
-    this.requestHandlers = new RequestHandlers(
+    this.requestHandlers = new CachedRequestHandlers(
       this.config.baseURL,
       this.config.defaultHeaders,
       this.config.timeout
@@ -187,7 +187,7 @@ class ApiClient {
   removeAuthToken(): void {
     delete this.config.defaultHeaders['Authorization'];
     // Update handlers with new headers
-    this.requestHandlers = new RequestHandlers(
+    this.requestHandlers = new CachedRequestHandlers(
       this.config.baseURL,
       this.config.defaultHeaders,
       this.config.timeout
@@ -246,6 +246,31 @@ class ApiClient {
    */
   getConfig(): ApiConfig {
     return { ...this.config };
+  }
+
+  /**
+   * Cache management methods
+   */
+  
+  /**
+   * Invalidate cache for specific pattern
+   */
+  invalidateCache(pattern?: string | RegExp): void {
+    this.requestHandlers.invalidateCache(pattern);
+  }
+
+  /**
+   * Clear all cached data
+   */
+  clearCache(): void {
+    this.requestHandlers.clearCache();
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats() {
+    return this.requestHandlers.getCacheStats();
   }
 
   // Utility methods (delegated to upload handler)

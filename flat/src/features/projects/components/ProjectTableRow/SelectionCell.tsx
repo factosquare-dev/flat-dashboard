@@ -32,7 +32,7 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
         style={{ paddingLeft: `${(project.level || 0) * 20}px` }}
       >
         {/* 대형 프로젝트만 확장/축소 버튼 */}
-        {isProjectType(project.type, ProjectTypeEnum.MASTER) && project.children && project.children.length > 0 && (
+        {(isProjectType(project.type, ProjectTypeEnum.MASTER) && project.children && project.children.length > 0) && (
           <button
             onClick={(e) => {
               e.stopPropagation();

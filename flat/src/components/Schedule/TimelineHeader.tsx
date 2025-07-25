@@ -1,5 +1,7 @@
 import React from 'react';
-import { isToday, isWeekend, getWeekNumber } from '../../utils/dateUtils';
+import { isToday, isWeekend, getWeekNumber } from '../../utils/coreUtils';
+import { format, getDate, isFirstDayOfMonth } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 interface TimelineHeaderProps {
   days: Date[];
@@ -9,7 +11,7 @@ interface TimelineHeaderProps {
 const TimelineHeader: React.FC<TimelineHeaderProps> = ({ days, cellWidth }) => {
   // Group days by month for month headers
   const monthGroups = days.reduce((acc, day, index) => {
-    const monthKey = `${day.getFullYear()}-${day.getMonth()}`;
+    const monthKey = format(day, 'yyyy-MM');
     if (!acc[monthKey]) {
       acc[monthKey] = { start: index, count: 0, month: day };
     }
@@ -32,7 +34,7 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({ days, cellWidth }) => {
                 minWidth: '60px' // Ensure month name doesn't get cut off
               }}
             >
-              {group.month.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short' }).replace(' ', '.')}
+              {format(group.month, 'yyyy.MMM', { locale: ko })}
             </div>
           ))}
         </div>
@@ -42,7 +44,7 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({ days, cellWidth }) => {
       <div className="flex border-b border-gray-200" style={{ height: '28px' }}>
         <div className="flex">
           {days.map((day, index) => {
-            const isFirstOfMonth = day.getDate() === 1;
+            const isFirstOfMonth = isFirstDayOfMonth(day);
             return (
               <div
                 key={index}
@@ -57,14 +59,14 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({ days, cellWidth }) => {
               >
                 <div className="flex flex-col items-center gap-0.5">
                   <div className={`text-[9px] leading-tight ${isToday(day) ? 'text-blue-600 font-semibold' : 'text-gray-400'}`}>
-                    {day.toLocaleDateString('ko-KR', { weekday: 'short' })}
+                    {format(day, 'EEE', { locale: ko })}
                   </div>
                   <div className={`font-medium flex items-center justify-center ${
                     isToday(day) 
                       ? 'bg-blue-500 text-white w-5 h-5 rounded-full text-xs' 
                       : 'text-sm text-gray-700'
                   }`}>
-                    {day.getDate()}
+                    {getDate(day)}
                   </div>
                 </div>
               </div>

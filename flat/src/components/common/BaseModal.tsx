@@ -15,10 +15,10 @@ interface BaseModalProps {
 }
 
 const sizeClasses = {
-  sm: 'max-w-[var(--modal-sm)]',
-  md: 'max-w-[var(--modal-md)]',
-  lg: 'max-w-[var(--modal-lg)]',
-  xl: 'max-w-[var(--modal-xl)]'
+  sm: 'max-w-sm',
+  md: 'max-w-2xl',
+  lg: 'max-w-4xl',
+  xl: 'max-w-6xl'
 };
 
 const BaseModal: React.FC<BaseModalProps> = ({

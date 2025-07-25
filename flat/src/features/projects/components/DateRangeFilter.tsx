@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
-import { formatDateISO } from '../../../utils/dateUtils';
+import { formatDateISO } from '../../../utils/coreUtils';
 
 interface DateRangeFilterProps {
   value: { startDate: string | null; endDate: string | null };

@@ -3,6 +3,7 @@
  */
 
 import React, { useCallback } from 'react';
+import { logger } from '../../utils/logger';
 import type { Project, Task, DragState } from './types';
 import { GANTT_CONSTANTS, getTotalDays } from './constants';
 import { getDateIndex, calculateTaskPosition } from './utils/ganttCalculations';
@@ -56,11 +57,13 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
     
     // Debug logging for first task
     if (task.title === '원료 수령') {
-      console.log('[TaskRenderer] Rendering task:', task.title);
-      console.log('[TaskRenderer] Task start date:', task.startDate);
-      console.log('[TaskRenderer] Start column index:', startCol);
-      console.log('[TaskRenderer] Cell width:', GANTT_CONSTANTS.CELL_WIDTH);
-      console.log('[TaskRenderer] Calculated X position:', startCol * GANTT_CONSTANTS.CELL_WIDTH);
+      logger.debug('[TaskRenderer] Rendering task', {
+        title: task.title,
+        startDate: task.startDate,
+        startCol,
+        cellWidth: GANTT_CONSTANTS.CELL_WIDTH,
+        xPosition: startCol * GANTT_CONSTANTS.CELL_WIDTH
+      });
     }
     
     return (
@@ -129,7 +132,7 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
     const elements: JSX.Element[] = [];
     let currentRow = 0;
     
-    console.log('[TaskRenderer] Rendering projects:', projects.length);
+    logger.debug('[TaskRenderer] Rendering projects', { count: projects.length });
     
     projects.forEach((project) => {
       // Project header
@@ -138,13 +141,18 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
       
       // Tasks
       if (project.expanded) {
-        console.log(`[TaskRenderer] Project ${project.name} is expanded, tasks:`, project.tasks.length);
+        logger.debug('[TaskRenderer] Project expanded', {
+          projectName: project.name,
+          taskCount: project.tasks.length
+        });
         project.tasks.forEach((task) => {
           elements.push(renderTask(task, currentRow));
           currentRow++;
         });
       } else {
-        console.log(`[TaskRenderer] Project ${project.name} is collapsed`);
+        logger.debug('[TaskRenderer] Project collapsed', {
+          projectName: project.name
+        });
       }
     });
     
@@ -160,4 +168,31 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
   );
 };
 
-export default TaskRenderer;
+// Custom comparison function for React.memo
+const arePropsEqual = (prevProps: TaskRendererProps, nextProps: TaskRendererProps) => {
+  // Check if projects array reference or length changed
+  if (prevProps.projects !== nextProps.projects || 
+      prevProps.projects.length !== nextProps.projects.length) {
+    return false;
+  }
+  
+  // Check if drag state changed
+  if (prevProps.dragState.isDragging !== nextProps.dragState.isDragging ||
+      prevProps.dragState.draggedTask?.id !== nextProps.dragState.draggedTask?.id ||
+      prevProps.dragState.hoveredCell?.row !== nextProps.dragState.hoveredCell?.row ||
+      prevProps.dragState.hoveredCell?.col !== nextProps.dragState.hoveredCell?.col ||
+      prevProps.dragState.ghostPosition?.x !== nextProps.dragState.ghostPosition?.x ||
+      prevProps.dragState.ghostPosition?.y !== nextProps.dragState.ghostPosition?.y) {
+    return false;
+  }
+  
+  // Check if callbacks changed (they should be memoized with useCallback in parent)
+  if (prevProps.onToggleProject !== nextProps.onToggleProject ||
+      prevProps.onMouseDown !== nextProps.onMouseDown) {
+    return false;
+  }
+  
+  return true;
+};
+
+export default React.memo(TaskRenderer, arePropsEqual);

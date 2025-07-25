@@ -3,7 +3,7 @@
  * Now uses focused sub-hooks for better maintainability
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { Project } from '../../types/project';
 import { getHierarchicalProjectsData, flattenProjects, toggleProject } from '../data/hierarchicalProjects';
 import { useProjectData } from './useProjects/useProjectData';
@@ -14,6 +14,12 @@ export const useProjects = () => {
   // Hierarchical data state (temporary until API is ready)
   const [hierarchicalData, setHierarchicalData] = useState<Project[]>(() => getHierarchicalProjectsData());
   const [useHierarchicalMode, setUseHierarchicalMode] = useState(false);
+
+  // Memoize flattened hierarchical data
+  const flattenedHierarchicalData = useMemo(
+    () => useHierarchicalMode ? flattenProjects(hierarchicalData) : [],
+    [hierarchicalData, useHierarchicalMode]
+  );
 
   // Data management hook
   const {
@@ -52,7 +58,7 @@ export const useProjects = () => {
     getSelectionStats,
     bulkOperations
   } = useProjectSelection({
-    projects: useHierarchicalMode ? flattenProjects(hierarchicalData) : projects,
+    projects: useHierarchicalMode ? flattenedHierarchicalData : projects,
     onSelectionChange: (selectedIds) => {
       // Handle selection change if needed
       console.log('Selection changed:', selectedIds);
@@ -75,7 +81,7 @@ export const useProjects = () => {
     itemsPerPage
   } = useProjectPagination({
     loadProjects,
-    projects: useHierarchicalMode ? flattenProjects(hierarchicalData) : projects,
+    projects: useHierarchicalMode ? flattenedHierarchicalData : projects,
     setProjects: useHierarchicalMode ? 
       (newProjects) => {
         // Convert flat projects back to hierarchical if needed
