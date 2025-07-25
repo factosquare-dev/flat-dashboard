@@ -7,7 +7,7 @@ import TaskRenderer from '../../GanttChart/TaskRenderer';
 import { useGanttDrag } from '../../GanttChart/hooks/useGanttDrag';
 import type { Project } from '../../GanttChart/types';
 import { getTotalRows } from '../../GanttChart/utils/ganttHelpers';
-import { GANTT_CONSTANTS, getTotalDays } from '../../GanttChart/constants';
+import { GANTT_CONSTANTS, getTotalDays, getGanttDateRange } from '../../GanttChart/constants';
 
 interface IntegratedGanttChartProps {
   participants: Participant[];
@@ -50,7 +50,13 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
   const projects = useMemo<Project[]>(() => {
     const colorMap = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-cyan-500'];
     
+    // Get the date range for the Gantt chart
+    const { baseDate, endDate } = getGanttDateRange();
+    const baseDateStr = baseDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
     console.log('[IntegratedGanttChart] Creating projects');
+    console.log('[IntegratedGanttChart] Gantt date range:', baseDateStr, 'to', endDateStr);
     console.log('[IntegratedGanttChart] Participants:', participants);
     console.log('[IntegratedGanttChart] Total tasks:', tasks.length);
     console.log('[IntegratedGanttChart] Tasks detail:', tasks);
@@ -65,15 +71,43 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
           }
           return matches;
         })
-        .map(task => ({
-          id: task.id,
-          title: task.title || task.taskType || '태스크',
-          projectId: participant.id,
-          startDate: typeof task.startDate === 'string' ? task.startDate : task.startDate.toISOString().split('T')[0],
-          endDate: typeof task.endDate === 'string' ? task.endDate : task.endDate.toISOString().split('T')[0],
-          status: task.status || 'pending',
-          progress: task.progress || 0
-        }));
+        .filter(task => {
+          // Filter out tasks that are completely outside the rendered date range
+          const taskStartDate = typeof task.startDate === 'string' ? task.startDate : task.startDate.toISOString().split('T')[0];
+          const taskEndDate = typeof task.endDate === 'string' ? task.endDate : task.endDate.toISOString().split('T')[0];
+          
+          // Task is visible if it overlaps with the rendered date range at all
+          const isVisible = taskEndDate >= baseDateStr && taskStartDate <= endDateStr;
+          
+          if (!isVisible) {
+            console.log(`[IntegratedGanttChart] Task ${task.id} filtered out - outside rendered range:`, taskStartDate, 'to', taskEndDate);
+          }
+          
+          return isVisible;
+        })
+        .map(task => {
+          const mappedTask = {
+            id: task.id,
+            title: task.title || task.taskType || '태스크',
+            projectId: participant.id,
+            startDate: typeof task.startDate === 'string' ? task.startDate : task.startDate.toISOString().split('T')[0],
+            endDate: typeof task.endDate === 'string' ? task.endDate : task.endDate.toISOString().split('T')[0],
+            status: task.status || 'pending',
+            progress: task.progress || 0
+          };
+          
+          // Debug specific task
+          if (mappedTask.title === '원료 수령') {
+            console.log('[IntegratedGanttChart] 원료 수령 task data:', {
+              original: task,
+              mapped: mappedTask,
+              startDate: mappedTask.startDate,
+              endDate: mappedTask.endDate
+            });
+          }
+          
+          return mappedTask;
+        });
 
       console.log(`[IntegratedGanttChart] Factory '${participant.name}' (${participant.id}): ${projectTasks.length} tasks`);
       if (projectTasks.length > 0) {

@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import type { ScheduleProps, ViewMode } from './types';
 import { useScheduleState } from '../hooks/useScheduleState';
 import { useScheduleEffects } from '../hooks/useScheduleEffects';
 import { useDynamicLayout } from '../hooks/useDynamicLayout';
 import { validateTaskFactoryData } from '../../../utils/scheduleUtils';
+import { useTaskStore } from '../../../stores/taskStore';
 import ScheduleLayout from '../components/ScheduleLayout';
 import ScheduleGridContainer from '../ScheduleGridContainer';
 import ScheduleModals from '../ScheduleModals';
@@ -32,6 +33,10 @@ const Schedule: React.FC<ScheduleProps> = ({
     setGridWidth(width);
   }, []);
 
+  // Use taskStore for unified data management
+  const { getTasksForProject, updateTask, deleteTask, addTask } = useTaskStore();
+  const storeTasks = projectId ? getTasksForProject(projectId) : [];
+  
   const {
     dateRange,
     projects,
@@ -46,7 +51,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     setSliderValue,
     handleProjectSelect,
     handleSelectAll
-  } = useScheduleState(participants, projectStartDate, projectEndDate, gridWidth, initialTasks, projectId);
+  } = useScheduleState(participants, projectStartDate, projectEndDate, gridWidth, storeTasks.length > 0 ? storeTasks : initialTasks, projectId);
 
   const { scrollToToday, handleSliderChange } = useScheduleEffects(
     dateRange.days,
@@ -87,7 +92,11 @@ const Schedule: React.FC<ScheduleProps> = ({
   );
 
   const handleToggleTableView = useCallback(() => {
-    setViewMode(prevMode => prevMode === 'gantt' ? 'table' : 'gantt');
+    setViewMode(prevMode => {
+      const newMode = prevMode === 'gantt' ? 'table' : 'gantt';
+      console.log('[Schedule] View mode changing from', prevMode, 'to', newMode);
+      return newMode;
+    });
   }, []);
   
   
@@ -130,29 +139,33 @@ const Schedule: React.FC<ScheduleProps> = ({
         isTableView={viewMode === 'table'}
       >
         {viewMode === 'gantt' ? (
-          <ScheduleGridContainer
-            projects={projects}
-            tasks={taskControls.tasks}
-            days={dateRange.days}
-            cellWidth={dateRange.cellWidth}
-            scrollRef={dragControls.scrollRef}
-            taskControls={taskControls}
-            dragControls={dragControls}
-            modalState={modalState}
-            setModalState={setModalState}
-            selectedProjects={selectedProjects}
-            setProjects={setProjects}
-            onDeleteProject={handleDeleteProject}
-            onProjectSelect={handleProjectSelect}
-            onSelectAll={handleSelectAll}
-            onAddFactory={() => setModalState((prev: any) => ({ ...prev, showFactoryModal: true }))}
-            onTaskCreate={handleQuickTaskCreate}
-            onGridWidthChange={handleGridWidthChange}
-          />
+          <>
+            {console.log('[Schedule] Rendering Gantt view with', projects.length, 'projects and', taskControls.tasks.length, 'tasks')}
+            <ScheduleGridContainer
+              projects={projects}
+              tasks={taskControls.tasks}
+              days={dateRange.days}
+              cellWidth={dateRange.cellWidth}
+              scrollRef={dragControls.scrollRef}
+              taskControls={taskControls}
+              dragControls={dragControls}
+              modalState={modalState}
+              setModalState={setModalState}
+              selectedProjects={selectedProjects}
+              setProjects={setProjects}
+              onDeleteProject={handleDeleteProject}
+              onProjectSelect={handleProjectSelect}
+              onSelectAll={handleSelectAll}
+              onAddFactory={() => setModalState((prev: any) => ({ ...prev, showFactoryModal: true }))}
+              onTaskCreate={handleQuickTaskCreate}
+              onGridWidthChange={handleGridWidthChange}
+            />
+          </>
         ) : (
           <ScheduleTableView
             projects={projects}
             tasks={taskControls.tasks}
+            projectId={projectId}
             onTaskClick={(task) => {
               setModalState((prev: any) => ({ 
                 ...prev, 

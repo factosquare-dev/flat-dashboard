@@ -7,7 +7,6 @@ export enum ProjectStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
-  ON_HOLD = 'ON_HOLD',
 }
 
 export enum ProjectType {

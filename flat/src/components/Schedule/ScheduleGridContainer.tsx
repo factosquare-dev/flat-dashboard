@@ -49,6 +49,12 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   onTaskCreate,
   onGridWidthChange
 }) => {
+  console.log('[ScheduleGridContainer] Rendered with:', {
+    projectsCount: projects.length,
+    tasksCount: tasks.length,
+    daysCount: days.length,
+    cellWidth
+  });
   // Task drag hooks
   const {
     dragTooltip,
@@ -200,7 +206,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
         resizePreview={resizePreview}
         hoveredDateIndex={hoveredDateIndex}
         snapIndicatorX={snapIndicatorX}
-        dragPreview={dragPreview} // Restore preview to grid for proper scrolling
+        dragPreview={dragPreview}
         draggedTask={modalState.draggedTask}
         selectedProjects={selectedProjects}
         modalState={modalState}

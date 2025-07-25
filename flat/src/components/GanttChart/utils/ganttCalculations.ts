@@ -3,6 +3,7 @@
  */
 
 import { formatDateISO } from '../../../utils/dateUtils';
+import { parseISO, differenceInDays, startOfDay, addDays } from 'date-fns';
 import { getGanttDateRange, GANTT_CONSTANTS } from '../constants';
 
 export const dateToString = (date: Date): string => {
@@ -10,20 +11,34 @@ export const dateToString = (date: Date): string => {
 };
 
 export const stringToDate = (dateStr: string): Date => {
-  return new Date(dateStr + 'T00:00:00');
+  return startOfDay(parseISO(dateStr));
 };
 
 export const getDateIndex = (dateStr: string): number => {
   const date = stringToDate(dateStr);
   const { baseDate } = getGanttDateRange();
-  const diffTime = date.getTime() - baseDate.getTime();
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const index = differenceInDays(date, startOfDay(baseDate));
+  
+  // Debug for 원료 수령
+  if (dateStr === '2025-07-04') {
+    console.log('[getDateIndex] Debug for 원료 수령 (2025-07-04):');
+    console.log('  - Input string:', dateStr);
+    console.log('  - Parsed date:', date);
+    console.log('  - Base date:', baseDate);
+    console.log('  - Base date formatted:', formatDateISO(baseDate));
+    console.log('  - Calculated index:', index);
+    
+    // Manually calculate what date this index represents
+    const calculatedDate = addDays(startOfDay(baseDate), index);
+    console.log('  - Index', index, 'represents date:', formatDateISO(calculatedDate));
+  }
+  
+  return index;
 };
 
 export const getDateFromIndex = (index: number): string => {
   const { baseDate } = getGanttDateRange();
-  const date = new Date(baseDate);
-  date.setDate(date.getDate() + index);
+  const date = addDays(startOfDay(baseDate), index);
   return dateToString(date);
 };
 

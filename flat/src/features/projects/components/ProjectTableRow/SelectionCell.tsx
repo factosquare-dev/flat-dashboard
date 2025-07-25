@@ -1,6 +1,8 @@
 import React from 'react';
 import { ChevronDown, ChevronRight, Folder, FolderOpen } from 'lucide-react';
 import type { Project } from '../../../types/project';
+import { ProjectTypeEnum } from '../../../../types/enums';
+import { isProjectType } from '../../../../utils/projectTypeUtils';
 
 interface SelectionCellProps {
   project: Project;
@@ -30,7 +32,7 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
         style={{ paddingLeft: `${(project.level || 0) * 20}px` }}
       >
         {/* 대형 프로젝트만 확장/축소 버튼 */}
-        {project.type === 'master' && project.children && project.children.length > 0 && (
+        {isProjectType(project.type, ProjectTypeEnum.MASTER) && project.children && project.children.length > 0 && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -48,14 +50,14 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
         )}
         
         {/* 대형 프로젝트만 폴더 아이콘 */}
-        {project.type === 'master' && (
+        {isProjectType(project.type, ProjectTypeEnum.MASTER) && (
           project.isExpanded ? 
             <FolderOpen className="w-4 h-4 text-blue-600" /> : 
             <Folder className="w-4 h-4 text-blue-600" />
         )}
         
         {/* 소형 프로젝트는 기존처럼 확장/축소 버튼과 체크박스 */}
-        {project.type === 'sub' && (
+        {isProjectType(project.type, ProjectTypeEnum.SUB) && (
           <>
             <button
               onClick={handleToggleTasks}
@@ -94,7 +96,7 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
         )}
         
         {/* 태스크는 들여쓰기와 체크박스만 */}
-        {project.type === 'task' && (
+        {isProjectType(project.type, ProjectTypeEnum.TASK) && (
           <input
             type="checkbox"
             checked={isSelected}

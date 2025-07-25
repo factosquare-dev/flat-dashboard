@@ -68,6 +68,10 @@ export class MockDatabaseImpl {
       projectAssignments: Array.from(db.projectAssignments.entries()),
       factoryProjects: Array.from(db.factoryProjects.entries()),
       userCustomers: Array.from(db.userCustomers.entries()),
+      statusMappings: Array.from(db.statusMappings.entries()),
+      priorityMappings: Array.from(db.priorityMappings.entries()),
+      serviceTypeMappings: Array.from(db.serviceTypeMappings.entries()),
+      projectTypeMappings: Array.from(db.projectTypeMappings.entries()),
     };
   }
 
@@ -108,6 +112,10 @@ export class MockDatabaseImpl {
       projectAssignments: new Map(processEntries(data.projectAssignments)),
       factoryProjects: new Map(processEntries(data.factoryProjects)),
       userCustomers: new Map(processEntries(data.userCustomers)),
+      statusMappings: new Map(processEntries(data.statusMappings)),
+      priorityMappings: new Map(processEntries(data.priorityMappings)),
+      serviceTypeMappings: new Map(processEntries(data.serviceTypeMappings)),
+      projectTypeMappings: new Map(processEntries(data.projectTypeMappings)),
     };
   }
 

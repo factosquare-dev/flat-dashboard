@@ -27,6 +27,12 @@ export interface MockDatabase {
   projectAssignments: Map<string, ProjectAssignment>;
   factoryProjects: Map<string, FactoryProject>;
   userCustomers: Map<string, UserCustomer>;
+  
+  // Configuration tables
+  statusMappings: Map<string, StatusMapping>;
+  priorityMappings: Map<string, PriorityMapping>;
+  serviceTypeMappings: Map<string, ServiceTypeMapping>;
+  projectTypeMappings: Map<string, ProjectTypeMapping>;
 }
 
 /**
@@ -66,6 +72,45 @@ export interface UserCustomer {
   role: 'manager' | 'sales' | 'support';
   assignedAt: Date;
   assignedBy: string;
+}
+
+/**
+ * Configuration Models
+ */
+export interface StatusMapping {
+  id: string;
+  type: 'project' | 'task';
+  code: string;
+  displayName: string;
+  displayNameEn?: string;
+  color?: string;
+  order: number;
+}
+
+export interface PriorityMapping {
+  id: string;
+  code: string;
+  displayName: string;
+  displayNameEn?: string;
+  color?: string;
+  order: number;
+}
+
+export interface ServiceTypeMapping {
+  id: string;
+  code: string;
+  displayName: string;
+  displayNameEn?: string;
+  description?: string;
+  order: number;
+}
+
+export interface ProjectTypeMapping {
+  id: string;
+  code: string;
+  displayName: string;
+  displayNameEn?: string;
+  order: number;
 }
 
 /**
@@ -146,6 +191,13 @@ export interface DbStats {
     userFactories: number;
     projectAssignments: number;
     factoryProjects: number;
+    userCustomers: number;
+  };
+  configurations: {
+    statusMappings: number;
+    priorityMappings: number;
+    serviceTypeMappings: number;
+    projectTypeMappings: number;
   };
   totalSize: number;
   version: string;

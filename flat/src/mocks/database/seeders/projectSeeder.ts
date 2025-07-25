@@ -348,7 +348,7 @@ function createSynchronizedProjects(
     name: '페이셜 미스트',
     type: ProjectType.SUB,
     // parentId 없음 - 독립적인 SUB 프로젝트
-    status: ProjectStatus.ON_HOLD,
+    status: ProjectStatus.CANCELLED,
     customerId: customers[0].id,
     customer: {
       id: customers[0].id,

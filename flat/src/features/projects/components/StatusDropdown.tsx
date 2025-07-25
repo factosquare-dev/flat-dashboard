@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { ProjectStatus } from '../../types/project';
-import { PROJECT_STATUS, PROJECT_STATUS_OPTIONS } from '../../../constants';
+import type { ProjectStatus } from '../../../types/project';
+import { getStatusDisplayName, getStatusStyles, getStatusIcon, getAllStatuses } from '../../../utils/statusUtils';
 
 interface StatusDropdownProps {
   value: ProjectStatus;
@@ -11,20 +11,6 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const getStatusStyle = (status: ProjectStatus) => {
-    switch (status) {
-      case PROJECT_STATUS.BEFORE_START:
-        return 'bg-gray-100 text-gray-700 border-gray-300';
-      case PROJECT_STATUS.IN_PROGRESS:
-        return 'bg-blue-100 text-blue-700 border-blue-300';
-      case PROJECT_STATUS.COMPLETED:
-        return 'bg-green-100 text-green-700 border-green-300';
-      case PROJECT_STATUS.SUSPENDED:
-        return 'bg-red-100 text-red-700 border-red-300';
-      default:
-        return 'bg-gray-100 text-gray-700 border-gray-300';
-    }
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -37,7 +23,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const statuses: ProjectStatus[] = PROJECT_STATUS_OPTIONS as ProjectStatus[];
+  const statuses = getAllStatuses('project');
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
@@ -46,11 +32,12 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
+        className={`flex items-center gap-1.5 px-3 py-1.5 pr-8 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all
-          border ${getStatusStyle(value)}`}
+          border ${getStatusStyles(value, 'project')}`}
       >
-        {value}
+        {getStatusIcon(value, 'project')}
+        {getStatusDisplayName(value, 'project')}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
           <svg className="w-3 h-3 text-current opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -60,18 +47,19 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
       
       {isOpen && (
         <div className="absolute z-50 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-          {statuses.map((status) => (
+          {statuses.map((statusInfo) => (
             <button
-              key={status}
+              key={statusInfo.code}
               onClick={(e) => {
                 e.stopPropagation();
-                onChange(status);
+                onChange(statusInfo.code as ProjectStatus);
                 setIsOpen(false);
               }}
-              className={`w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all
-                ${getStatusStyle(status)}`}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all
+                ${getStatusStyles(statusInfo.code, 'project')}`}
             >
-              {status}
+              {getStatusIcon(statusInfo.code, 'project')}
+              {statusInfo.displayName}
             </button>
           ))}
         </div>

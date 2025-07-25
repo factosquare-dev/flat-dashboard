@@ -54,6 +54,15 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
     const duration = getDuration(task.startDate, task.endDate);
     const isDragging = dragState.isDragging && dragState.draggedTask?.id === task.id;
     
+    // Debug logging for first task
+    if (task.title === '원료 수령') {
+      console.log('[TaskRenderer] Rendering task:', task.title);
+      console.log('[TaskRenderer] Task start date:', task.startDate);
+      console.log('[TaskRenderer] Start column index:', startCol);
+      console.log('[TaskRenderer] Cell width:', GANTT_CONSTANTS.CELL_WIDTH);
+      console.log('[TaskRenderer] Calculated X position:', startCol * GANTT_CONSTANTS.CELL_WIDTH);
+    }
+    
     return (
       <div
         key={`task-${task.id}`}
@@ -120,6 +129,8 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
     const elements: JSX.Element[] = [];
     let currentRow = 0;
     
+    console.log('[TaskRenderer] Rendering projects:', projects.length);
+    
     projects.forEach((project) => {
       // Project header
       elements.push(renderProjectHeader(project, currentRow));
@@ -127,10 +138,13 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
       
       // Tasks
       if (project.expanded) {
+        console.log(`[TaskRenderer] Project ${project.name} is expanded, tasks:`, project.tasks.length);
         project.tasks.forEach((task) => {
           elements.push(renderTask(task, currentRow));
           currentRow++;
         });
+      } else {
+        console.log(`[TaskRenderer] Project ${project.name} is collapsed`);
       }
     });
     

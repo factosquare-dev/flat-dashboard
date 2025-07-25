@@ -2,6 +2,7 @@ import React from 'react';
 import { Calendar, Mail } from 'lucide-react';
 import type { Priority, ServiceType, ProjectStatus } from '../../types/project';
 import DateRangeFilter from './DateRangeFilter';
+import { getStatusStyles, getAllStatuses } from '../../../utils/statusUtils';
 
 interface ProjectFiltersProps {
   selectedPriority: Priority | 'all';
@@ -37,7 +38,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
           placeholder="프로젝트명, 고객명, 공장명으로 검색..."
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all hover:bg-white"
+          className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs transition-all hover:bg-white"
         />
         <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -55,23 +56,17 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
         
         {/* Status Filters */}
         <div className="flex gap-1">
-          {(['시작전', '진행중', '완료', '중단'] as ProjectStatus[]).map(status => (
+          {getAllStatuses('project').map(statusInfo => (
             <button
-              key={status}
-              onClick={() => onStatusFilterToggle(status)}
-              className={`px-3 py-1.5 rounded-md font-medium text-xs transition-all ${
-                statusFilters.includes(status)
-                  ? status === '시작전' 
-                    ? 'bg-gray-600 text-white shadow-md'
-                    : status === '진행중'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : status === '완료'
-                    ? 'bg-green-600 text-white shadow-md'
-                    : 'bg-red-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              key={statusInfo.code}
+              onClick={() => onStatusFilterToggle(statusInfo.displayName as ProjectStatus)}
+              className={`px-3 py-1.5 rounded-full font-medium text-xs transition-all border ${
+                statusFilters.includes(statusInfo.displayName as ProjectStatus)
+                  ? `${getStatusStyles(statusInfo.code, 'project')} shadow-sm`
+                  : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
               }`}
             >
-              {status}
+              {statusInfo.displayName}
             </button>
           ))}
         </div>

@@ -54,13 +54,13 @@ const getHierarchicalProjects = (): Project[] => {
     // Map to legacy format for backward compatibility
     const mappedMaster = {
       ...master,
-      type: 'master' as any,
+      type: mapProjectType(master.type),
       level: 0,
       isExpanded: true,
       client: customerName, // Use customer name from database
       manager: users.find(u => u.id === master.createdBy)?.name || 'Unknown',
       productType: master.product.name,
-      serviceType: 'OEM' as any, // Default service type
+      serviceType: mapServiceType(master.serviceType || 'OEM'),
       currentStage: [], // MASTER projects don't show individual task stages
       progress: getStagesFromTasks(master.scheduleId).progress, // Only show overall progress
       status: mapProjectStatus(master.status),
@@ -83,13 +83,13 @@ const getHierarchicalProjects = (): Project[] => {
         
         return {
           ...sub,
-          type: 'sub' as any,
+          type: mapProjectType(sub.type),
           level: 1,
           parentId: master.id,
           client: customerName, // SUB project inherits MASTER's customer
           manager: users.find(u => u.id === sub.createdBy)?.name || 'Unknown',
           productType: sub.product.name,
-          serviceType: 'OEM' as any,
+          serviceType: mapServiceType(sub.serviceType || 'OEM'),
           currentStage: getStagesFromTasks(sub.scheduleId).stages,
           progress: getStagesFromTasks(sub.scheduleId).progress,
           status: mapProjectStatus(sub.status),
@@ -100,7 +100,7 @@ const getHierarchicalProjects = (): Project[] => {
           packaging: subPackagingFactory?.name || sub.packagingId,
           priority: sub.priority,
           depositPaid: sub.depositStatus === 'received',
-          children: [] // Tasks would go here if needed
+          children: getTasksForProject(sub.scheduleId) // Get tasks as children for SUB projects
         };
       })
     };
@@ -121,13 +121,13 @@ const getHierarchicalProjects = (): Project[] => {
     
     return {
       ...sub,
-      type: 'sub' as any, // Keep as 'sub' to differentiate from real masters
+      type: mapProjectType(sub.type),
       level: 0, // Top level
       isExpanded: false, // SUB projects don't have children
       client: customerName,
       manager: users.find(u => u.id === sub.createdBy)?.name || 'Unknown',
       productType: sub.product.name,
-      serviceType: 'OEM' as any,
+      serviceType: mapServiceType(sub.serviceType || 'OEM'),
       currentStage: getStagesFromTasks(sub.scheduleId).stages,
       progress: getStagesFromTasks(sub.scheduleId).progress,
       status: mapProjectStatus(sub.status),
@@ -138,7 +138,7 @@ const getHierarchicalProjects = (): Project[] => {
       packaging: packagingFactory?.name || sub.packagingId,
       priority: sub.priority,
       depositPaid: sub.depositStatus === 'received',
-      children: [] // Independent SUB projects don't have children
+      children: getTasksForProject(sub.scheduleId) // Get tasks for independent SUB projects too
     };
   });
   
@@ -150,16 +150,122 @@ const getHierarchicalProjects = (): Project[] => {
   }
 };
 
-// Helper function to map project status
+// Helper function to get tasks for a project
+const getTasksForProject = (project: Project): Project[] => {
+  if (!project.scheduleId) {
+    return [];
+  }
+  
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    // Get tasks for this schedule
+    const tasks = Array.from(database.tasks.values())
+      .filter(task => task.scheduleId === project.scheduleId);
+    
+    // Convert tasks to Project format for display
+    return tasks.map(task => ({
+      id: task.id,
+      name: task.name,
+      projectNumber: '', // Tasks don't have project numbers
+      type: '작업' as any, // Use Korean display name for task
+      level: 2, // Tasks are at level 2 (under SUB projects)
+      isExpanded: false,
+      client: '', // Inherit from parent
+      manager: '', // Tasks don't have manager
+      productType: '',
+      serviceType: 'OEM' as any,
+      currentStage: [mapTaskStatus(task.status)],
+      progress: task.progress || 0,
+      status: mapTaskStatus(task.status),
+      startDate: task.startDate,
+      endDate: task.endDate,
+      manufacturer: '',
+      container: '',
+      packaging: '',
+      priority: 'low' as any,
+      depositPaid: false,
+      children: [],
+      // Task-specific fields
+      taskType: task.type,
+      quantity: task.quantity,
+      description: task.description,
+      factory: task.factory,
+      participants: task.participants
+    } as any));
+  } catch (error) {
+    console.error('[getTasksForProject] Error getting tasks:', error);
+    return [];
+  }
+};
+
+// Helper function to map task status using DB
+const mapTaskStatus = (status: string): string => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    // Find matching status mapping
+    const statusMapping = Array.from(database.statusMappings.values())
+      .find(sm => sm.type === 'task' && sm.code === status);
+    
+    return statusMapping?.displayName || status;
+  } catch (error) {
+    console.error('[mapTaskStatus] Error getting status mapping:', error);
+    return status;
+  }
+};
+
+// Helper function to map project status using DB
 const mapProjectStatus = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    'PLANNING': '시작전',
-    'IN_PROGRESS': '진행중',
-    'COMPLETED': '완료',
-    'CANCELLED': '중단',
-    'ON_HOLD': '중단'
-  };
-  return statusMap[status] || status;
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    // Find matching status mapping
+    const statusMapping = Array.from(database.statusMappings.values())
+      .find(sm => sm.type === 'project' && sm.code === status);
+    
+    return statusMapping?.displayName || status;
+  } catch (error) {
+    console.error('[mapProjectStatus] Error getting status mapping:', error);
+    return status;
+  }
+};
+
+// Helper function to map service type using DB
+const mapServiceType = (serviceType: string): string => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    // Find matching service type mapping
+    const serviceMapping = Array.from(database.serviceTypeMappings.values())
+      .find(stm => stm.code === serviceType);
+    
+    return serviceMapping?.displayName || serviceType;
+  } catch (error) {
+    console.error('[mapServiceType] Error getting service type mapping:', error);
+    return serviceType;
+  }
+};
+
+// Helper function to map project type using DB
+const mapProjectType = (projectType: string): string => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    // Find matching project type mapping
+    const projectMapping = Array.from(database.projectTypeMappings.values())
+      .find(ptm => ptm.code === projectType);
+    
+    return projectMapping?.displayName?.toLowerCase() || projectType.toLowerCase();
+  } catch (error) {
+    console.error('[mapProjectType] Error getting project type mapping:', error);
+    return projectType.toLowerCase();
+  }
 };
 
 // Helper function to get stages from tasks

@@ -10,43 +10,109 @@ import { mockDataService } from '../../services/mockDataService';
 
 /**
  * Fix overlapping tasks by adjusting their dates
+ * Also ensures tasks stay within project boundaries
  */
-function fixOverlappingTasks(tasks: any[]): any[] {
+function fixOverlappingTasks(tasks: any[], projectStartDate?: string, projectEndDate?: string): any[] {
   if (tasks.length === 0) return tasks;
+  
+  const projectStart = projectStartDate ? new Date(projectStartDate) : null;
+  const projectEnd = projectEndDate ? new Date(projectEndDate) : null;
   
   // Sort tasks by start date
   const sortedTasks = [...tasks].sort((a, b) => 
     new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );
   
-  // Fix overlaps
-  for (let i = 1; i < sortedTasks.length; i++) {
-    const prevTask = sortedTasks[i - 1];
+  // Fix overlaps and ensure within project bounds
+  for (let i = 0; i < sortedTasks.length; i++) {
     const currentTask = sortedTasks[i];
+    const prevTask = i > 0 ? sortedTasks[i - 1] : null;
     
-    const prevEnd = new Date(prevTask.endDate);
-    const currentStart = new Date(currentTask.startDate);
+    let taskStart = new Date(currentTask.startDate);
+    let taskEnd = new Date(currentTask.endDate);
+    const duration = Math.ceil((taskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60 * 24));
     
-    // If tasks overlap, adjust current task to start after previous ends
-    if (currentStart <= prevEnd) {
-      const newStartDate = new Date(prevEnd);
-      newStartDate.setDate(newStartDate.getDate() + 1); // Add 1 day gap
-      
-      const duration = Math.ceil(
-        (new Date(currentTask.endDate).getTime() - new Date(currentTask.startDate).getTime()) / (1000 * 60 * 60 * 24)
-      );
-      
-      const newEndDate = new Date(newStartDate);
-      newEndDate.setDate(newEndDate.getDate() + duration);
-      
-      currentTask.startDate = formatDateISO(newStartDate);
-      currentTask.endDate = formatDateISO(newEndDate);
-      
-      console.log(`[fixOverlappingTasks] Adjusted task ${currentTask.id} to avoid overlap with ${prevTask.id}`);
+    // First, ensure task starts within project bounds
+    if (projectStart && taskStart < projectStart) {
+      taskStart = new Date(projectStart);
+      taskEnd = new Date(taskStart);
+      taskEnd.setDate(taskEnd.getDate() + duration);
+      console.log(`[fixOverlappingTasks] Adjusted task ${currentTask.id} start date to project start`);
     }
+    
+    // Check for overlap with previous task
+    if (prevTask) {
+      const prevEnd = new Date(prevTask.endDate);
+      if (taskStart <= prevEnd) {
+        taskStart = new Date(prevEnd);
+        taskStart.setDate(taskStart.getDate() + 1); // Add 1 day gap
+        taskEnd = new Date(taskStart);
+        taskEnd.setDate(taskEnd.getDate() + duration);
+        console.log(`[fixOverlappingTasks] Adjusted task ${currentTask.id} to avoid overlap with ${prevTask.id}`);
+      }
+    }
+    
+    // Ensure task ends within project bounds
+    if (projectEnd && taskEnd > projectEnd) {
+      // If task would extend beyond project end, try to fit it before project end
+      taskEnd = new Date(projectEnd);
+      
+      // Calculate new start date maintaining original duration if possible
+      const newStartDate = new Date(taskEnd);
+      newStartDate.setDate(newStartDate.getDate() - duration);
+      
+      // Check if new start date conflicts with previous task
+      if (prevTask) {
+        const prevEnd = new Date(prevTask.endDate);
+        if (newStartDate <= prevEnd) {
+          // Can't fit with original duration, use available space
+          taskStart = new Date(prevEnd);
+          taskStart.setDate(taskStart.getDate() + 1);
+          
+          // If there's no space at all, mark for removal
+          if (taskStart >= projectEnd) {
+            console.log(`[fixOverlappingTasks] Task ${currentTask.id} cannot fit within project bounds - will be removed`);
+            currentTask.startDate = formatDateISO(projectEnd);
+            currentTask.endDate = formatDateISO(projectEnd);
+            continue;
+          }
+        } else {
+          taskStart = newStartDate;
+        }
+      } else {
+        taskStart = newStartDate;
+      }
+      
+      // Final check to ensure start is within bounds
+      if (projectStart && taskStart < projectStart) {
+        taskStart = new Date(projectStart);
+      }
+      
+      console.log(`[fixOverlappingTasks] Adjusted task ${currentTask.id} to fit within project end date`);
+    }
+    
+    // Update task dates
+    currentTask.startDate = formatDateISO(taskStart);
+    currentTask.endDate = formatDateISO(taskEnd);
   }
   
-  return sortedTasks;
+  // Filter out tasks that don't fit within project bounds at all
+  const validTasks = sortedTasks.filter(task => {
+    const taskStart = new Date(task.startDate);
+    const taskEnd = new Date(task.endDate);
+    
+    if (projectStart && taskEnd < projectStart) {
+      console.log(`[fixOverlappingTasks] Removing task ${task.id} - ends before project start`);
+      return false;
+    }
+    if (projectEnd && taskStart > projectEnd) {
+      console.log(`[fixOverlappingTasks] Removing task ${task.id} - starts after project end`);
+      return false;
+    }
+    return true;
+  });
+  
+  return validTasks;
 }
 
 /**
@@ -125,8 +191,8 @@ export const getOrCreateScheduleForProject = async (
           
           console.log('[getOrCreateScheduleForProject] 13. Tasks after factory filter:', scheduleTasks.length);
           
-          // Fix overlapping tasks
-          const fixedTasks = fixOverlappingTasks(scheduleTasks);
+          // Fix overlapping tasks and ensure within project bounds
+          const fixedTasks = fixOverlappingTasks(scheduleTasks, existingSchedule.startDate, existingSchedule.endDate);
           
           // Log task details in a table format for better readability
           console.log('[getOrCreateScheduleForProject] 13a. Task details:');
@@ -147,10 +213,17 @@ export const getOrCreateScheduleForProject = async (
             if (projectData.manufacturerId && projectData.manufacturerId !== null) {
               const factory = database.factories.get(projectData.manufacturerId);
               if (factory) {
+                const startDateStr = typeof existingSchedule.startDate === 'string' ? 
+                  formatDateISO(new Date(existingSchedule.startDate)) : 
+                  formatDateISO(existingSchedule.startDate);
+                const endDateStr = typeof existingSchedule.endDate === 'string' ? 
+                  formatDateISO(new Date(existingSchedule.endDate)) : 
+                  formatDateISO(existingSchedule.endDate);
+                
                 participants.push({
                   id: factory.id,
                   name: factory.name,
-                  period: `${existingSchedule.startDate} ~ ${existingSchedule.endDate}`,
+                  period: `${startDateStr} ~ ${endDateStr}`,
                   color: 'blue'
                 });
               }
@@ -159,10 +232,17 @@ export const getOrCreateScheduleForProject = async (
             if (projectData.containerId && projectData.containerId !== null) {
               const factory = database.factories.get(projectData.containerId);
               if (factory) {
+                const startDateStr = typeof existingSchedule.startDate === 'string' ? 
+                  formatDateISO(new Date(existingSchedule.startDate)) : 
+                  formatDateISO(existingSchedule.startDate);
+                const endDateStr = typeof existingSchedule.endDate === 'string' ? 
+                  formatDateISO(new Date(existingSchedule.endDate)) : 
+                  formatDateISO(existingSchedule.endDate);
+                
                 participants.push({
                   id: factory.id,
                   name: factory.name,
-                  period: `${existingSchedule.startDate} ~ ${existingSchedule.endDate}`,
+                  period: `${startDateStr} ~ ${endDateStr}`,
                   color: 'red'
                 });
               }
@@ -171,10 +251,17 @@ export const getOrCreateScheduleForProject = async (
             if (projectData.packagingId && projectData.packagingId !== null) {
               const factory = database.factories.get(projectData.packagingId);
               if (factory) {
+                const startDateStr = typeof existingSchedule.startDate === 'string' ? 
+                  formatDateISO(new Date(existingSchedule.startDate)) : 
+                  formatDateISO(existingSchedule.startDate);
+                const endDateStr = typeof existingSchedule.endDate === 'string' ? 
+                  formatDateISO(new Date(existingSchedule.endDate)) : 
+                  formatDateISO(existingSchedule.endDate);
+                
                 participants.push({
                   id: factory.id,
                   name: factory.name,
-                  period: `${existingSchedule.startDate} ~ ${existingSchedule.endDate}`,
+                  period: `${startDateStr} ~ ${endDateStr}`,
                   color: 'yellow'
                 });
               }
@@ -324,7 +411,7 @@ export const getOrCreateScheduleForProject = async (
         const newEndDate = new Date(newStartDate);
         newEndDate.setDate(newEndDate.getDate() + Math.max(3, taskDuration)); // Minimum 3 days per task
         
-        // Check if task fits within project timeline
+        // Only add task if it fits within project timeline
         if (newEndDate <= projectEnd) {
           const newTask = {
             ...task,
@@ -335,10 +422,10 @@ export const getOrCreateScheduleForProject = async (
             endDate: formatDateISO(newEndDate)
           };
           
-          
           filteredTasks.push(newTask);
-          
           lastEndDateForFactory = newEndDate;
+        } else {
+          console.log(`[getOrCreateScheduleForProject] Task ${task.taskType} excluded - extends beyond project end date`);
         }
       });
     });
@@ -359,10 +446,12 @@ export const getOrCreateScheduleForProject = async (
     // Try to find by ID first, then by name
     const factory = allFactories.find(f => f.id === project.manufacturer || f.name === project.manufacturer);
     if (factory) {
+      const startDateStr = formatDateISO(new Date(project.startDate));
+      const endDateStr = formatDateISO(new Date(project.endDate));
       participants.push({
         id: factory.id,
         name: factory.name,
-        period: `${project.startDate} ~ ${project.endDate}`,
+        period: `${startDateStr} ~ ${endDateStr}`,
         color: 'blue'
       });
     }
@@ -372,10 +461,12 @@ export const getOrCreateScheduleForProject = async (
     // Try to find by ID first, then by name
     const factory = allFactories.find(f => f.id === project.container || f.name === project.container);
     if (factory) {
+      const startDateStr = formatDateISO(new Date(project.startDate));
+      const endDateStr = formatDateISO(new Date(project.endDate));
       participants.push({
         id: factory.id,
         name: factory.name,
-        period: `${project.startDate} ~ ${project.endDate}`,
+        period: `${startDateStr} ~ ${endDateStr}`,
         color: 'red'
       });
     }
@@ -385,10 +476,12 @@ export const getOrCreateScheduleForProject = async (
     // Try to find by ID first, then by name
     const factory = allFactories.find(f => f.id === project.packaging || f.name === project.packaging);
     if (factory) {
+      const startDateStr = formatDateISO(new Date(project.startDate));
+      const endDateStr = formatDateISO(new Date(project.endDate));
       participants.push({
         id: factory.id,
         name: factory.name,
-        period: `${project.startDate} ~ ${project.endDate}`,
+        period: `${startDateStr} ~ ${endDateStr}`,
         color: 'yellow'
       });
     }

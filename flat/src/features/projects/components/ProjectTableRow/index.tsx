@@ -36,7 +36,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
   onStartDrag
 }) => {
   const editableCell = useEditableCell();
-  const { isExpanded, tasks, handleToggleTasks, handleTaskToggle } = useTaskManagement();
+  const { isExpanded, tasks, handleToggleTasks, handleTaskToggle } = useTaskManagement({ project });
 
   const handleRowClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;

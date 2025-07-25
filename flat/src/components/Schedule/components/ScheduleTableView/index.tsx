@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { Participant, Task } from '../../../../types/schedule';
 import { useTaskContext } from '../../../../contexts/AppContext';
+import { useTaskStore } from '../../../../stores/taskStore';
 import TableHeader from './TableHeader';
 import TaskRow from './TaskRow';
 import EmptyState from './EmptyState';
@@ -8,6 +9,7 @@ import EmptyState from './EmptyState';
 interface ScheduleTableViewProps {
   projects?: Participant[];
   tasks?: Task[];
+  projectId?: string;
   onTaskClick?: (task: Task) => void;
   onDeleteProject?: (projectId: string) => void;
 }
@@ -15,13 +17,19 @@ interface ScheduleTableViewProps {
 const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
   projects: propsProjects,
   tasks: propsTasks,
+  projectId,
   onTaskClick,
   onDeleteProject,
 }) => {
   // Use context data if props are not provided
   const { tasks: contextTasks, participants, onTaskDelete, onFactoryDelete } = useTaskContext();
   
-  const tasks = propsTasks || contextTasks;
+  // Use taskStore to get unified task data
+  const { getTasksForProject } = useTaskStore();
+  const storeTasks = projectId ? getTasksForProject(projectId) : [];
+  
+  // Priority: props > store > context
+  const tasks = propsTasks || (storeTasks.length > 0 ? storeTasks : contextTasks);
   const projects = propsProjects || participants;
 
   // Sort all tasks by start date

@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { TASK_TEMPLATES } from '../../../../constants';
+import { useState, useEffect } from 'react';
+import { useTaskStore } from '../../../../stores/taskStore';
+import type { Project } from '../../../../types/project';
 
 interface Task {
   id: string;
@@ -7,31 +8,45 @@ interface Task {
   completed: boolean;
 }
 
-export const useTaskManagement = () => {
+interface UseTaskManagementProps {
+  project?: Project;
+}
+
+export const useTaskManagement = (props?: UseTaskManagementProps) => {
+  const project = props?.project;
   const [isExpanded, setIsExpanded] = useState(false);
+  const { getTasksForProject, updateTask, loadScheduleForProject } = useTaskStore();
   
-  // Default tasks based on the image
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', name: TASK_TEMPLATES.RAW_MATERIAL_PREP, completed: true },
-    { id: '2', name: TASK_TEMPLATES.MIXING_MANUFACTURING, completed: true },
-    { id: '3', name: TASK_TEMPLATES.MOLD_MAKING, completed: true },
-    { id: '4', name: TASK_TEMPLATES.STABILITY_TEST, completed: false },
-    { id: '5', name: TASK_TEMPLATES.TRIAL_MOLDING, completed: false },
-    { id: '6', name: TASK_TEMPLATES.DESIGN_WORK, completed: false },
-    { id: '7', name: TASK_TEMPLATES.PACKAGING_WORK, completed: false }
-  ]);
+  // Load schedule and tasks when component mounts
+  useEffect(() => {
+    if (project) {
+      loadScheduleForProject(project);
+    }
+  }, [project, loadScheduleForProject]);
+  
+  // Get tasks from store
+  const scheduleTasks = project ? getTasksForProject(project.id) : [];
+  
+  // Convert schedule tasks to simplified format for TaskList component
+  const tasks: Task[] = scheduleTasks.map(task => ({
+    id: String(task.id),
+    name: task.title || task.taskType || 'Unnamed Task',
+    completed: task.status === 'completed'
+  }));
 
   const handleToggleTasks = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
   };
 
-  const handleTaskToggle = (taskId: string) => {
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+  const handleTaskToggle = async (taskId: string) => {
+    if (!project) return;
+    
+    const task = scheduleTasks.find(t => String(t.id) === taskId);
+    if (task) {
+      const newStatus = task.status === 'completed' ? 'in-progress' : 'completed';
+      await updateTask(project.id, task.id, { status: newStatus });
+    }
   };
 
   return {

@@ -21,7 +21,7 @@ export function createSchedulesAndTasks(projects: Project[], users: User[]): { s
       endDate: project.endDate,
       status: project.status === ProjectStatus.IN_PROGRESS ? 'active' : 
               project.status === ProjectStatus.COMPLETED ? 'completed' :
-              project.status === ProjectStatus.ON_HOLD ? 'archived' : 'draft',
+              project.status === ProjectStatus.CANCELLED ? 'archived' : 'draft',
       createdAt: project.createdAt,
       updatedAt: currentDate,
     };
@@ -202,8 +202,8 @@ function calculateTaskTiming(
     }
   }
   
-  // For ON_HOLD projects, make the current task span today
-  if (project.status === ProjectStatus.ON_HOLD) {
+  // For CANCELLED projects, make the current task span today
+  if (project.status === ProjectStatus.CANCELLED) {
     const completedTasks = Math.floor((project.progress / 100) * totalTasks);
     
     if (taskIndex < completedTasks) {
@@ -257,8 +257,8 @@ function determineTaskStatus(
     return TaskStatus.TODO;
   }
   
-  // For on-hold projects, determine based on progress
-  if (project.status === ProjectStatus.ON_HOLD) {
+  // For cancelled projects, determine based on progress
+  if (project.status === ProjectStatus.CANCELLED) {
     const completedTasks = Math.floor((project.progress / 100) * totalTasks);
     if (taskIndex < completedTasks) {
       return TaskStatus.COMPLETED;

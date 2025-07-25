@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ServiceType } from '../../../types/project';
-import { SERVICE_TYPE_OPTIONS } from '../../../constants';
+import { getServiceTypeDisplayName, getAllServiceTypes } from '../../../utils/serviceTypeUtils';
 
 interface ServiceTypeDropdownProps {
   value: ServiceType;
@@ -22,7 +22,7 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const serviceTypes: ServiceType[] = SERVICE_TYPE_OPTIONS as ServiceType[];
+  const serviceTypes = getAllServiceTypes();
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
@@ -35,7 +35,7 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all
           border bg-indigo-100 text-indigo-700 border-indigo-300"
       >
-        {value}
+        {getServiceTypeDisplayName(value)}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
           <svg className="w-3 h-3 text-current opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -45,18 +45,19 @@ const ServiceTypeDropdown: React.FC<ServiceTypeDropdownProps> = ({ value, onChan
       
       {isOpen && (
         <div className="absolute z-50 mt-1 w-auto min-w-[8rem] bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-          {serviceTypes.map((serviceType) => (
+          {serviceTypes.map((serviceTypeInfo) => (
             <button
-              key={serviceType}
+              key={serviceTypeInfo.code}
               onClick={(e) => {
                 e.stopPropagation();
-                onChange(serviceType);
+                onChange(serviceTypeInfo.code as ServiceType);
                 setIsOpen(false);
               }}
               className="w-full px-3 py-2 text-left text-xs font-medium hover:brightness-110 transition-all whitespace-nowrap
                 bg-indigo-100 text-indigo-700 border-indigo-300"
+              title={serviceTypeInfo.description}
             >
-              {serviceType}
+              {serviceTypeInfo.displayName}
             </button>
           ))}
         </div>

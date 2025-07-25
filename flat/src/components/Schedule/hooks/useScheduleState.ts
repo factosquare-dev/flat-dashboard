@@ -4,6 +4,8 @@ import { getDaysArray } from '../../../utils/dateUtils';
 import { formatDate } from '../../../utils/formatUtils';
 import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
 import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
+import { useScheduleTasksWithStore } from '../../../hooks/useScheduleTasksWithStore';
+import { useTaskStore } from '../../../stores/taskStore';
 import { factories } from '../../../data/factories';
 import { getDatabaseWithRetry } from '../../../mocks/database/utils';
 import { ProjectType } from '../../../types/project';
@@ -107,6 +109,15 @@ export const useScheduleState = (
     
     startDate = new Date(projectStart.getTime() - (padding * 24 * 60 * 60 * 1000));
     endDate = new Date(projectEnd.getTime() + (padding * 24 * 60 * 60 * 1000));
+    
+    console.log('[useScheduleState] Date calculation:', {
+      projectStart: projectStart.toISOString().split('T')[0],
+      projectEnd: projectEnd.toISOString().split('T')[0],
+      projectDuration,
+      padding,
+      gridStartDate: startDate.toISOString().split('T')[0],
+      gridEndDate: endDate.toISOString().split('T')[0]
+    });
   } else {
     // 프로젝트 날짜가 없는 경우 전달받은 프로젝트 날짜 사용
     if (projectStartDate && projectEndDate) {
@@ -210,7 +221,13 @@ export const useScheduleState = (
   });
 
   const dragControls = useScheduleDrag();
-  const taskControls = useScheduleTasks(projects, startDate, endDate, initialTasks, cellWidth);
+  
+  // Use store-based task controls if projectId is provided
+  const storeTaskControls = useScheduleTasksWithStore(projects, startDate, endDate, projectId, cellWidth);
+  const localTaskControls = useScheduleTasks(projects, startDate, endDate, initialTasks, cellWidth);
+  
+  // Use store controls if projectId exists, otherwise use local controls
+  const taskControls = projectId ? storeTaskControls : localTaskControls;
 
   const handleProjectSelect = (projectId: string, checked: boolean) => {
     if (checked) {

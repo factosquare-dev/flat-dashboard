@@ -33,6 +33,10 @@ export const seedData = {
       projectAssignments: new Map(),
       factoryProjects: new Map(),
       userCustomers: new Map(),
+      statusMappings: new Map(),
+      priorityMappings: new Map(),
+      serviceTypeMappings: new Map(),
+      projectTypeMappings: new Map(),
     };
 
     // 1. Create Users
@@ -72,6 +76,19 @@ export const seedData = {
 
     const userCustomers = this.createUserCustomerRelations(users, customers);
     userCustomers.forEach(uc => db.userCustomers.set(uc.id, uc));
+
+    // 8. Create Status and Priority Mappings
+    const statusMappings = this.createStatusMappings();
+    statusMappings.forEach(sm => db.statusMappings.set(sm.id, sm));
+
+    const priorityMappings = this.createPriorityMappings();
+    priorityMappings.forEach(pm => db.priorityMappings.set(pm.id, pm));
+
+    const serviceTypeMappings = this.createServiceTypeMappings();
+    serviceTypeMappings.forEach(stm => db.serviceTypeMappings.set(stm.id, stm));
+
+    const projectTypeMappings = this.createProjectTypeMappings();
+    projectTypeMappings.forEach(ptm => db.projectTypeMappings.set(ptm.id, ptm));
 
     return db;
   },
@@ -656,5 +673,47 @@ export const seedData = {
     }
 
     return participants;
+  },
+
+  createStatusMappings() {
+    const projectStatuses = [
+      { id: 'status-proj-1', type: 'project' as const, code: 'PLANNING', displayName: '시작전', displayNameEn: 'Planning', color: '#6B7280', order: 1 },
+      { id: 'status-proj-2', type: 'project' as const, code: 'IN_PROGRESS', displayName: '진행중', displayNameEn: 'In Progress', color: '#3B82F6', order: 2 },
+      { id: 'status-proj-3', type: 'project' as const, code: 'COMPLETED', displayName: '완료', displayNameEn: 'Completed', color: '#10B981', order: 3 },
+      { id: 'status-proj-4', type: 'project' as const, code: 'CANCELLED', displayName: '중단', displayNameEn: 'Cancelled', color: '#EF4444', order: 4 },
+    ];
+
+    const taskStatuses = [
+      { id: 'status-task-1', type: 'task' as const, code: 'planning', displayName: '시작전', displayNameEn: 'Planning', color: '#6B7280', order: 1 },
+      { id: 'status-task-2', type: 'task' as const, code: 'in-progress', displayName: '진행중', displayNameEn: 'In Progress', color: '#3B82F6', order: 2 },
+      { id: 'status-task-3', type: 'task' as const, code: 'completed', displayName: '완료', displayNameEn: 'Completed', color: '#10B981', order: 3 },
+      { id: 'status-task-4', type: 'task' as const, code: 'cancelled', displayName: '중단', displayNameEn: 'Cancelled', color: '#EF4444', order: 4 },
+    ];
+
+    return [...projectStatuses, ...taskStatuses];
+  },
+
+  createPriorityMappings() {
+    return [
+      { id: 'priority-1', code: 'high', displayName: '높음', displayNameEn: 'High', color: '#EF4444', order: 1 },
+      { id: 'priority-2', code: 'medium', displayName: '보통', displayNameEn: 'Medium', color: '#F59E0B', order: 2 },
+      { id: 'priority-3', code: 'low', displayName: '낮음', displayNameEn: 'Low', color: '#10B981', order: 3 },
+    ];
+  },
+
+  createServiceTypeMappings() {
+    return [
+      { id: 'service-1', code: 'OEM', displayName: 'OEM', displayNameEn: 'OEM', description: '주문자 상표 부착 생산', order: 1 },
+      { id: 'service-2', code: 'ODM', displayName: 'ODM', displayNameEn: 'ODM', description: '제조업체 개발 생산', order: 2 },
+      { id: 'service-3', code: 'OBM', displayName: 'OBM', displayNameEn: 'OBM', description: '자체 브랜드 생산', order: 3 },
+    ];
+  },
+
+  createProjectTypeMappings() {
+    return [
+      { id: 'proj-type-1', code: 'MASTER', displayName: '대형', displayNameEn: 'Master', order: 1 },
+      { id: 'proj-type-2', code: 'SUB', displayName: '소형', displayNameEn: 'Sub', order: 2 },
+      { id: 'proj-type-3', code: 'TASK', displayName: '작업', displayNameEn: 'Task', order: 3 },
+    ];
   },
 };

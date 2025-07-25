@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { Project } from '../../types/project';
 import type { Schedule as ScheduleType } from '../../types/schedule';
 import { scheduleApi } from '../../api/scheduleApi';
+import { useTaskStore } from '../../stores/taskStore';
 import Schedule from '../Schedule';
 import ProjectListView from '../../features/projects/components/ProjectList';
 import { ErrorBoundary, ProjectListErrorFallback } from '../ErrorBoundary';
@@ -16,6 +17,9 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
   const [isLoadingSchedule, setIsLoadingSchedule] = useState(false);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
   
+  // Use taskStore for unified data management
+  const { loadScheduleForProject, getScheduleForProject, isLoading: storeLoading } = useTaskStore();
+  
   const handleBack = useCallback(() => {
     setSelectedProject(null);
   }, []);
@@ -26,23 +30,31 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
     if (selectedProject) {
       setIsLoadingSchedule(true);
       setScheduleError(null);
-      scheduleApi.getOrCreateScheduleForProject(selectedProject)
-        .then(schedule => {
-          if (isMounted) {
-            setProjectSchedule(schedule);
-          }
-        })
-        .catch(error => {
-          if (isMounted) {
-            setScheduleError('스케줄을 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
-            // Error handled silently
-          }
-        })
-        .finally(() => {
-          if (isMounted) {
-            setIsLoadingSchedule(false);
-          }
-        });
+      
+      // First try to get from store
+      const existingSchedule = getScheduleForProject(selectedProject.id);
+      if (existingSchedule) {
+        setProjectSchedule(existingSchedule);
+        setIsLoadingSchedule(false);
+      } else {
+        // Load from API and update store
+        loadScheduleForProject(selectedProject)
+          .then(schedule => {
+            if (isMounted) {
+              setProjectSchedule(schedule);
+            }
+          })
+          .catch(error => {
+            if (isMounted) {
+              setScheduleError('스케줄을 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+          })
+          .finally(() => {
+            if (isMounted) {
+              setIsLoadingSchedule(false);
+            }
+          });
+      }
     } else {
       setProjectSchedule(null);
       setScheduleError(null);
@@ -51,7 +63,7 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
     return () => {
       isMounted = false;
     };
-  }, [selectedProject]);
+  }, [selectedProject, loadScheduleForProject, getScheduleForProject]);
   
   if (selectedProject) {
     if (scheduleError) {
@@ -81,7 +93,7 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
           projectName={`${selectedProject.client} - ${selectedProject.productType}`}
           projectId={selectedProject.id}
           onBack={handleBack}
-          isLoading={isLoadingSchedule}
+          isLoading={isLoadingSchedule || storeLoading}
         />
       );
     }

@@ -13,11 +13,12 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
       return initialTasks.map(task => {
         const taskStartDate = new Date(task.startDate);
         const taskEndDate = new Date(task.endDate);
-        const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        const daysSinceStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Calculate days from grid start (not project start) for positioning
+        const daysSinceGridStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
         const taskDuration = Math.ceil((taskEndDate.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         
-        const x = daysSinceStart * cellWidth;
+        const x = daysSinceGridStart * cellWidth;
         const width = Math.max(cellWidth, taskDuration * cellWidth);
         
         // factoryId가 없는 경우 factory 이름으로 participant 찾기
@@ -53,11 +54,11 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
   });
 
   const calculateTaskPosition = (taskStartDate: Date, taskEndDate: Date): { x: number; width: number } => {
-    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const daysSinceStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    // Calculate days from grid start for positioning
+    const daysSinceGridStart = Math.max(0, (taskStartDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const taskDuration = Math.ceil((taskEndDate.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     
-    const x = daysSinceStart * cellWidth;
+    const x = daysSinceGridStart * cellWidth;
     const width = Math.max(cellWidth, taskDuration * cellWidth);
     
     return { x, width };

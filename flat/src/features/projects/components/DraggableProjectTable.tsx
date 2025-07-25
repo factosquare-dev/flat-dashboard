@@ -3,6 +3,8 @@ import type { Project } from '../../../types/project';
 import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '../../../hooks/useColumnOrder';
 import type { Column } from '../../../hooks/useColumnOrder';
+import { ProjectTypeEnum } from '../../../types/enums';
+import { isProjectType } from '../../../utils/projectTypeUtils';
 
 interface DraggableProjectTableProps {
   projects: Project[];
@@ -85,7 +87,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                   type="checkbox"
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                   onChange={(e) => onSelectAll(e.target.checked)}
-                  checked={projects.length > 0 && selectedRows.length === projects.filter(p => p.type === 'task').length}
+                  checked={projects.length > 0 && selectedRows.length === projects.filter(p => isProjectType(p.type, ProjectTypeEnum.TASK)).length}
                 />
               </div>
             </th>
