@@ -132,7 +132,7 @@ export const useDeleteProject = () => {
         { queryKey: queryKeys.projects.lists() },
         (old: Project[] | undefined) => ({
           ...old,
-          data: old?.filter((project: Project) => project.id !== id) || [],
+          data: old?.filter((project: Project) => project.id !== id) ?? [],
         })
       );
     },

@@ -1,8 +1,9 @@
 import type { CertificationType, FactoryManager } from '../../../data/factories';
+import { FactoryType } from '../../../types/enums';
 
 export interface FactoryFormData {
   name: string;
-  type: '제조' | '용기' | '포장';
+  type: FactoryType;
   address: string;
   contact: string;
   email: string;

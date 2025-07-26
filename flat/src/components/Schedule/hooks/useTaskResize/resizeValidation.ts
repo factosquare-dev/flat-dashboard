@@ -1,5 +1,5 @@
-import type { Task } from '../../../../types/schedule';
-import { formatDateISO } from '../../../../utils/coreUtils';
+import type { Task } from '@/types/schedule';
+import { formatDateISO } from '@/utils/coreUtils';
 
 export interface ResizeValidationResult {
   validStartDate: string;

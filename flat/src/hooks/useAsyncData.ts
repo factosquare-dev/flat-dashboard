@@ -1,18 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-interface UseAsyncDataOptions {
+interface UseAsyncDataOptions<T> {
   immediate?: boolean;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
   retryCount?: number;
   retryDelay?: number;
 }
 
-interface UseAsyncDataReturn<T> {
+interface UseAsyncDataReturn<T, TArgs extends unknown[] = unknown[]> {
   data: T | null;
   error: Error | null;
   loading: boolean;
-  execute: (...args: any[]) => Promise<void>;
+  execute: (...args: TArgs) => Promise<void>;
   reset: () => void;
   retry: () => Promise<void>;
 }
@@ -23,10 +23,10 @@ interface UseAsyncDataReturn<T> {
  * @param options - Configuration options
  * @returns Data, loading state, error, and control functions
  */
-export function useAsyncData<T>(
-  asyncFunction: (...args: any[]) => Promise<T>,
-  options: UseAsyncDataOptions = {}
-): UseAsyncDataReturn<T> {
+export function useAsyncData<T, TArgs extends unknown[] = unknown[]>(
+  asyncFunction: (...args: TArgs) => Promise<T>,
+  options: UseAsyncDataOptions<T> = {}
+): UseAsyncDataReturn<T, TArgs> {
   const {
     immediate = false,
     onSuccess,
@@ -39,7 +39,7 @@ export function useAsyncData<T>(
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const isMountedRef = useRef(true);
-  const lastArgsRef = useRef<any[]>([]);
+  const lastArgsRef = useRef<TArgs>({} as TArgs);
   const retriesRef = useRef(0);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export function useAsyncData<T>(
   }, []);
 
   const execute = useCallback(
-    async (...args: any[]) => {
+    async (...args: TArgs) => {
       try {
         lastArgsRef.current = args;
         retriesRef.current = 0;
@@ -95,7 +95,7 @@ export function useAsyncData<T>(
   }, []);
 
   const retry = useCallback(async () => {
-    if (lastArgsRef.current.length > 0) {
+    if (lastArgsRef.current) {
       await execute(...lastArgsRef.current);
     }
   }, [execute]);

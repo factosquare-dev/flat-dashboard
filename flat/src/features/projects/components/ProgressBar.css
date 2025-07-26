@@ -1,0 +1,35 @@
+/**
+ * ProgressBar Styles
+ * Using CSS Variables and data attributes for dynamic styling
+ */
+
+.progress-bar {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.progress-bar__track {
+  position: relative;
+  background-color: rgba(var(--color-text-muted), 0.6);
+  border-radius: var(--radius-full);
+  height: 10px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 500ms ease-out;
+  width: var(--progress-width, 0%);
+}
+
+.progress-bar__label {
+  margin-top: var(--spacing-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-align: center;
+}

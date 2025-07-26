@@ -1,4 +1,4 @@
-import type { Task, ModalState, Participant, TaskControls } from '../../../../types/schedule';
+import type { Task, ModalState, Participant, TaskControls, DragTooltip } from '../../../../types/schedule';
 
 export type DragState = {
   offsetX: number;
@@ -16,8 +16,8 @@ export interface UseTaskDragProps {
 }
 
 export interface UseTaskDragReturn {
-  dragTooltip: any;
-  dragPreview: any;
+  dragTooltip: DragTooltip | null;
+  dragPreview: { projectId: string; startDate: string; endDate: string } | null;
   handleTaskDragStart: (e: React.DragEvent, task: Task, index: number) => void;
   handleTaskDragEnd: () => void;
   handleTaskDragOver: (e: React.DragEvent, modalState: ModalState) => void;

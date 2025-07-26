@@ -63,7 +63,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     handleSelectItem,
     setupAutoScroll
   } = useDragSelection({
-    items: projects || [],
+    items: projects ?? [],
     selectedItems: selectedRows,
     onSelectionChange: setSelectedRows,
     getItemId: (project) => project.id
@@ -90,7 +90,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
 
   const handleSelectAllProjects = (checked: boolean) => {
     if (checked) {
-      setSelectedRows(projects?.map(p => p.id) || []);
+      setSelectedRows(projects?.map(p => p.id) ?? []);
     } else {
       setSelectedRows([]);
     }

@@ -1,14 +1,15 @@
 import React from 'react';
-import type { Project } from '../../../../types/project';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
 import { MoreVertical } from 'lucide-react';
-import { useEditableCell } from '../../../../hooks/useEditableCell';
+import { useEditableCell } from '@/hooks/useEditableCell';
 import TaskList from '../TaskList';
-import type { Column } from '../../../../hooks/useColumnOrder';
+import type { Column } from '@/hooks/useColumnOrder';
 import { useTaskManagement } from './useTaskManagement';
 import SelectionCell from './SelectionCell';
 import * as cellRenderers from './cellRenderers';
-import { ProjectTypeEnum } from '../../../../types/enums';
-import { isProjectType } from '../../../../utils/projectTypeUtils';
+import { ProjectTypeEnum } from '@/types/enums';
+import { isProjectType } from '@/utils/projectTypeUtils';
 
 interface ProjectTableRowProps {
   project: Project;
@@ -17,12 +18,12 @@ interface ProjectTableRowProps {
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
   onRowClick: (project: Project) => void;
-  onUpdateField: (projectId: string, field: keyof Project, value: Project[keyof Project]) => void;
-  onShowOptionsMenu: (projectId: string, position: { top: number; left: number }, event?: React.MouseEvent) => void;
+  onUpdateField: (projectId: ProjectId, field: keyof Project, value: Project[keyof Project]) => void;
+  onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }, event?: React.MouseEvent) => void;
   onMouseEnter?: () => void;
   isDragging?: boolean;
   onStartDrag?: (index: number) => void;
-  onDragStart?: (e: React.DragEvent, projectId: string) => void;
+  onDragStart?: (e: React.DragEvent, projectId: ProjectId) => void;
   onDragEnd?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent, project: Project) => void;

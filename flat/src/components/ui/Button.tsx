@@ -1,37 +1,29 @@
 import React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
-import { COMPONENT_STYLES } from '../../styles/components';
-import { ARIA_LABELS } from '../../utils/accessibility';
+import { ButtonVariant, Size } from '../../types/enums';
+import { cn } from '../../utils/cn';
+import './Button.css';
 
-const buttonVariants = cva(
-  COMPONENT_STYLES.BUTTON.BASE,
-  {
-    variants: {
-      variant: {
-        primary: COMPONENT_STYLES.BUTTON.VARIANT.PRIMARY,
-        secondary: COMPONENT_STYLES.BUTTON.VARIANT.SECONDARY,
-        outline: COMPONENT_STYLES.BUTTON.VARIANT.OUTLINE,
-        ghost: COMPONENT_STYLES.BUTTON.VARIANT.GHOST,
-        danger: COMPONENT_STYLES.BUTTON.VARIANT.DANGER,
-      },
-      size: {
-        sm: COMPONENT_STYLES.BUTTON.SIZE.SM,
-        md: COMPONENT_STYLES.BUTTON.SIZE.MD,
-        lg: COMPONENT_STYLES.BUTTON.SIZE.LG,
-        icon: 'h-10 w-10',
-      },
-    },
-    defaultVariants: {
-      variant: 'primary',
-      size: 'md',
-    },
-  }
-);
+const variantClassMap = {
+  [ButtonVariant.PRIMARY]: 'button--primary',
+  [ButtonVariant.SECONDARY]: 'button--secondary',
+  [ButtonVariant.GHOST]: 'button--ghost',
+  [ButtonVariant.DANGER]: 'button--danger',
+  [ButtonVariant.SUCCESS]: 'button--success',
+  [ButtonVariant.WARNING]: 'button--warning',
+};
+
+const sizeClassMap = {
+  [Size.SM]: 'button--sm',
+  [Size.MD]: 'button--md',
+  [Size.LG]: 'button--lg',
+  icon: 'button--icon',
+};
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: Size | 'icon';
   isLoading?: boolean;
   loading?: boolean; // Alias for isLoading for consistency
   leftIcon?: React.ReactNode;
@@ -45,8 +37,8 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ 
     className, 
-    variant, 
-    size, 
+    variant = ButtonVariant.PRIMARY, 
+    size = Size.MD, 
     isLoading, 
     loading,
     leftIcon, 
@@ -60,11 +52,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ...props 
   }, ref) => {
     const isButtonLoading = isLoading || loading;
-    const buttonClassName = buttonVariants({ 
-      variant, 
-      size, 
-      className: `${fullWidth ? 'w-full' : ''} ${className || ''}`.trim()
-    });
+    const buttonClassName = cn(
+      'button',
+      variantClassMap[variant],
+      size === 'icon' ? sizeClassMap.icon : sizeClassMap[size],
+      fullWidth && 'button--full-width',
+      className
+    );
 
     return (
       <button
@@ -78,16 +72,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isButtonLoading && (
-          <Loader2 className={`animate-spin ${size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-6 h-6' : 'w-5 h-5'}`} />
+          <Loader2 className="button__spinner" />
         )}
         {!isButtonLoading && leftIcon && (
-          <span className={`flex items-center ${size === 'sm' ? '[&>svg]:w-4 [&>svg]:h-4' : size === 'lg' ? '[&>svg]:w-6 [&>svg]:h-6' : '[&>svg]:w-5 [&>svg]:h-5'}`}>
+          <span className="button__icon button__icon--left">
             {leftIcon}
           </span>
         )}
         {children}
         {!isButtonLoading && rightIcon && (
-          <span className={`flex items-center ${size === 'sm' ? '[&>svg]:w-4 [&>svg]:h-4' : size === 'lg' ? '[&>svg]:w-6 [&>svg]:h-6' : '[&>svg]:w-5 [&>svg]:h-5'}`}>
+          <span className="button__icon button__icon--right">
             {rightIcon}
           </span>
         )}
@@ -98,4 +92,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+export { Button };

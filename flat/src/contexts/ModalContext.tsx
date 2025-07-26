@@ -14,7 +14,7 @@ export interface ModalConfig<T extends BaseModalProps = BaseModalProps> {
 }
 
 // Type-safe modal registry
-export type ModalConfigAny = ModalConfig<any>;
+export type ModalConfigAny = ModalConfig<BaseModalProps>;
 
 interface ModalContextType {
   modals: ModalConfigAny[];
@@ -101,7 +101,7 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       {modals.map(({ id, component: Component, props }) => (
         <Component
           key={id}
-          {...(props as any)}
+          {...props}
           isOpen={true}
           onClose={() => closeModal(id)}
         />

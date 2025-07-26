@@ -5,7 +5,6 @@ import ScheduleGrid from './ScheduleGrid';
 import { factories, taskTypesByFactoryType } from '../../data/factories';
 import { useTaskDrag } from './hooks/useTaskDrag';
 import { useTaskResize } from './hooks/useTaskResize';
-import DragPreview from './components/DragPreview';
 
 interface ScheduleGridContainerProps {
   projects: Participant[];
@@ -24,7 +23,6 @@ interface ScheduleGridContainerProps {
   onSelectAll: (checked: boolean) => void;
   onAddFactory?: () => void;
   onTaskCreate?: (task: { projectId: string; factory: string; startDate: string; endDate: string }) => void;
-  onGridWidthChange?: (width: number) => void;
 }
 
 import { getInteractionState, setInteractionMode, setPreventClickUntil } from './utils/globalState';
@@ -46,8 +44,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   onProjectSelect,
   onSelectAll,
   onAddFactory,
-  onTaskCreate,
-  onGridWidthChange
+  onTaskCreate
 }) => {
   // Task drag hooks
   const {
@@ -84,7 +81,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   const handleTaskClick = (task: Task) => {
     // Allow task clicks if it's a simple click (not a drag)
     if (dragControls.isDragClick() || !modalState.isDragging) {
-      setModalState((prev: any) => ({
+      setModalState(prev => ({
         ...prev,
         selectedTask: task,
         showTaskEditModal: true
@@ -106,7 +103,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     }
     
     // Clear any lingering drag/resize state when opening modal
-    setModalState((prev: any) => ({
+    setModalState((prev: ModalState) => ({
       ...prev,
       showTaskModal: true,
       selectedProjectId: projectId,
@@ -143,7 +140,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   };
 
   const handleProjectDragStart = (e: React.DragEvent, index: number) => {
-    setModalState((prev: any) => ({
+    setModalState((prev: ModalState) => ({
       ...prev,
       draggedProjectIndex: index
     }));
@@ -151,7 +148,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
   };
 
   const handleProjectDragEnd = () => {
-    setModalState((prev: any) => ({
+    setModalState((prev: ModalState) => ({
       ...prev,
       draggedProjectIndex: null,
       dragOverProjectIndex: null
@@ -213,9 +210,9 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
         onTaskDragStart={handleTaskDragStart}
         onTaskDragEnd={handleTaskDragEnd}
         onTaskDragOver={(e) => handleTaskDragOver(e, modalState)}
-        onTaskDrop={(e, projectId, taskIndex) => handleTaskDrop(e, projectId, modalState)}
+        onTaskDrop={(e, projectId) => handleTaskDrop(e, projectId, modalState)}
         onTaskMouseDown={handleTaskMouseDown}
-        onTaskHover={(taskId) => setModalState((prev: any) => ({ ...prev, hoveredTaskId: taskId }))}
+        onTaskHover={(taskId) => setModalState(prev => ({ ...prev, hoveredTaskId: taskId }))}
         onProjectDragStart={handleProjectDragStart}
         onProjectDragEnd={handleProjectDragEnd}
         onProjectDragOver={handleProjectDragOver}

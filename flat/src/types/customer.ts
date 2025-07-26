@@ -2,8 +2,10 @@
  * Customer type definitions
  */
 
+import { CustomerId, UserId } from './branded';
+
 export interface Customer {
-  id: string;
+  id: CustomerId;
   name: string;
   companyName: string;
   contactPerson: string;
@@ -15,7 +17,7 @@ export interface Customer {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  createdBy?: string;
+  createdBy?: UserId;
   notes?: string;
 }
 

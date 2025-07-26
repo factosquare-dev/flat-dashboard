@@ -11,7 +11,6 @@ interface ScheduleTableViewProps {
   tasks?: Task[];
   projectId?: string;
   onTaskClick?: (task: Task) => void;
-  onDeleteProject?: (projectId: string) => void;
 }
 
 const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
@@ -19,7 +18,6 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
   tasks: propsTasks,
   projectId,
   onTaskClick,
-  onDeleteProject,
 }) => {
   // Use context data if props are not provided
   const { tasks: contextTasks, participants, onTaskDelete, onFactoryDelete } = useTaskContext();
@@ -64,7 +62,6 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
                 key={task.id}
                 task={task}
                 project={project}
-                projects={projects}
                 onTaskClick={onTaskClick}
                 onTaskDelete={onTaskDelete}
                 onFactoryDelete={onFactoryDelete}

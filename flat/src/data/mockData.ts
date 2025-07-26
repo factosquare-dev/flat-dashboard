@@ -234,10 +234,6 @@ const getProductTypes = () => {
 
 export const productTypes = getProductTypes();
 
-// Re-export for backward compatibility
-export const serviceTypes = SERVICE_TYPE_OPTIONS;
-export const projectStatuses = PROJECT_STATUS_OPTIONS;
-export const priorities = PROJECT_PRIORITY_OPTIONS;
 
 // 현재 단계 옵션들
 export const currentStageOptions = [

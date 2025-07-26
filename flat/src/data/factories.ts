@@ -1,4 +1,6 @@
 import { FACTORY_TYPES, TASK_TYPES } from '../constants/factory';
+import { FactoryType } from '../types/enums';
+import { FactoryId, toFactoryId } from '../types/branded';
 
 // 공장 인증 타입
 export type CertificationType = 
@@ -22,9 +24,9 @@ export interface FactoryManager {
 }
 
 export interface Factory {
-  id: string;
+  id: FactoryId;
   name: string;
-  type: '제조' | '용기' | '포장';
+  type: FactoryType; // Using enum instead of string literals
   address: string;
   contact: string;
   email: string;
@@ -36,9 +38,9 @@ export interface Factory {
 export const factories: Factory[] = [
   // 제조 공장들
   {
-    id: 'mfg-1',
+    id: toFactoryId('mfg-1'),
     name: '큐셀시스템',
-    type: '제조',
+    type: FactoryType.MANUFACTURING,
     address: '경기도 성남시 중원구 둔촌대로 388',
     contact: '031-737-3000',
     email: 'info@qcellsystem.com',
@@ -60,9 +62,9 @@ export const factories: Factory[] = [
     ]
   },
   {
-    id: 'mfg-2',
+    id: toFactoryId('mfg-2'),
     name: '주식회사 코스모로스',
-    type: '제조',
+    type: FactoryType.MANUFACTURING,
     address: '인천광역시 남동구 남동서로 350',
     contact: '032-812-5000',
     email: 'contact@cosmoros.kr',
@@ -70,9 +72,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 22716', 'CGMP', 'ISO 14001']
   },
   {
-    id: 'mfg-3',
+    id: toFactoryId('mfg-3'),
     name: '(주)뷰티팩토리',
-    type: '제조',
+    type: FactoryType.MANUFACTURING,
     address: '경기도 화성시 향남읍 제약공단로 124',
     contact: '031-366-7000',
     email: 'sales@beautyfactory.co.kr',
@@ -80,9 +82,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 22716', 'CGMP']
   },
   {
-    id: 'mfg-4',
+    id: toFactoryId('mfg-4'),
     name: '코스메카코리아',
-    type: '제조',
+    type: FactoryType.MANUFACTURING,
     address: '충북 청주시 흥덕구 오송읍 오송생명로 123',
     contact: '043-249-6000',
     email: 'info@cosmecca.com',
@@ -90,9 +92,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 22716', 'CGMP', 'ISO 9001', 'ISO 14001']
   },
   {
-    id: 'mfg-5',
+    id: toFactoryId('mfg-5'),
     name: '(주)아모레퍼시픽 오산공장',
-    type: '제조',
+    type: FactoryType.MANUFACTURING,
     address: '경기도 오산시 중앙로 160',
     contact: '031-370-5000',
     email: 'factory@amorepacific.com',
@@ -102,9 +104,9 @@ export const factories: Factory[] = [
 
   // 용기 공장들
   {
-    id: 'cont-1',
+    id: toFactoryId('cont-1'),
     name: '(주)연우',
-    type: '용기',
+    type: FactoryType.CONTAINER,
     address: '경기도 안산시 단원구 엠티브이25로 20',
     contact: '031-494-7000',
     email: 'sales@yeonwoo.co.kr',
@@ -112,9 +114,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 9001', 'ISO 14001']
   },
   {
-    id: 'cont-2',
+    id: toFactoryId('cont-2'),
     name: '삼화플라스틱',
-    type: '용기',
+    type: FactoryType.CONTAINER,
     address: '경기도 김포시 대곶면 대곶북로 436',
     contact: '031-981-2000',
     email: 'info@samhwaplastic.com',
@@ -122,9 +124,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 9001']
   },
   {
-    id: 'cont-3',
+    id: toFactoryId('cont-3'),
     name: '(주)에이치피씨',
-    type: '용기',
+    type: FactoryType.CONTAINER,
     address: '경기도 평택시 포승읍 평택항만길 156',
     contact: '031-682-8800',
     email: 'contact@hpc.co.kr',
@@ -132,9 +134,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 9001', 'ISO 14001']
   },
   {
-    id: 'cont-4',
+    id: toFactoryId('cont-4'),
     name: '태성산업(주)',
-    type: '용기',
+    type: FactoryType.CONTAINER,
     address: '충남 아산시 인주면 인주산단로 123',
     contact: '041-533-3000',
     email: 'sales@taesung.com',
@@ -142,9 +144,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 9001', 'ISO 14001', 'ISO 45001']
   },
   {
-    id: 'cont-5',
+    id: toFactoryId('cont-5'),
     name: '(주)펌텍코리아',
-    type: '용기',
+    type: FactoryType.CONTAINER,
     address: '인천광역시 서구 원창로 134',
     contact: '032-561-5000',
     email: 'info@pumtech.co.kr',
@@ -154,9 +156,9 @@ export const factories: Factory[] = [
 
   // 포장 공장들
   {
-    id: 'pack-1',
+    id: toFactoryId('pack-1'),
     name: '(주)네트모베이지',
-    type: '포장',
+    type: FactoryType.PACKAGING,
     address: '서울특별시 금천구 가산디지털1로 145',
     contact: '02-2038-8000',
     email: 'contact@netmovage.com',
@@ -164,9 +166,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 9001', 'FSC']
   },
   {
-    id: 'pack-2',
+    id: toFactoryId('pack-2'),
     name: '서울포장산업(주)',
-    type: '포장',
+    type: FactoryType.PACKAGING,
     address: '경기도 파주시 조리읍 장곡로 247',
     contact: '031-955-6000',
     email: 'info@seoulpack.co.kr',
@@ -174,9 +176,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 9001', 'FSC', 'ISO 14001']
   },
   {
-    id: 'pack-3',
+    id: toFactoryId('pack-3'),
     name: '(주)한솔피엔에스',
-    type: '포장',
+    type: FactoryType.PACKAGING,
     address: '경기도 안양시 동안구 시민대로 361',
     contact: '031-380-1000',
     email: 'sales@hansolpns.com',
@@ -184,9 +186,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 9001', 'FSC', 'ISO 14001']
   },
   {
-    id: 'pack-4',
+    id: toFactoryId('pack-4'),
     name: '대림포장(주)',
-    type: '포장',
+    type: FactoryType.PACKAGING,
     address: '충북 음성군 대소면 대금로 290',
     contact: '043-881-5000',
     email: 'contact@daelimpack.co.kr',
@@ -194,9 +196,9 @@ export const factories: Factory[] = [
     certifications: ['ISO 9001', 'FSC']
   },
   {
-    id: 'pack-5',
+    id: toFactoryId('pack-5'),
     name: '(주)새한패키지',
-    type: '포장',
+    type: FactoryType.PACKAGING,
     address: '경남 양산시 산막공단북로 63',
     contact: '055-387-5000',
     email: 'info@saehanpack.com',

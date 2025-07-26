@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Mail } from 'lucide-react';
-import BaseModal from '../common/BaseModal';
-import FormInput from '../common/FormInput';
-import FormSelect from '../common/FormSelect';
-import FormTextarea from '../common/FormTextarea';
-import { Button } from '../ui/Button';
+import { ArrowLeft, Mail, AlertCircle } from 'lucide-react';
+import BaseModal, { ModalFooter } from '../common/BaseModal';
 import FactorySelector from './FactorySelector';
 import FileAttachment from './FileAttachment';
+import { useModalFormValidation } from '../../hooks/useModalFormValidation';
+import { ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
+import Button from '../common/Button';
+import { getModalSizeString } from '../../utils/modalUtils';
+import './EmailModal.css';
 
 interface EmailModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ const EmailModal: React.FC<EmailModalProps> = ({
     attachments: []
   });
   const [selectedFactories, setSelectedFactories] = useState<string[]>([]);
+  const [showFactoryValidationError, setShowFactoryValidationError] = useState(false);
 
   // Update recipient when defaultRecipients changes
   React.useEffect(() => {
@@ -55,16 +57,58 @@ const EmailModal: React.FC<EmailModalProps> = ({
     }
   }, [defaultRecipients]);
 
-  const handleSend = () => {
-    if (onSend) {
-      onSend({
-        ...emailData,
-        recipient: selectedFactories.join(', ')
-      });
+  // Validation rules
+  const validationRules = {
+    template: { required: true },
+    subject: { required: true },
+    content: { required: true }
+  };
+
+  const {
+    errors,
+    touched,
+    formRef,
+    handleSubmit: handleFormSubmit,
+    handleFieldChange,
+    resetForm,
+    isSubmitting
+  } = useModalFormValidation(emailData, {
+    rules: validationRules,
+    onSubmit: async (data) => {
+      // Check factory selection
+      if (selectedFactories.length === 0) {
+        setShowFactoryValidationError(true);
+        return;
+      }
+      
+      if (onSend) {
+        onSend({
+          ...data,
+          recipient: selectedFactories.join(', ')
+        });
+      }
+      // 모달 닫을 때 상태 초기화
+      setSelectedFactories([]);
+      setShowFactoryValidationError(false);
+      onClose();
     }
-    // 모달 닫을 때 상태 초기화
-    setSelectedFactories([]);
-    onClose();
+  });
+
+  const handleSend = () => {
+    // Use form submit handler
+    const form = formRef.current;
+    if (form) {
+      form.requestSubmit();
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEmailData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    handleFieldChange(name as keyof EmailData, value);
   };
 
   const handleFileAdd = (files: File[]) => {
@@ -109,63 +153,117 @@ const EmailModal: React.FC<EmailModalProps> = ({
           </span>
         </div>
       }
-      size="lg"
+      size={getModalSizeString(ModalSize.LG)}
       footer={
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={onClose}>
+        <ModalFooter>
+          <Button
+            variant={ButtonVariant.SECONDARY}
+            size={ButtonSize.MD}
+            onClick={onClose}
+          >
             취소
           </Button>
-          <Button 
-            variant="primary" 
+          <Button
+            variant={ButtonVariant.PRIMARY}
+            size={ButtonSize.MD}
             onClick={handleSend}
-            disabled={selectedFactories.length === 0 || !emailData.subject}
+            disabled={isSubmitting}
+            loading={isSubmitting}
           >
             발송
           </Button>
-        </div>
+        </ModalFooter>
       }
     >
-      <div className="space-y-4">
+      <form ref={formRef} onSubmit={handleFormSubmit} className="bg-gray-50 -mx-6 -my-6 px-6 py-6">
+        <div className="modal-section-spacing">
+        {/* Validation error messages */}
+        {showFactoryValidationError && selectedFactories.length === 0 && (
+          <div className="email-modal__error">
+            <AlertCircle className="email-modal__error-icon" />
+            <span>받는 공장을 선택해주세요</span>
+          </div>
+        )}
+        {Object.keys(errors).length > 0 && Object.keys(touched).length > 0 && (
+          <div className="email-modal__error">
+            <AlertCircle className="email-modal__error-icon" />
+            <span>필수 입력 항목을 모두 입력해주세요</span>
+          </div>
+        )}
+        
         {/* 메일 템플릿 선택 */}
-        <FormSelect
-          label="메일 템플릿 선택"
-          value={emailData.template}
-          onChange={(e) => setEmailData({...emailData, template: e.target.value})}
-          options={templateOptions}
-        />
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">메일 템플릿 선택 *</label>
+          <select
+            name="template"
+            className={`modal-input ${errors.template && touched.template ? 'border-red-400' : ''}`}
+            value={emailData.template}
+            onChange={handleInputChange}
+            required
+          >
+            {templateOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {errors.template && touched.template && <div className="text-red-600 text-xs mt-1">{errors.template}</div>}
+        </div>
 
         {/* 받는 공장 */}
         <FactorySelector
           availableFactories={availableFactories}
           selectedFactories={selectedFactories}
-          setSelectedFactories={setSelectedFactories}
+          setSelectedFactories={(factories) => {
+            setSelectedFactories(factories);
+            if (factories.length > 0) {
+              setShowFactoryValidationError(false);
+            }
+          }}
           defaultRecipients={defaultRecipients}
         />
 
         {/* 담당자 */}
-        <FormInput
-          label="담당자 (팩토)"
-          value={emailData.contactPerson}
-          onChange={(e) => setEmailData({...emailData, contactPerson: e.target.value})}
-          placeholder="담당자 이름"
-        />
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">담당자 (팩토)</label>
+          <input
+            type="text"
+            className="modal-input"
+            value={emailData.contactPerson}
+            onChange={(e) => setEmailData({...emailData, contactPerson: e.target.value})}
+            placeholder="담당자 이름"
+          />
+        </div>
 
         {/* 제목 */}
-        <FormInput
-          label="제목"
-          value={emailData.subject}
-          onChange={(e) => setEmailData({...emailData, subject: e.target.value})}
-          placeholder="메일 제목을 입력하세요"
-        />
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">제목 *</label>
+          <input
+            type="text"
+            name="subject"
+            className={`modal-input ${errors.subject && touched.subject ? 'border-red-400' : ''}`}
+            value={emailData.subject}
+            onChange={handleInputChange}
+            placeholder="메일 제목을 입력하세요"
+            required
+          />
+          {errors.subject && touched.subject && <div className="text-red-600 text-xs mt-1">{errors.subject}</div>}
+        </div>
 
         {/* 내용 */}
-        <FormTextarea
-          label="내용"
-          rows={6}
-          value={emailData.content}
-          onChange={(e) => setEmailData({...emailData, content: e.target.value})}
-          placeholder="메일 내용을 입력하세요"
-        />
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">내용 *</label>
+          <textarea
+            name="content"
+            rows={6}
+            className={`modal-input ${errors.content && touched.content ? 'border-red-400' : ''}`}
+            value={emailData.content}
+            onChange={handleInputChange}
+            placeholder="메일 내용을 입력하세요"
+            required
+          />
+          {errors.content && touched.content && <div className="text-red-600 text-xs mt-1">{errors.content}</div>}
+        </div>
 
         {/* 첨부파일 */}
         <FileAttachment
@@ -173,7 +271,8 @@ const EmailModal: React.FC<EmailModalProps> = ({
           onFileAdd={handleFileAdd}
           onFileDelete={handleFileDelete}
         />
-      </div>
+        </div>
+      </form>
     </BaseModal>
   );
 };

@@ -3,7 +3,6 @@ import type { Task } from '../../../types/schedule';
 import { GridCoordinateCalculator } from '../utils/dragCalculations';
 
 interface DragPreviewProps {
-  projectId: string;
   startDate: string;
   endDate: string;
   draggedTask: Task | null;
@@ -13,7 +12,6 @@ interface DragPreviewProps {
 }
 
 const DragPreview: React.FC<DragPreviewProps> = ({
-  projectId,
   startDate,
   endDate,
   draggedTask,

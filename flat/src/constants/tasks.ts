@@ -1,3 +1,5 @@
+import { FactoryType } from '../types/enums';
+
 export const DEFAULT_TASKS = {
   MANUFACTURING: [
     '원료 준비',
@@ -53,13 +55,13 @@ export const TASK_DURATIONS = {
   [TASK_TEMPLATES.QUALITY_INSPECTION]: 3,
 } as const;
 
-export const getDefaultTasksForFactory = (factoryType: string): string[] => {
+export const getDefaultTasksForFactory = (factoryType: FactoryType): string[] => {
   switch (factoryType) {
-    case '제조':
+    case FactoryType.MANUFACTURING:
       return DEFAULT_TASKS.MANUFACTURING;
-    case '용기':
+    case FactoryType.CONTAINER:
       return DEFAULT_TASKS.CONTAINER;
-    case '포장':
+    case FactoryType.PACKAGING:
       return DEFAULT_TASKS.PACKAGING;
     default:
       return [];

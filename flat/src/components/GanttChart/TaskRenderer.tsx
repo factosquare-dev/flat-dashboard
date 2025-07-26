@@ -6,7 +6,7 @@ import React, { useCallback } from 'react';
 import { logger } from '../../utils/logger';
 import type { Project, Task, DragState } from './types';
 import { GANTT_CONSTANTS, getTotalDays } from './constants';
-import { getDateIndex, calculateTaskPosition } from './utils/ganttCalculations';
+import { getDateIndex } from './utils/ganttCalculations';
 
 interface TaskRendererProps {
   projects: Project[];
@@ -47,7 +47,7 @@ const TaskRenderer: React.FC<TaskRendererProps> = ({
       <span className="mr-2" aria-hidden="true">{project.expanded ? '▼' : '▶'}</span>
       {project.name}
     </button>
-  ), [onToggleProject]);
+  ), [onToggleProject, totalDays]);
 
   // Helper function to render individual task
   const renderTask = useCallback((task: Task, row: number) => {

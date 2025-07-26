@@ -11,7 +11,6 @@ import TaskActions from './TaskActions';
 interface TaskRowProps {
   task: Task;
   project: Participant | undefined;
-  projects: Participant[];
   onTaskClick?: (task: Task) => void;
   onTaskDelete?: (taskId: string) => void;
   onFactoryDelete?: (factoryId: string) => void;
@@ -20,7 +19,6 @@ interface TaskRowProps {
 const TaskRow: React.FC<TaskRowProps> = ({
   task,
   project,
-  projects,
   onTaskClick,
   onTaskDelete,
   onFactoryDelete

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { UserFormData, FormErrors } from './types';
 import { getRoleLabel, getDepartmentLabel, getPositionLabel } from './utils';
+import { UserRole } from '../../../types/enums';
 
 interface FormFieldsProps {
   formData: UserFormData;
@@ -16,117 +17,92 @@ export const FormFields: React.FC<FormFieldsProps> = ({
   onPhoneChange
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="modal-section-spacing">
       {/* 이름 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          이름 <span className="text-red-500">*</span>
-        </label>
+      <div className="modal-field-spacing">
+        <label className="modal-field-label">이름 *</label>
         <input
           type="text"
           name="name"
+          className={`modal-input ${errors.name ? 'border-red-400' : ''}`}
           value={formData.name}
           onChange={onChange}
-          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.name ? 'border-red-300' : 'border-gray-300'
-          }`}
           placeholder="홍길동"
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-        )}
+        {errors.name && <div className="text-red-600 text-xs mt-1">{errors.name}</div>}
       </div>
 
       {/* 역할 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          역할 <span className="text-red-500">*</span>
-        </label>
+      <div className="modal-field-spacing">
+        <label className="modal-field-label">역할 *</label>
         <select
           name="role"
+          className="modal-input cursor-pointer"
           value={formData.role}
           onChange={onChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="customer">{getRoleLabel('customer')}</option>
-          <option value="manager">{getRoleLabel('manager')}</option>
-          <option value="admin">{getRoleLabel('admin')}</option>
+          <option value="">역할을 선택하세요</option>
+          <option value={UserRole.CUSTOMER}>{getRoleLabel(UserRole.CUSTOMER)}</option>
+          <option value={UserRole.MANAGER}>{getRoleLabel(UserRole.MANAGER)}</option>
+          <option value={UserRole.ADMIN}>{getRoleLabel(UserRole.ADMIN)}</option>
         </select>
       </div>
 
       {/* 이메일 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          이메일 <span className="text-red-500">*</span>
-        </label>
+      <div className="modal-field-spacing">
+        <label className="modal-field-label">이메일 *</label>
         <input
           type="email"
           name="email"
+          className={`modal-input ${errors.email ? 'border-red-400' : ''}`}
           value={formData.email}
           onChange={onChange}
-          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.email ? 'border-red-300' : 'border-gray-300'
-          }`}
           placeholder="example@email.com"
         />
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-        )}
+        {errors.email && <div className="text-red-600 text-xs mt-1">{errors.email}</div>}
       </div>
 
       {/* 전화번호 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          전화번호 <span className="text-red-500">*</span>
-        </label>
+      <div className="modal-field-spacing">
+        <label className="modal-field-label">전화번호 *</label>
         <input
           type="tel"
           name="phone"
+          className={`modal-input ${errors.phone ? 'border-red-400' : ''}`}
           value={formData.phone}
           onChange={onPhoneChange}
-          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.phone ? 'border-red-300' : 'border-gray-300'
-          }`}
           placeholder="010-1234-5678"
           maxLength={13}
         />
-        {errors.phone && (
-          <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-        )}
+        {errors.phone && <div className="text-red-600 text-xs mt-1">{errors.phone}</div>}
       </div>
 
       {/* 부서/회사명 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {getDepartmentLabel(formData.role)} {formData.role === 'customer' && <span className="text-red-500">*</span>}
+      <div className="modal-field-spacing">
+        <label className="modal-field-label">
+          {getDepartmentLabel(formData.role)} {formData.role === UserRole.CUSTOMER && '*'}
         </label>
         <input
           type="text"
           name="department"
+          className={`modal-input ${errors.department ? 'border-red-400' : ''}`}
           value={formData.department || ''}
           onChange={onChange}
-          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.department ? 'border-red-300' : 'border-gray-300'
-          }`}
-          placeholder={formData.role === 'customer' ? '삼성전자' : 'IT팀'}
+          placeholder={formData.role === UserRole.CUSTOMER ? '삼성전자' : 'IT팀'}
         />
-        {errors.department && (
-          <p className="mt-1 text-sm text-red-600">{errors.department}</p>
-        )}
+        {errors.department && <div className="text-red-600 text-xs mt-1">{errors.department}</div>}
       </div>
 
       {/* 직위/직책 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {getPositionLabel(formData.role)}
-        </label>
+      <div className="modal-field-spacing">
+        <label className="modal-field-label">{getPositionLabel(formData.role)}</label>
         <input
           type="text"
           name="position"
+          className="modal-input"
           value={formData.position || ''}
           onChange={onChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder={formData.role === 'customer' ? '과장' : '팀장'}
+          placeholder={formData.role === UserRole.CUSTOMER ? '과장' : '팀장'}
         />
       </div>
     </div>

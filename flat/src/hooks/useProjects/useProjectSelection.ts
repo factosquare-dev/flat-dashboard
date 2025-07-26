@@ -4,17 +4,18 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import type { Project } from '../../types/project';
+import type { ProjectId } from '../../types/branded';
 
 export interface UseProjectSelectionProps {
   projects: Project[];
-  onSelectionChange?: (selectedIds: string[]) => void;
+  onSelectionChange?: (selectedIds: ProjectId[]) => void;
 }
 
 export const useProjectSelection = ({ 
   projects, 
   onSelectionChange 
 }: UseProjectSelectionProps) => {
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<ProjectId[]>([]);
 
   // Memoized selection state
   const selectionState = useMemo(() => {
@@ -38,7 +39,7 @@ export const useProjectSelection = ({
   }, [projects, selectedRows]);
 
   // Toggle single project selection
-  const toggleProjectSelection = useCallback((projectId: string) => {
+  const toggleProjectSelection = useCallback((projectId: ProjectId) => {
     setSelectedRows(prev => {
       const newSelection = prev.includes(projectId)
         ? prev.filter(id => id !== projectId)
@@ -62,7 +63,7 @@ export const useProjectSelection = ({
   }, [projects, onSelectionChange]);
 
   // Select multiple projects
-  const selectProjects = useCallback((projectIds: string[]) => {
+  const selectProjects = useCallback((projectIds: ProjectId[]) => {
     setSelectedRows(prev => {
       const uniqueIds = [...new Set([...prev, ...projectIds])];
       onSelectionChange?.(uniqueIds);
@@ -71,7 +72,7 @@ export const useProjectSelection = ({
   }, [onSelectionChange]);
 
   // Deselect multiple projects
-  const deselectProjects = useCallback((projectIds: string[]) => {
+  const deselectProjects = useCallback((projectIds: ProjectId[]) => {
     setSelectedRows(prev => {
       const newSelection = prev.filter(id => !projectIds.includes(id));
       onSelectionChange?.(newSelection);
@@ -86,7 +87,7 @@ export const useProjectSelection = ({
   }, [onSelectionChange]);
 
   // Select range of projects (for shift+click)
-  const selectRange = useCallback((startId: string, endId: string) => {
+  const selectRange = useCallback((startId: ProjectId, endId: ProjectId) => {
     const startIndex = projects.findIndex(p => p.id === startId);
     const endIndex = projects.findIndex(p => p.id === endId);
     
@@ -101,7 +102,7 @@ export const useProjectSelection = ({
   }, [projects, selectProjects]);
 
   // Check if project is selected
-  const isProjectSelected = useCallback((projectId: string) => {
+  const isProjectSelected = useCallback((projectId: ProjectId) => {
     return selectedRows.includes(projectId);
   }, [selectedRows]);
 
@@ -131,13 +132,13 @@ export const useProjectSelection = ({
   // Bulk operations for selected projects
   const bulkOperations = useMemo(() => {
     return {
-      updateStatus: (status: string, onUpdate: (ids: string[], updates: any) => void) => {
+      updateStatus: (status: string, onUpdate: (ids: ProjectId[], updates: any) => void) => {
         onUpdate(selectedRows, { status });
       },
-      updatePriority: (priority: string, onUpdate: (ids: string[], updates: any) => void) => {
+      updatePriority: (priority: string, onUpdate: (ids: ProjectId[], updates: any) => void) => {
         onUpdate(selectedRows, { priority });
       },
-      delete: (onDelete: (ids: string[]) => void) => {
+      delete: (onDelete: (ids: ProjectId[]) => void) => {
         selectedRows.forEach(id => onDelete([id]));
         clearSelection();
       }

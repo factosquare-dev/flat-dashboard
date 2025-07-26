@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { LoadingFullScreen } from '../components/loading/LoadingSpinner';
 
 interface LoadingContextValue {
   isLoading: boolean;
@@ -59,8 +59,7 @@ export const LoadingProvider: React.FC<LoadingProviderProps> = ({ children }) =>
     <LoadingContext.Provider value={value}>
       {children}
       {isLoading && (
-        <LoadingSpinner
-          fullScreen
+        <LoadingFullScreen
           text={loadingText || '로딩 중...'}
         />
       )}

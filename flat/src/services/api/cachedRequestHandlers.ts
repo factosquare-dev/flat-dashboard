@@ -5,6 +5,7 @@
 import { logger } from '../../utils/logger';
 import { RequestHandlers, RequestOptions, ApiResponse } from './requestHandlers';
 import { apiCache, shouldCache, getCacheTTL } from '../../utils/api/cache';
+import { HttpMethod } from '../../types/enums';
 
 export class CachedRequestHandlers extends RequestHandlers {
   constructor(
@@ -19,7 +20,7 @@ export class CachedRequestHandlers extends RequestHandlers {
    * Cached GET request
    */
   async get<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
-    const method = 'GET';
+    const method = HttpMethod.GET;
     const url = this.buildURL(endpoint);
     
     // Check if this request should be cached
@@ -118,7 +119,7 @@ export class CachedRequestHandlers extends RequestHandlers {
     const response = await super.post<T>(endpoint, body, options);
     
     // Invalidate related cache entries
-    this.invalidateRelatedCache(endpoint, 'POST');
+    this.invalidateRelatedCache(endpoint, HttpMethod.POST);
     
     return response;
   }
@@ -130,7 +131,7 @@ export class CachedRequestHandlers extends RequestHandlers {
     const response = await super.put<T>(endpoint, body, options);
     
     // Invalidate related cache entries
-    this.invalidateRelatedCache(endpoint, 'PUT');
+    this.invalidateRelatedCache(endpoint, HttpMethod.PUT);
     
     return response;
   }
@@ -142,7 +143,7 @@ export class CachedRequestHandlers extends RequestHandlers {
     const response = await super.patch<T>(endpoint, body, options);
     
     // Invalidate related cache entries
-    this.invalidateRelatedCache(endpoint, 'PATCH');
+    this.invalidateRelatedCache(endpoint, HttpMethod.PATCH);
     
     return response;
   }

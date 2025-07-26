@@ -79,7 +79,7 @@ export function conditionalClasses(
  */
 export function useOptimizedClasses<T extends Record<string, any>>(
   classMap: T,
-  dependencies: any[] = []
+  dependencies: React.DependencyList = []
 ): T {
   return useMemo(() => {
     const optimized = {} as T;
@@ -184,14 +184,14 @@ export function colorVariant(
  * CSS custom properties helper for dynamic values
  */
 export function cssVariables(variables: Record<string, string | number>): React.CSSProperties {
-  const style: React.CSSProperties = {};
+  const style: Record<string, string> = {};
   
   for (const [key, value] of Object.entries(variables)) {
     const cssVar = key.startsWith('--') ? key : `--${key}`;
-    (style as any)[cssVar] = typeof value === 'number' ? `${value}px` : value;
+    style[cssVar] = typeof value === 'number' ? `${value}px` : value;
   }
   
-  return style;
+  return style as React.CSSProperties;
 }
 
 /**

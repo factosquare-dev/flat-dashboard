@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { APP_CONSTANTS } from '../config/constants';
+import { TaskStatus, ProjectStatus, Priority, UserRole } from '../types/enums';
 
 // Base validation schemas
 export const emailSchema = z
@@ -37,8 +38,8 @@ export const taskSchema = z.object({
   description: optionalStringSchema,
   startDate: z.string().min(1, APP_CONSTANTS.TEXT.VALIDATION.REQUIRED),
   endDate: z.string().min(1, APP_CONSTANTS.TEXT.VALIDATION.REQUIRED),
-  status: z.enum(['not_started', 'in_progress', 'completed', 'delayed', 'cancelled']),
-  priority: z.enum(['low', 'medium', 'high']).optional(),
+  status: z.enum([TaskStatus.PENDING, TaskStatus.IN_PROGRESS, TaskStatus.COMPLETED, TaskStatus.DELAYED, TaskStatus.CANCELLED]),
+  priority: z.enum([Priority.LOW, Priority.MEDIUM, Priority.HIGH]).optional(),
   assignee: optionalStringSchema,
   factory: optionalStringSchema,
   projectId: requiredStringSchema,
@@ -56,7 +57,7 @@ export const projectSchema = z.object({
   description: optionalStringSchema,
   startDate: z.string().min(1, APP_CONSTANTS.TEXT.VALIDATION.REQUIRED),
   endDate: z.string().min(1, APP_CONSTANTS.TEXT.VALIDATION.REQUIRED),
-  status: z.enum(['planning', 'active', 'completed', 'cancelled']),
+  status: z.enum([ProjectStatus.PLANNING, ProjectStatus.IN_PROGRESS, ProjectStatus.COMPLETED, ProjectStatus.CANCELLED]),
   customerId: requiredStringSchema,
   budget: z.number().min(0, '예산은 0 이상이어야 합니다').optional(),
   progress: z.number().min(0).max(100, '진행률은 0-100% 사이여야 합니다').optional(),
@@ -72,7 +73,7 @@ export const projectSchema = z.object({
 export const userSchema = z.object({
   name: requiredStringSchema,
   email: emailSchema,
-  role: z.enum(['admin', 'manager', 'user', 'guest']),
+  role: z.enum([UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.GUEST]),
   phone: phoneSchema.optional().or(z.literal('')),
   department: optionalStringSchema,
 });

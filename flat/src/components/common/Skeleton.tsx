@@ -1,4 +1,6 @@
 import React from 'react';
+import { cn } from '../../utils/cn';
+import './Skeleton.css';
 
 interface SkeletonProps {
   className?: string;
@@ -17,34 +19,6 @@ export const Skeleton: React.FC<SkeletonProps> = React.memo(({
   animation = 'pulse',
   count = 1,
 }) => {
-  const baseClasses = 'bg-gray-200';
-  
-  const animationClasses = {
-    pulse: 'animate-pulse',
-    wave: 'animate-shimmer',
-    none: '',
-  };
-
-  const variantClasses = {
-    text: 'rounded',
-    circular: 'rounded-full',
-    rectangular: 'rounded-md',
-  };
-
-  const defaultHeights = {
-    text: 'h-4',
-    circular: 'h-12 w-12',
-    rectangular: 'h-20',
-  };
-
-  const skeletonClass = `
-    ${baseClasses}
-    ${animationClasses[animation]}
-    ${variantClasses[variant]}
-    ${!height && defaultHeights[variant]}
-    ${className}
-  `.trim();
-
   const style: React.CSSProperties = {};
   if (width) style.width = typeof width === 'number' ? `${width}px` : width;
   if (height) style.height = typeof height === 'number' ? `${height}px` : height;
@@ -54,7 +28,12 @@ export const Skeleton: React.FC<SkeletonProps> = React.memo(({
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className={skeletonClass}
+          className={cn(
+            'skeleton',
+            `skeleton--${variant}`,
+            animation !== 'none' && `skeleton--${animation}`,
+            className
+          )}
           style={style}
           aria-hidden="true"
         />
@@ -71,7 +50,7 @@ export const SkeletonText: React.FC<{ lines?: number; className?: string }> = Re
   className = '' 
 }) => {
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={cn('skeleton-text', className)}>
       {Array.from({ length: lines }).map((_, index) => (
         <Skeleton
           key={index}
@@ -87,9 +66,9 @@ SkeletonText.displayName = 'SkeletonText';
 
 export const SkeletonCard: React.FC<{ className?: string }> = React.memo(({ className = '' }) => {
   return (
-    <div className={`p-4 border border-gray-200 rounded-lg ${className}`}>
-      <Skeleton variant="rectangular" height={200} className="mb-4" />
-      <Skeleton variant="text" className="mb-2" />
+    <div className={cn('skeleton-card', className)}>
+      <Skeleton variant="rectangular" height={200} className="skeleton-card__image" />
+      <Skeleton variant="text" className="skeleton-card__title" />
       <Skeleton variant="text" width="60%" />
     </div>
   );
@@ -103,19 +82,19 @@ export const SkeletonTable: React.FC<{ rows?: number; columns?: number; classNam
   className = '' 
 }) => {
   return (
-    <div className={`w-full ${className}`}>
+    <div className={cn('skeleton-table', className)}>
       {/* Header */}
-      <div className="flex gap-4 p-4 border-b border-gray-200">
+      <div className="skeleton-table__header">
         {Array.from({ length: columns }).map((_, index) => (
-          <Skeleton key={index} variant="text" className="flex-1" />
+          <Skeleton key={index} variant="text" className="skeleton-table__cell" />
         ))}
       </div>
       
       {/* Rows */}
       {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div key={rowIndex} className="flex gap-4 p-4 border-b border-gray-100">
+        <div key={rowIndex} className="skeleton-table__row">
           {Array.from({ length: columns }).map((_, colIndex) => (
-            <Skeleton key={colIndex} variant="text" className="flex-1" />
+            <Skeleton key={colIndex} variant="text" className="skeleton-table__cell" />
           ))}
         </div>
       ))}

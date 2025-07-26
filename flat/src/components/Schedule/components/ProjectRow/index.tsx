@@ -6,6 +6,8 @@ import { ProjectRowGrid } from './ProjectRowGrid';
 import { ProjectRowTasks } from './ProjectRowTasks';
 import { ProjectRowDragPreview } from './ProjectRowDragPreview';
 import { ProjectRowResizePreview } from './ProjectRowResizePreview';
+import { cn } from '../../../../utils/cn';
+import './ProjectRow.css';
 
 interface ProjectRowProps {
   project: Participant;
@@ -15,17 +17,32 @@ interface ProjectRowProps {
   isAddFactoryRow: boolean;
   hoveredTaskId: number | null;
   isDraggingTask: boolean;
-  resizePreview: any;
-  dragPreview: any;
+  resizePreview: {
+    left: number;
+    width: number;
+    taskId: string;
+    direction: 'start' | 'end';
+    targetProjectId?: string;
+  } | null;
+  dragPreview: {
+    projectId: string;
+    startDate: string;
+    endDate: string;
+    targetProjectId?: string;
+    dropX?: number;
+    width?: number;
+  } | null;
   draggedTask: Task | null;
-  modalState: any;
+  modalState: {
+    isResizingTask?: boolean;
+    isDraggingTask?: boolean;
+  };
   scrollRef: React.RefObject<HTMLDivElement>;
   allRows: Participant[];
   onGridClick: (e: React.MouseEvent, projectId: string, date: string) => void;
   onTaskClick: (task: Task) => void;
   onTaskDragStart: (e: React.DragEvent, task: Task, index: number) => void;
   onTaskDragEnd: () => void;
-  onTaskDragOver: (e: React.DragEvent) => void;
   onTaskDrop: (e: React.DragEvent, projectId: string, dropIndex: number) => void;
   onTaskMouseDown: (e: React.MouseEvent, task: Task, direction: 'start' | 'end') => void;
   onTaskHover: (taskId: number | null) => void;
@@ -50,7 +67,6 @@ const ProjectRow: React.FC<ProjectRowProps> = React.memo(({
   onTaskClick,
   onTaskDragStart,
   onTaskDragEnd,
-  onTaskDragOver,
   onTaskDrop,
   onTaskMouseDown,
   onTaskHover,
@@ -70,10 +86,13 @@ const ProjectRow: React.FC<ProjectRowProps> = React.memo(({
   return (
     <div
       key={project.id}
-      className={`relative flex ${isAddFactoryRow ? 'bg-white border-b border-gray-200' : 'border-b border-gray-200'} project-row`}
-      style={{ height: `${projectHeight}px`, minHeight: '50px' }}
+      className={cn(
+        'project-row',
+        isAddFactoryRow && 'project-row--add-factory'
+      )}
+      style={{ '--project-height': `${projectHeight}px` } as React.CSSProperties}
     >
-      <div className="flex-1 relative bg-white/50" data-project-id={project.id}>
+      <div className="project-row__content" data-project-id={project.id}>
         {/* Grid Cells Layer */}
         <ProjectRowGrid
           days={days}
@@ -86,8 +105,8 @@ const ProjectRow: React.FC<ProjectRowProps> = React.memo(({
 
         {/* Tasks Layer */}
         {!isAddFactoryRow && projectTasks.length > 0 && (
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="relative h-full pointer-events-auto">
+          <div className="project-row__overlay">
+            <div className="project-row__overlay-content">
               <ProjectRowTasks
                 projectTasks={projectTasks}
                 allRows={allRows}

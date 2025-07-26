@@ -294,7 +294,7 @@ export class FactoryService extends BaseService<Factory> {
       }
     }
 
-    const relationId = `fp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const relationId = `fp_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const factoryProject: FactoryProject = {
       id: relationId,
       projectId,

@@ -1,0 +1,92 @@
+/* UserCard styles */
+.card {
+  @apply bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden;
+}
+
+.cardHeader {
+  @apply bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-100;
+}
+
+.headerContent {
+  @apply flex items-center justify-between;
+}
+
+.userInfo {
+  @apply flex items-center gap-3;
+}
+
+.avatar {
+  @apply w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center;
+}
+
+.avatarText {
+  @apply w-6 h-6 text-gray-600;
+}
+
+.userName {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.roleAdmin {
+  @apply bg-purple-100 text-purple-700;
+}
+
+.roleManager {
+  @apply bg-green-100 text-green-700;
+}
+
+.roleCustomer {
+  @apply bg-blue-100 text-blue-700;
+}
+
+.roleDefault {
+  @apply bg-gray-100 text-gray-700;
+}
+
+.roleTag {
+  @apply inline-flex px-2 py-1 text-xs font-medium rounded-full;
+}
+
+.dropdownButton {
+  @apply p-2 hover:bg-gray-200 rounded-lg transition-colors;
+}
+
+.dropdownIcon {
+  @apply w-5 h-5 text-gray-600;
+}
+
+.dropdownMenu {
+  @apply absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10;
+}
+
+.dropdownItem {
+  @apply w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors;
+}
+
+.dropdownItemDelete {
+  @apply w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 transition-colors border-t border-gray-100;
+}
+
+.cardBody {
+  @apply p-6;
+}
+
+.infoSection {
+  @apply space-y-3;
+}
+
+.infoLabel {
+  @apply text-gray-500;
+}
+
+.infoText {
+  @apply text-gray-600;
+}
+
+.infoLink {
+  @apply text-gray-600 hover:text-blue-600 transition-colors;
+}
+
+.infoLinkTruncate {
+  @apply text-gray-600 hover:text-blue-600 transition-colors truncate;
+}

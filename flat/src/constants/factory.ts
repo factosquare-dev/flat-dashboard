@@ -1,29 +1,19 @@
-export const FACTORY_TYPES = {
-  MANUFACTURING: '제조',
-  CONTAINER: '용기',
-  PACKAGING: '포장',
-} as const;
+import { 
+  FactoryType, 
+  FactoryTypeLabel,
+  CertificateType, 
+  CertificateTypeLabel 
+} from '../types/enums';
 
-export const FACTORY_TYPE_OPTIONS = Object.values(FACTORY_TYPES);
+// Legacy support - use FactoryTypeLabel from enums instead
+export const FACTORY_TYPES = FactoryTypeLabel;
 
-export const CERTIFICATE_TYPES = {
-  // Quality Management
-  ISO_22716: 'ISO 22716',
-  CGMP: 'CGMP',
-  ISO_9001: 'ISO 9001',
-  ISO_14001: 'ISO 14001',
-  ISO_45001: 'ISO 45001',
-  
-  // Environmental & Ethical
-  FSC: 'FSC',
-  VEGAN: 'VEGAN',
-  HALAL: 'HALAL',
-  EWG: 'EWG',
-  COSMOS: 'COSMOS',
-  ECOCERT: 'ECOCERT',
-} as const;
+export const FACTORY_TYPE_OPTIONS = Object.values(FactoryTypeLabel);
 
-export const CERTIFICATE_TYPE_OPTIONS = Object.values(CERTIFICATE_TYPES);
+// Legacy support - use CertificateTypeLabel from enums instead
+export const CERTIFICATE_TYPES = CertificateTypeLabel;
+
+export const CERTIFICATE_TYPE_OPTIONS = Object.values(CertificateTypeLabel);
 
 // Factory form labels
 export const FACTORY_FORM_LABELS = {

@@ -1,5 +1,9 @@
 /* Import unified theme system */
+@import './styles/tokens.css';
 @import './styles/theme.css';
+@import './styles/design-tokens.css';
+@import './styles/modal-system.css';
+@import './styles/utilities.css';
 
 @tailwind base;
 @tailwind components;
@@ -32,9 +36,9 @@
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
+    var(--color-bg-muted) 25%,
+    var(--color-border-light) 50%,
+    var(--color-bg-muted) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
@@ -171,16 +175,16 @@ body {
 }
 
 #timeline-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--color-bg-muted);
 }
 
 #timeline-scroll::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: var(--color-border-medium);
+  border-radius: var(--radius-sm);
 }
 
 #timeline-scroll::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--color-text-disabled);
 }
 
 /* Hide scrollbars for month and date headers */
@@ -201,15 +205,15 @@ body {
 }
 
 .overflow-x-auto::-webkit-scrollbar-track {
-  background: #f3f4f6;
-  border-radius: 5px;
+  background: var(--color-bg-muted);
+  border-radius: var(--radius-md);
 }
 
 .overflow-x-auto::-webkit-scrollbar-thumb {
-  background: #9ca3af;
-  border-radius: 5px;
+  background: var(--color-text-disabled);
+  border-radius: var(--radius-md);
 }
 
 .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+  background: var(--color-text-muted);
 }

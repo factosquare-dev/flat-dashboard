@@ -1,11 +1,11 @@
 import React from 'react';
-import type { Task, Participant } from '../../../types/schedule';
+import type { Task } from '../../../types/schedule';
 import { getInteractionState } from '../utils/globalState';
+import { TaskStatus } from '../../../types/enums';
+import './TaskItem.css';
 
 interface TaskItemProps {
   task: Task;
-  startDate: Date;
-  endDate: Date;
   left: number;
   width: number;
   top: number;
@@ -13,8 +13,6 @@ interface TaskItemProps {
   isResizing: boolean;
   isHovered: boolean;
   isDraggingAnyTask?: boolean;
-  dragPreview?: { projectId: string; startDate: string; endDate: string } | null;
-  allRows?: Participant[];
   modalState?: {
     isResizingTask?: boolean;
     resizingTask?: Task;
@@ -33,8 +31,6 @@ interface TaskItemProps {
 
 const TaskItem: React.FC<TaskItemProps> = React.memo(({
   task,
-  startDate,
-  endDate,
   left,
   width,
   top,
@@ -42,8 +38,6 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
   isResizing,
   isHovered,
   isDraggingAnyTask = false,
-  dragPreview,
-  allRows = [],
   modalState,
   onDragStart,
   onDragEnd,
@@ -55,7 +49,7 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
   onResizeStart,
   onDelete
 }) => {
-  const isCompleted = task.isCompleted || task.status === 'completed' || task.status === 'approved';
+  const isCompleted = task.isCompleted || task.status === TaskStatus.COMPLETED;
   
   
   const isClickBlocked = () => {
@@ -64,25 +58,32 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
     return state.mode !== 'idle' || now < state.preventClickUntil;
   };
   
+  const taskClasses = [
+    'task-item',
+    'task-item-hover',
+    isDraggingAnyTask && !isDragging ? 'pointer-events-none' : 'pointer-events-auto',
+    isHovered && !isResizing ? 'ring-2 ring-blue-400 ring-offset-2 shadow-lg scale-[1.02]' : '',
+    isResizing ? 'opacity-70 cursor-ew-resize' : isDragging ? 'opacity-20 cursor-grabbing' : 'cursor-grab',
+    isCompleted ? 'task-item-completed' : 'task-item-pending',
+    isResizing || isDragging ? '' : 'transition-all'
+  ].filter(Boolean).join(' ');
+
+  const taskStyle = {
+    '--task-left': `${left}px`,
+    '--task-width': `${width}px`,
+    '--task-top': `${top}px`,
+    left: `var(--task-left)`,
+    width: `var(--task-width)`,
+    top: `var(--task-top)`,
+    height: '30px',
+    willChange: isResizing ? 'left, width' : 'auto',
+    zIndex: isDragging ? 100 : 500
+  } as React.CSSProperties;
+
   return (
     <div
-      className={`absolute px-3 py-1.5 rounded-lg text-xs group shadow-sm whitespace-nowrap ${
-        isDraggingAnyTask && !isDragging ? 'pointer-events-none' : 'pointer-events-auto'
-      } ${
-        isHovered && !isResizing ? 'ring-2 ring-blue-400 ring-offset-2 shadow-lg scale-[1.02]' : ''
-      } ${isResizing ? 'opacity-70 cursor-ew-resize' : isDragging ? 'opacity-20 cursor-grabbing' : 'cursor-grab hover:shadow-lg hover:scale-[1.02]'} ${
-        isCompleted
-          ? 'bg-blue-500 text-white' 
-          : 'bg-white border-2 border-blue-500 text-blue-600'
-      } ${isResizing || isDragging ? '' : 'transition-all'}`}
-      style={{
-        left: `${left}px`,
-        width: `${width}px`,
-        top: `${top}px`,
-        height: '30px',
-        willChange: isResizing ? 'left, width' : 'auto',
-        zIndex: isDragging ? 100 : 500 // Above grid but below preview and factory names
-      }}
+      className={taskClasses}
+      style={taskStyle}
       data-task-id={task.id}
       data-task-name={task.title || task.name || task.taskType}
       data-task-date={`${task.startDate}~${task.endDate}`}
@@ -94,8 +95,6 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
         e.stopPropagation();
         
         const clickBlocked = isClickBlocked();
-        const state = getInteractionState();
-        
         
         if (isResizing || isDragging || clickBlocked) {
           e.preventDefault();
@@ -139,10 +138,9 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
       
       {/* Resize handles - same size for all tasks */}
       <div
-        className={`absolute -left-1 top-0 bottom-0 w-2 z-30 ${
-          isResizing ? 'bg-blue-400 bg-opacity-50' : 'hover:bg-blue-400 hover:bg-opacity-50 group-hover:bg-blue-300 group-hover:bg-opacity-30'
+        className={`task-resize-handle task-resize-handle-left ${
+          isResizing ? 'task-resize-handle-active' : ''
         }`}
-        style={{ cursor: 'ew-resize', pointerEvents: 'auto' }}
         draggable={false}
         onMouseDown={(e) => {
           e.stopPropagation();
@@ -164,10 +162,9 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
         onMouseEnter={(e) => e.stopPropagation()}
       />
       <div
-        className={`absolute -right-1 top-0 bottom-0 w-2 z-30 ${
-          isResizing ? 'bg-blue-400 bg-opacity-50' : 'hover:bg-blue-400 hover:bg-opacity-50 group-hover:bg-blue-300 group-hover:bg-opacity-30'
+        className={`task-resize-handle task-resize-handle-right ${
+          isResizing ? 'task-resize-handle-active' : ''
         }`}
-        style={{ cursor: 'ew-resize', pointerEvents: 'auto' }}
         draggable={false}
         onMouseDown={(e) => {
           e.stopPropagation();
@@ -192,11 +189,7 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
       {/* Delete button */}
       {isHovered && onDelete && (
         <button
-          className="absolute w-4 h-4 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg z-20 transition-all"
-          style={{
-            top: '-8px',
-            right: '-8px'
-          }}
+          className="task-delete-button"
           onClick={(e) => {
             e.stopPropagation();
             onDelete();
@@ -220,9 +213,7 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
     prevProps.isDragging === nextProps.isDragging &&
     prevProps.isResizing === nextProps.isResizing &&
     prevProps.isHovered === nextProps.isHovered &&
-    prevProps.isDraggingAnyTask === nextProps.isDraggingAnyTask &&
-    prevProps.startDate === nextProps.startDate &&
-    prevProps.endDate === nextProps.endDate
+    prevProps.isDraggingAnyTask === nextProps.isDraggingAnyTask
   );
 });
 

@@ -3,16 +3,16 @@
  * Refactored from monolithic component into focused sub-components
  */
 
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import GanttHeader from './GanttChart/GanttHeader';
 import ProjectSidebar from './GanttChart/ProjectSidebar';
 import GanttGrid from './GanttChart/GanttGrid';
 import TaskRenderer from './GanttChart/TaskRenderer';
 import { useGanttDrag } from './GanttChart/hooks/useGanttDrag';
-import type { Project } from './GanttChart/types';
 import { useGanttData } from '../../hooks/useGanttData';
 import { getTotalRows } from './GanttChart/utils/ganttHelpers';
 import { GANTT_CONSTANTS, getTotalDays } from './GanttChart/constants';
+import './GanttChart.css';
 
 // Scrollbar styles
 const ganttScrollbarStyles = `
@@ -87,16 +87,18 @@ const GanttChart: React.FC = () => {
           onScroll={handleScroll}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          style={{ cursor: dragState.isDragging ? 'grabbing' : 'default' }}
+          data-dragging={dragState.isDragging}
         >
           <div
             ref={gridRef}
-            className="relative"
+            className="gantt-grid-container"
+            data-grid="true"
             style={{
-              width: totalDays * GANTT_CONSTANTS.CELL_WIDTH,
-              height: totalRows * GANTT_CONSTANTS.CELL_HEIGHT,
-              minHeight: '400px'
-            }}
+              '--total-days': totalDays,
+              '--total-rows': totalRows,
+              '--cell-width': `${GANTT_CONSTANTS.CELL_WIDTH}px`,
+              '--cell-height': `${GANTT_CONSTANTS.CELL_HEIGHT}px`
+            } as React.CSSProperties}
           >
             {/* Grid background */}
             <GanttGrid 

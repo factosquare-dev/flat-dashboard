@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import type { Project } from '../../../../types/project';
-import { useProjectFilters } from '../../../../hooks/useProjectFilters';
+import type { Project } from '@/types/project';
+import { useProjectFilters } from '@/hooks/useProjectFilters';
 import { useProjectModal } from './useProjectModal';
 import { useProjectActions } from './useProjectActions';
 

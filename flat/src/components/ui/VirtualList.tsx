@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { cn } from '../../utils/cn';
+import './VirtualList.css';
 
 interface VirtualListProps<T> {
   items: T[];
@@ -46,14 +48,14 @@ function VirtualList<T>({
   return (
     <div
       ref={scrollElementRef}
-      className={`overflow-auto ${className}`}
-      style={{ height: containerHeight }}
+      className={cn('virtual-list', className)}
+      style={{ '--container-height': `${containerHeight}px` } as React.CSSProperties}
       onScroll={handleScroll}
     >
-      <div style={{ height: totalHeight, position: 'relative' }}>
-        <div style={{ transform: `translateY(${offsetY}px)` }}>
+      <div className="virtual-list__content" style={{ '--total-height': `${totalHeight}px` } as React.CSSProperties}>
+        <div className="virtual-list__items" style={{ '--offset-y': `${offsetY}px` } as React.CSSProperties}>
           {visibleItems.map(({ item, index }) => (
-            <div key={index} style={{ height: itemHeight }}>
+            <div key={index} className="virtual-list__item" style={{ '--item-height': `${itemHeight}px` } as React.CSSProperties}>
               {renderItem(item, index)}
             </div>
           ))}

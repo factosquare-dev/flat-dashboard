@@ -1,44 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Calendar, Building2, CheckSquare } from 'lucide-react';
 import BaseModal, { ModalFooter } from './common/BaseModal';
-import FormInput from './common/FormInput';
-import FormSelect from './common/FormSelect';
-import { Button } from './ui/Button';
+import { MODAL_SIZES } from '../utils/modalUtils';
+import { ButtonVariant } from '../types/enums';
+import Button from './common/Button';
+
+interface Task {
+  id: number | string;
+  factory?: string;
+  task?: string;
+  title?: string;
+  taskType?: string;
+  date?: string;
+  startDate?: string;
+  endDate?: string;
+}
 
 interface TaskEditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  task: {
-    id: number | string;
-    factory?: string;
-    task?: string;
-    title?: string;
-    taskType?: string;
-    date?: string;
-    startDate?: string;
-    endDate?: string;
-  } | null;
-  onSave?: (updatedTask: any) => void;
+  task: Task | null;
+  onSave?: (updatedTask: Task) => void;
   onDelete?: (taskId: number | string) => void;
 }
 
-const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, onSave, onDelete }) => {
-  const [taskName, setTaskName] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+const TaskEditModalComponent: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, onSave, onDelete }) => {
+  const taskName = task?.title || task?.taskType || task?.task || '';
+  const [startDate, setStartDate] = useState(task?.startDate || task?.date || '');
+  const [endDate, setEndDate] = useState(task?.endDate || task?.date || '');
 
   useEffect(() => {
     if (task) {
-      setTaskName(task.title || task.taskType || task.task || '');
       setStartDate(task.startDate || task.date || '');
       setEndDate(task.endDate || task.date || '');
     }
   }, [task]);
 
-  if (!task) return null;
-
-  const handleSave = () => {
-    if (onSave) {
+  const handleSave = useCallback(() => {
+    if (onSave && task) {
       onSave({
         ...task,
         // Keep the original task name/type unchanged
@@ -48,93 +47,105 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ isOpen, onClose, task, on
       });
     }
     onClose();
-  };
+  }, [onSave, task, startDate, endDate, onClose]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (onDelete && task) {
       onDelete(task.id);
     }
     onClose();
-  };
+  }, [onDelete, task, onClose]);
+
+  if (!task) return null;
 
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
       title="태스크 편집"
-      size="sm"
+      size={MODAL_SIZES.SMALL}
       footer={
         <div className="flex justify-between w-full">
-          <Button 
-            variant="danger"
+          <Button
+            variant={ButtonVariant.DANGER}
             onClick={handleDelete}
-            size="md"
           >
             삭제
           </Button>
-          <ModalFooter>
-            <Button 
-              variant="secondary"
+          <div className="flex gap-3">
+            <Button
+              variant={ButtonVariant.SECONDARY}
               onClick={onClose}
-              size="md"
             >
               취소
             </Button>
-            <Button 
-              variant="primary"
+            <Button
+              variant={ButtonVariant.PRIMARY}
               onClick={handleSave}
-              size="md"
             >
               저장
             </Button>
-          </ModalFooter>
+          </div>
         </div>
       }
     >
-      <div className="space-y-6">
+      <div className="modal-section-spacing">
         {/* 공장 정보 (읽기 전용) */}
-        <div>
-          <label className="block text-base font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <Building2 className="icon-md" />
+        <div className="modal-field-spacing">
+          <div className="modal-field-label">
+            <Building2 />
             공장
-          </label>
-          <div className="w-full px-4 py-2.5 bg-gray-100 rounded-lg text-base text-gray-700">
+          </div>
+          <div className="modal-input bg-gray-100 text-gray-700">
             {task.factory || 'Unknown Factory'}
           </div>
         </div>
 
         {/* 태스크 이름 (읽기 전용) */}
-        <div>
-          <label className="block text-base font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <CheckSquare className="icon-md" />
+        <div className="modal-field-spacing">
+          <div className="modal-field-label">
+            <CheckSquare />
             태스크 이름
-          </label>
-          <div className="w-full px-4 py-2.5 bg-gray-100 rounded-lg text-base text-gray-700">
+          </div>
+          <div className="modal-input bg-gray-100 text-gray-700">
             {taskName || 'Unknown Task'}
           </div>
         </div>
 
-        {/* 시작 날짜 */}
-        <FormInput
-          type="date"
-          label="시작일"
-          value={startDate || ''}
-          onChange={(e) => setStartDate(e.target.value)}
-          icon={<Calendar className="icon-md" />}
-        />
+        {/* 날짜 입력 */}
+        <div className="modal-grid-2">
+          <div className="modal-field-spacing">
+            <div className="modal-field-label">
+              <Calendar />
+              시작일
+            </div>
+            <input
+              type="date"
+              className="modal-input"
+              value={startDate || ''}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
 
-        {/* 종료 날짜 */}
-        <FormInput
-          type="date"
-          label="종료일"
-          value={endDate || ''}
-          onChange={(e) => setEndDate(e.target.value)}
-          min={startDate}
-          icon={<Calendar className="icon-md" />}
-        />
+          <div className="modal-field-spacing">
+            <div className="modal-field-label">
+              <Calendar />
+              종료일
+            </div>
+            <input
+              type="date"
+              className="modal-input"
+              value={endDate || ''}
+              onChange={(e) => setEndDate(e.target.value)}
+              min={startDate}
+            />
+          </div>
+        </div>
       </div>
     </BaseModal>
   );
 };
+
+const TaskEditModal = memo(TaskEditModalComponent);
 
 export default TaskEditModal;

@@ -9,17 +9,18 @@ import type { Project, ProjectType, ProjectStatus } from '@/types/project';
 import type { Schedule, Task } from '@/types/schedule';
 import type { Comment } from '@/types/comment';
 import type { Customer } from '@/types/customer';
+import type { UserId, FactoryId, ProjectId, TaskId, CustomerId } from '@/types/branded';
 
 /**
  * Database Collections
  */
 export interface MockDatabase {
-  users: Map<string, User>;
-  customers: Map<string, Customer>;
-  factories: Map<string, Factory>;
-  projects: Map<string, Project>;
-  schedules: Map<string, Schedule>;
-  tasks: Map<string, Task>;
+  users: Map<UserId, User>;
+  customers: Map<CustomerId, Customer>;
+  factories: Map<FactoryId, Factory>;
+  projects: Map<ProjectId, Project>;
+  schedules: Map<ProjectId, Schedule>;
+  tasks: Map<TaskId, Task>;
   comments: Map<string, Comment>;
   
   // Relationship tables
@@ -40,26 +41,26 @@ export interface MockDatabase {
  */
 export interface UserFactory {
   id: string;
-  userId: string;
-  factoryId: string;
+  userId: UserId;
+  factoryId: FactoryId;
   role: 'manager' | 'operator' | 'viewer';
   assignedAt: Date;
-  assignedBy: string;
+  assignedBy: UserId;
 }
 
 export interface ProjectAssignment {
   id: string;
-  projectId: string;
-  userId: string;
+  projectId: ProjectId;
+  userId: UserId;
   role: 'manager' | 'member' | 'viewer';
   assignedAt: Date;
-  assignedBy: string;
+  assignedBy: UserId;
 }
 
 export interface FactoryProject {
   id: string;
-  projectId: string;
-  factoryId: string;
+  projectId: ProjectId;
+  factoryId: FactoryId;
   factoryType: 'manufacturer' | 'container' | 'packaging';
   isPrimary: boolean;
   assignedAt: Date;
@@ -67,11 +68,11 @@ export interface FactoryProject {
 
 export interface UserCustomer {
   id: string;
-  userId: string;
-  customerId: string;
+  userId: UserId;
+  customerId: CustomerId;
   role: 'manager' | 'sales' | 'support';
   assignedAt: Date;
-  assignedBy: string;
+  assignedBy: UserId;
 }
 
 /**

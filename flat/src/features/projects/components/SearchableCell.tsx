@@ -1,18 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Project } from '../../../types/project';
+import type { Customer } from '../../../types/customer';
 import SearchBox from './SearchBox';
 import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
 import { factories } from '../../../data/factories';
+import { FactoryType, FactoryTypeLabel } from '../../../types/enums';
 
 interface SearchableCellProps {
   project: Project;
   field: 'client' | 'manufacturer' | 'container' | 'packaging';
-  onUpdate: (projectId: string, field: keyof Project, value: any) => void;
+  onUpdate: (projectId: string, field: keyof Project, value: string) => void;
 }
 
 const SearchableCell: React.FC<SearchableCellProps> = ({ project, field, onUpdate }) => {
   const [showSearchBox, setShowSearchBox] = useState(false);
-  const [customerData, setCustomerData] = useState<any[]>([]);
+  const [customerData, setCustomerData] = useState<Customer[]>([]);
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   // Load customer data from mock database
@@ -40,9 +42,9 @@ const SearchableCell: React.FC<SearchableCellProps> = ({ project, field, onUpdat
       };
     } else {
       const typeMap = {
-        manufacturer: '제조',
-        container: '용기',
-        packaging: '포장'
+        manufacturer: FactoryType.MANUFACTURING,
+        container: FactoryType.CONTAINER,
+        packaging: FactoryType.PACKAGING
       };
       const factoryType = typeMap[field];
       const filteredFactories = factories.filter(f => f.type === factoryType);
@@ -55,7 +57,7 @@ const SearchableCell: React.FC<SearchableCellProps> = ({ project, field, onUpdat
           additionalText: f.certifications?.slice(0, 3).join(', '),
           searchableText: `${f.name} ${f.address} ${f.email}`
         })),
-        placeholder: `${factoryType} 공장 검색...`,
+        placeholder: `${FactoryTypeLabel[factoryType]} 공장 검색...`,
         displayField: 'name' as const
       };
     }

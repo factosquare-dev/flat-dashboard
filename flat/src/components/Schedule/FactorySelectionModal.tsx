@@ -2,11 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { factories } from '../../data/factories';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
 import { useDragSelection } from '../../hooks/useDragSelection';
+import { MODAL_SIZES } from '../../utils/modalUtils';
+import { FactoryType, FactoryTypeLabel } from '../../types/enums';
+import FactoryTypeBadge from '../common/FactoryTypeBadge';
 
 interface Factory {
   id: string;
   name: string;
-  type: '제조' | '용기' | '포장';
+  type: FactoryType;
   location?: string;
   contact?: string;
 }
@@ -22,7 +25,7 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
   onClose,
   onSelectFactories
 }) => {
-  const [selectedType, setSelectedType] = useState<'all' | '제조' | '용기' | '포장'>('all');
+  const [selectedType, setSelectedType] = useState<'all' | FactoryType>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFactoryIds, setSelectedFactoryIds] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,15 +61,6 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
     }
   }, [isOpen]);
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case '제조': return 'bg-blue-100 text-blue-700 border-blue-300';
-      case '용기': return 'bg-red-100 text-red-700 border-red-300';
-      case '포장': return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-      default: return 'bg-gray-100 text-gray-700 border-gray-300';
-    }
-  };
-
   const handleSubmit = () => {
     const selectedFactoriesList = factories.filter(f => selectedFactoryIds.includes(f.id));
     onSelectFactories(selectedFactoriesList);
@@ -88,7 +82,7 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
       onClose={onClose}
       title="공장 선택"
       description="간트차트에 추가할 공장을 선택해주세요"
-      size="lg"
+      size={MODAL_SIZES.LARGE}
       footer={
         <ModalFooter>
           <button
@@ -112,40 +106,33 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
       }
     >
       {/* 검색 및 필터 */}
-      <div className="space-y-4 mb-6">
+      <div className="modal-section-spacing">
         {/* 검색 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">공장 검색</label>
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">공장 검색</label>
           <input
             type="text"
             placeholder="공장명으로 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="modal-input"
           />
         </div>
 
         {/* 타입 필터 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">공장 유형</label>
-          <div className="flex gap-2 flex-wrap">
-            {(['all', '제조', '용기', '포장'] as const).map(type => (
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">공장 유형</label>
+          <div className="flex flex-wrap" style={{gap: 'var(--modal-gap-sm)'}}>
+            {(['all', ...Object.values(FactoryType)] as const).map(type => (
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}
-                className={`px-3 py-1.5 rounded-lg font-medium text-sm transition-all ${
-                  selectedType === type
-                    ? type === '제조' 
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : type === '용기'
-                      ? 'bg-red-600 text-white shadow-md'
-                      : type === '포장'
-                      ? 'bg-yellow-600 text-white shadow-md'
-                      : 'bg-indigo-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                className={`modal-button-compact ${
+                  selectedType === type ? 'selected' : ''
                 }`}
+                style={{fontSize: 'var(--modal-text-xs)'}}
               >
-                {type === 'all' ? '전체' : type}
+                {type === 'all' ? '전체' : FactoryTypeLabel[type as FactoryType]}
               </button>
             ))}
           </div>
@@ -215,9 +202,7 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-gray-900">{factory.name}</h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getTypeColor(factory.type)}`}>
-                            {factory.type}
-                          </span>
+                          <FactoryTypeBadge type={factory.type} size="sm" showLabel={false} />
                         </div>
                         {factory.location && (
                           <p className="text-sm text-gray-600 mb-1">📍 {factory.location}</p>

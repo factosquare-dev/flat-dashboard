@@ -9,3 +9,7 @@ export { default as FormInput } from './FormInput';
 export { default as FormSelect } from './FormSelect';
 export { default as FormTextarea } from './FormTextarea';
 export { default as PageLayout } from './PageLayout';
+export { default as FactoryTypeBadge } from './FactoryTypeBadge';
+export { default as StatusBadge } from './StatusBadge';
+export { default as LoadingState } from './LoadingState';
+export { default as EmptyState } from './EmptyState';

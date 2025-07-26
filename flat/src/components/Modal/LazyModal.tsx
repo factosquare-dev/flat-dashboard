@@ -8,7 +8,7 @@ interface LazyModalProps {
   isOpen: boolean;
   onClose: () => void;
   modalType: string;
-  modalProps?: Record<string, any>;
+  modalProps?: Record<string, unknown>;
   fallback?: React.ComponentType;
 }
 
@@ -83,7 +83,7 @@ export default React.memo(LazyModal);
 interface UseModalState {
   isOpen: boolean;
   modalType: string | null;
-  modalProps: Record<string, any>;
+  modalProps: Record<string, unknown>;
 }
 
 export function useLazyModal() {
@@ -95,7 +95,7 @@ export function useLazyModal() {
 
   const openModal = React.useCallback((
     modalType: keyof typeof modalComponents,
-    modalProps: Record<string, any> = {}
+    modalProps: Record<string, unknown> = {}
   ) => {
     setModalState({
       isOpen: true,
@@ -112,7 +112,7 @@ export function useLazyModal() {
     });
   }, []);
 
-  const updateModalProps = React.useCallback((newProps: Record<string, any>) => {
+  const updateModalProps = React.useCallback((newProps: Record<string, unknown>) => {
     setModalState(prev => ({
       ...prev,
       modalProps: { ...prev.modalProps, ...newProps },
@@ -131,10 +131,10 @@ export function useLazyModal() {
 interface ModalContextValue {
   openModal: (
     modalType: keyof typeof modalComponents,
-    modalProps?: Record<string, any>
+    modalProps?: Record<string, unknown>
   ) => void;
   closeModal: () => void;
-  updateModalProps: (newProps: Record<string, any>) => void;
+  updateModalProps: (newProps: Record<string, unknown>) => void;
 }
 
 const ModalContext = React.createContext<ModalContextValue | null>(null);

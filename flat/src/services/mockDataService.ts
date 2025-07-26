@@ -9,6 +9,7 @@ import { FACTORY_TYPES, TASK_TYPES } from '../constants/factory';
 import type { Factory } from '../types/factory';
 import type { Task } from '../types/schedule';
 import type { Project } from '../types/project';
+import { FactoryId, ProjectId, TaskId, toFactoryId, toProjectId } from '../types/branded';
 
 class MockDataService {
   private db: MockDatabaseImpl;
@@ -34,13 +35,13 @@ class MockDataService {
   }
 
   // ID로 공장 가져오기
-  getFactoryById(id: string): Factory | undefined {
+  getFactoryById(id: string | FactoryId): Factory | undefined {
     const database = this.db.getDatabase();
     return database.factories.get(id);
   }
 
   // 공장 ID로 태스크 타입 가져오기
-  getTaskTypesForFactory(factoryId: string): string[] {
+  getTaskTypesForFactory(factoryId: string | FactoryId): string[] {
     const factory = this.getFactoryById(factoryId);
     if (!factory) return [];
 
@@ -62,7 +63,7 @@ class MockDataService {
    */
   
   // 프로젝트의 모든 태스크 가져오기
-  getTasksByProjectId(projectId: string): Task[] {
+  getTasksByProjectId(projectId: string | ProjectId): Task[] {
     const database = this.db.getDatabase();
     const tasks = Array.from(database.tasks.values());
     return tasks.filter(task => {
@@ -75,7 +76,7 @@ class MockDataService {
   }
 
   // 공장별 태스크 가져오기
-  getTasksByFactoryId(factoryId: string): Task[] {
+  getTasksByFactoryId(factoryId: string | FactoryId): Task[] {
     const database = this.db.getDatabase();
     const tasks = Array.from(database.tasks.values());
     return tasks.filter(task => task.factoryId === factoryId);
@@ -92,7 +93,7 @@ class MockDataService {
   }
 
   // 프로젝트에 할당된 공장 가져오기
-  getFactoriesForProject(projectId: string): Factory[] {
+  getFactoriesForProject(projectId: string | ProjectId): Factory[] {
     const project = this.db.getDatabase().projects.get(projectId);
     if (!project) return [];
 

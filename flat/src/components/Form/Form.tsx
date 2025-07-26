@@ -3,6 +3,7 @@
  */
 
 import React, { useMemo } from 'react';
+import { GapSize, Size, ButtonVariant } from '../../types/enums';
 
 interface FormProps {
   children: React.ReactNode;
@@ -116,14 +117,14 @@ FormActions.displayName = 'FormActions';
 interface FormGridProps {
   children: React.ReactNode;
   columns?: 1 | 2 | 3 | 4;
-  gap?: 'small' | 'medium' | 'large';
+  gap?: GapSize;
   className?: string;
 }
 
 const FormGrid = React.memo<FormGridProps>(({
   children,
   columns = 2,
-  gap = 'medium',
+  gap = GapSize.MEDIUM,
   className = '',
 }) => {
   const gridClassName = useMemo(() => {
@@ -135,9 +136,9 @@ const FormGrid = React.memo<FormGridProps>(({
     };
     
     const gapClasses = {
-      small: 'gap-3',
-      medium: 'gap-4',
-      large: 'gap-6',
+      [GapSize.SMALL]: 'gap-3',
+      [GapSize.MEDIUM]: 'gap-4',
+      [GapSize.LARGE]: 'gap-6',
     };
     
     return `grid ${columnClasses[columns]} ${gapClasses[gap]} ${className}`;
@@ -184,15 +185,15 @@ export { FormSection, FormActions, FormGrid, FormFieldGroup };
 
 // Form button components
 interface FormButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  size?: 'small' | 'medium' | 'large';
+  variant?: ButtonVariant;
+  size?: Size;
   loading?: boolean;
   children: React.ReactNode;
 }
 
 export const FormButton = React.memo<FormButtonProps>(({
-  variant = 'primary',
-  size = 'medium',
+  variant = ButtonVariant.PRIMARY,
+  size = Size.MD,
   loading = false,
   disabled,
   className = '',
@@ -208,19 +209,19 @@ export const FormButton = React.memo<FormButtonProps>(({
     
     // Variant styles
     const variantClasses = {
-      primary: [
+      [ButtonVariant.PRIMARY]: [
         'border-transparent', 'bg-indigo-600', 'text-white', 
         'hover:bg-indigo-700', 'focus:ring-indigo-500'
       ],
-      secondary: [
+      [ButtonVariant.SECONDARY]: [
         'border-gray-300', 'bg-white', 'text-gray-700', 
         'hover:bg-gray-50', 'focus:ring-indigo-500'
       ],
-      danger: [
+      [ButtonVariant.DANGER]: [
         'border-transparent', 'bg-red-600', 'text-white', 
         'hover:bg-red-700', 'focus:ring-red-500'
       ],
-      ghost: [
+      [ButtonVariant.GHOST]: [
         'border-transparent', 'bg-transparent', 'text-gray-700', 
         'hover:bg-gray-100', 'focus:ring-indigo-500'
       ],
@@ -228,9 +229,9 @@ export const FormButton = React.memo<FormButtonProps>(({
     
     // Size styles
     const sizeClasses = {
-      small: ['px-3', 'py-2', 'text-sm', 'leading-4'],
-      medium: ['px-4', 'py-2', 'text-sm'],
-      large: ['px-6', 'py-3', 'text-base'],
+      [Size.SM]: ['px-3', 'py-2', 'text-sm', 'leading-4'],
+      [Size.MD]: ['px-4', 'py-2', 'text-sm'],
+      [Size.LG]: ['px-6', 'py-3', 'text-base'],
     };
     
     // Disabled styles

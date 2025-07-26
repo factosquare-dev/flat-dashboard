@@ -2,7 +2,6 @@
 export * from './factory';
 export * from './project';
 export * from './tasks';
-export * from './common';
 export * from './time';
 export * from './gantt';
 export * from './ui';
@@ -22,10 +21,3 @@ export const MOCK_FACTORY_NAMES = [
   '주식회사 코스모로스',
 ] as const;
 
-// Navigation items (currently in English)
-export const NAVIGATION_ITEMS = {
-  DASHBOARD: 'Dashboard',
-  PROJECTS: 'Projects',
-  USERS: 'Users',
-  FACTORIES: 'Factories',
-} as const;

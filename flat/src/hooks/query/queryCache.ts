@@ -3,11 +3,17 @@ import { DURATION } from '../../constants/time';
 
 class QueryCache {
   private cache = new Map<string, CacheEntry>();
-  private cleanupInterval: NodeJS.Timeout;
+  private cleanupInterval: NodeJS.Timeout | null = null;
 
   constructor() {
-    // Clean up cache periodically
-    this.cleanupInterval = setInterval(() => this.cleanup(), DURATION.CACHE_CLEANUP_INTERVAL);
+    // Lazy initialization of cleanup interval
+  }
+
+  private ensureCleanupRunning(): void {
+    if (!this.cleanupInterval) {
+      // Clean up cache periodically
+      this.cleanupInterval = setInterval(() => this.cleanup(), DURATION.CACHE_CLEANUP_INTERVAL);
+    }
   }
 
   get<T = any>(key: string): CacheEntry<T> | undefined {
@@ -15,6 +21,7 @@ class QueryCache {
   }
 
   set<T = any>(key: string, entry: CacheEntry<T>): void {
+    this.ensureCleanupRunning();
     this.cache.set(key, entry);
   }
 
@@ -41,13 +48,29 @@ class QueryCache {
         this.cache.delete(key);
       }
     }
+    
+    // Stop cleanup if cache is empty
+    if (this.cache.size === 0 && this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
   }
 
   destroy(): void {
-    clearInterval(this.cleanupInterval);
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
     this.cache.clear();
   }
 }
 
 // Create singleton instance
 export const queryCache = new QueryCache();
+
+// Clean up on window unload
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    queryCache.destroy();
+  });
+}

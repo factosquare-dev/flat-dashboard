@@ -61,7 +61,6 @@ export const useProjects = () => {
     projects: useHierarchicalMode ? flattenedHierarchicalData : projects,
     onSelectionChange: (selectedIds) => {
       // Handle selection change if needed
-      console.log('Selection changed:', selectedIds);
     }
   });
 
@@ -139,17 +138,22 @@ export const useProjects = () => {
   const enhancedDeleteProjects = (projectIds: string[]) => {
     if (useHierarchicalMode) {
       setHierarchicalData(prev => 
-        prev.filter(project => {
+        prev.reduce<Project[]>((acc, project) => {
           // Remove if it's a top-level project being deleted
           if (projectIds.includes(project.id)) {
-            return false;
+            return acc;
           }
           // Filter children if any are being deleted
           if (project.children) {
-            project.children = project.children.filter(child => !projectIds.includes(child.id));
+            const filteredChildren = project.children.filter(child => !projectIds.includes(child.id));
+            if (filteredChildren.length > 0 || !project.children.length) {
+              acc.push({ ...project, children: filteredChildren });
+            }
+          } else {
+            acc.push(project);
           }
-          return true;
-        })
+          return acc;
+        }, [])
       );
     } else {
       projectIds.forEach(id => deleteProject(id));

@@ -45,7 +45,7 @@ export const ARIA_LABELS = {
 
 // Generate unique IDs for accessibility
 export const generateAriaId = (prefix: string): string => {
-  return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${prefix}-${Math.random().toString(36).substring(2, 11)}`;
 };
 
 // Keyboard navigation helpers

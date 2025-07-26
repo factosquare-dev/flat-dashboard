@@ -16,7 +16,7 @@ export function debounce<T extends (...args: any[]) => any>(
   let lastInvokeTime = 0;
   let result: any;
 
-  const { leading = false, trailing = true, maxWait } = options || {};
+  const { leading = false, trailing = true, maxWait } = options ?? {};
 
   function invokeFunc(time: number) {
     const args = lastArgs;

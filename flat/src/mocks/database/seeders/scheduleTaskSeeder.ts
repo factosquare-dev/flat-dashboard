@@ -69,7 +69,7 @@ function createTasksForProject(
     const taskTiming = calculateTaskTiming(project, index, totalTasks, projectStartDate, projectEndDate, currentStartDate);
     
     // Determine task status based on project status and progress
-    let taskStatus = determineTaskStatus(project, index, totalTasks, taskTiming.startDate, taskTiming.endDate, today);
+    const taskStatus = determineTaskStatus(project, index, totalTasks, taskTiming.startDate, taskTiming.endDate, today);
     
     const task: Task = {
       id: `task-${project.id}-${index + 1}`,

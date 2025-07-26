@@ -13,39 +13,6 @@
   @apply opacity-50 cursor-not-allowed;
 }
 
-/* Buttons - Legacy support (prefer using ui/Button component) */
-.btn {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
-}
-
-.btn-primary {
-  @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500;
-}
-
-.btn-secondary {
-  @apply bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
-}
-
-.btn-ghost {
-  @apply bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500;
-}
-
-.btn-danger {
-  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
-}
-
-.btn-sm {
-  @apply px-3 py-1.5 text-sm;
-}
-
-.btn-md {
-  @apply px-4 py-2 text-sm;
-}
-
-.btn-lg {
-  @apply px-6 py-2.5 text-base;
-}
-
 /* Cards */
 .card {
   @apply bg-white rounded-xl border border-gray-200 shadow-sm;
@@ -142,35 +109,6 @@
 
 .zoom-in-95 {
   animation-name: zoom-in-95;
-}
-
-/* Modals - Legacy support (prefer using ui/Modal component) */
-.modal-overlay {
-  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200;
-}
-
-.modal-content {
-  @apply bg-white rounded-2xl shadow-xl w-full overflow-hidden border border-gray-200 animate-in zoom-in-95 duration-200;
-}
-
-.modal-header {
-  @apply flex items-center justify-between p-6 border-b border-gray-200;
-}
-
-.modal-title {
-  @apply text-2xl font-bold text-gray-800;
-}
-
-.modal-description {
-  @apply text-sm text-gray-600 mt-1;
-}
-
-.modal-body {
-  @apply p-6 overflow-y-auto;
-}
-
-.modal-footer {
-  @apply flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50;
 }
 
 /* Icons */
@@ -375,4 +313,195 @@
 @keyframes skeleton {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* Position utilities */
+.position-absolute {
+  @apply absolute;
+}
+
+.position-relative {
+  @apply relative;
+}
+
+.position-fixed {
+  @apply fixed;
+}
+
+.position-sticky {
+  @apply sticky;
+}
+
+/* Flexbox utilities */
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-between {
+  @apply flex items-center justify-between;
+}
+
+.flex-start {
+  @apply flex items-start;
+}
+
+.flex-end {
+  @apply flex items-end justify-end;
+}
+
+.flex-col-center {
+  @apply flex flex-col items-center justify-center;
+}
+
+/* Grid utilities */
+.grid-cols-auto {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* Width utilities */
+.w-cell {
+  width: var(--cell-width, 40px);
+}
+
+.w-sidebar {
+  width: var(--sidebar-width, 200px);
+}
+
+/* Height utilities */
+.h-cell {
+  height: var(--cell-height, 40px);
+}
+
+.h-header {
+  height: var(--header-height, 60px);
+}
+
+/* Z-index utilities */
+.z-base {
+  z-index: 1;
+}
+
+.z-dropdown {
+  z-index: 10;
+}
+
+.z-modal {
+  z-index: 50;
+}
+
+.z-tooltip {
+  z-index: 100;
+}
+
+/* Progress bar */
+.progress-bar {
+  @apply h-2 bg-gray-200 rounded-full overflow-hidden;
+}
+
+.progress-bar-fill {
+  @apply h-full bg-blue-500 transition-all duration-300 ease-out;
+}
+
+.progress-bar-striped {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+  animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+  0% {
+    background-position: 1rem 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/* Task item utilities */
+.task-item {
+  @apply absolute rounded px-2 py-1 text-xs font-medium whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer transition-all duration-200;
+}
+
+.task-item-hover {
+  @apply hover:z-10 hover:shadow-md hover:scale-105;
+}
+
+/* Timeline utilities */
+.timeline-header {
+  @apply sticky top-0 z-10 bg-white border-b border-gray-200;
+}
+
+.timeline-cell {
+  @apply border-r border-gray-200 relative;
+}
+
+.timeline-weekend {
+  @apply bg-gray-50;
+}
+
+.timeline-today {
+  @apply bg-red-50;
+}
+
+/* Gantt chart utilities */
+.gantt-row {
+  @apply border-b border-gray-200 relative;
+}
+
+.gantt-row-hover {
+  @apply hover:bg-gray-50;
+}
+
+.gantt-task {
+  @apply absolute rounded px-2 py-1 text-xs font-medium cursor-pointer transition-all duration-200;
+}
+
+.gantt-task-dragging {
+  @apply opacity-50;
+}
+
+/* Virtual list utilities */
+.virtual-list-container {
+  @apply relative overflow-auto;
+}
+
+.virtual-list-content {
+  @apply absolute top-0 left-0 right-0;
+}
+
+/* Drag preview utilities */
+.drag-preview {
+  @apply fixed pointer-events-none z-50 opacity-80;
+}
+
+/* Scrollbar utilities */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded hover:bg-gray-500;
 }

@@ -1,3 +1,5 @@
+import { FactoryId } from '../../types/branded';
+
 export interface WorkflowModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -10,14 +12,14 @@ export interface WorkflowModalProps {
 }
 
 export interface WorkflowData {
-  factory: string;
+  factory: FactoryId;
   task: string;
   startDate: string;
   endDate: string;
 }
 
 export interface WorkflowState {
-  selectedFactory: string;
+  selectedFactory: FactoryId | '';
   selectedTask: string;
   startDate: string;
   endDate: string;
@@ -28,7 +30,7 @@ export interface WorkflowState {
 }
 
 export type WorkflowAction = 
-  | { type: 'SET_FACTORY'; payload: string }
+  | { type: 'SET_FACTORY'; payload: FactoryId | '' }
   | { type: 'SET_TASK'; payload: string }
   | { type: 'SET_START_DATE'; payload: string }
   | { type: 'SET_END_DATE'; payload: string }

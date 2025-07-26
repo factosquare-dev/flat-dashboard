@@ -2,7 +2,7 @@ import React, { useState, memo } from 'react';
 import type { Comment, CommentAuthor } from '../../types/comment';
 import { MessageSquare, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import CommentInput from './CommentInput';
-import { formatRelativeTime } from '../../utils/dateUtils';
+import { formatRelativeTime } from '../../utils/coreUtils';
 
 interface CommentItemProps {
   comment: Comment;
@@ -162,7 +162,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
       {/* Replies - 2단계로 표시 */}
       {replies && replies.length > 0 && (
         <div className="ml-10 mt-3 space-y-3" onClick={(e) => e.stopPropagation()}>
-          {replies.map((reply, index) => (
+          {replies.map((reply) => (
             <div key={reply.id}>
               <CommentItem
                 comment={reply}
@@ -183,7 +183,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                     onSubmit={(content, mentions) => {
                       // 답글의 답글은 원래 최상위 댓글의 답글로 처리 (2단계 유지)
                       let finalContent = content;
-                      let finalMentions = mentions || [];
+                      let finalMentions = mentions ?? [];
                       
                       if (!content.includes(`@${reply.author.name}`)) {
                         finalContent = `@${reply.author.name} ${content}`;
@@ -213,7 +213,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             onSubmit={(content, mentions) => {
               // 자동으로 원댓글 작성자를 멘션에 추가
               let finalContent = content;
-              let finalMentions = mentions || [];
+              let finalMentions = mentions ?? [];
               
               if (!content.includes(`@${comment.author.name}`)) {
                 finalContent = `@${comment.author.name} ${content}`;

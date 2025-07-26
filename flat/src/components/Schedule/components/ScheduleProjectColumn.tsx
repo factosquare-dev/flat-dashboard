@@ -10,10 +10,15 @@ interface ScheduleProjectColumnProps {
   selectedProjects: string[];
   draggedProjectIndex: number | null;
   dragOverProjectIndex: number | null;
-  modalState: any;
-  setModalState: any;
+  modalState: {
+    draggedProjectIndex?: number | null;
+    dragOverProjectIndex?: number | null;
+  };
+  setModalState: React.Dispatch<React.SetStateAction<{
+    draggedProjectIndex?: number | null;
+    dragOverProjectIndex?: number | null;
+  }>>;
   onProjectSelect: (projectId: string, checked: boolean) => void;
-  onSelectAll: (checked: boolean) => void;
   onDeleteProject: (projectId: string) => void;
   onProjectDragStart: (e: React.DragEvent, index: number) => void;
   onProjectDragEnd: () => void;
@@ -33,7 +38,6 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
   modalState,
   setModalState,
   onProjectSelect,
-  onSelectAll,
   onDeleteProject,
   onProjectDragStart,
   onProjectDragEnd,
@@ -43,17 +47,6 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
   onAddFactory,
   isDragSelecting
 }) => {
-  // Add a dummy project for the "Add Factory" row
-  const addFactoryProject: Participant = {
-    id: 'ADD_FACTORY_ROW_ID',
-    name: '공장 추가',
-    period: '',
-    color: '',
-    type: ''
-  };
-
-  const allRows = [...projects, addFactoryProject];
-
   return (
     <div className="w-72 bg-white flex-shrink-0 relative" style={{ zIndex: 10000 }}>
       {/* Combined header - matching timeline header total height (24px + 28px + 1px border) */}
@@ -61,58 +54,61 @@ const ScheduleProjectColumn: React.FC<ScheduleProjectColumnProps> = ({
         <span className="text-xs font-medium text-gray-600">공장</span>
       </div>
       
-      {/* Project names with right border only for actual projects */}
+      {/* Project names - all projects including "Add Factory" */}
       <div className="border-r border-gray-100">
         {projects.map((project, index) => {
-        if (!project) return null;
-        
-        const rowCount = getProjectRowCount(project.id, tasks, project.name);
-        const projectHeight = Math.max(50, rowCount * 40 + 20);
-        
-        return (
-          <div key={project.id} 
-            onDragOver={(e) => {
-              e.preventDefault();
-              if (modalState.draggedProjectIndex !== null && modalState.draggedProjectIndex !== index) {
-                setModalState((prev: any) => ({ ...prev, dragOverProjectIndex: index }));
-              }
-            }}
-            onDragLeave={() => {
-              setModalState((prev: any) => ({ ...prev, dragOverProjectIndex: null }));
-            }}
-            onDrop={(e) => onProjectDrop(e, index)}
-            onMouseDown={() => onProjectMouseDown(index)}
-            onMouseEnter={() => onProjectMouseEnter(index)}
-          >
-            <ProjectHeader
-              project={project}
-              index={index}
-              isSelected={selectedProjects.includes(project.id)}
-              isDragging={draggedProjectIndex === index}
-              isDropTarget={dragOverProjectIndex === index}
-              projectHeight={projectHeight}
-              onCheckboxChange={(checked) => onProjectSelect(project.id, checked)}
-              onDragStart={(e) => onProjectDragStart(e, index)}
-              onDragEnd={onProjectDragEnd}
-              onDelete={() => onDeleteProject(project.id)}
+          if (!project) return null;
+          
+          const isAddFactoryRow = project.id === 'ADD_FACTORY_ROW';
+          
+          if (isAddFactoryRow) {
+            // Render Add Factory Row
+            return (
+              <AddFactoryRow 
+                key={project.id} 
+                height={50} 
+                onAddFactory={onAddFactory} 
+              />
+            );
+          }
+          
+          // Regular project row
+          const rowCount = getProjectRowCount(project.id, tasks, project.name);
+          const projectHeight = Math.max(50, rowCount * 40 + 20);
+          
+          return (
+            <div key={project.id} 
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (modalState.draggedProjectIndex !== null && modalState.draggedProjectIndex !== index) {
+                  setModalState(prev => ({ ...prev, dragOverProjectIndex: index }));
+                }
+              }}
+              onDragLeave={() => {
+                setModalState(prev => ({ ...prev, dragOverProjectIndex: null }));
+              }}
+              onDrop={(e) => onProjectDrop(e, index)}
+              onMouseDown={() => onProjectMouseDown(index)}
               onMouseEnter={() => onProjectMouseEnter(index)}
-              onCheckboxMouseDown={() => onProjectMouseDown(index)}
-              isDragSelecting={isDragSelecting}
-            />
-          </div>
-        );
+            >
+              <ProjectHeader
+                project={project}
+                isSelected={selectedProjects.includes(project.id)}
+                isDragging={draggedProjectIndex === index}
+                isDropTarget={dragOverProjectIndex === index}
+                projectHeight={projectHeight}
+                onCheckboxChange={(checked) => onProjectSelect(project.id, checked)}
+                onDragStart={(e) => onProjectDragStart(e, index)}
+                onDragEnd={onProjectDragEnd}
+                onDelete={() => onDeleteProject(project.id)}
+                onMouseEnter={() => onProjectMouseEnter(index)}
+                onCheckboxMouseDown={() => onProjectMouseDown(index)}
+                isDragSelecting={isDragSelecting}
+              />
+            </div>
+          );
         })}
       </div>
-      
-      {/* Add Factory Row - without right border */}
-      <AddFactoryRow 
-        key={addFactoryProject.id} 
-        height={50} 
-        onAddFactory={onAddFactory} 
-      />
-      
-      {/* 공장 추가 행 아래 경계선 - 오른쪽 경계선 없음 */}
-      <div className="border-b border-gray-200" style={{ height: '1px' }}></div>
     </div>
   );
 };

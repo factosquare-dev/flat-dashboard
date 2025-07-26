@@ -7,6 +7,8 @@ import BasicInfoSection from './components/BasicInfoSection';
 import ContactInfoSection from './components/ContactInfoSection';
 import AdditionalInfoSection from './components/AdditionalInfoSection';
 import { validateCustomerForm, getInitialFormData, CustomerFormData } from './utils/validation';
+import { ModalSize } from '../../types/enums';
+import { getModalSizeString } from '../../utils/modalUtils';
 import type { Customer } from '@/types/customer';
 
 interface CustomerModalProps {
@@ -68,9 +70,10 @@ const CustomerModal: React.FC<CustomerModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={getModalTitle()}
-      size="md"
+      size={getModalSizeString(ModalSize.MD)}
     >
-      <div className="space-y-6">
+      <div className="bg-gray-50 -mx-6 -my-6 px-6 py-6">
+        <div className="modal-section-spacing">
         <BasicInfoSection
           name={formData.name}
           companyName={formData.companyName}
@@ -96,6 +99,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({
           isViewMode={isViewMode}
           onChange={handleChange}
         />
+        </div>
       </div>
 
       {!isViewMode && (

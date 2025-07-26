@@ -1,6 +1,7 @@
 import React from 'react';
+import { TestTube } from 'lucide-react';
 import FormInput from '../common/FormInput';
-import FormGroup from '../common/FormGroup';
+import ModalSection from '../common/ModalSection';
 
 interface ContentInfo {
   containerSpecifications: string;
@@ -20,7 +21,7 @@ const IngredientInfoForm: React.FC<IngredientInfoFormProps> = ({
   onChange
 }) => {
   return (
-    <FormGroup title="성분">
+    <ModalSection title="성분" icon={<TestTube />} iconColor="text-pink-600">
       <FormInput
         label="컨셉성분"
         value={contentInfo.containerSpecifications}
@@ -51,7 +52,7 @@ const IngredientInfoForm: React.FC<IngredientInfoFormProps> = ({
         onChange={(e) => onChange('productionPreference', e.target.value)}
         placeholder="예: 제조일로부터 24개월"
       />
-    </FormGroup>
+    </ModalSection>
   );
 };
 

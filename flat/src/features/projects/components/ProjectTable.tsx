@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Project } from '../../types/project';
+import type { ProjectId } from '../../types/branded';
 import { MoreVertical, GripVertical } from 'lucide-react';
 import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '../../hooks/useColumnOrder';
@@ -7,15 +8,15 @@ import type { Column } from '../../hooks/useColumnOrder';
 
 interface ProjectTableProps {
   projects: Project[];
-  selectedRows: string[];
+  selectedRows: ProjectId[];
   sortField: keyof Project | null;
   sortDirection: 'asc' | 'desc';
   onSort: (field: keyof Project) => void;
   onSelectAll: (checked: boolean) => void;
-  onSelectRow: (projectId: string, checked: boolean, index?: number) => void;
+  onSelectRow: (projectId: ProjectId, checked: boolean, index?: number) => void;
   onSelectProject: (project: Project) => void;
-  onUpdateProject: (projectId: string, field: keyof Project, value: any) => void;
-  onShowOptionsMenu: (projectId: string, position: { top: number; left: number }) => void;
+  onUpdateProject: (projectId: ProjectId, field: keyof Project, value: any) => void;
+  onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }) => void;
   onMouseEnterRow?: (index: number) => void;
   isDragging?: boolean;
   onStartDrag?: (index: number) => void;

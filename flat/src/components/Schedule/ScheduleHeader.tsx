@@ -1,12 +1,7 @@
 import React from 'react';
-import { Plus, FileEdit, Mail, ArrowLeft, Table2, Calendar } from 'lucide-react';
+import { ArrowLeft, Table2, Calendar } from 'lucide-react';
 
 interface ScheduleHeaderProps {
-  title?: string;
-  onAddProject: () => void;
-  onOpenWorkflow: () => void;
-  onOpenEmail: () => void;
-  onAddTask?: () => void;
   onBack?: () => void;
   projectName?: string;
   onToggleTableView?: () => void;
@@ -14,11 +9,6 @@ interface ScheduleHeaderProps {
 }
 
 const ScheduleHeader: React.FC<ScheduleHeaderProps> = ({
-  title,
-  onAddProject,
-  onOpenWorkflow,
-  onOpenEmail,
-  onAddTask,
   onBack,
   projectName,
   onToggleTableView,

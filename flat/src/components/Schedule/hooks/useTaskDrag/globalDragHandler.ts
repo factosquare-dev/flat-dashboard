@@ -10,7 +10,7 @@ export const createGlobalDragOverHandler = (
   cellWidth: number,
   handleAutoScroll: (mouseX: number, containerWidth: number) => void,
   updateTooltip: (x: number, y: number, startDate: Date, endDate: Date) => void,
-  findProjectFromEvent: (e: { clientX: number; clientY: number; target: any }) => string | null,
+  findProjectFromEvent: (e: { clientX: number; clientY: number; target: EventTarget | null }) => string | null,
   updatePreview: (projectId: string | null, startDate: Date, endDate: Date, factory: string) => void
 ) => {
   return (e: DragEvent) => {

@@ -60,8 +60,6 @@ interface Config {
     userKey: string;
     settingsKey: string;
     mockDbKey: string;
-    legacyTokenKey: string;
-    legacyAuthTokenKey: string;
   };
   validation: {
     maxFileSize: number;
@@ -151,9 +149,6 @@ export const config: Config = {
     userKey: 'flat_user_data',
     settingsKey: 'flat_app_settings',
     mockDbKey: 'flat_mock_db',
-    // Legacy keys (for backward compatibility)
-    legacyTokenKey: 'auth_token',
-    legacyAuthTokenKey: 'authToken',
   },
 
   // Validation rules

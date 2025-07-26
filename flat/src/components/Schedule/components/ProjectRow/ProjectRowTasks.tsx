@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Task, Participant } from '../../../../types/schedule';
+import type { Task, Participant } from '@/types/schedule';
 import TaskItem from '../TaskItem';
-import { assignTaskRows } from '../../../../utils/taskUtils';
+import { assignTaskRows } from '@/utils/taskUtils';
 import { GridCoordinateCalculator } from '../../utils/dragCalculations';
 
 interface ProjectRowTasksProps {
@@ -10,8 +10,17 @@ interface ProjectRowTasksProps {
   cellWidth: number;
   hoveredTaskId: number | null;
   isDraggingTask: boolean;
-  resizePreview: any;
-  dragPreview: any;
+  resizePreview: {
+    left: number;
+    width: number;
+    taskId: string;
+    direction: 'start' | 'end';
+  } | null;
+  dragPreview: {
+    projectId: string;
+    startDate: string;
+    endDate: string;
+  } | null;
   draggedTask: Task | null;
   scrollRef: React.RefObject<HTMLDivElement>;
   onTaskClick: (task: Task) => void;

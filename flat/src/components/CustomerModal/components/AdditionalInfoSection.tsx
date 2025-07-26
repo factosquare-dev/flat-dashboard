@@ -1,7 +1,8 @@
 import React from 'react';
-import { MapPin, Hash } from 'lucide-react';
+import { MapPin, Hash, FileText } from 'lucide-react';
 import FormInput from '../../common/FormInput';
 import FormTextarea from '../../common/FormTextarea';
+import ModalSection from '../../common/ModalSection';
 
 interface AdditionalInfoSectionProps {
   address: string;
@@ -21,8 +22,7 @@ const AdditionalInfoSection: React.FC<AdditionalInfoSectionProps> = ({
   onChange
 }) => {
   return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-medium text-gray-900">추가 정보</h3>
+    <ModalSection title="추가 정보" icon={<FileText />} iconColor="text-purple-600">
       <FormInput
         label="주소"
         value={address}
@@ -56,7 +56,7 @@ const AdditionalInfoSection: React.FC<AdditionalInfoSectionProps> = ({
         rows={3}
         disabled={isViewMode}
       />
-    </div>
+    </ModalSection>
   );
 };
 

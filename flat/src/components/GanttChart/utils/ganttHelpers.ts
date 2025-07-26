@@ -3,6 +3,7 @@
  */
 
 import type { Project, Task } from '../types';
+import { ProjectNotFoundError } from '../../../errors';
 
 export const getTaskById = (projects: Project[], taskId: string | number): Task | null => {
   for (const project of projects) {
@@ -13,7 +14,16 @@ export const getTaskById = (projects: Project[], taskId: string | number): Task 
 };
 
 export const getProjectById = (projects: Project[], projectId: string): Project | null => {
-  return projects.find(p => p.id === projectId) || null;
+  const project = projects.find(p => p.id === projectId);
+  return project || null;
+};
+
+export const getProjectByIdOrThrow = (projects: Project[], projectId: string): Project => {
+  const project = projects.find(p => p.id === projectId);
+  if (!project) {
+    throw new ProjectNotFoundError(projectId);
+  }
+  return project;
 };
 
 export const getProjectByTaskId = (projects: Project[], taskId: string | number): Project | null => {

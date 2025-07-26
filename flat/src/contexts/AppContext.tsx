@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useProjects } from '../lib/react-query/hooks/useProjects';
 import { useModalState } from '../hooks/common/useModalState';
 import type { Project, Customer, Task, Participant } from '../types';
@@ -65,30 +65,49 @@ export const AppProvider: React.FC<AppProviderProps> = ({
   const taskModal = useModalState();
   const projectModal = useModalState();
 
-  const value: AppContextValue = {
-    // Project management
-    projects,
-    projectsLoading,
-    projectsError,
-    refetchProjects,
-    
-    // Modal states
-    customerModal,
-    taskModal,
-    projectModal,
-    
-    // Data
-    customers,
-    tasks,
-    participants,
-    
-    // Actions
-    onProjectSave,
-    onCustomerSave,
-    onTaskSave,
-    onTaskDelete,
-    onFactoryDelete,
-  };
+  const value: AppContextValue = useMemo(
+    () => ({
+      // Project management
+      projects,
+      projectsLoading,
+      projectsError,
+      refetchProjects,
+      
+      // Modal states
+      customerModal,
+      taskModal,
+      projectModal,
+      
+      // Data
+      customers,
+      tasks,
+      participants,
+      
+      // Actions
+      onProjectSave,
+      onCustomerSave,
+      onTaskSave,
+      onTaskDelete,
+      onFactoryDelete,
+    }),
+    [
+      projects,
+      projectsLoading,
+      projectsError,
+      refetchProjects,
+      customerModal,
+      taskModal,
+      projectModal,
+      customers,
+      tasks,
+      participants,
+      onProjectSave,
+      onCustomerSave,
+      onTaskSave,
+      onTaskDelete,
+      onFactoryDelete,
+    ]
+  );
 
   return (
     <AppContext.Provider value={value}>

@@ -1,64 +1,49 @@
 // Schedule related types
 
-// Task status enum for better type safety
-export enum TaskStatus {
-  TODO = 'TODO',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  BLOCKED = 'BLOCKED',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED'
-}
+import { Priority, FactoryType, TaskStatus, ParticipantRole, TaskType } from './enums';
+import { TaskId, UserId, FactoryId, ProjectId } from './branded';
+
+// Re-export TaskStatus from enums for backward compatibility
+export { TaskStatus, ParticipantRole, TaskType } from './enums';
 
 // Participant role in a task
 export interface Participant {
-  userId: string;
-  role: 'manager' | 'member' | 'reviewer';
+  userId: UserId;
+  role: ParticipantRole;
 }
 
 export interface Task {
-  id: string;
-  scheduleId: string;
+  id: TaskId;
+  scheduleId: ProjectId;
   title: string;
-  type: 'material' | 'production' | 'quality' | 'packaging' | 'inspection' | 'shipping' | 'other';
+  type: TaskType;
   status: TaskStatus;
   startDate: Date;
   endDate: Date;
   progress: number; // 0-100
   participants: Participant[];
-  factoryId?: string;
-  priority: 'high' | 'medium' | 'low';
-  dependsOn: string[]; // Task IDs this task depends on
-  blockedBy: string[]; // Task IDs blocking this task
+  factoryId?: FactoryId;
+  priority: Priority;
+  dependsOn: TaskId[]; // Task IDs this task depends on
+  blockedBy: TaskId[]; // Task IDs blocking this task
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
-  approvedBy?: string;
+  approvedBy?: UserId;
   approvedAt?: Date;
   rejectionReason?: string;
   
-  // Legacy fields for backward compatibility
-  id_legacy?: number | string;
-  taskType?: string;
-  projectId?: string;
-  factory?: string;
-  details?: string;
-  startDate_string?: string;
-  endDate_string?: string;
-  color?: string;
+  // UI-specific fields (computed, not stored)
   x?: number;
   width?: number;
-  isCompleted?: boolean;
-  allDay?: boolean;
-  originalStartDate?: string;
-  originalEndDate?: string;
-  assignee?: string;
+  color?: string;
 }
 
-// Legacy Participant interface for UI components
-export interface ParticipantLegacy {
-  id: string;
+// Legacy Factory interface for schedule participants
+// Will be replaced by the Factory interface from factory.ts
+export interface ScheduleFactory {
+  id: FactoryId;
   name: string;
   period: string;
   color: string;
@@ -66,18 +51,15 @@ export interface ParticipantLegacy {
 }
 
 export interface Schedule {
-  id: string;
-  projectId: string;
+  id: ProjectId; // Schedule ID is same as Project ID
+  projectId: ProjectId;
   startDate: Date;
   endDate: Date;
   status: 'draft' | 'active' | 'completed' | 'archived';
   createdAt: Date;
   updatedAt: Date;
-  // Legacy fields
-  participants?: ParticipantLegacy[];
+  factories?: Factory[];
   tasks?: Task[];
-  createdAt_string?: string;
-  updatedAt_string?: string;
 }
 
 export interface DragTooltip {
@@ -87,7 +69,7 @@ export interface DragTooltip {
 }
 
 export interface ResizePreview {
-  taskId: number;
+  taskId: string;
   startDate: string;
   endDate: string;
 }
@@ -104,7 +86,7 @@ export interface ModalState {
   selectedProjectId: string | null;
   selectedDate: string | null;
   selectedFactory: string | null;
-  hoveredTaskId: number | null;
+  hoveredTaskId: string | null;
   draggedProjectIndex: number | null;
   dragOverProjectIndex: number | null;
 }
@@ -114,8 +96,8 @@ export interface TaskControls {
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
   addTask: (task: Omit<Task, 'id' | 'x' | 'width' | 'color'>) => Task;
-  updateTask: (taskId: number, updates: Partial<Task>) => void;
-  deleteTask: (taskId: number) => void;
+  updateTask: (taskId: string, updates: Partial<Task>) => void;
+  deleteTask: (taskId: string) => void;
   reorderTasks: (draggedIndex: number, targetIndex: number, projectId: string) => void;
   calculateTaskPosition: (taskStartDate: Date, taskEndDate: Date) => { x: number; width: number };
 }

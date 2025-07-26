@@ -193,7 +193,7 @@ const getTasksForProject = (project: Project): Project[] => {
       description: task.description,
       factory: task.factory,
       participants: task.participants
-    } as any));
+    } as Project));
   } catch (error) {
     console.error('[getTasksForProject] Error getting tasks:', error);
     return [];
@@ -321,8 +321,6 @@ export const getHierarchicalProjectsData = (): Project[] => {
   return _hierarchicalProjects;
 };
 
-// For backward compatibility
-export const hierarchicalProjects: Project[] = [];
 
 // Flatten hierarchical projects for display
 export const flattenProjects = (projects: Project[]): Project[] => {

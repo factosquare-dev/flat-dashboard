@@ -1,24 +1,26 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { ARIA_LABELS, focusManagement, KEYBOARD_KEYS } from '../../utils/accessibility';
+import { ModalSize } from '../../types/enums';
+import './BaseModal.css';
 
 interface BaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: ModalSize;
   showCloseButton?: boolean;
   footer?: React.ReactNode;
   className?: string;
   description?: string;
 }
 
-const sizeClasses = {
-  sm: 'max-w-sm',
-  md: 'max-w-2xl',
-  lg: 'max-w-4xl',
-  xl: 'max-w-6xl'
+const sizeClassMap = {
+  [ModalSize.SM]: 'modal-container--sm',
+  [ModalSize.MD]: 'modal-container--md',
+  [ModalSize.LG]: 'modal-container--lg',
+  [ModalSize.XL]: 'modal-container--xl'
 };
 
 const BaseModal: React.FC<BaseModalProps> = ({
@@ -26,7 +28,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
   onClose,
   title,
   children,
-  size = 'md',
+  size = ModalSize.MD,
   showCloseButton = true,
   footer,
   className = '',
@@ -49,7 +51,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
       }, 0);
 
       // Prevent body scroll
-      document.body.style.overflow = 'hidden';
+      document.body.classList.add('modal-open');
       
       // Trap focus and handle ESC
       const cleanup = modalRef.current ? focusManagement.trapFocus(modalRef.current) : undefined;
@@ -65,7 +67,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
       return () => {
         cleanup?.();
         document.removeEventListener('keydown', handleEscKey);
-        document.body.style.overflow = 'unset';
+        document.body.classList.remove('modal-open');
         focusManagement.restoreFocus(previouslyFocusedRef.current);
       };
     }
@@ -81,7 +83,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="modal-backdrop"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -90,36 +92,36 @@ const BaseModal: React.FC<BaseModalProps> = ({
     >
       <div 
         ref={modalRef}
-        className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} ${className || ''}`.trim()}
+        className={`modal-container ${sizeClassMap[size]} ${className || ''}`.trim()}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header - Standardized */}
-        <div className="flex items-start justify-between p-6 border-b border-gray-200">
-          <div>
-            <h3 id="modal-title" className="text-xl font-semibold text-gray-900">{title}</h3>
+        <div className="modal-header">
+          <div className="modal-header__content">
+            <h3 id="modal-title" className="modal-header__title">{title}</h3>
             {description && (
-              <p id="modal-description" className="mt-2 text-base text-gray-500">{description}</p>
+              <p id="modal-description" className="modal-header__description">{description}</p>
             )}
           </div>
           {showCloseButton && (
             <button 
               onClick={onClose}
-              className="ml-4 p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="modal-close-button"
               aria-label={ARIA_LABELS.MODAL_CLOSE}
             >
-              <X className="w-6 h-6" aria-hidden="true" />
+              <X className="modal-close-button__icon" aria-hidden="true" />
             </button>
           )}
         </div>
 
         {/* Modal Content - Standardized scrollable area */}
-        <div className="p-6 max-h-[calc(90vh-200px)] overflow-y-auto">
+        <div className="modal-content">
           {children}
         </div>
 
         {/* Modal Footer - Standardized */}
         {footer && (
-          <div className="p-6 border-t border-gray-200">
+          <div className="modal-footer">
             {footer}
           </div>
         )}
@@ -133,7 +135,7 @@ export const ModalFooter: React.FC<{ children: React.ReactNode; className?: stri
   children, 
   className = '' 
 }) => (
-  <div className={`flex items-center justify-end gap-3 ${className || ''}`.trim()}>
+  <div className={`modal-footer__actions ${className || ''}`.trim()}>
     {children}
   </div>
 );

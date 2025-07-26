@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import type { Participant, Task } from '../../types/schedule';
 import { factories } from '../../data/factories';
+import { getFactoryTypeColor } from '../../utils/factoryUtils';
 
 // Lazy load all modal components
 const EmailModal = lazy(() => import('../EmailModal/index'));
@@ -51,7 +52,7 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
   onTaskCreate,
   onFactoryAdd
 }) => {
-  const handleEmailSend = (data: any) => {
+  const handleEmailSend = () => {
     setModalState(prev => ({ ...prev, showEmailModal: false }));
   };
 
@@ -63,7 +64,7 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
     setModalState(prev => ({ ...prev, showTaskEditModal: false, selectedTask: null }));
   };
 
-  const handleProductRequestSave = (data: any) => {
+  const handleProductRequestSave = () => {
     setModalState(prev => ({ ...prev, showProductRequestModal: false }));
   };
 
@@ -93,20 +94,24 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
           availableFactories={
             modalState.selectedFactories?.length > 0 ? 
               // 선택된 공장들만 표시
-              modalState.selectedFactories.map(name => {
-                const factory = factories.find(f => f.name === name);
+              modalState.selectedFactories.map(nameOrId => {
+                // ID인지 이름인지 확인하여 처리
+                let factory = factories.find(f => f.id === nameOrId);
+                if (!factory) {
+                  // ID로 찾지 못했으면 이름으로 검색 (하위 호환성)
+                  factory = factories.find(f => f.name === nameOrId);
+                }
                 return {
-                  name,
-                  color: factory?.type === '제조' ? 'bg-blue-500' : 
-                         factory?.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+                  id: factory?.id || nameOrId,
+                  name: factory?.name || nameOrId,
+                  color: getFactoryTypeColor(factory?.type || ''),
                   type: factory?.type || '공장'
                 };
               }) : 
               // 선택된 것이 없으면 현재 간트차트에 표시된 프로젝트(공장)들만 보여줌
               projects.map(project => ({
                 name: project.name,
-                color: project.type === '제조' ? 'bg-blue-500' : 
-                       project.type === '용기' ? 'bg-red-500' : 'bg-yellow-500',
+                color: getFactoryTypeColor(project.type || ''),
                 type: project.type || '공장'
               }))
           }

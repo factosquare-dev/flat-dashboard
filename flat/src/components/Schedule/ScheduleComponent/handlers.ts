@@ -1,13 +1,38 @@
 import type { Task, Participant } from '../../../types/schedule';
 import type { TaskData } from './types';
+
+interface TaskControls {
+  tasks: Task[];
+  setTasks: (tasks: Task[]) => void;
+  addTask: (task: Partial<Task>) => void;
+  updateTask: (taskId: string, task: Task) => Promise<void>;
+  deleteTask: (taskId: string) => void;
+}
+
+interface ModalState {
+  showTaskEditModal?: boolean;
+  selectedTask?: Task | null;
+  showTaskModal?: boolean;
+  selectedProjectId?: string | null;
+  selectedDate?: string | null;
+  showProductRequestModal?: boolean;
+  showWorkflowModal?: boolean;
+  showEmailModal?: boolean;
+  selectedFactories?: string[];
+}
+
+type SetModalState = React.Dispatch<React.SetStateAction<ModalState>>;
+
+type ToastError = (title: string, message: string) => void;
 import { factories, taskTypesByFactoryType } from '../../../data/factories';
 import { findAvailableDateRange } from '../../../utils/taskUtils';
 import { projectColors } from '../../../data/mockData';
+import { getFactoryByIdOrName } from '../../../utils/factoryUtils';
 
 export const createProjectHandlers = (
   projects: Participant[],
   setProjects: React.Dispatch<React.SetStateAction<Participant[]>>,
-  taskControls: any,
+  taskControls: TaskControls,
   currentProjectId?: string
 ) => {
   const handleDeleteProject = (projectId: string) => {
@@ -47,21 +72,44 @@ export const createProjectHandlers = (
   const handleAddFactory = (factory: { id: string; name: string; type: string }) => {
     // 이미 존재하지 않는 경우에만 추가
     if (!projects.find(p => p.id === factory.id)) {
-      // 현재 사용중인 색상들 찾기
-      const usedColors = projects.map(p => p.color);
+      // 색상 배열
+      const colors = [
+        "#3b82f6", // blue-500
+        "#ef4444", // red-500
+        "#22c55e", // green-500
+        "#eab308", // yellow-500
+        "#a855f7", // purple-500
+        "#ec4899", // pink-500
+        "#6366f1", // indigo-500
+        "#f97316", // orange-500
+        "#14b8a6", // teal-500
+        "#06b6d4"  // cyan-500
+      ];
       
-      // 사용되지 않은 첫 번째 색상 찾기
-      const availableColor = projectColors.find(color => !usedColors.includes(color)) || projectColors[projects.length % projectColors.length];
+      // 랜덤 색상 선택
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
       
       const newProject: Participant = {
         id: factory.id,
         name: factory.name,
         type: factory.type,
         period: '',
-        color: availableColor
+        color: randomColor
       };
       
-      setProjects(prev => [...prev, newProject]);
+      // "공장 추가" 행 바로 위에 추가하기 위해 splice 사용
+      setProjects(prev => {
+        const newProjects = [...prev];
+        const addFactoryIndex = newProjects.findIndex(p => p.id === 'ADD_FACTORY_ROW');
+        if (addFactoryIndex !== -1) {
+          // "공장 추가" 행 바로 위에 삽입
+          newProjects.splice(addFactoryIndex, 0, newProject);
+        } else {
+          // "공장 추가" 행이 없으면 마지막에 추가
+          newProjects.push(newProject);
+        }
+        return newProjects;
+      });
     }
   };
 
@@ -70,17 +118,17 @@ export const createProjectHandlers = (
 
 export const createTaskHandlers = (
   projects: Participant[],
-  taskControls: any,
-  modalState: any,
-  setModalState: any,
-  toastError: any
+  taskControls: TaskControls,
+  modalState: ModalState,
+  setModalState: SetModalState,
+  toastError: ToastError
 ) => {
   const handleTaskSave = async (updatedTask: Task) => {
     if (modalState.selectedTask) {
       try {
         await taskControls.updateTask(modalState.selectedTask.id, updatedTask);
-        setModalState((prev: any) => ({ ...prev, showTaskEditModal: false, selectedTask: null }));
-      } catch (error) {
+        setModalState(prev => ({ ...prev, showTaskEditModal: false, selectedTask: null }));
+      } catch {
         // Task update error logging removed for cleaner console
         // Keep modal open on error
         toastError('태스크 업데이트 실패', '태스크 업데이트 중 오류가 발생했습니다.');
@@ -91,12 +139,13 @@ export const createTaskHandlers = (
   const handleTaskDelete = () => {
     if (modalState.selectedTask) {
       taskControls.deleteTask(modalState.selectedTask.id);
-      setModalState((prev: any) => ({ ...prev, showTaskEditModal: false, selectedTask: null }));
+      setModalState(prev => ({ ...prev, showTaskEditModal: false, selectedTask: null }));
     }
   };
 
   const handleQuickTaskCreate = (taskData: TaskData & { projectId: string }) => {
-    const factory = factories.find(f => f.name === taskData.factory || f.id === taskData.factoryId);
+    // Use ID-based lookup with name fallback for backward compatibility
+    const factory = getFactoryByIdOrName(factories, taskData.factoryId || taskData.factory || '');
     const defaultTaskType = factory ? taskTypesByFactoryType[factory.type]?.[0] || '태스크' : '태스크';
     
     const duration = Math.ceil((new Date(taskData.endDate).getTime() - new Date(taskData.startDate).getTime()) / (1000 * 60 * 60 * 24));
@@ -139,7 +188,7 @@ export const createTaskHandlers = (
       factoryId: taskData.factoryId
     });
     
-    setModalState((prev: any) => ({ ...prev, showTaskModal: false, selectedProjectId: null, selectedDate: null }));
+    setModalState(prev => ({ ...prev, showTaskModal: false, selectedProjectId: null, selectedDate: null }));
   };
 
   return {
@@ -153,14 +202,14 @@ export const createTaskHandlers = (
 export const createModalHandlers = (
   projects: Participant[],
   selectedProjects: string[],
-  setModalState: any
+  setModalState: SetModalState
 ) => {
   const handleAddProject = () => {
-    setModalState((prev: any) => ({ ...prev, showProductRequestModal: true }));
+    setModalState(prev => ({ ...prev, showProductRequestModal: true }));
   };
 
   const handleOpenWorkflow = () => {
-    setModalState((prev: any) => ({ ...prev, showWorkflowModal: true }));
+    setModalState(prev => ({ ...prev, showWorkflowModal: true }));
   };
 
   const handleOpenEmail = () => {
@@ -172,7 +221,7 @@ export const createModalHandlers = (
           return factories;
         }, [] as string[])
       : []; // 선택된 것이 없으면 빈 배열로 설정
-    setModalState((prev: any) => ({ 
+    setModalState(prev => ({ 
       ...prev, 
       showEmailModal: true, 
       selectedFactories 
@@ -180,7 +229,7 @@ export const createModalHandlers = (
   };
 
   const handleAddTask = () => {
-    setModalState((prev: any) => ({ ...prev, showTaskModal: true }));
+    setModalState(prev => ({ ...prev, showTaskModal: true }));
   };
 
   return {

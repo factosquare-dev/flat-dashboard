@@ -1,4 +1,6 @@
 import React from 'react';
+import { cn } from '../../utils/cn';
+import './FloatingActionButton.css';
 
 interface FloatingActionButtonProps {
   onClick: () => void;
@@ -11,17 +13,6 @@ interface FloatingActionButtonProps {
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: (e: React.DragEvent) => void;
 }
-
-const positionClasses = {
-  first: 'bottom-8',
-  second: 'bottom-24',
-  third: 'bottom-40',
-};
-
-const variantClasses = {
-  primary: 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white',
-  secondary: 'bg-white text-gray-700 border border-gray-200',
-};
 
 const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   onClick,
@@ -75,34 +66,33 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       }
     }, 0);
     
-    e.currentTarget.classList.add('opacity-50');
+    e.currentTarget.classList.add('floating-action-button--dragging');
     onDragStart(e);
   };
   
   const handleDragEnd = (e: React.DragEvent) => {
     if (!draggable || !onDragEnd) return;
-    e.currentTarget.classList.remove('opacity-50');
+    e.currentTarget.classList.remove('floating-action-button--dragging');
     onDragEnd(e);
   };
 
   return (
     <button
       onClick={onClick}
-      className={`
-        fixed ${positionClasses[position]} right-8 
-        ${variantClasses[variant]}
-        rounded-full transition-all duration-300 shadow-lg hover:shadow-xl 
-        flex items-center justify-center overflow-hidden z-50 group
-        ${draggable ? 'cursor-move' : ''}
-        ${className}
-      `}
+      className={cn(
+        'floating-action-button',
+        `floating-action-button--${position}`,
+        `floating-action-button--${variant}`,
+        draggable && 'floating-action-button--draggable',
+        className
+      )}
       draggable={draggable}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex items-center gap-0 group-hover:gap-2 transition-all duration-300 px-4 py-4 group-hover:pr-5">
-        {React.cloneElement(icon, { className: 'w-5 h-5 flex-shrink-0' })}
-        <span className="max-w-0 group-hover:max-w-[100px] overflow-hidden whitespace-nowrap transition-all duration-300 font-medium text-sm">
+      <div className="floating-action-button__content">
+        {React.cloneElement(icon, { className: 'floating-action-button__icon' })}
+        <span className="floating-action-button__label">
           {label}
         </span>
       </div>

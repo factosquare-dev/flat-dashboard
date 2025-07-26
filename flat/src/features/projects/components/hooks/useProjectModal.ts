@@ -3,7 +3,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import type { Project } from '../../../../types/project';
+import type { Project } from '@/types/project';
 
 export const useProjectModal = () => {
   const [showProjectModal, setShowProjectModal] = useState(false);

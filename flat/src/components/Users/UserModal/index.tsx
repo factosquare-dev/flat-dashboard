@@ -2,24 +2,30 @@ import React, { useState, useEffect } from 'react';
 import BaseModal, { ModalFooter } from '../../common/BaseModal';
 import { FormFields } from './FormFields';
 import type { UserModalProps, UserFormData, FormErrors } from './types';
+import type { UserRole } from '../../../store/slices/userSlice';
+import { UserRole as UserRoleEnum } from '../../../types/enums';
 import { 
   formatPhoneNumber, 
   validateForm, 
   getDefaultDepartment, 
   getDefaultPosition 
 } from './utils';
+import { useModalFormValidation } from '../../../hooks/useModalFormValidation';
+import { AlertCircle } from 'lucide-react';
+import { MODAL_SIZES } from '../../../utils/modalUtils';
+import { ButtonVariant } from '../../../types/enums';
+import Button from '../../common/Button';
+import './UserModal.css';
 
 const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData }) => {
   const [formData, setFormData] = useState<UserFormData>({
     name: '',
     email: '',
     phone: '',
-    role: 'customer',
+    role: UserRoleEnum.CUSTOMER,
     department: '',
     position: ''
   });
-
-  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -30,12 +36,13 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData
           name: '',
           email: '',
           phone: '',
-          role: 'customer',
+          role: UserRoleEnum.CUSTOMER,
           department: '',
           position: ''
         });
       }
-      setErrors({});
+      // Reset validation state
+      resetForm();
     }
   }, [editData, isOpen]);
 
@@ -46,18 +53,16 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData
       [name]: value
     }));
     
-    // 에러 초기화
-    if (errors[name as keyof UserFormData]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
+    // Field change handled by validation hook
+    handleFieldChange(name as keyof UserFormData, value);
 
     // role 변경 시 기본값 설정
     if (name === 'role') {
-      if (value === 'admin' || value === 'manager') {
+      if (value === UserRoleEnum.ADMIN || value === UserRoleEnum.MANAGER) {
         setFormData(prev => ({
           ...prev,
-          department: prev.department || getDefaultDepartment(value as any),
-          position: prev.position || getDefaultPosition(value as any)
+          department: prev.department || getDefaultDepartment(value as UserRole),
+          position: prev.position || getDefaultPosition(value as UserRole)
         }));
       }
     }
@@ -66,22 +71,61 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
     setFormData(prev => ({ ...prev, phone: formatted }));
-    
-    if (errors.phone) {
-      setErrors(prev => ({ ...prev, phone: '' }));
+    handleFieldChange('phone', formatted);
+  };
+
+  // Validation rules
+  const validationRules = {
+    name: { required: true },
+    email: { 
+      required: true,
+      pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+      custom: (value: string) => {
+        if (value && !value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
+          return '올바른 이메일 형식이 아닙니다';
+        }
+        return null;
+      }
+    },
+    phone: { 
+      required: true,
+      pattern: /^\d{3}-\d{3,4}-\d{4}$/,
+      custom: (value: string) => {
+        if (value && !value.match(/^\d{3}-\d{3,4}-\d{4}$/)) {
+          return '전화번호 형식이 올바르지 않습니다 (예: 010-1234-5678)';
+        }
+        return null;
+      }
+    },
+    department: { 
+      required: formData.role === UserRoleEnum.CUSTOMER,
+      custom: (value: string) => {
+        if (formData.role === UserRoleEnum.CUSTOMER && !value?.trim()) {
+          return '고객의 경우 회사명은 필수입니다';
+        }
+        return null;
+      }
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const newErrors = validateForm(formData);
-    if (Object.keys(newErrors).length === 0) {
-      onSave(formData);
+  const {
+    errors,
+    touched,
+    formRef,
+    handleSubmit: handleFormSubmit,
+    handleFieldChange,
+    resetForm,
+    isSubmitting
+  } = useModalFormValidation(formData, {
+    rules: validationRules,
+    onSubmit: async (data) => {
+      await onSave(data);
       onClose();
-    } else {
-      setErrors(newErrors);
     }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    handleFormSubmit(e);
   };
 
   return (
@@ -90,27 +134,34 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData
       onClose={onClose}
       title={editData ? '사용자 수정' : '사용자 등록'}
       description="사용자 정보를 입력해주세요"
-      size="md"
+      size={MODAL_SIZES.MEDIUM}
       footer={
         <ModalFooter>
-          <button
-            type="button"
+          <Button
+            variant={ButtonVariant.SECONDARY}
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium transition-colors"
           >
             취소
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={ButtonVariant.PRIMARY}
             type="submit"
             form="user-form"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm"
           >
             {editData ? '수정' : '등록'}
-          </button>
+          </Button>
         </ModalFooter>
       }
     >
-      <form id="user-form" onSubmit={handleSubmit}>
+      <form ref={formRef} id="user-form" onSubmit={handleSubmit}>
+        {/* Validation error message */}
+        {Object.keys(errors).length > 0 && Object.keys(touched).length > 0 && (
+          <div className="user-modal__error">
+            <AlertCircle className="user-modal__error-icon" />
+            <span>필수 입력 항목을 모두 입력해주세요</span>
+          </div>
+        )}
+        
         <FormFields
           formData={formData}
           errors={errors}
@@ -120,11 +171,11 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData
         
         {/* 수정 모드가 아닐 때 비밀번호 섹션 표시 */}
         {!editData && (
-          <div className="pt-4 mt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-500 mb-2">
+          <div className="user-modal__info-box">
+            <p className="user-modal__info-text">
               * 초기 비밀번호는 이메일 주소와 동일하게 설정됩니다.
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="user-modal__info-text">
               * 사용자는 첫 로그인 시 비밀번호를 변경해야 합니다.
             </p>
           </div>

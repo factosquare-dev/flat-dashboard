@@ -1,26 +1,21 @@
-// Project related types
-export type ServiceType = 'OEM' | 'ODM' | 'OBM' | 'Private Label' | 'White Label' | '기타';
+// Re-export from centralized enums
+export { 
+  ProjectStatus, 
+  ProjectType, 
+  Priority, 
+  ServiceType,
+  DepositStatus 
+} from './enums';
 
-// Export enums for better type safety
-export enum ProjectStatus {
-  PLANNING = 'PLANNING',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-}
+import { ProjectId, CustomerId, FactoryId, UserId } from './branded';
 
-export enum ProjectType {
-  MASTER = 'MASTER',
-  SUB = 'SUB',
-  TASK = 'TASK',
-}
-
-// Support both Korean and English status for backward compatibility
+// Legacy type aliases - will be removed in future versions
+export type ServiceTypeString = 'OEM' | 'ODM' | 'OBM' | 'Private Label' | 'White Label' | '기타';
 export type ProjectStatusKorean = '시작전' | '진행중' | '완료' | '중단';
-export type Priority = '높음' | '보통' | '낮음' | 'high' | 'medium' | 'low';
+export type PriorityString = '높음' | '보통' | '낮음' | 'high' | 'medium' | 'low';
 
 export interface Customer {
-  id: string;
+  id: CustomerId;
   name: string;
   contactPerson: string;
   contactNumber: string;
@@ -34,55 +29,43 @@ export interface Product {
 }
 
 export interface Project {
-  id: string;
+  id: ProjectId;
   projectNumber?: string;
   name: string;
   type: ProjectType;
-  parentId?: string;
+  parentId?: ProjectId;
   status: ProjectStatus;
-  customerId: string;
+  customerId: CustomerId;
   customer: Customer;
   product: Product;
   quantity: number;
   totalAmount: number;
   depositAmount: number;
-  depositStatus: 'pending' | 'received' | 'refunded';
+  depositStatus: DepositStatus;
   startDate: Date;
   endDate: Date;
-  manufacturerId: string;
-  containerId: string;
-  packagingId: string;
+  manufacturerId: FactoryId;
+  containerId: FactoryId;
+  packagingId: FactoryId;
   priority: Priority;
   progress: number;
-  scheduleId: string;
-  createdBy: string;
+  scheduleId: ProjectId; // Schedule ID is same as Project ID
+  createdBy: UserId;
   createdAt: Date;
   updatedAt: Date;
-  // Legacy fields for backward compatibility
-  client?: string;
-  manager?: string;
-  productType?: string;
-  serviceType?: ServiceType;
-  currentStage?: string[];
-  manufacturer?: string;
-  container?: string;
-  packaging?: string;
-  depositPaid?: boolean;
-  children?: Project[];
-  isExpanded?: boolean;
-  level?: number;
 }
 
-export type FactoryType = 'manufacturing' | 'container' | 'packaging';
+// Re-export FactoryType from enums
+export { FactoryType } from './enums';
 
 export interface ProjectFactory {
-  id: string;
+  id: FactoryId;
   name: string;
   color: string;
   type?: FactoryType;
 }
 
 export interface EditingCell {
-  projectId: string;
+  projectId: ProjectId;
   field: string;
 }

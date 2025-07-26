@@ -1,7 +1,8 @@
-export type UserRole = 'admin' | 'manager' | 'customer';
+import { UserRole } from '../../types/enums';
+import { UserId } from '../../types/branded';
 
 export interface User {
-  id: string;
+  id: UserId;
   email: string;
   name: string;
   role: UserRole;

@@ -2,6 +2,8 @@
  * User type definitions
  */
 
+import { UserId } from './branded';
+
 export enum UserRole {
   ADMIN = 'ADMIN',
   PRODUCT_MANAGER = 'PRODUCT_MANAGER',
@@ -12,7 +14,7 @@ export enum UserRole {
 }
 
 export interface User {
-  id: string;
+  id: UserId;
   username: string;
   email: string;
   name: string;

@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Search } from 'lucide-react';
+import { useDebouncedSearch } from '../../../hooks/common';
+import { cn } from '../../../utils/cn';
+import './SearchBox.css';
 
 interface SearchItem {
   id: string;
@@ -27,7 +30,10 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   data,
   placeholder
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const { searchValue, debouncedValue, setSearchValue } = useDebouncedSearch({
+    delay: 300,
+    minLength: 0
+  });
   const [filteredItems, setFilteredItems] = useState<SearchItem[]>(data);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -45,7 +51,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         left: rect.left
       });
       
-      setSearchTerm('');
+      setSearchValue('');
       setSelectedIndex(0);
       
       // Clear any existing timeout
@@ -85,16 +91,16 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (searchTerm.trim() === '') {
+    if (debouncedValue.trim() === '') {
       setFilteredItems(data);
     } else {
       const filtered = data.filter(item => 
-        item.searchableText.toLowerCase().includes(searchTerm.toLowerCase())
+        item.searchableText.toLowerCase().includes(debouncedValue.toLowerCase())
       );
       setFilteredItems(filtered);
     }
     setSelectedIndex(0);
-  }, [searchTerm, data]);
+  }, [debouncedValue, data]);
 
   // 선택된 항목이 보이도록 스크롤
   useEffect(() => {
@@ -148,27 +154,30 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   return ReactDOM.createPortal(
     <div 
       ref={boxRef}
-      className="fixed bg-white rounded-lg shadow-2xl border border-gray-200 w-80 z-[9999]"
-      style={{ top: `${position.top}px`, left: `${position.left}px` }}
+      className="search-box"
+      style={{ 
+        '--search-box-top': `${position.top}px`,
+        '--search-box-left': `${position.left}px`
+      } as React.CSSProperties}
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
     >
-      <div className="p-2">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+      <div className="search-box__header">
+        <div className="search-box__input-wrapper">
+          <Search className="search-box__icon" />
           <input
             ref={searchInputRef}
             type="text"
             placeholder={placeholder}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full pl-8 pr-3 py-2 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="search-box__input"
           />
         </div>
       </div>
       
-      <div ref={listRef} className="max-h-64 overflow-y-auto">
+      <div ref={listRef} className="search-box__list">
         {filteredItems.map((item, index) => (
           <div
             key={item.id}
@@ -179,27 +188,22 @@ const SearchBox: React.FC<SearchBoxProps> = ({
               onClose();
             }}
             onMouseEnter={() => setSelectedIndex(index)}
-            className={`px-3 py-2 cursor-pointer transition-colors ${
-              index === selectedIndex ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
-            }`}
+            className={cn(
+              'search-box__item',
+              index === selectedIndex && 'search-box__item--selected'
+            )}
           >
-            <div className={`text-xs font-medium truncate ${
-              index === selectedIndex ? 'text-white' : 'text-gray-900'
-            }`}>{item.name}</div>
+            <div className="search-box__item-name">{item.name}</div>
             {item.subText && (
-              <div className={`text-xs truncate ${
-                index === selectedIndex ? 'text-blue-200' : 'text-gray-500'
-              }`}>{item.subText}</div>
+              <div className="search-box__item-subtext">{item.subText}</div>
             )}
             {item.additionalText && (
-              <div className={`text-xs mt-0.5 truncate ${
-                index === selectedIndex ? 'text-blue-200' : 'text-gray-400'
-              }`}>{item.additionalText}</div>
+              <div className="search-box__item-additional">{item.additionalText}</div>
             )}
           </div>
         ))}
         {filteredItems.length === 0 && (
-          <div className="px-3 py-4 text-xs text-gray-500 text-center">
+          <div className="search-box__empty">
             검색 결과가 없습니다
           </div>
         )}

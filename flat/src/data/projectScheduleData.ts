@@ -6,6 +6,7 @@ import { formatDateISO } from '../utils/dateUtils';
 import { factories } from './factories';
 import { TASK_TYPES, FACTORY_TYPES } from '../constants/factory';
 import { mockDataService } from '../services/mockDataService';
+import { ProjectStatus, getProjectStatusFromLabel } from '../types/enums';
 
 // 태스크 타입별 기간 (일)
 const TASK_DURATIONS: { [key: string]: number } = {
@@ -162,9 +163,9 @@ export const generateTasksForProject = (project: Project, projectFactories: Proj
   const isProjectEnded = today > projectEndDate;
   
   // 프로젝트에 할당된 공장 ID들 가져오기
-  const manufacturerFactory = mockDataService.getAllFactories().find(f => f.name === project.manufacturer);
-  const containerFactory = mockDataService.getAllFactories().find(f => f.name === project.container);
-  const packagingFactory = mockDataService.getAllFactories().find(f => f.name === project.packaging);
+  const manufacturerFactory = project.manufacturerId ? mockDataService.getFactoryById(project.manufacturerId) : undefined;
+  const containerFactory = project.containerId ? mockDataService.getFactoryById(project.containerId) : undefined;
+  const packagingFactory = project.packagingId ? mockDataService.getFactoryById(project.packagingId) : undefined;
   
   const assignedFactories = [
     manufacturerFactory,
@@ -197,11 +198,13 @@ export const generateTasksForProject = (project: Project, projectFactories: Proj
         taskStartDate = addDays(today, -10);
         taskEndDate = addDays(today, -3);
         status = 'in-progress'; // 종료일이 지났는데 완료되지 않음
-      } else if (project.status === '완료') {
-        status = 'completed';
-      } else if (project.status === '시작전') {
-        status = 'pending';
-      } else if (project.status === '진행중') {
+      } else {
+        const projectStatus = getProjectStatusFromLabel(project.status);
+        if (projectStatus === ProjectStatus.COMPLETED) {
+          status = 'completed';
+        } else if (projectStatus === ProjectStatus.PLANNING) {
+          status = 'pending';
+        } else if (projectStatus === ProjectStatus.IN_PROGRESS) {
         // 진행중인 프로젝트의 경우 날짜로 판단
         if (taskEndDate < today) {
           status = 'completed';

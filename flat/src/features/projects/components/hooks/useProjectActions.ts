@@ -3,9 +3,9 @@
  */
 
 import { useCallback } from 'react';
-import type { Project } from '../../../../types/project';
-import { useProjects } from '../../../../hooks/useProjects';
-import { formatDate } from '../../../../utils/coreUtils';
+import type { Project } from '@/types/project';
+import { useProjects } from '@/hooks/useProjects';
+import { formatDate } from '@/utils/coreUtils';
 
 export const useProjectActions = () => {
   const projectsHook = useProjects();

@@ -4,9 +4,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { DragState, Task, Project } from '../types';
-import { GANTT_CONSTANTS } from '../constants';
 import { getRowFromY, getColFromX, getDateFromIndex } from '../utils/ganttCalculations';
-import { getTaskById, getProjectByTaskId } from '../utils/ganttHelpers';
 
 interface UseGanttDragProps {
   projects: Project[];
@@ -23,6 +21,13 @@ export const useGanttDrag = ({ projects, setProjects }: UseGanttDragProps) => {
   });
 
   const isDraggingRef = useRef(false);
+  
+  // Helper function to calculate task duration
+  const getDuration = useCallback((startDate: string, endDate: string): number => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  }, []);
 
   // Handle mouse down on task
   const handleMouseDown = useCallback((e: React.MouseEvent, task: Task, element: HTMLElement) => {
@@ -157,14 +162,7 @@ export const useGanttDrag = ({ projects, setProjects }: UseGanttDragProps) => {
       mouseOffset: { x: 0, y: 0 }
     });
     isDraggingRef.current = false;
-  }, [dragState, projects, setProjects]);
-
-  // Helper function to calculate task duration
-  const getDuration = useCallback((startDate: string, endDate: string): number => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-  }, []);
+  }, [dragState, projects, setProjects, getDuration]);
 
   return {
     dragState,

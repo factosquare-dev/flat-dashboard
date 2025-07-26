@@ -6,12 +6,10 @@ interface ProjectRowDragPreviewProps {
     width: number;
     targetProjectId: string;
   };
-  cellWidth: number;
 }
 
 export const ProjectRowDragPreview: React.FC<ProjectRowDragPreviewProps> = React.memo(({
   dragPreview,
-  cellWidth,
 }) => {
   return (
     <div

@@ -5,10 +5,7 @@ import { formatDate } from '../../../utils/coreUtils';
 import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
 import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
 import { useScheduleTasksWithStore } from '../../../hooks/useScheduleTasksWithStore';
-import { useTaskStore } from '../../../stores/taskStore';
 import { factories } from '../../../data/factories';
-import { getDatabaseWithRetry } from '../../../mocks/database/utils';
-import { ProjectType } from '../../../types/project';
 import { storageKeys } from '../../../config';
 import { parseScheduleDate } from '../../../utils/scheduleDateParsing';
 import { addDays, startOfDay } from 'date-fns';
@@ -69,10 +66,15 @@ export const useScheduleState = (
       const database = JSON.parse(localStorage.getItem(storageKeys.mockDbKey) || '{}');
       const projects = database.projects || {};
       
-      let targetProject = null;
+      interface ProjectData {
+        startDate: string;
+        endDate: string;
+      }
+      
+      let targetProject: ProjectData | null = null;
       for (const [id, project] of Object.entries(projects)) {
         if (id === projectId) {
-          targetProject = project as any;
+          targetProject = project as ProjectData;
           break;
         }
       }
@@ -84,7 +86,7 @@ export const useScheduleState = (
           endDate: targetProject.endDate
         };
       }
-    } catch (error) {
+    } catch {
       // Error getting project dates
     }
 
@@ -103,9 +105,6 @@ export const useScheduleState = (
     // Use local date parsing to avoid timezone issues
     const projectStart = parseLocalDate(projectDateRange.startDate);
     const projectEnd = parseLocalDate(projectDateRange.endDate);
-    
-    // 프로젝트 기간 계산
-    const projectDuration = Math.ceil((projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24));
     
     // 패딩 제거 - 프로젝트 날짜와 그리드 날짜를 동일하게 설정
     startDate = startOfDay(projectStart);
@@ -157,29 +156,55 @@ export const useScheduleState = (
     "#06b6d4"  // cyan-500
   ], []);
 
-  // 공장 데이터를 기반으로 초기 프로젝트 생성 - 프로젝트 날짜 기준
-  const initialProjects = participants && participants.length > 0 ? participants : 
-    factories.slice(0, 10).map((factory, index) => {
-      // 프로젝트 기간 내에서 공장별 작업 기간 분배
-      const projectStart = parseLocalDate(projectDateRange.startDate || projectStartDate);
-      const projectEnd = parseLocalDate(projectDateRange.endDate || projectEndDate);
-      const projectDuration = (projectEnd.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24);
-      
-      // 각 공장의 작업을 프로젝트 기간 내에 균등 분배
-      const factoryStartOffset = Math.floor((projectDuration / 10) * index);
-      const factoryDuration = Math.floor(projectDuration / 10 * 0.8); // 80% 기간 사용
-      
-      const factoryStart = new Date(projectStart.getTime() + (factoryStartOffset * 24 * 60 * 60 * 1000));
-      const factoryEnd = new Date(factoryStart.getTime() + (factoryDuration * 24 * 60 * 60 * 1000));
-      
-      return {
-        id: factory.id,
-        name: factory.name,
-        type: factory.type,
-        period: `${formatDate(factoryStart)} ~ ${formatDate(factoryEnd)}`,
-        color: colors[index % colors.length],
-      };
-    });
+  // 공장 데이터를 기반으로 초기 프로젝트 생성 - projectId로 MockDB에서 가져오기
+  const getProjectParticipants = () => {
+    // 이미 participants가 있으면 그대로 사용
+    if (participants && participants.length > 0) {
+      return participants;
+    }
+
+    // projectId가 있으면 MockDB에서 해당 프로젝트의 Schedule 정보 가져오기
+    if (projectId) {
+      try {
+        const database = JSON.parse(localStorage.getItem(storageKeys.mockDbKey) || '{}');
+        const schedules = database.schedules || {};
+        
+        // schedules에서 projectId와 일치하는 Schedule 찾기
+        for (const [scheduleId, schedule] of Object.entries(schedules)) {
+          const scheduleData = schedule as any;
+          if (scheduleData.projectId === projectId && scheduleData.participants) {
+            // Schedule의 participants 사용
+            return scheduleData.participants.map((participant: any, index: number) => ({
+              id: participant.id,
+              name: participant.name,
+              type: participant.type || '',
+              period: participant.period || '',
+              color: participant.color || colors[index % colors.length]
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('[useScheduleState] Error loading participants from MockDB:', error);
+      }
+    }
+
+    // participants가 없고 projectId도 없으면 빈 배열 반환
+    return [];
+  };
+
+  const participantsList = getProjectParticipants();
+  
+  // "공장 추가" 행을 마지막에 추가 (항상 표시)
+  const initialProjects = [
+    ...participantsList,
+    {
+      id: 'ADD_FACTORY_ROW',
+      name: '공장 추가',
+      type: 'ADD_FACTORY',
+      period: '',
+      color: ''
+    }
+  ];
 
   const [projects, setProjects] = useState<Participant[]>(initialProjects);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);

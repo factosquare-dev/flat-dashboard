@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { User } from '../../types/comment';
-import { Send, X } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { managerNames } from '../../data/mockData';
 
 interface CommentInputProps {

@@ -223,7 +223,7 @@ export const suggestTaskScheduling = (
   const projectEnd = dateUtils.parseDate(projectEndDate);
   
   // 첫 번째 사용 가능한 슬롯 찾기
-  let searchDate = new Date(projectStart);
+  const searchDate = new Date(projectStart);
   
   while (searchDate <= projectEnd) {
     const searchStartStr = dateUtils.formatDate(searchDate);

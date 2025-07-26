@@ -1,10 +1,12 @@
-import type { Schedule, Task } from '../types/schedule';
+import type { Schedule } from '../types/schedule';
+import type { MockTask } from '../types/mockSchedule';
 import { formatDateISO } from '../utils/coreUtils';
 import { getRandomManager, getRandomProductType, allClients, managerNames } from './mockData';
 import { mockFactories } from './scheduleMockData';
 import { validateSchedule, TASK_CONSTRAINTS } from '../utils/taskValidation';
 import { FACTORY_TYPES, TASK_TYPES } from '../constants/factory';
 import { mockDataService } from '../services/mockDataService';
+import { ProjectStatusLabel, ProjectStatus, PriorityLabel, Priority, ServiceType, ServiceTypeLabel, TaskStatus } from '../types/enums';
 
 // 날짜 계산 함수
 const addDays = (date: Date, days: number): Date => {
@@ -53,7 +55,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -30)), 
           endDate: formatDate(addDays(today, -27)), 
           color: 'blue', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'sub-1-1'
         },
         {
@@ -64,7 +66,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -26)), 
           endDate: formatDate(addDays(today, -20)), 
           color: 'blue', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'sub-1-1'
         },
         {
@@ -75,7 +77,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -19)), 
           endDate: formatDate(addDays(today, -15)), 
           color: 'blue', 
-          status: 'in-progress', 
+          status: TaskStatus.IN_PROGRESS, 
           projectId: 'sub-1-1'
         }] : [])
       ],
@@ -100,7 +102,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -20)), 
           endDate: formatDate(addDays(today, -17)), 
           color: 'purple', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'sub-1-2'
         },
         {
@@ -111,7 +113,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -16)), 
           endDate: formatDate(addDays(today, -10)), 
           color: 'purple', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'sub-1-2'
         },
         {
@@ -122,7 +124,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -9)), 
           endDate: formatDate(addDays(today, -5)), 
           color: 'purple', 
-          status: 'in-progress', 
+          status: TaskStatus.IN_PROGRESS, 
           projectId: 'sub-1-2'
         }] : [])
       ],
@@ -151,7 +153,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -30)), 
           endDate: formatDate(addDays(today, -27)), 
           color: 'blue', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-001'
         },
         {
@@ -162,7 +164,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -26)), 
           endDate: formatDate(addDays(today, -20)), 
           color: 'blue', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-001'
         },
         {
@@ -173,7 +175,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -19)), 
           endDate: formatDate(addDays(today, -15)), 
           color: 'blue', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-001', 
           assignee: mockDataService.getAssigneeForFactoryId(manufacturingFactories[0].id)
         }] : []),
@@ -187,7 +189,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -14)), 
           endDate: formatDate(addDays(today, -10)), 
           color: 'red', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-001'
         },
         {
@@ -198,13 +200,13 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -9)), 
           endDate: formatDate(addDays(today, -5)), 
           color: 'red', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-001'
         }] : []),
         
         // 포장 공장 태스크들 - 순차적으로 진행, 겹치지 않음
-        { id: 7, factory: packagingFactories[0]?.name || '(주)네트모베이지', factoryId: packagingFactories[0]?.id || 'pack-1', taskType: TASK_TYPES.PACKAGING.DESIGN, startDate: formatDate(addDays(today, 5)), endDate: formatDate(addDays(today, 9)), color: 'yellow', status: 'pending', projectId: 'proj-001' },
-        { id: 8, factory: packagingFactories[0]?.name || '(주)네트모베이지', factoryId: packagingFactories[0]?.id || 'pack-1', taskType: TASK_TYPES.PACKAGING.PACKAGING_WORK, startDate: formatDate(addDays(today, 10)), endDate: formatDate(addDays(today, 14)), color: 'yellow', status: 'pending', projectId: 'proj-001' }
+        { id: 7, factory: packagingFactories[0]?.name || '(주)네트모베이지', factoryId: packagingFactories[0]?.id || 'pack-1', taskType: TASK_TYPES.PACKAGING.DESIGN, startDate: formatDate(addDays(today, 5)), endDate: formatDate(addDays(today, 9)), color: 'yellow', status: TaskStatus.PENDING, projectId: 'proj-001' },
+        { id: 8, factory: packagingFactories[0]?.name || '(주)네트모베이지', factoryId: packagingFactories[0]?.id || 'pack-1', taskType: TASK_TYPES.PACKAGING.PACKAGING_WORK, startDate: formatDate(addDays(today, 10)), endDate: formatDate(addDays(today, 14)), color: 'yellow', status: TaskStatus.PENDING, projectId: 'proj-001' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -222,15 +224,15 @@ export const createMockSchedules = (): Schedule[] => {
       ].filter(Boolean),
       tasks: [
         // 제조 공장 태스크들 - 순차적으로 진행, 겹치지 않음 (두 번째 제조 공장 사용)
-        { id: 9, factory: manufacturingFactories[1]?.name || '주식회사 코스모로스', factoryId: manufacturingFactories[1]?.id || 'mfg-2', taskType: TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT, startDate: formatDate(addDays(today, -20)), endDate: formatDate(addDays(today, -17)), color: 'purple', status: 'completed', projectId: 'proj-002' },
-        { id: 10, factory: manufacturingFactories[1]?.name || '주식회사 코스모로스', factoryId: manufacturingFactories[1]?.id || 'mfg-2', taskType: TASK_TYPES.MANUFACTURING.MIXING, startDate: formatDate(addDays(today, -16)), endDate: formatDate(addDays(today, -10)), color: 'purple', status: 'completed', projectId: 'proj-002' },
-        { id: 13, factory: manufacturingFactories[1]?.name || '주식회사 코스모로스', factoryId: manufacturingFactories[1]?.id || 'mfg-2', taskType: TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK, startDate: formatDate(addDays(today, -9)), endDate: formatDate(addDays(today, -5)), color: 'purple', status: 'completed', projectId: 'proj-002' },
+        { id: 9, factory: manufacturingFactories[1]?.name || '주식회사 코스모로스', factoryId: manufacturingFactories[1]?.id || 'mfg-2', taskType: TASK_TYPES.MANUFACTURING.MATERIAL_RECEIPT, startDate: formatDate(addDays(today, -20)), endDate: formatDate(addDays(today, -17)), color: 'purple', status: TaskStatus.COMPLETED, projectId: 'proj-002' },
+        { id: 10, factory: manufacturingFactories[1]?.name || '주식회사 코스모로스', factoryId: manufacturingFactories[1]?.id || 'mfg-2', taskType: TASK_TYPES.MANUFACTURING.MIXING, startDate: formatDate(addDays(today, -16)), endDate: formatDate(addDays(today, -10)), color: 'purple', status: TaskStatus.COMPLETED, projectId: 'proj-002' },
+        { id: 13, factory: manufacturingFactories[1]?.name || '주식회사 코스모로스', factoryId: manufacturingFactories[1]?.id || 'mfg-2', taskType: TASK_TYPES.MANUFACTURING.FIRST_QUALITY_CHECK, startDate: formatDate(addDays(today, -9)), endDate: formatDate(addDays(today, -5)), color: 'purple', status: TaskStatus.COMPLETED, projectId: 'proj-002' },
         
         // 용기 공장 태스크들 - 순차적으로 진행, 겹치지 않음 (두 번째 용기 공장 사용)
-        { id: 11, factory: containerFactories[1]?.name || '삼화플라스틱', factoryId: containerFactories[1]?.id || 'cont-2', taskType: TASK_TYPES.CONTAINER.INJECTION_MOLDING, startDate: formatDate(addDays(today, -4)), endDate: formatDate(addDays(today, 1)), color: 'green', status: 'in-progress', projectId: 'proj-002' },
+        { id: 11, factory: containerFactories[1]?.name || '삼화플라스틱', factoryId: containerFactories[1]?.id || 'cont-2', taskType: TASK_TYPES.CONTAINER.INJECTION_MOLDING, startDate: formatDate(addDays(today, -4)), endDate: formatDate(addDays(today, 1)), color: 'green', status: TaskStatus.IN_PROGRESS, projectId: 'proj-002' },
         
         // 포장 공장 태스크들 - 순차적으로 진행, 겹치지 않음 (두 번째 포장 공장 사용)
-        { id: 12, factory: packagingFactories[1]?.name || '서울포장산업(주)', factoryId: packagingFactories[1]?.id || 'pack-2', taskType: TASK_TYPES.PACKAGING.LABEL_ATTACHMENT, startDate: formatDate(addDays(today, 10)), endDate: formatDate(addDays(today, 13)), color: 'orange', status: 'pending', projectId: 'proj-002' }
+        { id: 12, factory: packagingFactories[1]?.name || '서울포장산업(주)', factoryId: packagingFactories[1]?.id || 'pack-2', taskType: TASK_TYPES.PACKAGING.LABEL_ATTACHMENT, startDate: formatDate(addDays(today, 10)), endDate: formatDate(addDays(today, 13)), color: 'orange', status: TaskStatus.PENDING, projectId: 'proj-002' }
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -255,7 +257,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -45)), 
           endDate: formatDate(addDays(today, -42)), 
           color: 'teal', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-003'
         },
         {
@@ -266,7 +268,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -41)), 
           endDate: formatDate(addDays(today, -35)), 
           color: 'teal', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-003'
         },
         {
@@ -277,7 +279,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -34)), 
           endDate: formatDate(addDays(today, -30)), 
           color: 'teal', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-003'
         },
         {
@@ -288,7 +290,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -29)), 
           endDate: formatDate(addDays(today, -25)), 
           color: 'teal', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-003'
         }] : []),
         
@@ -301,7 +303,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -24)), 
           endDate: formatDate(addDays(today, -20)), 
           color: 'indigo', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-003'
         }] : [])
       ],
@@ -327,7 +329,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, 30)), 
           endDate: formatDate(addDays(today, 33)), 
           color: 'pink', 
-          status: 'pending', 
+          status: TaskStatus.PENDING, 
           projectId: 'proj-004'
         },
         {
@@ -338,7 +340,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, 34)), 
           endDate: formatDate(addDays(today, 41)), 
           color: 'pink', 
-          status: 'pending', 
+          status: TaskStatus.PENDING, 
           projectId: 'proj-004'
         },
         {
@@ -349,7 +351,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, 42)), 
           endDate: formatDate(addDays(today, 47)), 
           color: 'pink', 
-          status: 'pending', 
+          status: TaskStatus.PENDING, 
           projectId: 'proj-004'
         }] : [])
       ],
@@ -375,7 +377,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -60)), 
           endDate: formatDate(addDays(today, -57)), 
           color: 'gray', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-005'
         },
         {
@@ -386,7 +388,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -56)), 
           endDate: formatDate(addDays(today, -49)), 
           color: 'gray', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-005'
         },
         {
@@ -397,7 +399,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -48)), 
           endDate: formatDate(addDays(today, -41)), 
           color: 'gray', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-005'
         },
         {
@@ -408,7 +410,7 @@ export const createMockSchedules = (): Schedule[] => {
           startDate: formatDate(addDays(today, -40)), 
           endDate: formatDate(addDays(today, -33)), 
           color: 'gray', 
-          status: 'completed', 
+          status: TaskStatus.COMPLETED, 
           projectId: 'proj-005'
         }] : [])
       ],
@@ -438,7 +440,7 @@ export interface ProjectFromSchedule {
   manager: string;
   serviceType: 'OEM' | 'ODM' | 'OBM' | 'Private Label' | 'White Label';
   currentStage: string[];
-  status: '시작전' | '진행중' | '완료';
+  status: string; // Will use ProjectStatusLabel values
   progress: number;
   startDate: string;
   endDate: string;
@@ -447,7 +449,7 @@ export interface ProjectFromSchedule {
   packaging: string;
   sales: string;
   purchase: string;
-  priority: '높음' | '보통' | '낮음';
+  priority: string; // Will use PriorityLabel values
 }
 
 export const extractProjectFromSchedule = (schedule: Schedule): ProjectFromSchedule => {
@@ -461,7 +463,7 @@ export const extractProjectFromSchedule = (schedule: Schedule): ProjectFromSched
     .filter(task => {
       const startDate = new Date(task.startDate);
       const endDate = new Date(task.endDate);
-      return task.status === 'in-progress' && startDate <= today && endDate >= today;
+      return task.status === TaskStatus.IN_PROGRESS && startDate <= today && endDate >= today;
     })
     .map(task => task.taskType);
   
@@ -471,13 +473,13 @@ export const extractProjectFromSchedule = (schedule: Schedule): ProjectFromSched
   const progress = Math.round((completedTasks / totalTasks) * 100);
   
   // 상태 계산
-  let status: '시작전' | '진행중' | '완료' = '시작전';
-  if (schedule.tasks.every(t => t.status === 'completed')) {
-    status = '완료';
-  } else if (schedule.tasks.some(t => t.status === 'in-progress')) {
-    status = '진행중';
-  } else if (schedule.tasks.some(t => t.status === 'completed')) {
-    status = '진행중';
+  let status = ProjectStatusLabel[ProjectStatus.PLANNING];
+  if (schedule.tasks.every(t => t.status === TaskStatus.COMPLETED)) {
+    status = ProjectStatusLabel[ProjectStatus.COMPLETED];
+  } else if (schedule.tasks.some(t => t.status === TaskStatus.IN_PROGRESS)) {
+    status = ProjectStatusLabel[ProjectStatus.IN_PROGRESS];
+  } else if (schedule.tasks.some(t => t.status === TaskStatus.COMPLETED)) {
+    status = ProjectStatusLabel[ProjectStatus.IN_PROGRESS];
   }
   
   // 참여 공장 분류 - Mock DB에서 공장 타입별로 분류
@@ -500,7 +502,7 @@ export const extractProjectFromSchedule = (schedule: Schedule): ProjectFromSched
     client,
     productType,
     manager: getRandomManager(),
-    serviceType: ['OEM', 'ODM', 'OBM', 'Private Label', 'White Label'][Math.floor(Math.random() * 5)] as any,
+    serviceType: Object.values(ServiceTypeLabel).filter(v => v !== ServiceTypeLabel[ServiceType.OTHER])[Math.floor(Math.random() * 5)],
     currentStage: currentStages,
     status,
     progress,
@@ -511,6 +513,6 @@ export const extractProjectFromSchedule = (schedule: Schedule): ProjectFromSched
     packaging,
     sales: `${Math.floor(Math.random() * 2000000000) + 300000000}`,
     purchase: `${Math.floor(Math.random() * 1000000000) + 200000000}`,
-    priority: progress < 30 ? '낮음' : progress > 70 ? '높음' : '보통'
+    priority: progress < 30 ? PriorityLabel[Priority.LOW] : progress > 70 ? PriorityLabel[Priority.HIGH] : PriorityLabel[Priority.MEDIUM]
   };
 };

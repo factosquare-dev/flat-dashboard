@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import type { Project } from '../../../types/project';
 import { formatCurrency, parseCurrency } from '../../../utils/coreUtils';
 import { factoriesByType } from '../../../data/mockData';
@@ -29,9 +29,20 @@ const EditableCell: React.FC<EditableCellProps> = ({
     isEditing,
     handleSearch
   } = editableCell;
+  
+  const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const value = project[field];
   const editing = isEditing(project.id, field);
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (type === 'search' && editing) {
     // 필드에 따라 다른 검색 리스트 사용
@@ -62,8 +73,14 @@ const EditableCell: React.FC<EditableCellProps> = ({
             defaultValue={value as string}
             onChange={(e) => handleSearch(e.target.value, searchList)}
             onBlur={() => {
-              setTimeout(() => {
+              // Clear any existing timeout
+              if (blurTimeoutRef.current) {
+                clearTimeout(blurTimeoutRef.current);
+              }
+              // Set new timeout
+              blurTimeoutRef.current = setTimeout(() => {
                 stopEditing();
+                blurTimeoutRef.current = null;
               }, 200);
             }}
             onKeyDown={(e) => {

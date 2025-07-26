@@ -1,14 +1,15 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useStore } from '../store';
 import { lightTheme, darkTheme } from '../styles/themes';
+import { Theme } from '../types/enums';
 
-type Theme = typeof lightTheme;
+type ThemeObject = typeof lightTheme;
 
 interface ThemeContextType {
-  theme: Theme;
+  theme: ThemeObject;
   isDark: boolean;
   toggleTheme: () => void;
-  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  setTheme: (theme: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);

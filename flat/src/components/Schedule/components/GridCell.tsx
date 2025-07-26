@@ -1,6 +1,8 @@
 import React from 'react';
 import { isWeekend, isToday, formatDateISO } from '../../../utils/coreUtils';
 import { getCellBackgroundClasses, getCellHoverClasses, gridColors } from '../../../design-system/colors/grid';
+import { cn } from '../../../utils/cn';
+import './GridCell.css';
 
 interface GridCellProps {
   day: Date;
@@ -29,21 +31,25 @@ const GridCell: React.FC<GridCellProps> = ({
   if (isAddFactoryRow) {
     return (
       <div
-        className={getCellBackgroundClasses(isTodayCell, isWeekendDay, true)}
-        style={{ width: `${cellWidth}px` }}
+        className={cn(
+          'grid-cell',
+          'grid-cell--add-factory',
+          getCellBackgroundClasses(isTodayCell, isWeekendDay, true)
+        )}
+        style={{ '--cell-width': `${cellWidth}px` } as React.CSSProperties}
       />
     );
   }
 
   return (
     <div
-      className={`cursor-pointer transition-colors relative border-r ${gridColors.border.cell} ${
-        getCellBackgroundClasses(isTodayCell, isWeekendDay)
-      } ${getCellHoverClasses(isTodayCell, isWeekendDay)}`}
-      style={{ 
-        width: `${cellWidth}px`, 
-        height: '100%'
-      }}
+      className={cn(
+        'grid-cell',
+        'grid-cell--interactive',
+        getCellBackgroundClasses(isTodayCell, isWeekendDay),
+        getCellHoverClasses(isTodayCell, isWeekendDay)
+      )}
+      style={{ '--cell-width': `${cellWidth}px` } as React.CSSProperties}
       onClick={onClick}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}

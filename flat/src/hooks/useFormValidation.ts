@@ -2,9 +2,9 @@ import { useState, useCallback, useMemo } from 'react';
 
 type ValidationRule<T> = (value: T) => string | null;
 
-interface ValidationRules<T> {
-  [key: string]: ValidationRule<any> | ValidationRule<any>[];
-}
+type ValidationRules<T> = {
+  [K in keyof T]?: ValidationRule<T[K]> | ValidationRule<T[K]>[];
+};
 
 interface UseFormValidationOptions<T> {
   initialValues: T;
@@ -19,12 +19,12 @@ interface UseFormValidationReturn<T> {
   touched: Partial<Record<keyof T, boolean>>;
   isValid: boolean;
   isDirty: boolean;
-  handleChange: (field: keyof T, value: any) => void;
+  handleChange: <K extends keyof T>(field: K, value: T[K]) => void;
   handleBlur: (field: keyof T) => void;
   validate: () => boolean;
   validateField: (field: keyof T) => boolean;
   reset: () => void;
-  setFieldValue: (field: keyof T, value: any) => void;
+  setFieldValue: <K extends keyof T>(field: K, value: T[K]) => void;
   setFieldError: (field: keyof T, error: string | null) => void;
 }
 
@@ -33,7 +33,7 @@ interface UseFormValidationReturn<T> {
  * @param options - Form validation options
  * @returns Form state and validation functions
  */
-export function useFormValidation<T extends Record<string, any>>(
+export function useFormValidation<T extends Record<string, unknown>>(
   options: UseFormValidationOptions<T>
 ): UseFormValidationReturn<T> {
   const {
@@ -60,7 +60,7 @@ export function useFormValidation<T extends Record<string, any>>(
   const validateField = useCallback(
     (field: keyof T): boolean => {
       const value = values[field];
-      const rules = validationRules[field as string];
+      const rules = validationRules[field];
 
       if (!rules) {
         setErrors(prev => {
@@ -95,15 +95,17 @@ export function useFormValidation<T extends Record<string, any>>(
     const newErrors: Partial<Record<keyof T, string>> = {};
     let isValid = true;
 
-    Object.keys(validationRules).forEach(field => {
-      const value = values[field as keyof T];
+    (Object.keys(validationRules) as Array<keyof T>).forEach(field => {
+      const value = values[field];
       const rules = validationRules[field];
+      if (!rules) return;
+      
       const rulesArray = Array.isArray(rules) ? rules : [rules];
 
       for (const rule of rulesArray) {
         const error = rule(value);
         if (error) {
-          newErrors[field as keyof T] = error;
+          newErrors[field] = error;
           isValid = false;
           break;
         }
@@ -115,7 +117,7 @@ export function useFormValidation<T extends Record<string, any>>(
   }, [values, validationRules]);
 
   const handleChange = useCallback(
-    (field: keyof T, value: any) => {
+    <K extends keyof T>(field: K, value: T[K]) => {
       setValues(prev => ({ ...prev, [field]: value }));
       
       if (validateOnChange && touched[field]) {
@@ -142,7 +144,7 @@ export function useFormValidation<T extends Record<string, any>>(
     setTouched({});
   }, [initialValues]);
 
-  const setFieldValue = useCallback((field: keyof T, value: any) => {
+  const setFieldValue = useCallback(<K extends keyof T>(field: K, value: T[K]) => {
     setValues(prev => ({ ...prev, [field]: value }));
   }, []);
 
@@ -176,7 +178,7 @@ export function useFormValidation<T extends Record<string, any>>(
 
 // Common validation rules
 export const validationRules = {
-  required: (message = '필수 입력 항목입니다') => (value: any) => {
+  required: (message = '필수 입력 항목입니다') => (value: unknown) => {
     if (value === null || value === undefined || value === '') {
       return message;
     }
@@ -211,7 +213,7 @@ export const validationRules = {
     return null;
   },
 
-  number: (message = '숫자만 입력 가능합니다') => (value: any) => {
+  number: (message = '숫자만 입력 가능합니다') => (value: unknown) => {
     if (value && isNaN(Number(value))) {
       return message;
     }

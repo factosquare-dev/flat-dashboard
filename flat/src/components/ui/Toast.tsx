@@ -1,43 +1,36 @@
 import React, { useEffect } from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
 import { useStore } from '../../store';
+import { ToastVariant } from '../../types/enums';
+import { cn } from '../../utils/cn';
+import './Toast.css';
 
-const toastVariants = cva(
-  'relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-4 shadow-lg transition-all',
-  {
-    variants: {
-      variant: {
-        default: 'bg-white border-gray-200',
-        success: 'bg-green-50 border-green-200',
-        error: 'bg-red-50 border-red-200',
-        warning: 'bg-yellow-50 border-yellow-200',
-        info: 'bg-blue-50 border-blue-200',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-    },
-  }
-);
+const variantClassMap = {
+  [ToastVariant.DEFAULT]: 'toast--default',
+  [ToastVariant.SUCCESS]: 'toast--success',
+  [ToastVariant.ERROR]: 'toast--error',
+  [ToastVariant.WARNING]: 'toast--warning',
+  [ToastVariant.INFO]: 'toast--info',
+};
 
 const iconMap = {
-  default: Info,
-  success: CheckCircle,
-  error: XCircle,
-  warning: AlertCircle,
-  info: Info,
+  [ToastVariant.DEFAULT]: Info,
+  [ToastVariant.SUCCESS]: CheckCircle,
+  [ToastVariant.ERROR]: XCircle,
+  [ToastVariant.WARNING]: AlertCircle,
+  [ToastVariant.INFO]: Info,
 };
 
-const colorMap = {
-  default: 'text-gray-600',
-  success: 'text-green-600',
-  error: 'text-red-600',
-  warning: 'text-yellow-600',
-  info: 'text-blue-600',
+const iconColorMap = {
+  [ToastVariant.DEFAULT]: 'toast__icon--default',
+  [ToastVariant.SUCCESS]: 'toast__icon--success',
+  [ToastVariant.ERROR]: 'toast__icon--error',
+  [ToastVariant.WARNING]: 'toast__icon--warning',
+  [ToastVariant.INFO]: 'toast__icon--info',
 };
 
-interface ToastProps extends VariantProps<typeof toastVariants> {
+interface ToastProps {
+  variant?: ToastVariant;
   id: string;
   title: string;
   message?: string;
@@ -49,12 +42,12 @@ export const Toast: React.FC<ToastProps> = ({
   id,
   title,
   message,
-  variant = 'default',
+  variant = ToastVariant.DEFAULT,
   duration = 5000,
   onClose,
 }) => {
-  const Icon = iconMap[variant || 'default'];
-  const iconColor = colorMap[variant || 'default'];
+  const Icon = iconMap[variant || ToastVariant.DEFAULT];
+  const iconColorClass = iconColorMap[variant || ToastVariant.DEFAULT];
 
   useEffect(() => {
     if (duration > 0) {
@@ -67,21 +60,21 @@ export const Toast: React.FC<ToastProps> = ({
   }, [duration, onClose]);
 
   return (
-    <div className={toastVariants({ variant })}>
-      <div className="flex items-start space-x-3">
-        <Icon className={`h-5 w-5 ${iconColor} flex-shrink-0 mt-0.5`} />
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-900">{title}</p>
+    <div className={cn('toast', variantClassMap[variant])}>
+      <div className="toast__content">
+        <Icon className={cn('toast__icon', iconColorClass)} />
+        <div className="toast__text">
+          <p className="toast__title">{title}</p>
           {message && (
-            <p className="text-sm text-gray-600 mt-1">{message}</p>
+            <p className="toast__message">{message}</p>
           )}
         </div>
       </div>
       <button
         onClick={onClose}
-        className="flex-shrink-0 ml-4 text-gray-400 hover:text-gray-500 focus:outline-none"
+        className="toast__close"
       >
-        <X className="h-4 w-4" />
+        <X className="toast__close-icon" />
       </button>
     </div>
   );
@@ -93,7 +86,7 @@ export const ToastContainer: React.FC = () => {
   if (notifications.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 max-w-sm">
+    <div className="toast-container">
       {notifications.map((notification) => (
         <Toast
           key={notification.id}

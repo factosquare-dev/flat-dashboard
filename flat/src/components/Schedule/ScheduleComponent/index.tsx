@@ -19,13 +19,11 @@ const Schedule: React.FC<ScheduleProps> = ({
   endDate: projectEndDate,
   projectName,
   projectId,
-  className = '',
-  onBack,
-  isLoading = false
+  onBack
 }) => {
   const [gridWidth, setGridWidth] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
-  const { containerStyle, debugInfo } = useDynamicLayout();
+  const { containerStyle } = useDynamicLayout();
   const { error: toastError } = useToast();
   
 
@@ -34,7 +32,7 @@ const Schedule: React.FC<ScheduleProps> = ({
   }, []);
 
   // Use taskStore for unified data management
-  const { getTasksForProject, updateTask, deleteTask, addTask } = useTaskStore();
+  const { getTasksForProject } = useTaskStore();
   const storeTasks = projectId ? getTasksForProject(projectId) : [];
   
   const {
@@ -42,7 +40,6 @@ const Schedule: React.FC<ScheduleProps> = ({
     projects,
     setProjects,
     selectedProjects,
-    tasks,
     taskControls,
     dragControls,
     modalState,
@@ -53,7 +50,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     handleSelectAll
   } = useScheduleState(participants, projectStartDate, projectEndDate, gridWidth, storeTasks.length > 0 ? storeTasks : initialTasks, projectId);
 
-  const { scrollToToday, handleSliderChange } = useScheduleEffects(
+  useScheduleEffects(
     dateRange.days,
     dragControls.scrollRef,
     sliderValue,
@@ -148,7 +145,6 @@ const Schedule: React.FC<ScheduleProps> = ({
           onDeleteProject={handleDeleteProject}
           onProjectSelect={handleProjectSelect}
           onSelectAll={handleSelectAll}
-          onTaskCreate={handleQuickTaskCreate}
           onAddTask={handleAddTask}
           onGridWidthChange={handleGridWidthChange}
           onQuickTaskCreate={handleQuickTaskCreate}

@@ -1,5 +1,7 @@
 import React from 'react';
 import type { Task } from '../../types/schedule';
+import { cn } from '../../utils/cn';
+import './TaskItem.css';
 
 interface TaskItemProps {
   task: Task;
@@ -31,17 +33,15 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
   return (
     <div
-      className={`absolute flex items-center justify-center text-white text-xs font-medium rounded cursor-pointer transition-all ${
-        task.color
-      } ${isHovered ? 'ring-2 ring-offset-2 ring-blue-400 z-20' : 'z-10'} ${
-        task.isCompleted ? 'opacity-60' : ''
-      }`}
+      className={cn(
+        'task-item',
+        task.color,
+        isHovered && 'task-item--hovered',
+        task.isCompleted && 'task-item--completed'
+      )}
       style={{
         left: `${task.x}px`,
-        width: `${task.width}px`,
-        height: '32px',
-        top: '50%',
-        transform: 'translateY(-50%)'
+        width: `${task.width}px`
       }}
       onClick={() => onTaskClick(task)}
       draggable
@@ -54,14 +54,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
     >
       {/* Resize handles */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black hover:bg-opacity-20"
+        className="task-item__resize-handle task-item__resize-handle--start"
         onMouseDown={(e) => {
           e.stopPropagation();
           onTaskMouseDown(e, task, 'start');
         }}
       />
       <div
-        className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black hover:bg-opacity-20"
+        className="task-item__resize-handle task-item__resize-handle--end"
         onMouseDown={(e) => {
           e.stopPropagation();
           onTaskMouseDown(e, task, 'end');
@@ -69,7 +69,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
       />
       
       {/* Task content */}
-      <span className="px-2 truncate pointer-events-none select-none">
+      <span className="task-item__content">
         {task.title}
       </span>
     </div>

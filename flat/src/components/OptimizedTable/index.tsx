@@ -10,7 +10,7 @@ interface Column<T> {
   title: string;
   width?: string | number;
   minWidth?: string | number;
-  render?: (value: any, record: T, index: number) => React.ReactNode;
+  render?: (value: T[keyof T] | unknown, record: T, index: number) => React.ReactNode;
   sortable?: boolean;
   fixed?: 'left' | 'right';
   className?: string;
@@ -87,8 +87,8 @@ const TableRow = React.memo(<T,>({
     >
       {columns.map((column, colIndex) => {
         const value = typeof column.key === 'string' && column.key.includes('.') 
-          ? column.key.split('.').reduce((obj, key) => obj?.[key], record as any)
-          : (record as any)[column.key];
+          ? column.key.split('.').reduce((obj: unknown, key) => (obj as Record<string, unknown>)?.[key], record as unknown)
+          : record[column.key as keyof T];
 
         const cellClassName = `px-4 py-3 text-sm text-gray-900 ${column.className || ''}`;
 
@@ -140,25 +140,26 @@ const TableHeader = React.memo(<T,>({
     onSort(columnKey, newDirection);
   }, [onSort, sortConfig]);
 
+  const getThClassName = (isSortable: boolean) => {
+    const classes = [
+      'px-4', 'py-3', 'text-left', 'text-xs', 'font-medium', 
+      'text-gray-500', 'uppercase', 'tracking-wider'
+    ];
+    
+    if (isSortable) {
+      classes.push('cursor-pointer', 'hover:bg-gray-100');
+    }
+    
+    return classes.join(' ');
+  };
+
   return (
     <thead className={headerClassName}>
       <tr>
         {columns.map((column, index) => {
           const isCurrentSort = sortConfig?.key === column.key;
           const isSortable = column.sortable && onSort;
-          
-          const thClassName = useMemo(() => {
-            const classes = [
-              'px-4', 'py-3', 'text-left', 'text-xs', 'font-medium', 
-              'text-gray-500', 'uppercase', 'tracking-wider'
-            ];
-            
-            if (isSortable) {
-              classes.push('cursor-pointer', 'hover:bg-gray-100');
-            }
-            
-            return classes.join(' ');
-          }, [isSortable]);
+          const thClassName = getThClassName(!!isSortable);
 
           return (
             <th
@@ -302,7 +303,7 @@ function OptimizedTable<T>({
 }
 
 export default React.memo(OptimizedTable) as <T>(
-  props: OptimizedTableProps<T> & { ref?: React.Ref<any> }
+  props: OptimizedTableProps<T> & { ref?: React.Ref<HTMLDivElement> }
 ) => React.ReactElement;
 
 export type { Column, OptimizedTableProps };

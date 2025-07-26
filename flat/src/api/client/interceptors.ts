@@ -1,5 +1,6 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError } from 'axios';
 import { APP_CONSTANTS } from '../../config/constants';
+import { clearAllStorage, getAuthToken, clearAuthTokens } from '../../utils/storageConversions';
 
 interface RetryConfig {
   retries?: number;
@@ -135,8 +136,12 @@ export function setupRetryInterceptor(
       }
 
       // Get retry config from request or use defaults
-      const retryConfig = (requestConfig as any).__retryConfig || config;
-      const currentRetryCount = (requestConfig as any).__retryCount || 0;
+      const extendedConfig = requestConfig as typeof requestConfig & {
+        __retryConfig?: RetryConfig;
+        __retryCount?: number;
+      };
+      const retryConfig = extendedConfig.__retryConfig || config;
+      const currentRetryCount = extendedConfig.__retryCount || 0;
 
       if (
         currentRetryCount >= (retryConfig.retries || 0) ||
@@ -146,8 +151,8 @@ export function setupRetryInterceptor(
       }
 
       // Increment retry count
-      (requestConfig as any).__retryCount = currentRetryCount + 1;
-      (requestConfig as any).__retryConfig = retryConfig;
+      extendedConfig.__retryCount = currentRetryCount + 1;
+      extendedConfig.__retryConfig = retryConfig;
 
       // Calculate delay
       const delay = retryConfig.retryDelay?.(currentRetryCount) || 1000;
@@ -182,9 +187,9 @@ export function setupCommonHeadersInterceptor(
 /**
  * Response interceptor for transforming response data
  */
-export function setupTransformInterceptor<T = any>(
+export function setupTransformInterceptor<T = unknown>(
   axiosInstance: AxiosInstance,
-  transform: (data: any) => T
+  transform: (data: unknown) => T
 ) {
   axiosInstance.interceptors.response.use(
     (response) => {
@@ -225,11 +230,11 @@ export const apiClient = axios.create({
 // Setup interceptors
 setupCommonHeadersInterceptor(apiClient, {
   'X-Client-Version': '1.0.0',
-  'X-Request-ID': () => `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+  'X-Request-ID': () => `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
 });
 
 setupAuthInterceptor(apiClient, () => {
-  return localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
+  return getAuthToken();
 });
 
 setupLoggingInterceptor(apiClient);
@@ -241,8 +246,8 @@ setupRetryInterceptor(apiClient, {
 
 setupErrorInterceptor(apiClient, {
   onUnauthorized: () => {
-    localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
-    localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
+    // Clear all storage including branded types
+    clearAllStorage();
     window.location.href = APP_CONSTANTS.ROUTES.LOGIN;
   },
   onNetworkError: (error) => {

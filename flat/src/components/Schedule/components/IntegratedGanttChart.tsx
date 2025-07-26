@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react';
 import type { Participant, Task } from '../../../types/schedule';
+import { TaskStatus } from '../../../types/enums';
 import GanttHeader from '../../GanttChart/GanttHeader';
 import ProjectSidebar from '../../GanttChart/ProjectSidebar';
 import GanttGrid from '../../GanttChart/GanttGrid';
@@ -13,9 +14,6 @@ interface IntegratedGanttChartProps {
   participants: Participant[];
   tasks: Task[];
   onTaskUpdate?: (taskId: string, updates: Partial<Task>) => void;
-  onTaskCreate?: (task: Omit<Task, 'id'>) => void;
-  onTaskDelete?: (taskId: string) => void;
-  onProjectDelete?: (projectId: string) => void;
   onProjectToggle?: (projectId: string) => void;
 }
 
@@ -41,9 +39,6 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
   participants,
   tasks,
   onTaskUpdate,
-  onTaskCreate,
-  onTaskDelete,
-  onProjectDelete,
   onProjectToggle
 }) => {
   // Convert participants and tasks to GanttChart's Project format
@@ -81,7 +76,7 @@ const IntegratedGanttChart: React.FC<IntegratedGanttChartProps> = ({
             projectId: participant.id,
             startDate: typeof task.startDate === 'string' ? task.startDate : task.startDate.toISOString().split('T')[0],
             endDate: typeof task.endDate === 'string' ? task.endDate : task.endDate.toISOString().split('T')[0],
-            status: task.status || 'pending',
+            status: task.status || TaskStatus.PENDING,
             progress: task.progress || 0
           };
           

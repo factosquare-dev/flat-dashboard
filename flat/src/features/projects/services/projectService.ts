@@ -10,6 +10,11 @@ import type {
   DeleteProjectResponse 
 } from '../../../types/api';
 import { API_ENDPOINTS } from '../../../types/api';
+import { 
+  transformApiProject, 
+  transformApiProjectList, 
+  transformProjectToApi 
+} from '../../../api/transformers';
 
 class ProjectService {
   private readonly basePath = API_ENDPOINTS.PROJECTS;
@@ -19,7 +24,7 @@ class ProjectService {
     pagination?: PaginationParams,
     sort?: SortParams
   ): Promise<ApiResponse<{ projects: Project[]; total: number }>> {
-    return apiClient.get<{ projects: Project[]; total: number }>(this.basePath, {
+    const response = await apiClient.get<any>(this.basePath, {
       params: {
         ...filters,
         ...pagination,
@@ -27,14 +32,54 @@ class ProjectService {
         sortOrder: sort?.order,
       },
     });
+
+    // Transform API response to domain model
+    if (response.success && response.data) {
+      const transformedData = transformApiProjectList({
+        ...response,
+        data: response.data.projects
+      });
+      
+      return {
+        ...response,
+        data: {
+          projects: transformedData.data as Project[],
+          total: response.data.total
+        }
+      };
+    }
+    
+    return response;
   }
 
   async getProject(id: string): Promise<ApiResponse<Project>> {
-    return apiClient.get<Project>(API_ENDPOINTS.PROJECT_BY_ID(id));
+    const response = await apiClient.get<any>(API_ENDPOINTS.PROJECT_BY_ID(id));
+    
+    // Transform API response to domain model
+    if (response.success && response.data) {
+      return {
+        ...response,
+        data: transformApiProject(response.data) as Project
+      };
+    }
+    
+    return response;
   }
 
   async createProject(data: ProjectFormData): Promise<ApiResponse<Project>> {
-    return apiClient.post<Project, ProjectFormData>(this.basePath, data);
+    // Transform domain model to API format
+    const apiData = transformProjectToApi(data as Partial<ProjectModel>);
+    const response = await apiClient.post<any>(this.basePath, apiData);
+    
+    // Transform API response back to domain model
+    if (response.success && response.data) {
+      return {
+        ...response,
+        data: transformApiProject(response.data) as Project
+      };
+    }
+    
+    return response;
   }
 
   async updateProject(id: string, data: Partial<ProjectModel>): Promise<ApiResponse<Project>> {
@@ -56,7 +101,19 @@ class ProjectService {
       throw new Error('Only SUB projects can have a parent project');
     }
     
-    return apiClient.patch<Project, Partial<ProjectModel>>(API_ENDPOINTS.PROJECT_BY_ID(id), validatedData);
+    // Transform domain model to API format
+    const apiData = transformProjectToApi(validatedData);
+    const response = await apiClient.patch<any>(API_ENDPOINTS.PROJECT_BY_ID(id), apiData);
+    
+    // Transform API response back to domain model
+    if (response.success && response.data) {
+      return {
+        ...response,
+        data: transformApiProject(response.data) as Project
+      };
+    }
+    
+    return response;
   }
 
   async deleteProject(id: string): Promise<ApiResponse<void>> {
@@ -71,11 +128,31 @@ class ProjectService {
     id: string,
     status: Project['status']
   ): Promise<ApiResponse<Project>> {
-    return apiClient.patch<Project, { status: Project['status'] }>(`${API_ENDPOINTS.PROJECT_BY_ID(id)}/status`, { status });
+    const response = await apiClient.patch<any>(`${API_ENDPOINTS.PROJECT_BY_ID(id)}/status`, { status });
+    
+    // Transform API response back to domain model
+    if (response.success && response.data) {
+      return {
+        ...response,
+        data: transformApiProject(response.data) as Project
+      };
+    }
+    
+    return response;
   }
 
   async assignUsers(id: string, userIds: string[]): Promise<ApiResponse<Project>> {
-    return apiClient.post<Project, { userIds: string[] }>(`${API_ENDPOINTS.PROJECT_BY_ID(id)}/assign`, { userIds });
+    const response = await apiClient.post<any>(`${API_ENDPOINTS.PROJECT_BY_ID(id)}/assign`, { userIds });
+    
+    // Transform API response back to domain model
+    if (response.success && response.data) {
+      return {
+        ...response,
+        data: transformApiProject(response.data) as Project
+      };
+    }
+    
+    return response;
   }
 
   async uploadAttachment(id: string, file: File): Promise<ApiResponse<{ url: string }>> {

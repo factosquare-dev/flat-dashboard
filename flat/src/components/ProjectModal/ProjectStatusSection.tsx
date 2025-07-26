@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import type { ProjectData } from './types';
+import { ProjectStatus, ProjectStatusLabel, Priority, PriorityLabel } from '../../types/enums';
 
 interface ProjectStatusSectionProps {
   formData: ProjectData;
@@ -22,10 +23,9 @@ const ProjectStatusSection: React.FC<ProjectStatusSectionProps> = ({ formData, o
             onChange={(e) => onChange({ status: e.target.value })}
             className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
           >
-            <option value="시작전">시작전</option>
-            <option value="진행중">진행중</option>
-            <option value="완료">완료</option>
-            <option value="중단">중단</option>
+            {Object.entries(ProjectStatusLabel).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
           </select>
         </div>
         <div className="group">
@@ -35,9 +35,9 @@ const ProjectStatusSection: React.FC<ProjectStatusSectionProps> = ({ formData, o
             onChange={(e) => onChange({ priority: e.target.value })}
             className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
           >
-            <option value="높음">높음</option>
-            <option value="보통">보통</option>
-            <option value="낮음">낮음</option>
+            {Object.entries(PriorityLabel).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
           </select>
         </div>
         <div>

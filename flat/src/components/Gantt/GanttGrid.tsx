@@ -2,6 +2,8 @@ import React, { useMemo, useCallback } from 'react';
 import type { DragState } from '../../types/gantt';
 import { GANTT_CONSTANTS, TOTAL_DAYS } from '../../constants/gantt';
 import { getTodayIndex, isTodayInRange, isWeekendColumn } from '../../utils/ganttUtils';
+import { cn } from '../../utils/cn';
+import './GanttGrid.css';
 
 interface GanttGridProps {
   totalRows: number;
@@ -12,14 +14,14 @@ const GanttGrid: React.FC<GanttGridProps> = ({ totalRows, dragState }) => {
   const todayIndex = getTodayIndex();
   const isToday = isTodayInRange();
 
-  // Helper function to get grid cell class names - cleaner than inline ternary operators
+  // Helper function to get grid cell class names
   const getGridCellClassName = useCallback((isWeekend: boolean, isTodayColumn: boolean, isHovered: boolean) => {
-    const baseClasses = 'absolute border-r border-b border-gray-200 transition-colors';
-    const backgroundClass = isWeekend ? 'bg-gray-50' : 'bg-white';
-    const todayClass = isTodayColumn ? 'bg-red-50' : '';
-    const hoverClass = isHovered && dragState.isDragging ? 'bg-blue-100 border-blue-400' : '';
-    
-    return `${baseClasses} ${backgroundClass} ${todayClass} ${hoverClass}`.trim();
+    return cn(
+      'gantt-grid__cell',
+      isWeekend && 'gantt-grid__cell--weekend',
+      isTodayColumn && 'gantt-grid__cell--today',
+      isHovered && dragState.isDragging && 'gantt-grid__cell--hovered'
+    );
   }, [dragState.isDragging]);
 
   // Render grid cells - memoized for performance
@@ -45,18 +47,18 @@ const GanttGrid: React.FC<GanttGridProps> = ({ totalRows, dragState }) => {
             key={`${row}-${col}`}
             className={getGridCellClassName(isWeekend, isTodayColumn, isHovered)}
             style={{
-              left: col * GANTT_CONSTANTS.CELL_WIDTH,
-              top: row * GANTT_CONSTANTS.CELL_HEIGHT,
-              width: GANTT_CONSTANTS.CELL_WIDTH,
-              height: GANTT_CONSTANTS.CELL_HEIGHT
-            }}
+              '--cell-col': col,
+              '--cell-row': row,
+              '--gantt-cell-width': `${GANTT_CONSTANTS.CELL_WIDTH}px`,
+              '--gantt-cell-height': `${GANTT_CONSTANTS.CELL_HEIGHT}px`
+            } as React.CSSProperties}
           />
         );
       }
     }
     
     return cells;
-  }, [totalRows, todayIndex, dragState.hoveredCell, dragState.isDragging, getGridCellClassName]);
+  }, [totalRows, todayIndex, dragState.hoveredCell, getGridCellClassName]);
 
   return (
     <>
@@ -66,13 +68,15 @@ const GanttGrid: React.FC<GanttGridProps> = ({ totalRows, dragState }) => {
       {/* Today line */}
       {isToday && (
         <div
-          className="absolute top-0 w-0.5 bg-red-500 z-10"
-          style={{ 
-            left: todayIndex * GANTT_CONSTANTS.CELL_WIDTH + GANTT_CONSTANTS.CELL_WIDTH / 2,
-            height: totalRows * GANTT_CONSTANTS.CELL_HEIGHT
-          }}
+          className="gantt-grid__today-line"
+          style={{
+            '--today-index': todayIndex,
+            '--total-rows': totalRows,
+            '--gantt-cell-width': `${GANTT_CONSTANTS.CELL_WIDTH}px`,
+            '--gantt-cell-height': `${GANTT_CONSTANTS.CELL_HEIGHT}px`
+          } as React.CSSProperties}
         >
-          <div className="absolute -top-6 -left-8 bg-red-500 text-white text-xs px-2 py-1 rounded">
+          <div className="gantt-grid__today-label">
             오늘
           </div>
         </div>

@@ -1,31 +1,33 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
+import { Size } from '../../types/enums';
+import './LoadingSpinner.css';
 
 interface LoadingSpinnerProps {
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  size?: Size;
   className?: string;
   color?: string;
   label?: string;
 }
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  size = 'md',
+  size = Size.MD,
   className,
   color = 'currentColor',
   label = 'Loading...'
 }) => {
-  const sizeClasses = {
-    xs: 'w-3 h-3',
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8',
-    xl: 'w-12 h-12'
+  const sizeClassMap = {
+    [Size.XS]: 'loading-spinner__svg--xs',
+    [Size.SM]: 'loading-spinner__svg--sm',
+    [Size.MD]: 'loading-spinner__svg--md',
+    [Size.LG]: 'loading-spinner__svg--lg',
+    [Size.XL]: 'loading-spinner__svg--xl'
   };
 
   return (
-    <div className={cn('inline-flex items-center', className)} role="status">
+    <div className={cn('loading-spinner', className)} role="status">
       <svg
-        className={cn(sizeClasses[size], 'animate-spin')}
+        className={cn('loading-spinner__svg', sizeClassMap[size])}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -63,22 +65,22 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   isLoading,
   children,
   className,
-  spinnerSize = 'lg',
+  spinnerSize = Size.LG,
   blur = true,
   message
 }) => {
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn('loading-overlay', className)}>
       {children}
       {isLoading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center">
+        <div className="loading-overlay__backdrop">
           {blur && (
-            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm" />
+            <div className="loading-overlay__backdrop loading-overlay__backdrop--blur" />
           )}
-          <div className="relative flex flex-col items-center gap-3">
+          <div className="loading-overlay__content">
             <LoadingSpinner size={spinnerSize} color="#3B82F6" />
             {message && (
-              <p className="text-sm font-medium text-gray-600">{message}</p>
+              <p className="loading-overlay__message">{message}</p>
             )}
           </div>
         </div>
@@ -97,19 +99,35 @@ export const LoadingDots: React.FC<LoadingDotsProps> = ({
   dotClassName 
 }) => {
   return (
-    <div className={cn('flex space-x-1', className)}>
+    <div className={cn('loading-dots', className)}>
       {[0, 1, 2].map((i) => (
         <div
           key={i}
           className={cn(
-            'w-2 h-2 bg-gray-400 rounded-full animate-bounce',
+            'loading-dots__dot',
             dotClassName
           )}
-          style={{
-            animationDelay: `${i * 0.1}s`
-          }}
         />
       ))}
+    </div>
+  );
+};
+
+interface LoadingFullScreenProps {
+  text?: string;
+  size?: Size;
+}
+
+export const LoadingFullScreen: React.FC<LoadingFullScreenProps> = ({
+  text,
+  size = Size.LG
+}) => {
+  return (
+    <div className="loading-fullscreen">
+      <div className="loading-fullscreen__content">
+        <LoadingSpinner size={size} color="#3B82F6" />
+        {text && <p className="loading-fullscreen__text">{text}</p>}
+      </div>
     </div>
   );
 };

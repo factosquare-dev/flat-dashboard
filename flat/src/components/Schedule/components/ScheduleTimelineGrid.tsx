@@ -1,8 +1,6 @@
 import React from 'react';
 import type { Participant, Task, ResizePreview } from '../../../types/schedule';
-import { isToday } from '../../../utils/coreUtils';
 import { getProjectRowCount } from '../../../utils/taskUtils';
-import { getTasksForFactory } from '../../../utils/scheduleUtils';
 import TimelineHeader from '../TimelineHeader';
 import ProjectRow from './ProjectRow';
 import DragPreview from './DragPreview';
@@ -17,7 +15,11 @@ interface ScheduleTimelineGridProps {
   resizePreview: ResizePreview | null;
   dragPreview: { projectId: string; startDate: string; endDate: string } | null;
   draggedTask: Task | null;
-  modalState: any;
+  modalState: {
+    showTaskModal?: boolean;
+    isResizingTask?: boolean;
+    isDraggingTask?: boolean;
+  };
   scrollRef: React.RefObject<HTMLDivElement>;
   onGridClick: (e: React.MouseEvent, projectId: string, date: string) => void;
   onTaskClick: (task: Task) => void;
@@ -27,7 +29,6 @@ interface ScheduleTimelineGridProps {
   onTaskDrop: (e: React.DragEvent, projectId: string, dropIndex: number) => void;
   onTaskMouseDown: (e: React.MouseEvent, task: Task, direction: 'start' | 'end') => void;
   onTaskHover: (taskId: number | null) => void;
-  onTaskCreate?: (task: { projectId: string; factory: string; startDate: string; endDate: string }) => void;
   onTaskDelete?: (taskId: number) => void;
 }
 
@@ -55,18 +56,6 @@ const scrollbarStyles = `
 `;
 
 const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
-  // Count total tasks being rendered across all projects
-  React.useEffect(() => {
-    let totalRenderedTasks = 0;
-    const tasksByProject: Record<string, number> = {};
-    
-    props.projects.forEach(project => {
-      const projectTasks = getTasksForFactory(props.tasks, project);
-      tasksByProject[project.name] = projectTasks.length;
-      totalRenderedTasks += projectTasks.length;
-    });
-    
-  }, [props.tasks, props.projects]);
   const {
     projects,
     tasks,
@@ -87,25 +76,13 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
     onTaskDrop,
     onTaskMouseDown,
     onTaskHover,
-    onTaskCreate,
     onTaskDelete
   } = props;
 
 
-  // Find today's position for today line
-  const todayIndex = days.findIndex(day => isToday(day));
-  const todayPosition = todayIndex * cellWidth;
 
-  // Add dummy project for "Add Factory" row
-  const addFactoryProject: Participant = {
-    id: 'ADD_FACTORY_ROW_ID',
-    name: '공장 추가',
-    period: '',
-    color: '',
-    type: ''
-  };
-
-  const allRows = [...projects, addFactoryProject];
+  // projects already includes "Add Factory" row from useScheduleState
+  const allRows = projects;
 
 
   return (
@@ -129,7 +106,7 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
         
         {/* Project rows - now using separated ProjectRow component */}
         {allRows.map((project) => {
-          const isAddFactoryRow = project.id === 'ADD_FACTORY_ROW_ID';
+          const isAddFactoryRow = project.id === 'ADD_FACTORY_ROW';
           
           return (
             <ProjectRow
@@ -160,8 +137,6 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
           );
         })}
         
-        {/* 공장 추가 행 아래 경계선 */}
-        <div className="border-b border-gray-200" style={{ height: '1px' }}></div>
         
         {/* SCROLL-SYNCHRONIZED Global drag preview - 스크롤과 완벽 동기화 */}
         {dragPreview && dragPreview.projectId && dragPreview.startDate && (() => {
@@ -173,8 +148,8 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
           
           const projectIndex = allRows.findIndex(p => p.id === dragPreview.projectId);
           const totalHeightAbove = allRows.slice(0, projectIndex).reduce((sum, p) => {
-            const rowCount = p.id === 'ADD_FACTORY_ROW_ID' ? 1 : getProjectRowCount(p.id, tasks, p.name);
-            const height = p.id === 'ADD_FACTORY_ROW_ID' ? 50 : Math.max(50, rowCount * 40 + 20);
+            const rowCount = p.id === 'ADD_FACTORY_ROW' ? 1 : getProjectRowCount(p.id, tasks, p.name);
+            const height = p.id === 'ADD_FACTORY_ROW' ? 50 : Math.max(50, rowCount * 40 + 20);
             return sum + height;
           }, 0);
           
@@ -195,7 +170,6 @@ const ScheduleTimelineGrid: React.FC<ScheduleTimelineGridProps> = (props) => {
               }}
             >
               <DragPreview
-                projectId={dragPreview.projectId}
                 startDate={dragPreview.startDate}
                 endDate={dragPreview.endDate}
                 draggedTask={draggedTask}

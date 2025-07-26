@@ -4,6 +4,8 @@ import { createSelector } from 'reselect';
 import type { Task, Schedule } from '../types/schedule';
 import type { Project } from '../types/project';
 import { scheduleApi } from '../api/schedule';
+import { TaskStatus } from '../types/enums';
+import { ProjectNotFoundError, assertDefined } from '../errors';
 
 interface TaskStore {
   // 상태
@@ -33,7 +35,7 @@ export const selectTasksForProject = createSelector(
   [selectSchedules, (_: TaskStore, projectId: string) => projectId],
   (schedules, projectId) => {
     const schedule = Array.from(schedules.values()).find(s => s.projectId === projectId);
-    return schedule?.tasks || [];
+    return schedule?.tasks ?? []; // Use nullish coalescing instead of ||  
   }
 );
 
@@ -41,7 +43,19 @@ export const selectTasksForProject = createSelector(
 export const selectScheduleForProject = createSelector(
   [selectSchedules, (_: TaskStore, projectId: string) => projectId],
   (schedules, projectId) => {
-    return Array.from(schedules.values()).find(s => s.projectId === projectId) || null;
+    return Array.from(schedules.values()).find(s => s.projectId === projectId) ?? null;
+  }
+);
+
+// Version that throws if not found
+export const selectScheduleForProjectOrThrow = createSelector(
+  [selectSchedules, (_: TaskStore, projectId: string) => projectId],
+  (schedules, projectId) => {
+    const schedule = Array.from(schedules.values()).find(s => s.projectId === projectId);
+    if (!schedule) {
+      throw new ProjectNotFoundError(projectId);
+    }
+    return schedule;
   }
 );
 
@@ -51,14 +65,14 @@ export const selectCurrentProjectTasks = createSelector(
   (schedules, selectedProjectId) => {
     if (!selectedProjectId) return [];
     const schedule = Array.from(schedules.values()).find(s => s.projectId === selectedProjectId);
-    return schedule?.tasks || [];
+    return schedule?.tasks ?? [];
   }
 );
 
 // Memoized selector for completed tasks count
 export const selectCompletedTasksCount = createSelector(
   [selectTasksForProject],
-  (tasks) => tasks.filter(task => task.status === 'completed').length
+  (tasks) => tasks.filter(task => task.status === TaskStatus.COMPLETED).length
 );
 
 // Memoized selector for tasks by status
@@ -72,11 +86,11 @@ export const selectTaskStats = createSelector(
   [selectTasksForProject],
   (tasks) => {
     const total = tasks.length;
-    const completed = tasks.filter(task => task.status === 'completed').length;
-    const inProgress = tasks.filter(task => task.status === 'in_progress').length;
-    const pending = tasks.filter(task => task.status === 'pending').length;
+    const completed = tasks.filter(task => task.status === TaskStatus.COMPLETED).length;
+    const inProgress = tasks.filter(task => task.status === TaskStatus.IN_PROGRESS).length;
+    const pending = tasks.filter(task => task.status === TaskStatus.PENDING).length;
     const overdue = tasks.filter(task => {
-      if (task.status === 'completed') return false;
+      if (task.status === TaskStatus.COMPLETED) return false;
       return task.dueDate && new Date(task.dueDate) < new Date();
     }).length;
     
@@ -140,7 +154,8 @@ export const selectUpcomingTasks = createSelector(
     const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     
     return tasks.filter(task => {
-      if (task.status === 'completed' || !task.dueDate) return false;
+      // Use enum for type safety
+      if (task.status === TaskStatus.COMPLETED || !task.dueDate) return false;
       const dueDate = new Date(task.dueDate);
       return dueDate >= now && dueDate <= sevenDaysFromNow;
     });
@@ -196,7 +211,7 @@ export const useTaskStore = create<TaskStore>()(
         const schedule = get().getScheduleForProject(projectId);
         
         if (!schedule) {
-          throw new Error('Schedule not found for project');
+          throw new ProjectNotFoundError(projectId);
         }
 
         set({ isLoading: true, error: null });

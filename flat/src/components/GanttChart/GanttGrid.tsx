@@ -69,7 +69,7 @@ const GanttGrid: React.FC<GanttGridProps> = ({ totalRows, dragState }) => {
     }
     
     return cells;
-  }, [totalRows, totalDays, todayIndex, dragState.hoveredCell, dragState.isDragging, getGridCellClassName]);
+  }, [totalRows, totalDays, todayIndex, dragState.hoveredCell, getGridCellClassName]);
 
   // Today line
   const todayLine = useMemo(() => {

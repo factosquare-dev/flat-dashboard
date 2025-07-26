@@ -1,9 +1,8 @@
-export type Theme = 'light' | 'dark' | 'system';
-export type Language = 'en' | 'ko' | 'ja';
+import { Theme, Language, ToastVariant } from '../../types/enums';
 
 export interface Notification {
   id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: ToastVariant;
   title: string;
   message?: string;
   duration?: number;
@@ -27,10 +26,12 @@ export interface UISlice {
   clearNotifications: () => void;
 }
 
-export const uiSlice = (set: any) => ({
+import { StateCreator } from 'zustand';
+
+export const uiSlice: StateCreator<UISlice> = (set) => ({
   // Initial state
-  theme: 'light',
-  language: 'en',
+  theme: Theme.LIGHT,
+  language: Language.EN,
   sidebarCollapsed: false,
   notifications: [],
   
@@ -50,7 +51,7 @@ export const uiSlice = (set: any) => ({
         ...state.notifications,
         {
           ...notification,
-          id: Math.random().toString(36).substr(2, 9),
+          id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           timestamp: new Date(),
         },
       ],

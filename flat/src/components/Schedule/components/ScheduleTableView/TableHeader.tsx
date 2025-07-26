@@ -1,6 +1,5 @@
 import React from 'react';
 import { APP_CONSTANTS } from '../../../../config/constants';
-import { ARIA_LABELS } from '../../../../utils/accessibility';
 
 const TableHeader: React.FC = () => {
   const headers = [

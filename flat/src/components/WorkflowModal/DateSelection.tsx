@@ -1,6 +1,5 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
-import FormInput from '../common/FormInput';
 
 interface DateSelectionProps {
   startDate: string;
@@ -18,32 +17,37 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
   onEndDateChange
 }) => {
   return (
-    <div>
-      <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-        <Calendar className="w-4 h-4" />
+     <div className="modal-field-spacing">
+      <div className="modal-field-label">
+        <Calendar />
         작업 기간
-      </h3>
-      
-      <div className="grid grid-cols-2 gap-3">
-        <FormInput
-          type="date"
-          label="시작일"
-          value={startDate}
-          onChange={(e) => {
-            onStartDateChange(e.target.value);
-            if (quickAddData && !endDate) {
-              onEndDateChange(e.target.value);
-            }
-          }}
-        />
+      </div>
+      <div className="modal-grid-2">
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">시작일</label>
+          <input
+            type="date"
+            className="modal-input"
+            value={startDate}
+            onChange={(e) => {
+              onStartDateChange(e.target.value);
+              if (quickAddData && !endDate) {
+                onEndDateChange(e.target.value);
+              }
+            }}
+          />
+        </div>
         
-        <FormInput
-          type="date"
-          label="종료일"
-          value={endDate}
-          onChange={(e) => onEndDateChange(e.target.value)}
-          min={startDate}
-        />
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">종료일</label>
+          <input
+            type="date"
+            className="modal-input"
+            value={endDate}
+            onChange={(e) => onEndDateChange(e.target.value)}
+            min={startDate}
+          />
+        </div>
       </div>
     </div>
   );

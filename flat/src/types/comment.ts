@@ -2,30 +2,32 @@
  * Comment type definitions
  */
 
+import { UserId, ProjectId } from './branded';
+
 export interface CommentAuthor {
-  id: string;
+  id: UserId;
   name: string;
   profileImage?: string;
 }
 
 export interface Comment {
-  id: string;
-  projectId: string;
-  userId: string;
+  id: string; // Comment IDs remain as strings for now
+  projectId: ProjectId;
+  userId: UserId;
   author: CommentAuthor;
   content: string;
   createdAt: Date;
   updatedAt: Date;
-  parentId?: string;
+  parentId?: string; // Comment IDs remain as strings
   replies?: Comment[];
   mentions?: CommentAuthor[];
 }
 
 export interface CreateCommentInput {
   content: string;
-  projectId: string;
-  parentId?: string;
-  mentions?: string[];
+  projectId: ProjectId;
+  parentId?: string; // Comment IDs remain as strings
+  mentions?: UserId[];
 }
 
 export type UpdateCommentInput = Partial<CreateCommentInput>;

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import UserModal, { type UserFormData } from '../../components/Users/UserModal';
 import UserCard, { type UserData } from '../../components/Users/UserCard';
 import UserToolbar from '../../components/Users/UserToolbar';
@@ -6,10 +6,13 @@ import FloatingActionButton from '../../components/common/FloatingActionButton';
 import { useUserFilter } from '../../hooks/useUserFilter';
 import { useUserManagement } from '../../hooks/useUserManagement';
 import { useModalState } from '../../hooks/useModalState';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Users } from 'lucide-react';
+import { LoadingState } from '../../components/loading/LoadingState';
+import { EmptyState } from '../../components/common';
 
 const UsersPage: React.FC = () => {
   const modalState = useModalState<UserData | null>(false, null);
+  const [isLoading] = useState(false);
   
   // 사용자 관리 훅 사용
   const {
@@ -101,7 +104,24 @@ const UsersPage: React.FC = () => {
         </div>
 
         {/* 사용자 카드 그리드 */}
-        {filteredUsers.length > 0 ? (
+        <LoadingState
+          isLoading={isLoading}
+          error={null}
+          isEmpty={filteredUsers.length === 0}
+          emptyComponent={
+            <EmptyState
+              icon={<Users />}
+              title={searchTerm ? '검색 결과가 없습니다' : '등록된 사용자가 없습니다'}
+              description={searchTerm ? '다른 검색어를 시도해보세요' : '새로운 사용자를 추가해보세요'}
+              action={
+                !searchTerm ? {
+                  label: '사용자 추가',
+                  onClick: handleAddUser
+                } : undefined
+              }
+            />
+          }
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredUsers.map((user) => (
               <UserCard
@@ -112,12 +132,7 @@ const UsersPage: React.FC = () => {
               />
             ))}
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-            <p className="text-lg mb-2">검색 결과가 없습니다</p>
-            <p className="text-sm">다른 검색어를 시도해보세요</p>
-          </div>
-        )}
+        </LoadingState>
       </div>
 
       {/* 플로팅 액션 버튼 - 새 사용자 추가 */}

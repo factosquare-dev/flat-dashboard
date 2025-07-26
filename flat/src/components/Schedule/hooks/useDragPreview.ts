@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { factories } from '../../../data/factories';
 import { formatDateISO } from '../../../utils/coreUtils';
 
-export const useDragPreview = (projects: any[]) => {
+import type { Participant, Task } from '../../../types/schedule';
+
+export const useDragPreview = (projects: Participant[]) => {
   const [dragPreview, setDragPreview] = useState<{ projectId: string; startDate: string; endDate: string } | null>(null);
   const [lastValidProjectId, setLastValidProjectId] = useState<string | null>(null);
   const [isInitialPosition, setIsInitialPosition] = useState(true);
@@ -91,7 +93,7 @@ export const useDragPreview = (projects: any[]) => {
     setIsInitialPosition(true);
   };
 
-  const initializePreview = (draggedTask: any) => {
+  const initializePreview = (draggedTask: Task) => {
     if (!projects.length) return;
 
     const draggedTaskFactory = draggedTask.factory;

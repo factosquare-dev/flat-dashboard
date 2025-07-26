@@ -1,8 +1,8 @@
 import React from 'react';
 import { ChevronDown, ChevronRight, Folder, FolderOpen } from 'lucide-react';
-import type { Project } from '../../../types/project';
-import { ProjectTypeEnum } from '../../../../types/enums';
-import { isProjectType } from '../../../../utils/projectTypeUtils';
+import type { Project } from '@/types/project';
+import { ProjectTypeEnum } from '@/types/enums';
+import { isProjectType } from '@/utils/projectTypeUtils';
 
 interface SelectionCellProps {
   project: Project;

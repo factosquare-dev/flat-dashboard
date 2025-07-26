@@ -1,6 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { MoreVertical, User } from 'lucide-react';
+import { useClickOutside } from '../../hooks/useClickOutside';
+import { cn } from '../../utils/classNames';
 import type { UserRole } from '../../store/slices/userSlice';
+import styles from './UserCard.module.css';
 
 export interface UserData {
   id: string;
@@ -18,66 +21,52 @@ interface UserCardProps {
   onDelete: (userId: string) => void;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
+const UserCard: React.FC<UserCardProps> = React.memo(({ user, onEdit, onDelete }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // 외부 클릭 감지 - custom hook 사용
+  const dropdownRef = useClickOutside<HTMLDivElement>(
+    useCallback(() => setIsDropdownOpen(false), []),
+    isDropdownOpen
+  );
 
-  // 외부 클릭 감지
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isDropdownOpen]);
-
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     onEdit(user);
     setIsDropdownOpen(false);
-  };
+  }, [onEdit, user]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (confirm(`정말로 ${user.name}님을 삭제하시겠습니까?`)) {
       onDelete(user.id);
     }
     setIsDropdownOpen(false);
-  };
+  }, [onDelete, user.id, user.name]);
 
-  const getRoleDisplay = (role: UserRole) => {
-    switch (role) {
+  const roleDisplay = useMemo(() => {
+    switch (user.role) {
       case 'admin':
-        return { text: '관리자', class: 'bg-purple-100 text-purple-700' };
+        return { text: '관리자', className: styles.roleAdmin };
       case 'manager':
-        return { text: '매니저', class: 'bg-green-100 text-green-700' };
+        return { text: '매니저', className: styles.roleManager };
       case 'customer':
-        return { text: '고객', class: 'bg-blue-100 text-blue-700' };
+        return { text: '고객', className: styles.roleCustomer };
       default:
-        return { text: role, class: 'bg-gray-100 text-gray-700' };
+        return { text: user.role, className: styles.roleDefault };
     }
-  };
-
-  const roleDisplay = getRoleDisplay(user.role);
+  }, [user.role]);
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden">
+    <div className={styles.card}>
       {/* 카드 헤더 */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-              <User className="w-6 h-6 text-gray-600" />
+      <div className={styles.cardHeader}>
+        <div className={styles.headerContent}>
+          <div className={styles.userInfo}>
+            <div className={styles.avatar}>
+              <User className={styles.avatarText} />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">{user.name}</h3>
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${roleDisplay.class}`}>
+              <h3 className={styles.userName}>{user.name}</h3>
+              <span className={cn(styles.roleTag, roleDisplay.className)}>
                 {roleDisplay.text}
               </span>
             </div>
@@ -86,26 +75,26 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
           {/* 드롭다운 메뉴 */}
           <div className="relative" ref={dropdownRef}>
             <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+              onClick={useCallback(() => setIsDropdownOpen(prev => !prev), [])}
+              className={styles.dropdownButton}
               aria-label="옵션 메뉴"
               aria-expanded={isDropdownOpen}
               aria-haspopup="true"
             >
-              <MoreVertical className="w-5 h-5 text-gray-600" />
+              <MoreVertical className={styles.dropdownIcon} />
             </button>
             
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+              <div className={styles.dropdownMenu}>
                 <button
                   onClick={handleEdit}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors"
+                  className={styles.dropdownItem}
                 >
                   수정
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 transition-colors border-t border-gray-100"
+                  className={styles.dropdownItemDelete}
                 >
                   삭제
                 </button>
@@ -116,12 +105,12 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
       </div>
       
       {/* 카드 바디 */}
-      <div className="p-6">
-        <div className="space-y-3">
+      <div className={styles.cardBody}>
+        <div className={styles.infoSection}>
           {(user.department || user.position) && (
             <div className="text-sm">
-              <span className="text-gray-500">소속: </span>
-              <span className="text-gray-600">
+              <span className={styles.infoLabel}>소속: </span>
+              <span className={styles.infoText}>
                 {user.department}
                 {user.position && ` · ${user.position}`}
               </span>
@@ -129,10 +118,10 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
           )}
           
           <div className="text-sm">
-            <span className="text-gray-500">이메일: </span>
+            <span className={styles.infoLabel}>이메일: </span>
             <a 
               href={`mailto:${user.email}`} 
-              className="text-gray-600 hover:text-blue-600 transition-colors truncate"
+              className={styles.infoLinkTruncate}
               title={user.email}
             >
               {user.email}
@@ -140,10 +129,10 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
           </div>
           
           <div className="text-sm">
-            <span className="text-gray-500">연락처: </span>
+            <span className={styles.infoLabel}>연락처: </span>
             <a 
               href={`tel:${user.phone}`} 
-              className="text-gray-600 hover:text-blue-600 transition-colors"
+              className={styles.infoLink}
             >
               {user.phone}
             </a>
@@ -152,6 +141,8 @@ const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
       </div>
     </div>
   );
-};
+});
+
+UserCard.displayName = 'UserCard';
 
 export default UserCard;

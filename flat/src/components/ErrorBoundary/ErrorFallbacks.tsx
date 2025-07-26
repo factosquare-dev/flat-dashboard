@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { AlertCircle, RefreshCw, Home } from 'lucide-react';
 
 interface ErrorFallbackProps {
@@ -7,7 +7,12 @@ interface ErrorFallbackProps {
 }
 
 // 기본 ErrorFallback (기존 ErrorFallback.tsx 내용 기반)
-export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => (
+export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
+  const handleHomeClick = useCallback(() => {
+    window.location.href = '/';
+  }, []);
+  
+  return (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="max-w-md w-full space-y-8 p-8">
       <div className="rounded-md bg-red-50 p-4 border border-red-200">
@@ -44,7 +49,7 @@ export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, rese
           Try Again
         </button>
         <button
-          onClick={() => window.location.href = '/'}
+          onClick={handleHomeClick}
           className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
         >
           <Home className="w-4 h-4" />
@@ -53,7 +58,8 @@ export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, rese
       </div>
     </div>
   </div>
-);
+  );
+};
 
 // 프로젝트 목록용 ErrorFallback
 export const ProjectListErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => (
@@ -118,7 +124,7 @@ export const ComponentErrorFallback: React.FC<ErrorFallbackProps> = ({ error, re
   <div className="flex items-center justify-center p-4 border border-red-200 bg-red-50 rounded-lg">
     <div className="text-center">
       <AlertCircle className="w-6 h-6 text-red-600 mx-auto mb-2" />
-      <p className="text-sm text-red-800 mb-2">컴포넌트 로딩 오류</p>
+      <p className="text-sm text-red-800 mb-2" title={error.message}>컴포넌트 로딩 오류</p>
       <button
         onClick={resetError}
         className="text-xs px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"

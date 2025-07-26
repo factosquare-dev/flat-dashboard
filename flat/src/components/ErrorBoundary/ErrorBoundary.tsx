@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { logger } from '../../utils/logger';
-import { handleError, formatErrorForDisplay } from '../../utils/error/errorHandler';
+import { handleError as utilHandleError } from '../../utils/error/errorHandler';
+import { handleError, FlatError } from '../../errors';
 import { ErrorFallback } from './ErrorFallback';
 
 interface Props {
@@ -25,13 +26,19 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    const appError = handleError(error);
+    // Use our new error handling
+    handleError(error, 'ErrorBoundary');
     
-    logger.error('React ErrorBoundary caught error', {
-      error: appError,
-      errorInfo,
+    // Log detailed error information
+    const errorDetails = {
+      message: error.message,
+      stack: error.stack,
       componentStack: errorInfo.componentStack,
-    });
+      isFlatError: error instanceof FlatError,
+      errorCode: error instanceof FlatError ? error.code : undefined,
+    };
+    
+    logger.error('React ErrorBoundary caught error', errorDetails);
 
     // Call custom error handler if provided
     if (this.props.onError) {

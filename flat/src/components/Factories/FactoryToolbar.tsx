@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import type { FactoryType } from '../../hooks/useFactoryFilter';
+import { FactoryType, FactoryTypeLabel } from '../../types/enums';
 
 interface FactoryToolbarProps {
   selectedType: FactoryType;
@@ -9,7 +9,7 @@ interface FactoryToolbarProps {
   onSearchChange: (term: string) => void;
 }
 
-const FACTORY_TYPES: FactoryType[] = ['제조', '용기', '포장'];
+const FACTORY_TYPES = Object.entries(FactoryTypeLabel) as [FactoryType, string][];
 
 const FactoryToolbar: React.FC<FactoryToolbarProps> = ({
   selectedType,
@@ -28,14 +28,14 @@ const FactoryToolbar: React.FC<FactoryToolbarProps> = ({
       <div className="flex flex-col sm:flex-row gap-4">
         {/* 타입 필터 */}
         <div className="flex gap-3">
-          {FACTORY_TYPES.map(type => (
+          {FACTORY_TYPES.map(([type, label]) => (
             <button
               key={type}
               onClick={() => onTypeChange(type)}
               className={getTypeButtonClass(type)}
               aria-pressed={selectedType === type}
             >
-              {type}
+              {label}
             </button>
           ))}
         </div>

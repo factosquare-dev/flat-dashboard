@@ -50,9 +50,6 @@ export const useScheduleEffects = (
           
           // 스크롤 가능한 경우에만 스크롤
           if (maxScrollLeft > 0) {
-            // 오늘 날짜의 절대 위치 (픽셀)
-            const todayPosition = todayIndex * cellWidth;
-            
             // 비율 기반 계산으로 모든 프로젝트에서 일관된 중앙 위치
             const totalDays = days.length;
             const todayRatio = todayIndex / (totalDays - 1); // 전체에서 오늘의 비율 (0~1)
@@ -88,9 +85,6 @@ export const useScheduleEffects = (
       
       // 스크롤 가능한 경우에만 스크롤
       if (maxScrollLeft > 0) {
-        // 오늘 날짜의 절대 위치 (픽셀)
-        const todayPosition = todayIndex * cellWidth;
-        
         // 비율 기반 계산으로 모든 프로젝트에서 일관된 중앙 위치
         const totalDays = days.length;
         const todayRatio = todayIndex / (totalDays - 1); // 전체에서 오늘의 비율 (0~1)

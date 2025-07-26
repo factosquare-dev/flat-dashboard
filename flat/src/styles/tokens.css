@@ -1,0 +1,222 @@
+/**
+ * Design Tokens for FLAT Dashboard
+ * Following The Style Hierarchy principle
+ * 
+ * 1. Design Tokens (CSS Variables) <- We are here
+ * 2. Utility Classes (Tailwind)
+ * 3. Component Classes (BEM)
+ * 4. Inline Styles (Last Resort)
+ */
+
+:root {
+  /* =================
+     Color Tokens
+     ================= */
+  
+  /* Primary Colors */
+  --color-primary: #3B82F6;
+  --color-primary-dark: #2563EB;
+  --color-primary-light: #60A5FA;
+  --color-primary-transparent: rgba(100, 108, 255, 0.67);
+  --color-primary-bg: #DBEAFE;
+  --color-primary-text: #1E40AF;
+  
+  /* Factory Type Colors */
+  --color-factory-manufacturing: #3B82F6;
+  --color-factory-manufacturing-bg: #DBEAFE;
+  --color-factory-manufacturing-text: #1E40AF;
+  
+  --color-factory-container: #EF4444;
+  --color-factory-container-bg: #FEE2E2;
+  --color-factory-container-text: #991B1B;
+  
+  --color-factory-packaging: #F59E0B;
+  --color-factory-packaging-bg: #FEF3C7;
+  --color-factory-packaging-text: #92400E;
+  
+  /* Status Colors */
+  --color-status-success: #10B981;
+  --color-status-success-bg: #D1FAE5;
+  --color-status-success-text: #065F46;
+  
+  --color-status-warning: #F59E0B;
+  --color-status-warning-bg: #FEF3C7;
+  --color-status-warning-text: #92400E;
+  
+  --color-status-error: #EF4444;
+  --color-status-error-bg: #FEE2E2;
+  --color-status-error-text: #991B1B;
+  
+  --color-status-info: #3B82F6;
+  --color-status-info-bg: #DBEAFE;
+  --color-status-info-text: #1E40AF;
+  
+  /* Additional Colors */
+  --color-info-transparent: rgba(97, 218, 251, 0.67);
+  --color-error: #EF4444;
+  --color-error-light: #FEF2F2;
+  --color-error-lighter: #FEE2E2;
+  --color-error-dark: #991B1B;
+  
+  /* Neutral Colors */
+  --color-text-primary: #111827;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #6B7280;
+  --color-text-disabled: #9CA3AF;
+  
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-muted: #F3F4F6;
+  --color-bg-hover: #F9FAFB;
+  
+  --color-border-light: #E5E7EB;
+  --color-border-medium: #D1D5DB;
+  --color-border-dark: #9CA3AF;
+  
+  /* =================
+     Spacing Tokens
+     ================= */
+  
+  --spacing-unit: 4px;
+  --spacing-0: 0;
+  --spacing-1: calc(var(--spacing-unit) * 1);   /* 4px */
+  --spacing-2: calc(var(--spacing-unit) * 2);   /* 8px */
+  --spacing-3: calc(var(--spacing-unit) * 3);   /* 12px */
+  --spacing-4: calc(var(--spacing-unit) * 4);   /* 16px */
+  --spacing-5: calc(var(--spacing-unit) * 5);   /* 20px */
+  --spacing-6: calc(var(--spacing-unit) * 6);   /* 24px */
+  --spacing-8: calc(var(--spacing-unit) * 8);   /* 32px */
+  --spacing-10: calc(var(--spacing-unit) * 10); /* 40px */
+  --spacing-12: calc(var(--spacing-unit) * 12); /* 48px */
+  --spacing-16: calc(var(--spacing-unit) * 16); /* 64px */
+  
+  /* =================
+     Typography Tokens
+     ================= */
+  
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* =================
+     Border Radius Tokens
+     ================= */
+  
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-default: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+  
+  /* =================
+     Shadow Tokens
+     ================= */
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-default: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* =================
+     Transition Tokens
+     ================= */
+  
+  --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* =================
+     Z-Index Tokens
+     ================= */
+  
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+  
+  /* =================
+     Component Specific Tokens
+     ================= */
+  
+  /* Form Tokens */
+  --form-input-height: 40px;
+  --form-input-padding-x: var(--spacing-3);
+  --form-input-padding-y: var(--spacing-2);
+  --form-input-border-width: 1px;
+  --form-input-border-color: var(--color-border-medium);
+  --form-input-border-radius: var(--radius-md);
+  --form-input-focus-ring-color: var(--color-primary);
+  --form-input-focus-ring-width: 2px;
+  
+  /* Button Tokens */
+  --button-padding-x: var(--spacing-4);
+  --button-padding-y: var(--spacing-2);
+  --button-font-weight: var(--font-weight-medium);
+  --button-border-radius: var(--radius-md);
+  
+  /* Badge Tokens */
+  --badge-padding-x: var(--spacing-2);
+  --badge-padding-y: var(--spacing-1);
+  --badge-font-size: var(--font-size-xs);
+  --badge-font-weight: var(--font-weight-medium);
+  --badge-border-radius: var(--radius-full);
+  
+  /* Factory Badge Tokens */
+  --factory-badge-padding-x: var(--spacing-3);
+  --factory-badge-padding-y: var(--spacing-1);
+  --factory-badge-font-size: var(--font-size-xs);
+  --factory-badge-font-weight: var(--font-weight-medium);
+  --factory-badge-border-radius: var(--radius-full);
+  
+  /* Modal Tokens */
+  --modal-padding: var(--spacing-6);
+  --modal-border-radius: var(--radius-lg);
+  --modal-max-width-sm: 480px;
+  --modal-max-width-md: 640px;
+  --modal-max-width-lg: 800px;
+  --modal-max-width-xl: 1024px;
+  --modal-text-xs: var(--font-size-xs);
+  --modal-icon-sm: 16px;
+  
+  /* Table Tokens */
+  --table-cell-padding-x: var(--spacing-3);
+  --table-cell-padding-y: var(--spacing-2);
+  --table-header-bg: var(--color-bg-muted);
+  --table-border-color: var(--color-border-light);
+  
+  /* Card Tokens */
+  --card-padding: var(--spacing-4);
+  --card-border-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-default);
+  --card-border-color: var(--color-border-light);
+}
+
+/* Dark mode tokens (future enhancement) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode color overrides */
+  }
+}

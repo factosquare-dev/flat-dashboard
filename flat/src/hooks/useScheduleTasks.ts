@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { Task, Participant } from '../types/schedule';
+import { useState, useCallback } from 'react';
+import type { Task, Factory } from '../types/schedule';
 import { calculateTaskPositionByDate } from '../utils/scheduleDateCalculation';
 
 const generateTaskColor = (index: number): string => {
@@ -7,7 +7,7 @@ const generateTaskColor = (index: number): string => {
   return 'bg-blue-500';
 };
 
-export const useScheduleTasks = (participants: Participant[], startDate: Date, endDate: Date, initialTasks?: Task[], cellWidth: number = 50, days?: Date[]) => {
+export const useScheduleTasks = (factories: Factory[], startDate: Date, endDate: Date, initialTasks?: Task[], cellWidth: number = 50, days?: Date[]) => {
   const [tasks, setTasks] = useState<Task[]>(() => {
     if (initialTasks && initialTasks.length > 0) {
       // 초기 태스크가 있으면 위치 계산 후 설정
@@ -28,15 +28,15 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
           
         }
         
-        // factoryId가 없는 경우 factory 이름으로 participant 찾기
+        // factoryId가 없는 경우 factory 이름으로 factory 찾기
         let factoryId = task.factoryId;
-        if (!factoryId && task.factory && participants.length > 0) {
-          const participant = participants.find(p => 
-            p.name === task.factory || 
-            p.name.replace(/\s*\([^)]*\)\s*$/, '').trim() === task.factory
+        if (!factoryId && task.factory && factories.length > 0) {
+          const factory = factories.find(f => 
+            f.name === task.factory || 
+            f.name.replace(/\s*\([^)]*\)\s*$/, '').trim() === task.factory
           );
-          if (participant) {
-            factoryId = participant.id;
+          if (factory) {
+            factoryId = factory.id;
           }
         }
         
@@ -55,7 +55,8 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
   });
   const [nextTaskId, setNextTaskId] = useState(() => {
     if (initialTasks && initialTasks.length > 0) {
-      return Math.max(...initialTasks.map(t => t.id)) + 1;
+      const ids = initialTasks.map(t => typeof t.id === 'number' ? t.id : 0);
+      return ids.length > 0 ? Math.max(...ids) + 1 : 1;
     }
     return 1;
   });
@@ -76,18 +77,23 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
     return { x: 0, width: cellWidth };
   };
 
-  const addTask = (task: Omit<Task, 'id' | 'x' | 'width' | 'color'>) => {
+  const findFactoryByName = useCallback((factoryName: string) => {
+    if (!factoryName) return undefined;
+    return factories.find(f => 
+      f.name === factoryName || 
+      f.name.replace(/\s*\([^)]*\)\s*$/, '').trim() === factoryName
+    );
+  }, [factories]);
+
+  const addTask = useCallback((task: Omit<Task, 'id' | 'x' | 'width' | 'color'>) => {
     const { x, width } = calculateTaskPosition(task.startDate, task.endDate);
     
     // factory로 participant 찾기
     let factoryId = task.factoryId;
     if (!factoryId && task.factory) {
-      const participant = participants.find(p => 
-        p.name === task.factory || 
-        p.name.replace(/\s*\([^)]*\)\s*$/, '').trim() === task.factory
-      );
-      if (participant) {
-        factoryId = participant.id;
+      const factory = findFactoryByName(task.factory);
+      if (factory) {
+        factoryId = factory.id;
       }
     }
     
@@ -102,13 +108,13 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
       factoryId: factoryId // factory의 ID만 사용
     };
     
-    setTasks([...tasks, newTask]);
+    setTasks(prevTasks => [...prevTasks, newTask]);
     setNextTaskId(nextTaskId + 1);
     
     return newTask;
-  };
+  }, [cellWidth, days, findFactoryByName, nextTaskId, tasks.length]);
 
-  const updateTask = (taskId: number, updates: Partial<Task>) => {
+  const updateTask = useCallback((taskId: string | number, updates: Partial<Task>) => {
     setTasks(prevTasks => prevTasks.map(task => {
       if (task.id === taskId) {
         const updatedTask = { ...task, ...updates };
@@ -127,13 +133,13 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
       }
       return task;
     }));
-  };
+  }, [calculateTaskPosition]);
 
-  const deleteTask = (taskId: number) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
-  };
+  const deleteTask = useCallback((taskId: string | number) => {
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+  }, []);
 
-  const reorderTasks = (draggedIndex: number, targetIndex: number, projectId: string) => {
+  const reorderTasks = useCallback((draggedIndex: number, targetIndex: number, projectId: string) => {
     const projectTasks = tasks.filter(t => t.projectId === projectId);
     const otherTasks = tasks.filter(t => t.projectId !== projectId);
     
@@ -142,7 +148,7 @@ export const useScheduleTasks = (participants: Participant[], startDate: Date, e
     reorderedProjectTasks.splice(targetIndex, 0, removed);
     
     setTasks([...otherTasks, ...reorderedProjectTasks]);
-  };
+  }, [tasks]);
 
   return {
     tasks,

@@ -38,7 +38,8 @@ export const getDateRange = () => {
       return { baseDate, endDate };
     }
   } catch (error) {
-    console.error('[GanttChart] Error getting dates from MockDB:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to get dates from MockDB';
+    console.error('[GanttChart] Error getting dates from MockDB:', errorMessage, error);
   }
   
   // Fallback to current date range

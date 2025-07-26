@@ -5,15 +5,15 @@ import { logger } from '../../utils/logger';
  * Hook for user interaction logging
  */
 export function useUserActionLogging(componentName?: string) {
-  const logClick = useCallback((element: string, data?: any) => {
+  const logClick = useCallback((element: string, data?: Record<string, unknown>) => {
     logger.logUserAction('click', componentName, { element, ...data });
   }, [componentName]);
 
-  const logFormSubmit = useCallback((formName: string, data?: any) => {
+  const logFormSubmit = useCallback((formName: string, data?: Record<string, unknown>) => {
     logger.logUserAction('form_submit', componentName, { formName, ...data });
   }, [componentName]);
 
-  const logFormError = useCallback((formName: string, errors: any) => {
+  const logFormError = useCallback((formName: string, errors: Record<string, unknown>) => {
     logger.warn(`Form validation errors: ${formName}`, {
       component: componentName,
       action: 'form_error',
@@ -22,11 +22,11 @@ export function useUserActionLogging(componentName?: string) {
     });
   }, [componentName]);
 
-  const logSearch = useCallback((query: string, filters?: any) => {
+  const logSearch = useCallback((query: string, filters?: Record<string, unknown>) => {
     logger.logUserAction('search', componentName, { query, filters });
   }, [componentName]);
 
-  const logFilter = useCallback((filterType: string, value: any) => {
+  const logFilter = useCallback((filterType: string, value: unknown) => {
     logger.logUserAction('filter', componentName, { filterType, value });
   }, [componentName]);
 

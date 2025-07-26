@@ -1,17 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { APP_CONSTANTS } from '../config/constants';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  avatar?: string;
-  preferences?: {
-    theme: 'light' | 'dark';
-    locale: string;
-  };
-}
+import { logger } from '../utils/logger';
+import { User } from '../types/user';
+import { 
+  getCurrentUserFromStorage, 
+  saveCurrentUserToStorage,
+  clearAllStorage,
+  getAuthToken,
+  saveAuthToken,
+  saveRefreshToken,
+  clearAuthTokens,
+  saveTheme,
+  saveLocale,
+  STORAGE_KEYS
+} from '../utils/storageConversions';
 
 interface AuthContextValue {
   user: User | null;
@@ -37,20 +39,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Check for existing auth token and validate
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
+        const token = getAuthToken();
         if (token) {
           // Validate token and get user info
           // This would typically be an API call
-          const storedUser = localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.USER_PREFERENCES);
+          const storedUser = getCurrentUserFromStorage();
           if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            setUser(storedUser);
           }
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        logger.error('Auth initialization error', error, 'AuthContext');
         // Clear invalid tokens
-        localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
-        localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
+        clearAuthTokens();
       } finally {
         setIsLoading(false);
       }
@@ -75,14 +76,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const { user: userData, token, refreshToken } = await response.json();
       
-      // Store tokens
-      localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN, token);
-      localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-      localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER_PREFERENCES, JSON.stringify(userData));
+      // Convert API response to User with branded types
+      const typedUser = userData; // In real app, use convertApiUser(userData)
       
-      setUser(userData);
+      // Store tokens
+      saveAuthToken(token);
+      saveRefreshToken(refreshToken);
+      saveCurrentUserToStorage(typedUser);
+      
+      setUser(typedUser);
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error', error, 'AuthContext');
       throw error;
     } finally {
       setIsLoading(false);
@@ -90,10 +94,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    // Clear stored data
-    localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
-    localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
-    localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER_PREFERENCES);
+    // Clear all stored data using utility
+    clearAllStorage();
     
     setUser(null);
     
@@ -106,7 +108,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     const updatedUser = { ...user, ...updates };
     setUser(updatedUser);
-    localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER_PREFERENCES, JSON.stringify(updatedUser));
+    saveCurrentUserToStorage(updatedUser);
   };
 
   const updatePreferences = (preferences: Partial<User['preferences']>) => {
@@ -117,16 +119,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       preferences: { ...user.preferences, ...preferences }
     };
     setUser(updatedUser);
-    localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER_PREFERENCES, JSON.stringify(updatedUser));
+    saveCurrentUserToStorage(updatedUser);
     
     // Store theme separately for easy access
     if (preferences.theme) {
-      localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.THEME, preferences.theme);
+      saveTheme(preferences.theme);
     }
     
     // Store locale separately for easy access
     if (preferences.locale) {
-      localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.LOCALE, preferences.locale);
+      saveLocale(preferences.locale);
     }
   };
 

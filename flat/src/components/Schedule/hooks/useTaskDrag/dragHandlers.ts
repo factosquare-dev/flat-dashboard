@@ -2,10 +2,11 @@
  * Drag event handlers for useTaskDrag
  */
 
-import type { Task, ModalState, Participant, TaskControls } from '../../../../types/schedule';
+import type { ModalState, Participant, TaskControls } from '@/types/schedule';
+import type { DragState } from './types';
 import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '../../utils/dragCalculations';
-import { formatDateISO } from '../../../../utils/coreUtils';
-import { UI_DELAYS } from '../../../../constants/time';
+import { formatDateISO } from '@/utils/coreUtils';
+import { UI_DELAYS } from '@/constants/time';
 import { validateTaskDrop } from './dragValidation';
 import { cleanupDragState, shouldAllowDrop } from './dragState';
 
@@ -17,7 +18,7 @@ export const createDragHandlers = (
   taskControls: TaskControls,
   setModalState: React.Dispatch<React.SetStateAction<ModalState>>,
   modalState: ModalState,
-  dragStateRef: React.MutableRefObject<any>,
+  dragStateRef: React.MutableRefObject<DragState | null>,
   cleanupTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>,
   toastError: (message: string) => void,
   updateTooltip: (x: number, y: number, startDate: Date, endDate: Date) => void,
@@ -124,7 +125,7 @@ export const createDragHandlers = (
     }
   };
 
-  const handleTaskDragEnd = (e: React.DragEvent) => {
+  const handleTaskDragEnd = () => {
     
     // Stop auto-scroll
     stopAutoScroll();

@@ -1,14 +1,18 @@
 import React from 'react';
 import GridCell from '../GridCell';
-import { formatDateISO } from '../../../../utils/coreUtils';
+import { formatDateISO } from '@/utils/coreUtils';
 import { getInteractionState } from '../../utils/globalState';
+import './ProjectRowGrid.css';
 
 interface ProjectRowGridProps {
   days: Date[];
   cellWidth: number;
   projectId: string;
   isAddFactoryRow: boolean;
-  modalState: any;
+  modalState: {
+    isResizingTask?: boolean;
+    isDraggingTask?: boolean;
+  };
   onGridClick: (e: React.MouseEvent, projectId: string, date: string) => void;
 }
 
@@ -48,7 +52,7 @@ export const ProjectRowGrid: React.FC<ProjectRowGridProps> = React.memo(({
   }, []);
 
   return (
-    <div className="absolute inset-0 flex">
+    <div className="project-row-grid">
       {days.map((day, dayIndex) => (
         <GridCell
           key={dayIndex}
@@ -58,7 +62,7 @@ export const ProjectRowGrid: React.FC<ProjectRowGridProps> = React.memo(({
           isAddFactoryRow={isAddFactoryRow}
           onClick={!isAddFactoryRow ? (e) => handleCellClick(e, day) : undefined}
           onDragOver={!isAddFactoryRow ? handleDragOver : undefined}
-          onDragLeave={!isAddFactoryRow ? (e) => {
+          onDragLeave={!isAddFactoryRow ? () => {
             // No cleanup needed
           } : undefined}
           onDrop={!isAddFactoryRow ? (e) => {

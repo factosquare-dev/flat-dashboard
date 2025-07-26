@@ -16,5 +16,3 @@ export const MOCK_CONFIG = {
   seed: 12345, // Seed for consistent random data
 } as const;
 
-// Export for backward compatibility
-export const ENABLE_MOCK = USE_MOCK_DATA;

@@ -4,7 +4,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 
-type ValidationRule<T = any> = {
+type ValidationRule<T = unknown> = {
   required?: boolean | string;
   minLength?: number | string;
   maxLength?: number | string;
@@ -16,15 +16,15 @@ type ValidationRule<T = any> = {
   custom?: (value: T) => boolean | string;
 };
 
-type FormSchema<T extends Record<string, any>> = {
+type FormSchema<T extends Record<string, unknown>> = {
   [K in keyof T]: ValidationRule<T[K]>;
 };
 
-type FormErrors<T extends Record<string, any>> = {
+type FormErrors<T extends Record<string, unknown>> = {
   [K in keyof T]?: string;
 };
 
-type TouchedFields<T extends Record<string, any>> = {
+type TouchedFields<T extends Record<string, unknown>> = {
   [K in keyof T]?: boolean;
 };
 
@@ -34,7 +34,7 @@ interface UseFormValidationOptions {
   validateOnSubmit?: boolean;
 }
 
-export function useFormValidation<T extends Record<string, any>>(
+export function useFormValidation<T extends Record<string, unknown>>(
   initialValues: T,
   schema: FormSchema<T>,
   options: UseFormValidationOptions = {}
@@ -52,7 +52,7 @@ export function useFormValidation<T extends Record<string, any>>(
 
   // Memoized validation function for a single field
   const validateField = useCallback(
-    (fieldName: keyof T, value: any): string | undefined => {
+    (fieldName: keyof T, value: T[keyof T]): string | undefined => {
       const rule = schema[fieldName];
       if (!rule) return undefined;
 
@@ -184,7 +184,7 @@ export function useFormValidation<T extends Record<string, any>>(
   }, [touched]);
 
   // Set field value
-  const setValue = useCallback((fieldName: keyof T, value: any) => {
+  const setValue = useCallback((fieldName: keyof T, value: T[keyof T]) => {
     setValues(prev => ({ ...prev, [fieldName]: value }));
     
     if (validateOnChange) {
@@ -254,7 +254,8 @@ export function useFormValidation<T extends Record<string, any>>(
         try {
           await onSubmit(values);
         } catch (error) {
-          console.error('Form submission error:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Form submission failed';
+          console.error('Form submission error:', errorMessage, error);
         } finally {
           setIsSubmitting(false);
         }
@@ -265,7 +266,7 @@ export function useFormValidation<T extends Record<string, any>>(
   // Field helpers
   const getFieldProps = useCallback((fieldName: keyof T) => ({
     value: values[fieldName],
-    onChange: (value: any) => setValue(fieldName, value),
+    onChange: (value: T[keyof T]) => setValue(fieldName, value),
     onBlur: () => touchField(fieldName),
     error: touched[fieldName] ? errors[fieldName] : undefined,
   }), [values, setValue, touchField, touched, errors]);

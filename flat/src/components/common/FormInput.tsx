@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
-import { COMPONENT_STYLES, cn } from '../../styles/components';
-import { ARIA_LABELS, generateAriaId } from '../../utils/accessibility';
+import { cn } from '../../utils/cn';
+import { generateAriaId } from '../../utils/accessibility';
+import './FormInput.css';
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -34,30 +35,30 @@ const FormInput: React.FC<FormInputProps> = React.memo(({
     onKeyPress?.(e);
   }, [onEnterPress, onKeyPress]);
   return (
-    <div className="w-full">
+    <div className="form-input">
       {label && (
         <label 
           htmlFor={inputId}
           className={cn(
-            COMPONENT_STYLES.LABEL.BASE,
-            required && COMPONENT_STYLES.LABEL.REQUIRED
+            'form-input__label',
+            required && 'form-input__label--required'
           )}
         >
           {label}
         </label>
       )}
-      <div className="relative">
+      <div className="form-input__wrapper">
         {icon && (
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" aria-hidden="true">
+          <div className="form-input__icon" aria-hidden="true">
             {icon}
           </div>
         )}
         <input
           id={inputId}
           className={cn(
-            COMPONENT_STYLES.INPUT.BASE,
-            error ? COMPONENT_STYLES.INPUT.STATE.ERROR : COMPONENT_STYLES.INPUT.STATE.DEFAULT,
-            icon ? 'pl-10' : '',
+            'form-input__field',
+            error && 'form-input__field--error',
+            icon && 'form-input__field--with-icon',
             className
           )}
           onKeyPress={handleKeyPress}
@@ -69,12 +70,12 @@ const FormInput: React.FC<FormInputProps> = React.memo(({
         />
       </div>
       {error && (
-        <p id={errorId} className={COMPONENT_STYLES.TEXT.ERROR} role="alert">
+        <p id={errorId} className="form-input__error" role="alert">
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p id={helpId} className={COMPONENT_STYLES.TEXT.HELPER}>
+        <p id={helpId} className="form-input__helper">
           {helperText}
         </p>
       )}

@@ -14,15 +14,26 @@ interface ScheduleViewSwitcherProps {
   };
   projectId?: string;
   selectedProjects: string[];
-  taskControls: any;
-  dragControls: any;
-  modalState: any;
-  setModalState: React.Dispatch<React.SetStateAction<any>>;
+  taskControls: {
+    deleteTask: (taskId: string) => void;
+  };
+  dragControls: {
+    scrollRef: React.RefObject<HTMLElement>;
+  };
+  modalState: {
+    showFactoryModal?: boolean;
+    showTaskEditModal?: boolean;
+    selectedTask?: Task;
+  };
+  setModalState: React.Dispatch<React.SetStateAction<{
+    showFactoryModal?: boolean;
+    showTaskEditModal?: boolean;
+    selectedTask?: Task;
+  }>>;
   setProjects: React.Dispatch<React.SetStateAction<Participant[]>>;
   onDeleteProject: (projectId: string) => void;
   onProjectSelect: (projectId: string) => void;
   onSelectAll: (selected: boolean) => void;
-  onTaskCreate: () => void;
   onAddTask: () => void;
   onGridWidthChange: (width: number) => void;
   onQuickTaskCreate: (projectId: string, date: string) => void;
@@ -43,7 +54,6 @@ const ScheduleViewSwitcher: React.FC<ScheduleViewSwitcherProps> = React.memo(({
   onDeleteProject,
   onProjectSelect,
   onSelectAll,
-  onTaskCreate,
   onAddTask,
   onGridWidthChange,
   onQuickTaskCreate,
@@ -65,7 +75,7 @@ const ScheduleViewSwitcher: React.FC<ScheduleViewSwitcherProps> = React.memo(({
         onDeleteProject={onDeleteProject}
         onProjectSelect={onProjectSelect}
         onSelectAll={onSelectAll}
-        onAddFactory={() => setModalState((prev: any) => ({ ...prev, showFactoryModal: true }))}
+        onAddFactory={() => setModalState(prev => ({ ...prev, showFactoryModal: true }))}
         onTaskCreate={onQuickTaskCreate}
         onGridWidthChange={onGridWidthChange}
       />
@@ -78,7 +88,7 @@ const ScheduleViewSwitcher: React.FC<ScheduleViewSwitcherProps> = React.memo(({
       tasks={tasks}
       projectId={projectId}
       onTaskClick={(task) => {
-        setModalState((prev: any) => ({ 
+        setModalState(prev => ({ 
           ...prev, 
           showTaskEditModal: true, 
           selectedTask: task 

@@ -104,15 +104,3 @@ export const COLORS = {
     600: 'bg-red-600',
   },
 } as const;
-
-// Z-index scale
-export const Z_INDEX = {
-  DROPDOWN: 'z-10',
-  STICKY: 'z-20',
-  FIXED: 'z-30',
-  MODAL_BACKDROP: 'z-40',
-  MODAL: 'z-50',
-  POPOVER: 'z-60',
-  TOOLTIP: 'z-70',
-  TOAST: 'z-80',
-} as const;

@@ -1,6 +1,7 @@
 import React from 'react';
+import { Beaker } from 'lucide-react';
 import FormInput from '../common/FormInput';
-import FormGroup from '../common/FormGroup';
+import ModalSection from '../common/ModalSection';
 
 interface ReceiptInfo {
   targetType: string;
@@ -20,7 +21,7 @@ const ContentInfoForm: React.FC<ContentInfoFormProps> = ({
   onChange
 }) => {
   return (
-    <FormGroup title="내용물">
+    <ModalSection title="내용물" icon={<Beaker />} iconColor="text-teal-600">
       <div className="grid grid-cols-2 gap-4">
         <FormInput
           label="타겟제형"
@@ -49,7 +50,7 @@ const ContentInfoForm: React.FC<ContentInfoFormProps> = ({
           placeholder="예: 나이아신아마이드"
         />
       </div>
-    </FormGroup>
+    </ModalSection>
   );
 };
 

@@ -21,17 +21,17 @@
 }
 
 .health-indicator.healthy {
-  background-color: #10b981;
+  background-color: var(--color-status-success);
   color: white;
 }
 
 .health-indicator.unhealthy {
-  background-color: #ef4444;
+  background-color: var(--color-status-error);
   color: white;
 }
 
 .health-indicator.unknown {
-  background-color: #6b7280;
+  background-color: var(--color-text-muted);
   color: white;
 }
 
@@ -42,10 +42,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em var(--color-primary-transparent));
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em var(--color-info-transparent));
 }
 
 @keyframes logo-spin {
@@ -74,35 +74,35 @@
 }
 
 .health-check-btn {
-  background-color: #0066cc;
+  background-color: var(--color-primary);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
 }
 
 .health-check-btn:hover {
-  background-color: #0052a3;
+  background-color: var(--color-primary-dark);
 }
 
 .error-btn {
-  background-color: #dc2626;
+  background-color: var(--color-status-error);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
 }
 
 .error-btn:hover {
-  background-color: #b91c1c;
+  background-color: var(--color-error-dark);
 }
 
 .read-the-docs {
-  color: #888;
+  color: var(--color-text-muted);
 }
 
 /* Error Boundary Styles */
@@ -117,16 +117,16 @@
 
 .error-boundary-content {
   max-width: 600px;
-  padding: 2rem;
-  border: 1px solid #ef4444;
-  border-radius: 8px;
-  background-color: #fef2f2;
-  color: #991b1b;
+  padding: var(--spacing-8);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  background-color: var(--color-error-light);
+  color: var(--color-error-dark);
 }
 
 .error-boundary-content h2 {
   margin-top: 0;
-  color: #dc2626;
+  color: var(--color-status-error);
 }
 
 .error-details {
@@ -141,12 +141,12 @@
 }
 
 .error-details pre {
-  background-color: #fee2e2;
-  padding: 1rem;
-  border-radius: 4px;
+  background-color: var(--color-error-lighter);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-sm);
   overflow-x: auto;
-  font-size: 0.8rem;
-  margin: 0.5rem 0;
+  font-size: var(--font-size-xs);
+  margin: var(--spacing-2) 0;
 }
 
 .error-actions {
@@ -157,29 +157,29 @@
 }
 
 .retry-button {
-  background-color: #dc2626;
+  background-color: var(--color-status-error);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  padding: var(--spacing-3) var(--spacing-6);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .retry-button:hover {
-  background-color: #b91c1c;
+  background-color: var(--color-error-dark);
 }
 
 .reload-button {
-  background-color: #6b7280;
+  background-color: var(--color-text-muted);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  padding: var(--spacing-3) var(--spacing-6);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .reload-button:hover {
-  background-color: #4b5563;
+  background-color: var(--color-text-secondary);
 }

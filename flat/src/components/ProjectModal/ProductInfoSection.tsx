@@ -1,29 +1,38 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Package } from 'lucide-react';
 import type { ProjectData } from './types';
-import { productTypes, serviceTypes } from '../../data/mockData';
+import { productTypes } from '../../data/mockData';
+import { SERVICE_TYPE_OPTIONS } from '../../constants';
 
 interface ProductInfoSectionProps {
   formData: ProjectData;
   onChange: (updates: Partial<ProjectData>) => void;
 }
 
-const ProductInfoSection: React.FC<ProductInfoSectionProps> = ({ formData, onChange }) => {
+const ProductInfoSectionComponent: React.FC<ProductInfoSectionProps> = ({ formData, onChange }) => {
+  const handleProductTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange({ productType: e.target.value });
+  }, [onChange]);
+  
+  const handleServiceTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange({ serviceType: e.target.value });
+  }, [onChange]);
+  
   return (
-    <div className="bg-white rounded-xl p-5 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <Package className="w-5 h-5 text-purple-600" />
+    <div className="modal-field-spacing">
+      <div className="modal-field-label">
+        <Package />
         제품 정보
-      </h3>
-      <div className="grid grid-cols-2 gap-6">
-        <div className="group">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            제품 타입 <span className="text-red-500">*</span>
+      </div>
+      <div className="modal-grid-2">
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">
+            제품 타입 *
           </label>
           <select
             value={formData.productType}
-            onChange={(e) => onChange({ productType: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
+            onChange={handleProductTypeChange}
+            className="modal-input cursor-pointer"
             required
           >
             <option value="">제품 타입을 선택하세요</option>
@@ -32,28 +41,25 @@ const ProductInfoSection: React.FC<ProductInfoSectionProps> = ({ formData, onCha
             ))}
           </select>
         </div>
-        <div className="group">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">
             서비스 유형
           </label>
           <select
             value={formData.serviceType}
-            onChange={(e) => onChange({ serviceType: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
+            onChange={handleServiceTypeChange}
+            className="modal-input cursor-pointer"
           >
-            {serviceTypes.map(type => (
+            {SERVICE_TYPE_OPTIONS.map(type => (
               <option key={type} value={type}>{type}</option>
             ))}
-            <option value="ODM">ODM</option>
-            <option value="OBM">OBM</option>
-            <option value="Private Label">Private Label</option>
-            <option value="White Label">White Label</option>
-            <option value="기타">기타</option>
           </select>
         </div>
       </div>
     </div>
   );
 };
+
+const ProductInfoSection = React.memo(ProductInfoSectionComponent);
 
 export default ProductInfoSection;

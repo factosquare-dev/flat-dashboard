@@ -5,8 +5,8 @@
 
 import type { Schedule, Task, Participant } from '../../types/schedule';
 import type { Project } from '../../types/project';
-import { USE_MOCK_DATA } from '../../mocks/mockData';
-import { getApiClient, API_BASE_URL } from './apiClient';
+import { USE_MOCK_DATA } from '../../config/mock';
+import { apiClient } from '../client/interceptors';
 import {
   getOrCreateScheduleForProject,
   addTaskToSchedule,
@@ -21,17 +21,12 @@ export const scheduleApi = {
     participants: Participant[];
     tasks: Task[];
   }): Promise<Schedule> => {
-    try {
-      const apiClient = await getApiClient();
-      const response = await apiClient.post<Schedule>('/schedules', {
-        projectId,
-        ...data
-      });
-      
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiClient.post<Schedule>('/schedules', {
+      projectId,
+      ...data
+    });
+    
+    return response.data;
   },
 
   // 스케줄 조회
@@ -42,12 +37,8 @@ export const scheduleApi = {
       throw new Error('Schedule not found');
     }
 
-    const response = await fetch(`${API_BASE_URL}/schedules/${scheduleId}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch schedule');
-    }
-    
-    return response.json();
+    const response = await apiClient.get<Schedule>(`/schedules/${scheduleId}`);
+    return response.data;
   },
 
   // 프로젝트 ID로 스케줄 조회
@@ -58,13 +49,16 @@ export const scheduleApi = {
       return schedule || null;
     }
 
-    const response = await fetch(`${API_BASE_URL}/schedules/project/${projectId}`);
-    if (!response.ok) {
-      if (response.status === 404) return null;
-      throw new Error('Failed to fetch schedule');
+    try {
+      const response = await apiClient.get<Schedule>(`/schedules/project/${projectId}`);
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error && 'response' in error) {
+        const axiosError = error as { response?: { status: number } };
+        if (axiosError.response?.status === 404) return null;
+      }
+      throw error;
     }
-    
-    return response.json();
   },
   
   // 프로젝트로부터 스케줄 생성 또는 조회
@@ -78,12 +72,8 @@ export const scheduleApi = {
       return Array.from(mockSchedules.values());
     }
 
-    const response = await fetch(`${API_BASE_URL}/schedules`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch schedules');
-    }
-    
-    return response.json();
+    const response = await apiClient.get<Schedule[]>('/schedules');
+    return response.data;
   },
 
   // 태스크 추가
@@ -98,8 +88,8 @@ export const scheduleApi = {
       return updatedSchedule.tasks[updatedSchedule.tasks.length - 1];
     }
 
-    const apiClient = await getApiClient();
-    return apiClient.post<Task>(`/schedules/${scheduleId}/tasks`, task);
+    const response = await apiClient.post<Task>(`/schedules/${scheduleId}/tasks`, task);
+    return response.data;
   },
 
   // 태스크 수정
@@ -119,8 +109,8 @@ export const scheduleApi = {
       return updatedTask;
     }
 
-    const apiClient = await getApiClient();
-    return apiClient.put<Task>(`/schedules/${scheduleId}/tasks/${taskId}`, updates);
+    const response = await apiClient.put<Task>(`/schedules/${scheduleId}/tasks/${taskId}`, updates);
+    return response.data;
   },
 
   // 태스크 삭제
@@ -135,7 +125,6 @@ export const scheduleApi = {
       return;
     }
 
-    const apiClient = await getApiClient();
     await apiClient.delete(`/schedules/${scheduleId}/tasks/${taskId}`);
   }
 };

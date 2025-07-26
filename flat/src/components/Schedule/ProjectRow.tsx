@@ -84,7 +84,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
       </div>
       <div className="flex-1 relative bg-white" style={{ minHeight: '80px' }}>
         <div className="absolute inset-0 flex">
-          {days.map((day, index) => (
+          {days.map((day) => (
             <div
               key={day.toISOString()}
               className={`${isWeekend(day) ? 'bg-gray-100' : ''}`}

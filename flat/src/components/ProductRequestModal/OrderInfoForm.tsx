@@ -1,6 +1,7 @@
 import React from 'react';
+import { Package } from 'lucide-react';
 import FormInput from '../common/FormInput';
-import FormGroup from '../common/FormGroup';
+import ModalSection from '../common/ModalSection';
 
 interface OrderInfoFormProps {
   deliveryQuantity: string;
@@ -18,7 +19,7 @@ const OrderInfoForm: React.FC<OrderInfoFormProps> = ({
   onChange
 }) => {
   return (
-    <FormGroup title="발주 정보">
+    <ModalSection title="발주 정보" icon={<Package />} iconColor="text-orange-600">
       <div className="grid grid-cols-2 gap-4">
         <div className="grid grid-cols-2 gap-4">
           <FormInput
@@ -49,7 +50,7 @@ const OrderInfoForm: React.FC<OrderInfoFormProps> = ({
           />
         </div>
       </div>
-    </FormGroup>
+    </ModalSection>
   );
 };
 

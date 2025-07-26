@@ -29,9 +29,9 @@ export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
-  const [filters, setFilters] = useState(options.filters || {});
-  const [pagination, setPagination] = useState(options.pagination || { page: 1, limit: 20 });
-  const [sort, setSort] = useState(options.sort || { field: 'createdAt', order: 'desc' });
+  const [filters, setFilters] = useState(options.filters ?? {});
+  const [pagination, setPagination] = useState(options.pagination ?? { page: 1, limit: 20 });
+  const [sort, setSort] = useState(options.sort ?? { field: 'createdAt', order: 'desc' });
   
   // Debounce search filter
   const debouncedFilters = useDebounce(filters, 300);

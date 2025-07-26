@@ -8,6 +8,7 @@ import type { Customer } from '@/types/customer';
 import { formatDate } from '@/utils/dateUtils';
 import { useToast } from '@/hooks/useToast';
 import { customerService } from '@/mocks/services';
+import { LoadingState } from '@/components/loading/LoadingState';
 
 const CustomersPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -31,7 +32,10 @@ const CustomersPage: React.FC = () => {
         throw new Error(result.error || '고객 정보를 불러오는데 실패했습니다');
       }
     } catch (error) {
-      showToast('고객 정보를 불러오는데 실패했습니다', 'error');
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : '고객 정보를 불러오는데 실패했습니다';
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +90,10 @@ const CustomersPage: React.FC = () => {
           throw new Error(result.error || '고객 삭제에 실패했습니다');
         }
       } catch (error) {
-        showToast('고객 삭제에 실패했습니다', 'error');
+        const errorMessage = error instanceof Error 
+          ? error.message 
+          : '고객 삭제에 실패했습니다';
+        showToast(errorMessage, 'error');
       }
     }
   };
@@ -94,7 +101,7 @@ const CustomersPage: React.FC = () => {
   const handleSaveCustomer = async (customerData: Partial<Customer>) => {
     try {
       if (modalMode === 'create') {
-        const result = await customerService.create(customerData as any, 'current-user');
+        const result = await customerService.create(customerData, 'current-user');
         if (result.success) {
           await loadCustomers();
           showToast('고객이 등록되었습니다', 'success');
@@ -112,7 +119,10 @@ const CustomersPage: React.FC = () => {
       }
       setShowModal(false);
     } catch (error) {
-      showToast((error as Error).message || '저장에 실패했습니다', 'error');
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : '저장에 실패했습니다';
+      showToast(errorMessage, 'error');
     }
   };
 
@@ -155,9 +165,25 @@ const CustomersPage: React.FC = () => {
       </div>
 
       {/* Customers Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+      <LoadingState
+        isLoading={isLoading}
+        error={null}
+        isEmpty={filteredCustomers.length === 0}
+        emptyComponent={
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="text-center py-12">
+              <Building2 className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">고객이 없습니다</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                {searchQuery ? '검색 결과가 없습니다' : '새로운 고객을 등록해주세요'}
+              </p>
+            </div>
+          </div>
+        }
+      >
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -254,17 +280,9 @@ const CustomersPage: React.FC = () => {
               ))}
             </tbody>
           </table>
-          {filteredCustomers.length === 0 && (
-            <div className="text-center py-12">
-              <Building2 className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">고객이 없습니다</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                {searchQuery ? '검색 결과가 없습니다' : '새로운 고객을 등록해주세요'}
-              </p>
-            </div>
-          )}
         </div>
       </div>
+    </LoadingState>
 
       {/* Customer Modal */}
       <CustomerModal

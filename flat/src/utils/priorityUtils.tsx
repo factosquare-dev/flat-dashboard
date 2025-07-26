@@ -1,6 +1,7 @@
 import React from 'react';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 import type { Priority } from '../types/project';
+import { logger } from './logger';
 
 export interface PriorityInfo {
   code: string;
@@ -39,7 +40,7 @@ export const getPriorityInfo = (priority: Priority): PriorityInfo => {
         priorityCache!.set(pm.displayName, info);
       });
     } catch (error) {
-      console.error('[getPriorityInfo] Error loading priority mappings:', error);
+      logger.error('[getPriorityInfo] Error loading priority mappings', error, 'priorityUtils');
     }
   }
   

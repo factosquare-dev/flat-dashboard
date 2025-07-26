@@ -6,12 +6,13 @@ import type { FactoryFormData } from './types';
 import { BasicInfoForm } from './BasicInfoForm';
 import { CertificationForm } from './CertificationForm';
 import { ManagerForm } from './ManagerForm';
+import { FactoryType } from '../../../types/enums';
 
 const FactoryRegistration: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FactoryFormData>({
     name: '',
-    type: '제조',
+    type: FactoryType.MANUFACTURING,
     address: '',
     contact: '',
     email: '',

@@ -1,14 +1,11 @@
 import React from 'react';
 import { Building2, ChevronRight } from 'lucide-react';
-import { getLightColorClass, getDotColorClass } from './utils';
+import type { Factory } from '../../data/factories';
 
 interface FactorySelectionProps {
-  factories: Array<{
-    name: string;
-    color: string;
-  }>;
-  selectedFactory: string;
-  onFactorySelect: (factoryName: string) => void;
+  factories: Factory[];
+  selectedFactory: string; // Factory ID
+  onFactorySelect: (factoryId: string) => void;
 }
 
 export const FactorySelection: React.FC<FactorySelectionProps> = ({
@@ -17,27 +14,23 @@ export const FactorySelection: React.FC<FactorySelectionProps> = ({
   onFactorySelect
 }) => {
   return (
-    <div>
-      <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-        <Building2 className="w-4 h-4" />
+    <div className="modal-field-spacing">
+      <div className="modal-field-label">
+        <Building2 />
         공장 선택
-      </h3>
-      <div className="grid grid-cols-2 gap-3">
+      </div>
+      <div className="modal-grid-2">
         {factories.map((factory) => (
           <button
-            key={factory.name}
-            onClick={() => onFactorySelect(factory.name)}
-            className={`p-3 rounded-lg border-2 transition-all ${
-              selectedFactory === factory.name 
-                ? getLightColorClass(factory.color)
-                : 'bg-white border-gray-200 hover:border-gray-300'
-            }`}
+            key={factory.id}
+            onClick={() => onFactorySelect(factory.id)}
+            className={`modal-button-compact ${selectedFactory === factory.id ? 'selected' : ''}`}
           >
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${getDotColorClass(factory.color)}`}></div>
-              <span className="text-sm font-medium text-gray-800">{factory.name}</span>
-              {selectedFactory === factory.name && (
-                <ChevronRight className="w-4 h-4 text-gray-400 ml-auto" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full" style={{backgroundColor: `var(--color-factory-${factory.type.toLowerCase()})`}}></div>
+              <span className="font-medium text-gray-800">{factory.name}</span>
+              {selectedFactory === factory.id && (
+                <ChevronRight className="w-3 h-3 text-gray-400 ml-auto" />
               )}
             </div>
           </button>

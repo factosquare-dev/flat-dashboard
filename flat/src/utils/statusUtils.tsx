@@ -1,6 +1,6 @@
 import React from 'react';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { ProjectStatusEnum, TaskStatusEnum } from '../types/enums';
+import { ProjectStatus, TaskStatus } from '../types/enums';
 
 export interface StatusInfo {
   code: string;
@@ -74,7 +74,7 @@ export const getStatusIcon = (status: string, type: 'project' | 'task' = 'projec
   const upperCode = info.code.toUpperCase();
   
   // Use enum values for comparison
-  if (upperCode === ProjectStatusEnum.PLANNING || upperCode === TaskStatusEnum.PLANNING.toUpperCase()) {
+  if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
     return (
       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -82,7 +82,7 @@ export const getStatusIcon = (status: string, type: 'project' | 'task' = 'projec
     );
   }
   
-  if (upperCode === ProjectStatusEnum.IN_PROGRESS || upperCode === TaskStatusEnum.IN_PROGRESS.toUpperCase().replace('-', '_')) {
+  if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return (
       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
@@ -90,7 +90,7 @@ export const getStatusIcon = (status: string, type: 'project' | 'task' = 'projec
     );
   }
   
-  if (upperCode === ProjectStatusEnum.COMPLETED || upperCode === TaskStatusEnum.COMPLETED.toUpperCase()) {
+  if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return (
       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -98,7 +98,7 @@ export const getStatusIcon = (status: string, type: 'project' | 'task' = 'projec
     );
   }
   
-  if (upperCode === ProjectStatusEnum.CANCELLED || upperCode === TaskStatusEnum.CANCELLED.toUpperCase()) {
+  if (upperCode === ProjectStatus.CANCELLED || upperCode === TaskStatus.CANCELLED) {
     return (
       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -168,16 +168,16 @@ function getStatusStylesByCode(code: string, isSelected: boolean = false): strin
 function getStatusColorByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
-  if (upperCode === ProjectStatusEnum.PLANNING || upperCode === TaskStatusEnum.PLANNING.toUpperCase()) {
+  if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
     return '#6B7280'; // gray-500
   }
-  if (upperCode === ProjectStatusEnum.IN_PROGRESS || upperCode === TaskStatusEnum.IN_PROGRESS.toUpperCase().replace('-', '_')) {
+  if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return '#3B82F6'; // blue-500
   }
-  if (upperCode === ProjectStatusEnum.COMPLETED || upperCode === TaskStatusEnum.COMPLETED.toUpperCase()) {
+  if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return '#10B981'; // green-500
   }
-  if (upperCode === ProjectStatusEnum.CANCELLED || upperCode === TaskStatusEnum.CANCELLED.toUpperCase()) {
+  if (upperCode === ProjectStatus.CANCELLED || upperCode === TaskStatus.CANCELLED) {
     return '#EF4444'; // red-500
   }
   
@@ -187,16 +187,16 @@ function getStatusColorByCode(code: string): string {
 function getStatusBgClassByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
-  if (upperCode === ProjectStatusEnum.PLANNING || upperCode === TaskStatusEnum.PLANNING.toUpperCase()) {
+  if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
     return 'bg-gray-100';
   }
-  if (upperCode === ProjectStatusEnum.IN_PROGRESS || upperCode === TaskStatusEnum.IN_PROGRESS.toUpperCase().replace('-', '_')) {
+  if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return 'bg-blue-100';
   }
-  if (upperCode === ProjectStatusEnum.COMPLETED || upperCode === TaskStatusEnum.COMPLETED.toUpperCase()) {
+  if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return 'bg-green-100';
   }
-  if (upperCode === ProjectStatusEnum.CANCELLED || upperCode === TaskStatusEnum.CANCELLED.toUpperCase()) {
+  if (upperCode === ProjectStatus.CANCELLED || upperCode === TaskStatus.CANCELLED) {
     return 'bg-red-100';
   }
   
@@ -206,16 +206,16 @@ function getStatusBgClassByCode(code: string): string {
 function getStatusTextClassByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
-  if (upperCode === ProjectStatusEnum.PLANNING || upperCode === TaskStatusEnum.PLANNING.toUpperCase()) {
+  if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
     return 'text-gray-700';
   }
-  if (upperCode === ProjectStatusEnum.IN_PROGRESS || upperCode === TaskStatusEnum.IN_PROGRESS.toUpperCase().replace('-', '_')) {
+  if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return 'text-blue-700';
   }
-  if (upperCode === ProjectStatusEnum.COMPLETED || upperCode === TaskStatusEnum.COMPLETED.toUpperCase()) {
+  if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return 'text-green-700';
   }
-  if (upperCode === ProjectStatusEnum.CANCELLED || upperCode === TaskStatusEnum.CANCELLED.toUpperCase()) {
+  if (upperCode === ProjectStatus.CANCELLED || upperCode === TaskStatus.CANCELLED) {
     return 'text-red-700';
   }
   
@@ -225,16 +225,16 @@ function getStatusTextClassByCode(code: string): string {
 function getStatusBorderClassByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
-  if (upperCode === ProjectStatusEnum.PLANNING || upperCode === TaskStatusEnum.PLANNING.toUpperCase()) {
+  if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
     return 'border-gray-300';
   }
-  if (upperCode === ProjectStatusEnum.IN_PROGRESS || upperCode === TaskStatusEnum.IN_PROGRESS.toUpperCase().replace('-', '_')) {
+  if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return 'border-blue-300';
   }
-  if (upperCode === ProjectStatusEnum.COMPLETED || upperCode === TaskStatusEnum.COMPLETED.toUpperCase()) {
+  if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return 'border-green-300';
   }
-  if (upperCode === ProjectStatusEnum.CANCELLED || upperCode === TaskStatusEnum.CANCELLED.toUpperCase()) {
+  if (upperCode === ProjectStatus.CANCELLED || upperCode === TaskStatus.CANCELLED) {
     return 'border-red-300';
   }
   
@@ -244,16 +244,16 @@ function getStatusBorderClassByCode(code: string): string {
 function getSelectedStatusStylesByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
-  if (upperCode === ProjectStatusEnum.PLANNING || upperCode === TaskStatusEnum.PLANNING.toUpperCase()) {
+  if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
     return 'bg-gray-600 text-white border-gray-700';
   }
-  if (upperCode === ProjectStatusEnum.IN_PROGRESS || upperCode === TaskStatusEnum.IN_PROGRESS.toUpperCase().replace('-', '_')) {
+  if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return 'bg-blue-600 text-white border-blue-700';
   }
-  if (upperCode === ProjectStatusEnum.COMPLETED || upperCode === TaskStatusEnum.COMPLETED.toUpperCase()) {
+  if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return 'bg-green-600 text-white border-green-700';
   }
-  if (upperCode === ProjectStatusEnum.CANCELLED || upperCode === TaskStatusEnum.CANCELLED.toUpperCase()) {
+  if (upperCode === ProjectStatus.CANCELLED || upperCode === TaskStatus.CANCELLED) {
     return 'bg-red-600 text-white border-red-700';
   }
   

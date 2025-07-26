@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import type { CertificationType, FactoryManager } from '../../../data/factories';
+import { FactoryType, FactoryTypeLabel } from '../../../types/enums';
 
 export interface FactoryFormData {
   id?: string;
   name: string;
-  type: '제조' | '용기' | '포장';
+  type: FactoryType; // Using enum for type safety
   address: string;
   contact: string;
   email: string;
@@ -15,7 +16,7 @@ export interface FactoryFormData {
 
 const initialFormData: FactoryFormData = {
   name: '',
-  type: '제조',
+  type: FactoryType.MANUFACTURING,
   address: '',
   contact: '',
   email: '',

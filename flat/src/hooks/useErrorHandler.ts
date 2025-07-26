@@ -30,7 +30,7 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
     // Handle authentication errors
     if (redirectOn401 && appError.code === ERROR_CODES.UNAUTHORIZED) {
       // Clear auth token
-      localStorage.removeItem(storageKeys.legacyAuthTokenKey);
+      localStorage.removeItem(storageKeys.tokenKey);
       // Redirect to login
       navigate('/login', { state: { from: window.location.pathname } });
       return appError;

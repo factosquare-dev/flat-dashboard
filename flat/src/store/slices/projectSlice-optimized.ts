@@ -1,6 +1,8 @@
 import { produce } from 'immer';
 import type { Project } from '../../types/project';
 import { createImmerUpdater, createAsyncAction } from '../utils/storeUtils';
+import { projectsApi } from '../../api/projects';
+import { ProjectStatus, getProjectStatusFromLabel } from '../../types/enums';
 
 export interface ProjectFilters {
   status: string[];
@@ -152,22 +154,40 @@ export const createProjectSlice = (set: any, get: any) => {
     fetchProjects: createAsyncAction<ProjectSlice>(
       set,
       async () => {
-        // Simulate API call - replace with actual API
-        const response = await fetch('/api/projects');
-        const projects = await response.json();
-        set({ projects });
+        const response = await projectsApi.getProjects();
+        set({ projects: response.data });
       }
     ),
     
     saveProject: createAsyncAction<ProjectSlice>(
       set,
       async (project: Project) => {
-        // Simulate API call - replace with actual API
-        const response = await fetch(`/api/projects/${project.id}`, {
-          method: project.id ? 'PUT' : 'POST',
-          body: JSON.stringify(project),
-        });
-        const savedProject = await response.json();
+        let savedProject: Project;
+        
+        if (project.id) {
+          // Update existing project
+          savedProject = await projectsApi.updateProject({
+            id: project.id,
+            name: project.name,
+            description: project.description,
+            startDate: project.startDate,
+            endDate: project.endDate,
+            customerId: project.customerId,
+            status: getProjectStatusFromLabel(project.status) || ProjectStatus.PLANNING,
+            budget: project.totalAmount
+          });
+        } else {
+          // Create new project
+          savedProject = await projectsApi.createProject({
+            name: project.name || '',
+            description: project.description,
+            startDate: project.startDate,
+            endDate: project.endDate,
+            customerId: project.customerId || project.client || '',
+            status: getProjectStatusFromLabel(project.status) || ProjectStatus.PLANNING,
+            budget: project.totalAmount
+          });
+        }
         
         immerSet(draft => {
           if (project.id) {
@@ -187,8 +207,7 @@ export const createProjectSlice = (set: any, get: any) => {
     removeProject: createAsyncAction<ProjectSlice>(
       set,
       async (id: string) => {
-        // Simulate API call - replace with actual API
-        await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+        await projectsApi.deleteProject(id);
         
         immerSet(draft => {
           const index = draft.projects.findIndex(p => p.id === id);
@@ -215,7 +234,7 @@ export const projectSelectors = {
   getProjectCount: (state: ProjectSlice) => state.projects.length,
   
   getActiveProjects: (state: ProjectSlice) =>
-    state.projects.filter(p => p.status === 'active'),
+    state.projects.filter(p => p.status === ProjectStatus.IN_PROGRESS),
     
   getProjectStats: (state: ProjectSlice) => {
     const stats = {
@@ -227,14 +246,17 @@ export const projectSelectors = {
     
     state.projects.forEach(project => {
       switch (project.status) {
-        case 'active':
+        case ProjectStatus.IN_PROGRESS:
           stats.active++;
           break;
-        case 'completed':
+        case ProjectStatus.COMPLETED:
           stats.completed++;
           break;
-        case 'pending':
+        case ProjectStatus.PLANNING:
           stats.pending++;
+          break;
+        case ProjectStatus.CANCELLED:
+          // Count cancelled projects separately if needed
           break;
       }
     });

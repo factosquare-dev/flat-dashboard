@@ -2,6 +2,7 @@ import { useStore } from '../index';
 import { shallow } from 'zustand/shallow';
 import { createSelector } from 'zustand';
 import type { RootState } from '../index';
+import { ProjectStatus } from '../../types/enums';
 
 /**
  * Performance-optimized store hooks with memoization
@@ -77,9 +78,9 @@ export const useAppStatus = () => useStore(
 // Memoized selectors using createSelector
 const projectCountSelector = (state: RootState) => state.projects.length;
 const activeProjectsSelector = (state: RootState) => 
-  state.projects.filter(p => p.status === 'active').length;
+  state.projects.filter(p => p.status === ProjectStatus.IN_PROGRESS).length;
 const completedProjectsSelector = (state: RootState) => 
-  state.projects.filter(p => p.status === 'completed').length;
+  state.projects.filter(p => p.status === ProjectStatus.COMPLETED).length;
 
 export const useProjectStats = () => useStore(
   createSelector(

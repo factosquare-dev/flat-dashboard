@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import type { Factory } from '../data/factories';
+import { FactoryType, FactoryTypeLabel } from '../types/enums';
 
-export type FactoryType = '제조' | '용기' | '포장';
+// Using FactoryTypeLabel values as string literals
 
 interface UseFactoryFilterReturn {
   selectedType: FactoryType;
@@ -12,7 +13,7 @@ interface UseFactoryFilterReturn {
 }
 
 export const useFactoryFilter = (factories: Factory[]): UseFactoryFilterReturn => {
-  const [selectedType, setSelectedType] = useState<FactoryType>('제조');
+  const [selectedType, setSelectedType] = useState<FactoryType>(FactoryType.MANUFACTURING);
   const [searchTerm, setSearchTerm] = useState('');
 
   const searchLower = useMemo(() => searchTerm.toLowerCase(), [searchTerm]);

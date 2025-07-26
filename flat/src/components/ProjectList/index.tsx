@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Project } from '../../types/project';
 import type { Schedule as ScheduleType } from '../../types/schedule';
-import { scheduleApi } from '../../api/scheduleApi';
 import { useTaskStore } from '../../stores/taskStore';
 import Schedule from '../Schedule';
 import ProjectListView from '../../features/projects/components/ProjectList';
 import { ErrorBoundary, ProjectListErrorFallback } from '../ErrorBoundary';
+import { LoadingState } from '../loading/LoadingState';
+import { EmptyState } from '../common';
+import { Calendar } from 'lucide-react';
 
 interface ProjectListContainerProps {
   className?: string;
 }
 
-const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className = '' }) => {
+const ProjectListContainer = React.memo<ProjectListContainerProps>(({ className = '' }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [projectSchedule, setProjectSchedule] = useState<ScheduleType | null>(null);
   const [isLoadingSchedule, setIsLoadingSchedule] = useState(false);
@@ -22,6 +24,8 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
   
   const handleBack = useCallback(() => {
     setSelectedProject(null);
+    setProjectSchedule(null);
+    setScheduleError(null);
   }, []);
   
   useEffect(() => {
@@ -44,7 +48,7 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
               setProjectSchedule(schedule);
             }
           })
-          .catch(error => {
+          .catch(() => {
             if (isMounted) {
               setScheduleError('스케줄을 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
             }
@@ -68,35 +72,49 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
   if (selectedProject) {
     if (scheduleError) {
       return (
-        <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
-          <div className="text-center max-w-md">
-            <h3 className="text-lg font-semibold text-red-600 mb-2">오류 발생</h3>
-            <p className="text-gray-600 mb-4">{scheduleError}</p>
-            <button
-              onClick={handleBack}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              돌아가기
-            </button>
-          </div>
-        </div>
-      );
-    }
-    
-    if (projectSchedule) {
-      return (
-        <Schedule
-          participants={projectSchedule.participants}
-          tasks={projectSchedule.tasks}
-          startDate={projectSchedule.startDate}
-          endDate={projectSchedule.endDate}
-          projectName={`${selectedProject.client} - ${selectedProject.productType}`}
-          projectId={selectedProject.id}
-          onBack={handleBack}
-          isLoading={isLoadingSchedule || storeLoading}
+        <EmptyState
+          icon={<Calendar />}
+          title="오류 발생"
+          description={scheduleError}
+          action={{
+            label: '돌아가기',
+            onClick: handleBack
+          }}
         />
       );
     }
+    
+    return (
+      <LoadingState
+        isLoading={isLoadingSchedule || storeLoading}
+        error={scheduleError}
+        isEmpty={!projectSchedule}
+        emptyComponent={
+          <EmptyState
+            icon={<Calendar />}
+            title="스케줄 정보 없음"
+            description="해당 프로젝트의 스케줄 정보가 없습니다."
+            action={{
+              label: '돌아가기',
+              onClick: handleBack
+            }}
+          />
+        }
+      >
+        {projectSchedule && (
+          <Schedule
+            participants={projectSchedule.factories ?? []}
+            tasks={projectSchedule.tasks}
+            startDate={projectSchedule.startDate}
+            endDate={projectSchedule.endDate}
+            projectName={`${selectedProject.client} - ${selectedProject.productType}`}
+            projectId={selectedProject.id}
+            onBack={handleBack}
+            isLoading={isLoadingSchedule || storeLoading}
+          />
+        )}
+      </LoadingState>
+    );
   }
   
   return (
@@ -107,6 +125,6 @@ const ProjectListContainer: React.FC<ProjectListContainerProps> = ({ className =
       />
     </ErrorBoundary>
   );
-};
+});
 
 export default ProjectListContainer;

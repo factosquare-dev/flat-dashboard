@@ -3,4 +3,4 @@ export {
   calculateResizeDateFromX, 
   calculateHoveredDateIndex, 
   calculateSnapIndicatorX 
-} from '../../../../utils/coreUtils';
+} from '@/utils/coreUtils';

@@ -1,10 +1,10 @@
 import React from 'react';
 import ScheduleComponent from './Schedule';
 import ScheduleErrorBoundary from './ScheduleErrorBoundary';
-import type { Participant, Task } from '../../types/schedule';
+import type { Factory, Task } from '../../types/schedule';
 
 interface ScheduleProps {
-  participants: Participant[];
+  participants: Factory[];
   tasks: Task[];
   startDate: string;
   endDate: string;

@@ -1,6 +1,8 @@
 import React, { useMemo, useCallback } from 'react';
 import { GANTT_CONSTANTS, TOTAL_DAYS } from '../../constants/gantt';
 import { getTodayIndex, isTodayInRange } from '../../utils/ganttUtils';
+import { cn } from '../../utils/cn';
+import './GanttHeader.css';
 
 interface GanttHeaderProps {
   headerRef: React.RefObject<HTMLDivElement>;
@@ -28,12 +30,11 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef, onHeaderScroll }) 
           months.push(
             <div
               key={`month-${currentMonth}`}
-              className="border-r border-gray-300 flex items-center justify-center text-sm font-medium"
+              className="gantt-header__month"
               style={{ 
-                position: 'absolute',
-                left: monthStart * GANTT_CONSTANTS.CELL_WIDTH,
-                width: monthDays * GANTT_CONSTANTS.CELL_WIDTH
-              }}
+                '--month-start': monthStart,
+                '--month-days': monthDays
+              } as React.CSSProperties}
             >
               {new Date(2025, currentMonth).toLocaleString('ko-KR', { month: 'long' })}
             </div>
@@ -95,10 +96,17 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef, onHeaderScroll }) 
   }, [todayIndex]);
 
   return (
-    <div className="flex bg-gray-50 border-b border-gray-300">
+    <div className="gantt-header"
+      style={{
+        '--gantt-cell-width': `${GANTT_CONSTANTS.CELL_WIDTH}px`,
+        '--gantt-header-height': `${GANTT_CONSTANTS.HEADER_HEIGHT}px`,
+        '--gantt-total-days': TOTAL_DAYS,
+        '--today-index': todayIndex
+      } as React.CSSProperties}
+    >
       {/* Project column header */}
-      <div className="w-48 flex-shrink-0 px-4 py-2 border-r border-gray-300">
-        <h3 className="font-semibold text-sm">프로젝트 / 작업</h3>
+      <div className="gantt-header__project-column">
+        <h3 className="gantt-header__title">프로젝트 / 작업</h3>
       </div>
       
       {/* Date headers */}

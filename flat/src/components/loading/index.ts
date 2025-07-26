@@ -15,7 +15,8 @@ export {
 export { 
   LoadingSpinner,
   LoadingOverlay,
-  LoadingDots 
+  LoadingDots,
+  LoadingFullScreen
 } from './LoadingSpinner';
 
 export { 

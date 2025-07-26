@@ -1,42 +1,43 @@
+import {
+  ProjectStatus,
+  ProjectStatusLabel,
+  Priority,
+  PriorityLabel,
+  ServiceType,
+  ServiceTypeLabel
+} from '../types/enums';
+
+// Legacy support - use ProjectStatusLabel from enums instead
 export const PROJECT_STATUS = {
-  BEFORE_START: '시작전',
-  IN_PROGRESS: '진행중',
-  COMPLETED: '완료',
-  SUSPENDED: '중단',
+  BEFORE_START: ProjectStatusLabel[ProjectStatus.PLANNING],
+  IN_PROGRESS: ProjectStatusLabel[ProjectStatus.IN_PROGRESS],
+  COMPLETED: ProjectStatusLabel[ProjectStatus.COMPLETED],
+  SUSPENDED: ProjectStatusLabel[ProjectStatus.CANCELLED],
 } as const;
 
-export const PROJECT_STATUS_OPTIONS = Object.values(PROJECT_STATUS);
+export const PROJECT_STATUS_OPTIONS = Object.values(ProjectStatusLabel);
 
-export const PROJECT_PRIORITY = {
-  HIGH: '높음',
-  MEDIUM: '보통',
-  LOW: '낮음',
-} as const;
+// Legacy support - use PriorityLabel from enums instead
+export const PROJECT_PRIORITY = PriorityLabel;
 
-export const PROJECT_PRIORITY_OPTIONS = Object.values(PROJECT_PRIORITY);
+export const PROJECT_PRIORITY_OPTIONS = Object.values(PriorityLabel);
 
-export const SERVICE_TYPES = {
-  OEM: 'OEM',
-  ODM: 'ODM',
-  OBM: 'OBM',
-  PRIVATE_LABEL: 'Private Label',
-  WHITE_LABEL: 'White Label',
-  OTHER: '기타',
-} as const;
+// Legacy support - use ServiceTypeLabel from enums instead
+export const SERVICE_TYPES = ServiceTypeLabel;
 
-export const SERVICE_TYPE_OPTIONS = Object.values(SERVICE_TYPES);
+export const SERVICE_TYPE_OPTIONS = Object.values(ServiceTypeLabel);
 
 // Status colors for UI consistency
 export const PROJECT_STATUS_COLORS = {
-  [PROJECT_STATUS.BEFORE_START]: '#94a3b8',
-  [PROJECT_STATUS.IN_PROGRESS]: '#3b82f6',
-  [PROJECT_STATUS.COMPLETED]: '#10b981',
-  [PROJECT_STATUS.SUSPENDED]: '#ef4444',
+  [ProjectStatusLabel[ProjectStatus.PLANNING]]: '#94a3b8',
+  [ProjectStatusLabel[ProjectStatus.IN_PROGRESS]]: '#3b82f6',
+  [ProjectStatusLabel[ProjectStatus.COMPLETED]]: '#10b981',
+  [ProjectStatusLabel[ProjectStatus.CANCELLED]]: '#ef4444',
 } as const;
 
 // Priority colors for UI consistency
 export const PROJECT_PRIORITY_COLORS = {
-  [PROJECT_PRIORITY.HIGH]: '#ef4444',
-  [PROJECT_PRIORITY.MEDIUM]: '#f59e0b',
-  [PROJECT_PRIORITY.LOW]: '#10b981',
+  [PriorityLabel[Priority.HIGH]]: '#ef4444',
+  [PriorityLabel[Priority.MEDIUM]]: '#f59e0b',
+  [PriorityLabel[Priority.LOW]]: '#10b981',
 } as const;

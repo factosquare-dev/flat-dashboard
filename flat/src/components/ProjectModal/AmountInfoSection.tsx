@@ -1,7 +1,8 @@
 import React from 'react';
 import { DollarSign } from 'lucide-react';
 import type { ProjectData } from './types';
-import { formatCurrency } from '../../utils/currency';
+import { formatCurrency } from '../../utils/coreUtils';
+import './AmountInfoSection.css';
 
 interface AmountInfoSectionProps {
   formData: ProjectData;
@@ -28,31 +29,31 @@ const AmountInfoSection: React.FC<AmountInfoSectionProps> = ({ formData, onChang
   };
 
   return (
-    <div className="bg-white rounded-xl p-5 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <DollarSign className="w-5 h-5 text-emerald-600" />
+    <div className="amount-info-section">
+      <h3 className="amount-info-section__header">
+        <DollarSign className="amount-info-section__icon" />
         금액 정보
       </h3>
-      <div className="grid grid-cols-2 gap-6">
-        <div className="group">
-          <label className="block text-sm font-medium text-gray-700 mb-2">매출</label>
+      <div className="amount-info-section__grid">
+        <div className="amount-info-section__group">
+          <label className="amount-info-section__label">매출</label>
           <input
             type="text"
             value={formatCurrencyValue(formData.sales)}
             onChange={(e) => handleCurrencyChange('sales', e.target.value)}
             onKeyPress={handleKeyPress}
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            className="amount-info-section__input"
             placeholder="매출 금액"
           />
         </div>
-        <div className="group">
-          <label className="block text-sm font-medium text-gray-700 mb-2">매입</label>
+        <div className="amount-info-section__group">
+          <label className="amount-info-section__label">매입</label>
           <input
             type="text"
             value={formatCurrencyValue(formData.purchase)}
             onChange={(e) => handleCurrencyChange('purchase', e.target.value)}
             onKeyPress={handleKeyPress}
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            className="amount-info-section__input"
             placeholder="매입 금액"
           />
         </div>

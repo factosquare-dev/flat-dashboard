@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, ErrorInfo } from 'react';
 
 export interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: any) => void;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
   resetOnPropsChange?: boolean;
   resetKeys?: Array<string | number>;
   isolate?: boolean;
@@ -14,6 +14,6 @@ export interface ErrorBoundaryProps {
 export interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
-  errorInfo?: any;
+  errorInfo?: ErrorInfo;
   eventId?: string;
 }

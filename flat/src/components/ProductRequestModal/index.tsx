@@ -1,13 +1,17 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { FileText, Mail } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { FileText, Mail, AlertCircle } from 'lucide-react';
 import EmailModal from '../EmailModal/index';
-import BaseModal from '../common/BaseModal';
+import BaseModal, { ModalFooter } from '../common/BaseModal';
 import FormInput from '../common/FormInput';
 import FormTextarea from '../common/FormTextarea';
-import { Button } from '../ui/Button';
 import OrderInfoForm from './OrderInfoForm';
 import ContentInfoForm from './ContentInfoForm';
 import IngredientInfoForm from './IngredientInfoForm';
+import { useModalFormValidation } from '../../hooks/useModalFormValidation';
+import { ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
+import Button from '../common/Button';
+import { getModalSizeString } from '../../utils/modalUtils';
+import './ProductRequestModal.css';
 
 interface ProductRequestModalProps {
   isOpen: boolean;
@@ -75,6 +79,33 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({
     requirements: '',
   });
   const [isSaved, setIsSaved] = useState(false);
+  
+  // Validation rules
+  const validationRules = {
+    brandName: { required: true },
+    targetProduct: { required: true },
+    deliveryQuantity: { required: true },
+    usageLocation: { required: true },
+    deliverySchedule: { required: true }
+  };
+
+  const {
+    errors,
+    touched,
+    formRef,
+    handleSubmit: handleFormSubmit,
+    handleFieldChange,
+    resetForm,
+    isSubmitting
+  } = useModalFormValidation(formData, {
+    rules: validationRules,
+    onSubmit: async (data) => {
+      if (onSave) {
+        onSave(data);
+        setIsSaved(true);
+      }
+    }
+  });
 
   // 모달이 닫힐 때 저장 상태 초기화
   React.useEffect(() => {
@@ -84,19 +115,16 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({
   }, [isOpen]);
 
   const handleSave = useCallback(() => {
-    if (onSave) {
-      onSave(formData);
-      setIsSaved(true);
+    const form = formRef.current;
+    if (form) {
+      form.requestSubmit();
     }
-  }, [onSave, formData]);
+  }, [formRef]);
 
   const handleSendEmail = useCallback(() => {
     if (!isSaved) {
-      if (window.confirm('제품 개발 의뢰서를 먼저 저장하시겠습니까?')) {
-        handleSave();
-      } else {
-        return;
-      }
+      // Auto-save before sending email for better UX
+      handleSave();
     }
     
     onClose(); // ProductRequestModal 닫기
@@ -105,7 +133,7 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({
     }, 100);
   }, [isSaved, handleSave, onClose]);
   
-  const handleEmailSend = useCallback((emailData: any) => {
+  const handleEmailSend = useCallback(() => {
     setShowEmailModal(false);
     if (onSendEmail) {
       onSendEmail(formData);
@@ -137,7 +165,8 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({
       ...prev,
       [field]: value
     }));
-  }, []);
+    handleFieldChange(field as keyof ProductRequestData, value);
+  }, [handleFieldChange]);
 
   return (
     <>
@@ -150,45 +179,68 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({
             제품 개발 정보
           </span>
         }
-        size="xl"
+        size={getModalSizeString(ModalSize.XL)}
         footer={
-          <div className="flex justify-between items-center">
-            <Button 
-              variant="success"
-              onClick={handleSendEmail}
-              icon={<Mail className="w-4 h-4" />}
-            >
-              메일 보내기
-            </Button>
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={onClose}>
-                취소
-              </Button>
-              <Button 
-                variant="primary" 
-                onClick={handleSave}
-                disabled={isSaved}
+          <ModalFooter>
+            <div className="flex justify-between items-center w-full">
+              <Button
+                variant={ButtonVariant.PRIMARY}
+                size={ButtonSize.MD}
+                onClick={handleSendEmail}
               >
-                {isSaved ? '저장됨' : '저장'}
+                <Mail className="w-4 h-4" />
+                메일 보내기
               </Button>
+              <div className="flex gap-3">
+                <Button
+                  variant={ButtonVariant.SECONDARY}
+                  size={ButtonSize.MD}
+                  onClick={onClose}
+                >
+                  취소
+                </Button>
+                <Button
+                  variant={ButtonVariant.PRIMARY}
+                  size={ButtonSize.MD}
+                  onClick={handleSave}
+                  disabled={isSaved || isSubmitting}
+                  loading={isSubmitting}
+                >
+                  {isSaved ? '저장됨' : '저장'}
+                </Button>
+              </div>
             </div>
-          </div>
+          </ModalFooter>
         }
       >
-        <div className="space-y-6">
+        <form ref={formRef} onSubmit={handleFormSubmit} className="bg-gray-50 -mx-6 -my-6 px-6 py-6">
+          <div className="modal-section-spacing">
+          {/* Validation error message */}
+          {Object.keys(errors).length > 0 && Object.keys(touched).length > 0 && (
+            <div className="product-request-modal__error">
+              <AlertCircle className="product-request-modal__error-icon" />
+              <span>필수 입력 항목을 모두 입력해주세요</span>
+            </div>
+          )}
           {/* 브랜드명 및 제품명 */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="modal-grid-2">
             <FormInput
               label="브랜드명"
+              name="brandName"
               value={formData.brandName}
               onChange={(e) => updateMainField('brandName', e.target.value)}
               placeholder="브랜드명을 입력하세요"
+              required
+              error={touched.brandName ? errors.brandName : undefined}
             />
             <FormInput
               label="타겟 제품"
+              name="targetProduct"
               value={formData.targetProduct}
               onChange={(e) => updateMainField('targetProduct', e.target.value)}
               placeholder="타겟 제품을 입력하세요"
+              required
+              error={touched.targetProduct ? errors.targetProduct : undefined}
             />
           </div>
 
@@ -217,8 +269,11 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({
           <FormInput
             type="date"
             label="출시 예정일"
+            name="deliverySchedule"
             value={formData.deliverySchedule}
             onChange={(e) => updateMainField('deliverySchedule', e.target.value)}
+            required
+            error={touched.deliverySchedule ? errors.deliverySchedule : undefined}
           />
 
           {/* 요청사항 */}
@@ -229,7 +284,8 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({
             rows={4}
             placeholder="추가 요청사항을 입력하세요"
           />
-        </div>
+          </div>
+        </form>
       </BaseModal>
       
       {/* Email Modal */}

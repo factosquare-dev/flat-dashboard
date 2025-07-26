@@ -1,5 +1,6 @@
 import type { UserRole } from '../../../store/slices/userSlice';
 import type { UserFormData, FormErrors } from './types';
+import { UserRole as UserRoleEnum } from '../../../types/enums';
 
 export const formatPhoneNumber = (value: string): string => {
   const numbers = value.replace(/[^0-9]/g, '');
@@ -27,7 +28,7 @@ export const validateForm = (formData: UserFormData): FormErrors => {
     errors.phone = '올바른 전화번호 형식이 아닙니다';
   }
 
-  if (formData.role === 'customer' && !formData.department?.trim()) {
+  if (formData.role === UserRoleEnum.CUSTOMER && !formData.department?.trim()) {
     errors.department = '회사명을 입력해주세요';
   }
 
@@ -36,27 +37,27 @@ export const validateForm = (formData: UserFormData): FormErrors => {
 
 export const getRoleLabel = (role: UserRole): string => {
   switch (role) {
-    case 'admin': return '관리자';
-    case 'manager': return '매니저';
-    case 'customer': return '고객';
+    case UserRoleEnum.ADMIN: return '관리자';
+    case UserRoleEnum.MANAGER: return '매니저';
+    case UserRoleEnum.CUSTOMER: return '고객';
     default: return role;
   }
 };
 
 export const getDepartmentLabel = (role: UserRole): string => {
-  return role === 'customer' ? '회사명' : '부서명';
+  return role === UserRoleEnum.CUSTOMER ? '회사명' : '부서명';
 };
 
 export const getPositionLabel = (role: UserRole): string => {
-  return role === 'customer' ? '직책' : '직위';
+  return role === UserRoleEnum.CUSTOMER ? '직책' : '직위';
 };
 
 export const getDefaultDepartment = (role: UserRole): string => {
-  return role === 'admin' || role === 'manager' ? 'FLAT' : '';
+  return role === UserRoleEnum.ADMIN || role === UserRoleEnum.MANAGER ? 'FLAT' : '';
 };
 
 export const getDefaultPosition = (role: UserRole): string => {
-  if (role === 'admin') return '관리자';
-  if (role === 'manager') return '매니저';
+  if (role === UserRoleEnum.ADMIN) return '관리자';
+  if (role === UserRoleEnum.MANAGER) return '매니저';
   return '';
 };

@@ -3,7 +3,6 @@ import type { Participant } from '../../../types/schedule';
 
 interface ProjectHeaderProps {
   project: Participant;
-  index: number;
   isSelected: boolean;
   isDragging: boolean;
   isDropTarget: boolean;
@@ -19,7 +18,6 @@ interface ProjectHeaderProps {
 
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   project,
-  index,
   isSelected,
   isDragging,
   isDropTarget,

@@ -5,7 +5,6 @@ import ScheduleProjectColumn from './components/ScheduleProjectColumn';
 import ScheduleTimelineGrid from './components/ScheduleTimelineGrid';
 import DragTooltipComponent from './components/DragTooltip';
 import ResizePreviewComponent from './components/ResizePreview';
-import ResizeIndicator from './components/ResizeIndicator';
 
 interface ScheduleGridProps {
   projects: Participant[];
@@ -24,8 +23,14 @@ interface ScheduleGridProps {
   dragPreview: { projectId: string; startDate: string; endDate: string } | null;
   draggedTask: Task | null;
   selectedProjects: string[];
-  modalState: any;
-  setModalState: any;
+  modalState: {
+    showTaskModal?: boolean;
+    isResizingTask?: boolean;
+  };
+  setModalState: React.Dispatch<React.SetStateAction<{
+    showTaskModal?: boolean;
+    isResizingTask?: boolean;
+  }>>;
   setProjects: (projects: Participant[]) => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onMouseMove: (e: React.MouseEvent) => void;
@@ -63,14 +68,11 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
     isDraggingTask,
     dragTooltip,
     resizePreview,
-    hoveredDateIndex,
-    snapIndicatorX,
     dragPreview,
     draggedTask,
     selectedProjects,
     modalState,
     setModalState,
-    setProjects,
     onProjectSelect,
     onDeleteProject,
     onGridClick,
@@ -94,8 +96,6 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = (props) => {
   // Use project drag selection hook
   const {
     isDragSelecting,
-    dragStartIndex,
-    dragEndIndex,
     handleProjectMouseDown,
     handleProjectMouseEnter
   } = useProjectDragSelection({

@@ -24,26 +24,12 @@ export const findOverlappingTasks = (
 };
 
 // 태스크에 row 인덱스 할당 (겹치지 않도록) - Factory별로 독립적으로 처리
-export const assignTaskRows = (tasks: Task[], factoryId?: string, factoryName?: string): Task[] => {
+export const assignTaskRows = (tasks: Task[]): Task[] => {
   const sortedTasks = [...tasks].sort((a, b) => 
     new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );
   
-  // Debug: log task overlap analysis
-  if (tasks.length > 5) {
-    const overlapAnalysis = sortedTasks.map(task => {
-      const overlappingTasks = sortedTasks.filter(t => 
-        t.id !== task.id && isTaskOverlapping(task, t)
-      );
-      return {
-        taskId: task.id,
-        title: task.title || task.taskType,
-        dates: `${task.startDate} ~ ${task.endDate}`,
-        overlapsCount: overlappingTasks.length
-      };
-    });
-    
-  }
+  // Debug logging removed for cleaner console
   
   const taskRows = new Map<number, number>();
   
@@ -154,6 +140,7 @@ export const findAvailableDateRange = (
   
   // 사용 가능한 날짜를 찾지 못한 경우 경고
   if (!foundValidRange) {
+    console.warn('findAvailableDateRange: Could not find valid date range after', attempts, 'attempts');
   }
   
   return {

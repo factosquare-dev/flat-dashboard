@@ -1,8 +1,7 @@
 import type { Schedule, Task, Participant } from '../../types/schedule';
-import type { Project } from '../../types/project';
-import { createScheduleFromProject, createSampleInProgressTasks } from '../../data/projectScheduleData';
+import type { Project, ProjectFactory } from '../../types/project';
 import { formatDate } from '../../utils/coreUtils';
-import { USE_MOCK_DATA } from '../../mocks/mockData';
+import { USE_MOCK_DATA } from '../../config/mock';
 import { getDatabaseWithRetry } from '../../mocks/database/utils';
 // Removed deprecated scheduleAdapter import
 import { createMockSchedules } from '../../data/mockSchedules';
@@ -12,7 +11,7 @@ import { mockDataService } from '../../services/mockDataService';
  * Fix overlapping tasks by adjusting their dates
  * Also ensures tasks stay within project boundaries
  */
-function fixOverlappingTasks(tasks: any[], projectStartDate?: string, projectEndDate?: string): any[] {
+function fixOverlappingTasks(tasks: Task[], projectStartDate?: string, projectEndDate?: string): Task[] {
   if (tasks.length === 0) return tasks;
   
   const projectStart = projectStartDate ? new Date(projectStartDate) : null;
@@ -249,7 +248,7 @@ export const getOrCreateScheduleForProject = async (
           return result;
         }
       }
-    } catch (error) {
+    } catch {
       // Fall through to old logic
     }
   }
@@ -261,13 +260,14 @@ export const getOrCreateScheduleForProject = async (
   let mockSchedules: Schedule[] = [];
   try {
     mockSchedules = createMockSchedules();
-  } catch (error) {
+  } catch {
+    // Continue with empty array
   }
   
   const mockSchedule = mockSchedules.find(s => s.projectId === project.id);
   
   if (!mockSchedule) {
-  } else {
+    // No mock schedule found for this project
   }
   
   // Filter tasks to fit within project dates
@@ -276,7 +276,7 @@ export const getOrCreateScheduleForProject = async (
   
   // Create non-overlapping tasks within each factory
   let globalTaskId = 1;
-  const filteredTasks: any[] = [];
+  const filteredTasks: Task[] = [];
   
   
   if (mockSchedule) {
@@ -289,17 +289,14 @@ export const getOrCreateScheduleForProject = async (
     
     // Get assigned factories for this project
     const assignedFactoryIds = new Set<string>();
-    if (project.manufacturer) {
-      const factory = allFactories.find(f => f.id === project.manufacturer || f.name === project.manufacturer);
-      if (factory) assignedFactoryIds.add(factory.id);
+    if (project.manufacturerId) {
+      assignedFactoryIds.add(project.manufacturerId);
     }
-    if (project.container) {
-      const factory = allFactories.find(f => f.id === project.container || f.name === project.container);
-      if (factory) assignedFactoryIds.add(factory.id);
+    if (project.containerId) {
+      assignedFactoryIds.add(project.containerId);
     }
-    if (project.packaging) {
-      const factory = allFactories.find(f => f.id === project.packaging || f.name === project.packaging);
-      if (factory) assignedFactoryIds.add(factory.id);
+    if (project.packagingId) {
+      assignedFactoryIds.add(project.packagingId);
     }
     
     
@@ -310,13 +307,14 @@ export const getOrCreateScheduleForProject = async (
       }
       const isValid = assignedFactoryIds.has(task.factoryId);
       if (!isValid) {
+        // Task is not from an assigned factory
       }
       return isValid;
     });
     
     
     // Group tasks by factory
-    const tasksByFactory = new Map<string, any[]>();
+    const tasksByFactory = new Map<string, Task[]>();
     validProjectTasks.forEach(task => {
       const factory = task.factory || 'Unknown';
       if (!tasksByFactory.has(factory)) {
@@ -369,60 +367,57 @@ export const getOrCreateScheduleForProject = async (
           filteredTasks.push(newTask);
           lastEndDateForFactory = newEndDate;
         } else {
-        }
+        // Task doesn't fit in project timeline
+      }
       });
     });
   }
   
   // Get participants based on project's factories
   const participants: Participant[] = [];
-  let allFactories: any[] = [];
+  let allFactories: ProjectFactory[] = [];
   
   try {
     allFactories = mockDataService.getAllFactories();
-  } catch (error) {
+  } catch {
+    // Continue with empty array
   }
   
-  if (project.manufacturer && project.manufacturer !== 'null') {
-    // Try to find by ID first, then by name
-    const factory = allFactories.find(f => f.id === project.manufacturer || f.name === project.manufacturer);
+  const startDateStr = formatDate(new Date(project.startDate), 'iso');
+  const endDateStr = formatDate(new Date(project.endDate), 'iso');
+  const period = `${startDateStr} ~ ${endDateStr}`;
+
+  if (project.manufacturerId) {
+    const factory = allFactories.find(f => f.id === project.manufacturerId);
     if (factory) {
-      const startDateStr = formatDate(new Date(project.startDate), 'iso');
-      const endDateStr = formatDate(new Date(project.endDate), 'iso');
       participants.push({
         id: factory.id,
         name: factory.name,
-        period: `${startDateStr} ~ ${endDateStr}`,
+        period,
         color: 'blue'
       });
     }
   }
   
-  if (project.container && project.container !== 'null') {
-    // Try to find by ID first, then by name
-    const factory = allFactories.find(f => f.id === project.container || f.name === project.container);
+  if (project.containerId) {
+    const factory = allFactories.find(f => f.id === project.containerId);
     if (factory) {
-      const startDateStr = formatDate(new Date(project.startDate), 'iso');
-      const endDateStr = formatDate(new Date(project.endDate), 'iso');
       participants.push({
         id: factory.id,
         name: factory.name,
-        period: `${startDateStr} ~ ${endDateStr}`,
+        period,
         color: 'red'
       });
     }
   }
   
-  if (project.packaging && project.packaging !== 'null') {
-    // Try to find by ID first, then by name
-    const factory = allFactories.find(f => f.id === project.packaging || f.name === project.packaging);
+  if (project.packagingId) {
+    const factory = allFactories.find(f => f.id === project.packagingId);
     if (factory) {
-      const startDateStr = formatDate(new Date(project.startDate), 'iso');
-      const endDateStr = formatDate(new Date(project.endDate), 'iso');
       participants.push({
         id: factory.id,
         name: factory.name,
-        period: `${startDateStr} ~ ${endDateStr}`,
+        period,
         color: 'yellow'
       });
     }

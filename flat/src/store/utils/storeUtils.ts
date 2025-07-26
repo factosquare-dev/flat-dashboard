@@ -102,7 +102,7 @@ export const createComputed = <TState, TComputed>(
 /**
  * Create a debounced action
  */
-export const createDebouncedAction = <T extends (...args: any[]) => any>(
+export const createDebouncedAction = <T extends (...args: unknown[]) => unknown>(
   action: T,
   delay: number
 ): T & { cancel: () => void } => {
@@ -117,34 +117,39 @@ export const createDebouncedAction = <T extends (...args: any[]) => any>(
     }, delay);
   }) as T;
   
-  (debounced as any).cancel = () => {
+  const debouncedWithCancel = debounced as T & { cancel: () => void };
+  debouncedWithCancel.cancel = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
     }
   };
   
-  return debounced as T & { cancel: () => void };
+  return debouncedWithCancel;
 };
 
 /**
  * Persist middleware helper
  */
-export const createPersistConfig = (name: string, include?: string[], exclude?: string[]) => {
+export const createPersistConfig = <T extends Record<string, unknown>>(
+  name: string, 
+  include?: string[], 
+  exclude?: string[]
+) => {
   return {
     name,
     partialize: include
-      ? (state: any) => {
-          const result: any = {};
+      ? (state: T) => {
+          const result: Partial<T> = {};
           include.forEach(key => {
-            if (key in state) result[key] = state[key];
+            if (key in state) result[key as keyof T] = state[key as keyof T];
           });
           return result;
         }
       : exclude
-      ? (state: any) => {
+      ? (state: T) => {
           const result = { ...state };
-          exclude.forEach(key => delete result[key]);
+          exclude.forEach(key => delete result[key as keyof T]);
           return result;
         }
       : undefined,
@@ -154,10 +159,17 @@ export const createPersistConfig = (name: string, include?: string[], exclude?: 
 /**
  * Logger middleware for development
  */
-export const createLogger = (storeName: string) => {
-  return (config: StateCreator<any>) => (set: any, get: any, api: any) => {
+export const createLogger = <T extends object>(storeName: string) => {
+  return (config: StateCreator<T>) => (
+    set: StateCreator<T>['setState'], 
+    get: StateCreator<T>['getState'], 
+    api: StateCreator<T>['api']
+  ) => {
     return config(
-      (...args: any[]) => {
+      (...args: Parameters<typeof set>) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[${storeName}] State update:`, args);
+        }
         set(...args);
       },
       get,

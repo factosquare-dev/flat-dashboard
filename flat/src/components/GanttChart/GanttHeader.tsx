@@ -13,6 +13,13 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
   // Get dynamic date range from MockDB
   const { baseDate } = getGanttDateRange();
   const totalDays = getTotalDays();
+
+  // CSS variables for dynamic sizing
+  const cssVars = {
+    '--cell-width': `${GANTT_CONSTANTS.CELL_WIDTH}px`,
+    '--sidebar-width': `${GANTT_CONSTANTS.SIDEBAR_WIDTH}px`,
+    '--header-height': `${GANTT_CONSTANTS.HEADER_HEIGHT}px`,
+  } as React.CSSProperties;
   
   // Render month headers
   const monthHeaders = useMemo(() => {
@@ -31,12 +38,13 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
           months.push(
             <div
               key={`month-${currentMonth}`}
-              className="border-r border-gray-300 flex items-center justify-center text-sm font-medium"
+              className="position-absolute border-r border-gray-300 flex-center text-sm font-medium"
               style={{ 
-                position: 'absolute',
-                left: monthStart * GANTT_CONSTANTS.CELL_WIDTH,
-                width: monthDays * GANTT_CONSTANTS.CELL_WIDTH
-              }}
+                '--month-start': monthStart,
+                '--month-days': monthDays,
+                left: `calc(var(--month-start) * var(--cell-width))`,
+                width: `calc(var(--month-days) * var(--cell-width))`
+              } as React.CSSProperties}
             >
               {new Date(date.getFullYear(), currentMonth).toLocaleString('ko-KR', { month: 'long' })}
             </div>
@@ -56,12 +64,13 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
       months.push(
         <div
           key={`month-${currentMonth}`}
-          className="border-r border-gray-300 flex items-center justify-center text-sm font-medium"
+          className="position-absolute border-r border-gray-300 flex-center text-sm font-medium"
           style={{ 
-            position: 'absolute',
-            left: monthStart * GANTT_CONSTANTS.CELL_WIDTH,
-            width: monthDays * GANTT_CONSTANTS.CELL_WIDTH
-          }}
+            '--month-start': monthStart,
+            '--month-days': monthDays,
+            left: `calc(var(--month-start) * var(--cell-width))`,
+            width: `calc(var(--month-days) * var(--cell-width))`
+          } as React.CSSProperties}
         >
           {new Date(lastDate.getFullYear(), currentMonth).toLocaleString('ko-KR', { month: 'long' })}
         </div>
@@ -86,15 +95,15 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
       headers.push(
         <div
           key={i}
-          className={`border-r border-gray-300 text-center text-xs flex flex-col items-center justify-center ${
-            isWeekend ? 'bg-gray-100 text-gray-500' : 'bg-white'
-          } ${isToday ? 'bg-red-100 font-bold text-red-700' : ''}`}
+          className={`position-absolute border-r border-gray-300 text-center text-xs flex-col-center ${
+            isWeekend ? 'timeline-weekend text-gray-500' : 'bg-white'
+          } ${isToday ? 'timeline-today font-bold text-red-700' : ''}`}
           style={{
-            position: 'absolute',
-            left: i * GANTT_CONSTANTS.CELL_WIDTH,
-            width: GANTT_CONSTANTS.CELL_WIDTH,
-            height: 30
-          }}
+            '--date-index': i,
+            left: `calc(var(--date-index) * var(--cell-width))`,
+            width: 'var(--cell-width)',
+            height: '30px'
+          } as React.CSSProperties}
         >
           <div className="font-medium">{date.getDate()}</div>
           <div className="text-[10px] text-gray-400">
@@ -123,37 +132,39 @@ const GanttHeader: React.FC<GanttHeaderProps> = ({ headerRef }) => {
   return (
     <>
       {/* Project column header */}
-      <div className="bg-gray-100 border-b border-r border-gray-300 flex items-center justify-center font-semibold text-gray-700"
-           style={{ width: GANTT_CONSTANTS.SIDEBAR_WIDTH, height: GANTT_CONSTANTS.HEADER_HEIGHT }}>
+      <div 
+        className="bg-gray-100 border-b border-r border-gray-300 flex-center font-semibold text-gray-700 w-sidebar h-header"
+        style={cssVars}
+      >
         Project
       </div>
       
       {/* Date headers */}
       <div
         ref={headerRef}
-        className="bg-white border-b border-gray-300 overflow-hidden relative"
+        className="bg-white border-b border-gray-300 overflow-hidden position-relative h-header"
         style={{ 
-          width: `calc(100% - ${GANTT_CONSTANTS.SIDEBAR_WIDTH}px)`,
-          height: GANTT_CONSTANTS.HEADER_HEIGHT
+          ...cssVars,
+          width: 'calc(100% - var(--sidebar-width))'
         }}
       >
         {/* Month headers */}
-        <div className="relative" style={{ height: 30 }}>
+        <div className="position-relative h-[30px]">
           {monthHeaders}
         </div>
         
         {/* Date headers */}
-        <div className="relative" style={{ height: 30 }}>
+        <div className="position-relative h-[30px]">
           {dateHeaders}
         </div>
         
         {/* Today line in header */}
         {todayLinePosition !== null && (
           <div
-            className="absolute top-0 w-0.5 bg-red-500 z-10"
+            className="position-absolute top-0 w-0.5 bg-red-500 z-dropdown h-header"
             style={{
-              left: todayLinePosition,
-              height: GANTT_CONSTANTS.HEADER_HEIGHT
+              ...cssVars,
+              left: todayLinePosition
             }}
           />
         )}

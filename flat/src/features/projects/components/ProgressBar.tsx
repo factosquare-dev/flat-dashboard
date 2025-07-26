@@ -1,20 +1,29 @@
 import React from 'react';
+import './ProgressBar.css';
 
 interface ProgressBarProps {
   progress: number;
+  className?: string;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({ progress, className = '' }) => {
+  // Clamp progress between 0 and 100
+  const clampedProgress = Math.max(0, Math.min(100, progress));
+  
   return (
-    <div className="relative w-full mx-auto">
-      <div className="relative bg-gray-200/60 rounded-full h-2.5 overflow-hidden">
+    <div className={`progress-bar ${className}`}>
+      <div className="progress-bar__track">
         <div 
-          className="absolute inset-y-0 left-0 bg-[#0061FF] rounded-full transition-all duration-500 ease-out"
-          style={{ width: `${progress}%` }}
+          className="progress-bar__fill"
+          style={{ '--progress-width': `${clampedProgress}%` } as React.CSSProperties}
+          role="progressbar"
+          aria-valuenow={clampedProgress}
+          aria-valuemin={0}
+          aria-valuemax={100}
         />
       </div>
-      <div className="mt-1 text-[11px] font-medium text-gray-700 text-center">
-        {progress}%
+      <div className="progress-bar__label">
+        {clampedProgress}%
       </div>
     </div>
   );

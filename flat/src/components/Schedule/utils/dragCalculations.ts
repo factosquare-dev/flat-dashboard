@@ -114,7 +114,7 @@ export class GridCoordinateCalculator {
   }
 }
 
-// Legacy functions for backward compatibility
+// Utility functions for date calculations
 export const calculateDateFromX = (x: number, cellWidth: number, days: Date[]): Date => {
   const calculator = new GridCoordinateCalculator({ days, cellWidth });
   return calculator.mouseXToDate(x, false);

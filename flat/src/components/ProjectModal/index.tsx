@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import BasicInfoSection from './BasicInfoSection';
 import ProductInfoSection from './ProductInfoSection';
 import ProjectStatusSection from './ProjectStatusSection';
@@ -11,15 +11,21 @@ import type { ProjectModalProps, ProjectData } from './types';
 import type { Comment } from '../../types/comment';
 import type { User } from '../../types/user';
 import { managerNames } from '../../data/mockData';
+import { ProjectStatusLabel, ProjectStatus, PriorityLabel, Priority, ServiceTypeLabel, ServiceType, ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
+import { useModalFormValidation } from '../../hooks/useModalFormValidation';
+import { AlertCircle } from 'lucide-react';
+import Button from '../common/Button';
+import { getModalSizeString } from '../../utils/modalUtils';
+import './ProjectModal.css';
 
 const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, editData, mode }) => {
   const [formData, setFormData] = useState<ProjectData>({
     client: '',
     manager: '',
     productType: '',
-    serviceType: 'OEM',
-    status: '시작전',
-    priority: '보통',
+    serviceType: ServiceType.OEM,
+    status: ProjectStatus.PLANNING,
+    priority: Priority.MEDIUM,
     startDate: '',
     endDate: '',
     manufacturer: '',
@@ -30,12 +36,6 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
     description: ''
   });
 
-  // Mock current user - 실제로는 전역 상태나 props로 받아야 함
-  const currentUser: User = {
-    id: 'current-user',
-    name: '현재 사용자',
-    avatar: ''
-  };
 
   // Mock DB에서 매니저 이름 가져오기
   const getRandomManagerName = () => {
@@ -109,9 +109,9 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
         client: '',
         manager: '',
         productType: '',
-        serviceType: 'OEM',
-        status: '시작전',
-        priority: '보통',
+        serviceType: ServiceType.OEM,
+        status: ProjectStatus.PLANNING,
+        priority: Priority.MEDIUM,
         startDate: '',
         endDate: '',
         manufacturer: '',
@@ -124,44 +124,96 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
     }
   }, [editData, mode]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-    onClose();
+  // Validation rules
+  const validationRules = {
+    client: { required: true },
+    manager: { required: true },
+    productType: { required: true },
+    serviceType: { required: true },
+    startDate: { required: true },
+    endDate: { 
+      required: true,
+      custom: (value: string) => {
+        if (value && formData.startDate && value < formData.startDate) {
+          return '종료일은 시작일보다 늦어야 합니다';
+        }
+        return null;
+      }
+    }
   };
 
-  const updateFormData = (updates: Partial<ProjectData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+  const {
+    errors,
+    touched,
+    formRef,
+    handleSubmit: handleFormSubmit,
+    validateForm,
+    isSubmitting
+  } = useModalFormValidation(formData, {
+    rules: validationRules,
+    onSubmit: async (data) => {
+      await onSave(data);
+      onClose();
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    handleFormSubmit(e);
   };
+
+  const updateFormData = useCallback((updates: Partial<ProjectData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const modalTitle = useMemo(() => 
+    mode === 'create' ? '새 프로젝트 생성' : '프로젝트 수정', 
+    [mode]
+  );
+
+  const currentUser = useMemo((): User => ({
+    id: 'current-user',
+    name: '현재 사용자',
+    avatar: ''
+  }), []);
 
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={mode === 'create' ? '새 프로젝트 생성' : '프로젝트 수정'}
+      title={modalTitle}
       description="프로젝트 정보를 입력해주세요"
-      size="xl"
+      size={getModalSizeString(ModalSize.XL)}
       footer={
         <ModalFooter>
-          <button
-            type="button"
+          <Button
+            variant={ButtonVariant.SECONDARY}
+            size={ButtonSize.MD}
             onClick={onClose}
-            className="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium"
           >
             취소
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={ButtonVariant.PRIMARY}
+            size={ButtonSize.MD}
             type="submit"
             form="project-form"
-            className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-sm"
+            disabled={isSubmitting}
+            loading={isSubmitting}
           >
             {mode === 'create' ? '생성' : '수정'}
-          </button>
+          </Button>
         </ModalFooter>
       }
     >
-      <form id="project-form" onSubmit={handleSubmit} className="bg-gray-50 -mx-6 -my-6 px-6 py-6">
-          <div className="space-y-6">
+      <form ref={formRef} id="project-form" onSubmit={handleSubmit} className="bg-gray-50 -mx-6 -my-6 px-6 py-6">
+          <div className="modal-section-spacing">
+            {/* Validation error message */}
+            {Object.keys(errors).length > 0 && Object.keys(touched).length > 0 && (
+              <div className="project-modal__error">
+                <AlertCircle className="project-modal__error-icon" />
+                <span>필수 입력 항목을 모두 입력해주세요</span>
+              </div>
+            )}
             <BasicInfoSection formData={formData} onChange={updateFormData} />
             <ProductInfoSection formData={formData} onChange={updateFormData} />
             <ProjectStatusSection formData={formData} onChange={updateFormData} />
@@ -184,4 +236,4 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
   );
 };
 
-export default ProjectModal;
+export default React.memo(ProjectModal);

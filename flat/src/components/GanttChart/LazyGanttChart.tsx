@@ -4,6 +4,7 @@
  */
 
 import React, { lazy, Suspense } from 'react';
+import { logger } from '../../utils/logger';
 
 // Lazy load the GanttChart component
 const GanttChart = lazy(() => import('./index'));
@@ -37,7 +38,7 @@ class GanttChartErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('GanttChart loading error:', error, errorInfo);
+    logger.error('GanttChart loading error:', error, { errorInfo });
   }
 
   render() {

@@ -10,6 +10,7 @@ import type {
 } from '../project';
 import type { UserRole } from '../user';
 import type { FactoryType } from '../factory';
+import type { UserId, FactoryId, ProjectId, CustomerId, TaskId } from '../branded';
 
 // Common filter types
 export interface DateRangeFilter {
@@ -34,9 +35,9 @@ export interface ProjectFilters extends PaginationParams, SearchParams {
   status?: ProjectStatus | ProjectStatus[];
   priority?: Priority | Priority[];
   serviceType?: ServiceType | ServiceType[];
-  customerId?: string;
-  factoryId?: string;
-  managerId?: string;
+  customerId?: CustomerId;
+  factoryId?: FactoryId;
+  managerId?: UserId;
   startDate?: string;
   endDate?: string;
 }
@@ -45,7 +46,7 @@ export interface CreateProjectRequest {
   projectCode: string;
   projectName: string;
   customerName: string;
-  customerId?: string;
+  customerId?: CustomerId;
   productType: string;
   serviceType: ServiceType;
   priority: Priority;
@@ -59,7 +60,7 @@ export interface CreateProjectRequest {
 }
 
 export interface UpdateProjectRequest extends Partial<CreateProjectRequest> {
-  id: string;
+  id: ProjectId;
 }
 
 // User API requests
@@ -81,7 +82,7 @@ export interface CreateUserRequest {
 }
 
 export interface UpdateUserRequest extends Partial<Omit<CreateUserRequest, 'password'>> {
-  id: string;
+  id: UserId;
   password?: string;
 }
 
@@ -106,13 +107,13 @@ export interface CreateFactoryRequest {
 }
 
 export interface UpdateFactoryRequest extends Partial<CreateFactoryRequest> {
-  id: string;
+  id: FactoryId;
 }
 
 // Schedule API requests
 export interface ScheduleFilters extends PaginationParams, SearchParams {
-  projectId?: string;
-  factoryId?: string;
+  projectId?: ProjectId;
+  factoryId?: FactoryId;
   status?: string;
   startDate?: string;
   endDate?: string;

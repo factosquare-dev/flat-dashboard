@@ -11,7 +11,7 @@ export const useDynamicLayout = () => {
     left: '256px' 
   });
   
-  const [debugInfo, setDebugInfo] = useState<{ 
+  const [debugInfo] = useState<{ 
     sidebarSelector: string; 
     sidebarWidth: number; 
     sidebarClasses: string 
@@ -20,14 +20,11 @@ export const useDynamicLayout = () => {
     sidebarWidth: 0,
     sidebarClasses: ''
   });
-  
-  // Force recalculation when sidebar state changes
-  const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
     let rafId: number | null = null;
     let timeoutId: NodeJS.Timeout | null = null;
-    let sidebarEventListeners: Array<{ element: Element; event: string; handler: EventListener }> = [];
+    const sidebarEventListeners: Array<{ element: Element; event: string; handler: EventListener }> = [];
     
     const calculateMargins = () => {
       if (rafId) return;
@@ -44,7 +41,6 @@ export const useDynamicLayout = () => {
         
         // Find sidebar width
         let sidebarWidth = 256;
-        let sidebarClasses = '';
         let foundSelector = '';
         
         // First check main element's margin-left as it reflects sidebar state
@@ -55,7 +51,6 @@ export const useDynamicLayout = () => {
           if (marginLeft > 0) {
             sidebarWidth = marginLeft;
             foundSelector = 'main.margin-left';
-            sidebarClasses = 'detected from main margin';
           }
         }
         
@@ -84,7 +79,6 @@ export const useDynamicLayout = () => {
           if (sidebar) {
             const rect = sidebar.getBoundingClientRect();
             sidebarWidth = rect.width;
-            sidebarClasses = sidebar.className || sidebar.getAttribute('class') || 'no classes';
             
             // Check collapsed state
             const isCollapsed = 
@@ -101,7 +95,7 @@ export const useDynamicLayout = () => {
         } else {
           // Fallback: search for sidebar-like elements
           const allElements = document.querySelectorAll('*');
-          let possibleSidebars = [];
+          const possibleSidebars = [];
           
           allElements.forEach(el => {
             const rect = el.getBoundingClientRect();
@@ -126,15 +120,10 @@ export const useDynamicLayout = () => {
             const found = possibleSidebars[0];
             foundSelector = found.selector;
             sidebarWidth = found.width;
-            sidebarClasses = found.classes;
           }
         }
         
-        setDebugInfo({
-          sidebarSelector: foundSelector || 'NOT FOUND',
-          sidebarWidth,
-          sidebarClasses
-        });
+        // Debug info is tracked in state but not used in this component
         
         setContainerStyle({
           top: `${headerHeight}px`,
@@ -152,7 +141,6 @@ export const useDynamicLayout = () => {
     // ResizeObserver for more efficient sidebar size tracking
     const resizeObserver = new ResizeObserver(() => {
       calculateMargins();
-      setForceUpdate(prev => prev + 1);
     });
     
     // Watch for main element margin changes (sidebar state indicator)
@@ -204,7 +192,6 @@ export const useDynamicLayout = () => {
     // MutationObserver for sidebar changes
     const observer = new MutationObserver(() => {
       calculateMargins();
-      setForceUpdate(prev => prev + 1);
     });
     
     const sidebarElement = document.querySelector('aside') || 
@@ -227,7 +214,6 @@ export const useDynamicLayout = () => {
     if (mainElement) {
       const handleTransition = () => {
         calculateMargins();
-        setForceUpdate(prev => prev + 1);
       };
       mainElement.addEventListener('transitionend', handleTransition);
       mainElement.addEventListener('transitionstart', handleTransition);

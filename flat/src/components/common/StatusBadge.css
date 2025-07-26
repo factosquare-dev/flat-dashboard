@@ -1,0 +1,109 @@
+/**
+ * Status Badge Styles
+ * Using Design Tokens for consistency
+ */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  border-radius: 9999px; /* full rounded */
+  border: 1px solid transparent;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+/* Size Variants */
+.status-badge--sm {
+  padding: calc(var(--spacing-1) * 0.5) var(--spacing-1);
+  font-size: 0.625rem; /* 10px */
+}
+
+.status-badge--md {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+}
+
+.status-badge--lg {
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+/* Project Status Variants */
+.status-badge.status-badge-planning {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-light);
+}
+
+.status-badge.status-badge-in-progress {
+  background-color: var(--color-status-info-bg);
+  color: var(--color-status-info-text);
+  border-color: var(--color-primary);
+}
+
+.status-badge.status-badge-completed {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
+  border-color: var(--color-status-success);
+}
+
+.status-badge.status-badge-cancelled {
+  background-color: var(--color-status-error-bg);
+  color: var(--color-status-error-text);
+  border-color: var(--color-status-error);
+}
+
+/* Task Status Variants */
+.status-badge.status-badge-pending {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-light);
+}
+
+.status-badge.status-badge-delayed {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning-text);
+  border-color: var(--color-status-warning);
+}
+
+/* Priority Variants */
+.status-badge.status-badge-high-priority {
+  background-color: var(--color-status-error-bg);
+  color: var(--color-status-error-text);
+  border-color: var(--color-status-error);
+}
+
+.status-badge.status-badge-medium-priority {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning-text);
+  border-color: var(--color-status-warning);
+}
+
+.status-badge.status-badge-low-priority {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary-text);
+  border-color: var(--color-primary);
+}
+
+/* Default */
+.status-badge.status-badge-default {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-muted);
+  border-color: var(--color-border-light);
+}
+
+/* Hover Effects */
+.status-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Focus States for Accessibility */
+.status-badge:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

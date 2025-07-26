@@ -1,0 +1,8 @@
+/* ProjectRowGrid CSS */
+
+/* Grid container */
+.project-row-grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}

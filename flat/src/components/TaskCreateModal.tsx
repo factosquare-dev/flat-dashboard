@@ -1,26 +1,30 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { factories, taskTypesByFactoryType, getFactoryByName } from '../data/factories';
+import { AlertCircle } from 'lucide-react';
+import { factories, taskTypesByFactoryType } from '../data/factories';
 import BaseModal from './common/BaseModal';
-import FormInput from './common/FormInput';
-import FormSelect from './common/FormSelect';
-import { Button } from './ui/Button';
 import { formatDateISO } from '../utils/coreUtils';
 import { UI_DELAYS } from '../constants/time';
 import { useToast } from '../hooks/useToast';
 import { validateTask, TASK_CONSTRAINTS, dateUtils } from '../utils/taskValidation';
 import { mockDataService } from '../services/mockDataService';
+import { TaskStatus, ModalSize, ButtonVariant, ButtonSize } from '../types/enums';
+import { getFactoryByIdSafe, getFactoryByIdOrName } from '../utils/factoryUtils';
+import { MODAL_SIZES } from '../utils/modalUtils';
+import Button from './common/Button';
+import './TaskCreateModal.css';
+import { FactoryId, ProjectId, toFactoryId, toFactoryIdSafe, extractIdString } from '../types/branded';
 
 interface TaskCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (task: { factory: string; factoryId: string; taskType: string; startDate: string; endDate: string }) => void;
-  availableFactories: string[];
+  onSave: (task: { factory: string; factoryId: FactoryId; taskType: string; startDate: string; endDate: string }) => void;
+  availableFactories: FactoryId[];
   initialDate?: string;
-  projectId?: string;
+  projectId?: ProjectId;
   selectedFactory?: string;
   projectStartDate?: string;
   projectEndDate?: string;
-  existingTasks?: { factory: string; factoryId?: string; startDate: string; endDate: string; }[];
+  existingTasks?: { factory: string; factoryId?: FactoryId; startDate: string; endDate: string; }[];
 }
 
 const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
@@ -42,6 +46,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   const [taskType, setTaskType] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
   const cleanupTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   
   // 모달이 열릴 때 날짜 초기화
@@ -53,14 +58,14 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     }
   }, [initialDate, isOpen]);
   
-  // selectedFactory가 있으면 해당 공장을 자동 선택
+  // selectedFactory가 있으면 해당 공장을 자동 선택 - ID/이름 둘 다 지원
   React.useEffect(() => {
     if (selectedFactory && isOpen) {
-      // selectedFactory가 이름인 경우 ID로 변환
-      const factory = mockDataService.getAllFactories().find(f => f.name === selectedFactory);
+      const allFactories = mockDataService.getAllFactories();
+      const factory = getFactoryByIdOrName(allFactories, selectedFactory);
       setFactoryId(factory?.id || '');
     } else if (projectId && isOpen) {
-      const projectFactory = factories.find(f => f.id === projectId);
+      const projectFactory = getFactoryByIdSafe(factories, projectId);
       if (projectFactory) {
         setFactoryId(projectFactory.id);
       }
@@ -76,13 +81,18 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     };
   }, []);
 
-  // 사용 가능한 공장 목록 필터링
-  const availableFactoryList = useMemo(() => 
-    availableFactories.length > 0 
-      ? factories.filter(f => availableFactories.includes(f.name))
-      : factories,
-    [availableFactories]
-  );
+  // 사용 가능한 공장 목록 필터링 - ID 기반으로 변경
+  const availableFactoryList = useMemo(() => {
+    if (availableFactories.length > 0) {
+      // availableFactories가 이름 배열인 경우 ID로 변환하여 필터링
+      return factories.filter(f => {
+        // availableFactories가 ID인지 이름인지 확인
+        const hasId = availableFactories.some(af => factories.some(factory => factory.id === af));
+        return hasId ? availableFactories.includes(f.id) : availableFactories.includes(f.name);
+      });
+    }
+    return factories;
+  }, [availableFactories]);
 
   const currentFactory = useMemo(() => 
     mockDataService.getAllFactories().find(f => f.id === factoryId),
@@ -95,25 +105,28 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   );
 
   const handleSave = useCallback(() => {
+    // Reset validation error
+    setValidationError(null);
+    
     // Input validation with proper error messages
     if (!factoryId?.trim()) {
-      toastError('공장 선택 오류', '공장을 선택해주세요.');
+      setValidationError('공장을 선택해주세요.');
       return;
     }
     
     if (!taskType?.trim()) {
-      toastError('작업 유형 오류', '작업 유형을 선택해주세요.');
+      setValidationError('작업 유형을 선택해주세요.');
       return;
     }
     
     if (!startDate?.trim() || !endDate?.trim()) {
-      toastError('날짜 입력 오류', '시작일과 종료일을 모두 입력해주세요.');
+      setValidationError('시작일과 종료일을 모두 입력해주세요.');
       return;
     }
     
     const selectedFactory = mockDataService.getAllFactories().find(f => f.id === factoryId);
     if (!selectedFactory) {
-      toastError('공장 선택 오류', '유효하지 않은 공장입니다.');
+      setValidationError('유효하지 않은 공장입니다.');
       return;
     }
     
@@ -126,15 +139,15 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       startDate,
       endDate,
       color: 'blue',
-      status: 'pending' as const,
+      status: TaskStatus.PENDING,
       projectId: projectId || ''
     };
     
     // Validate the task using our validation utilities
     const taskValidation = validateTask(newTask, projectStartDate, projectEndDate);
     if (!taskValidation.isValid) {
-      const errorMessage = taskValidation.errors.map(error => error.message).join('\n');
-      toastError('태스크 유효성 검증 실패', errorMessage);
+      const errorMessage = taskValidation.errors.map(error => error.message).join(', ');
+      setValidationError(errorMessage);
       return;
     }
     
@@ -148,19 +161,19 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
     );
     
     if (hasOverlap) {
-      toastError('태스크 겹침 오류', `${selectedFactory.name}에서 해당 기간에 이미 진행 중인 태스크가 있습니다.`);
+      setValidationError(`${selectedFactory.name}에서 해당 기간에 이미 진행 중인 태스크가 있습니다.`);
       return;
     }
     
     // Additional validation: Check task duration
     const duration = dateUtils.getDaysBetween(startDate, endDate);
     if (duration < TASK_CONSTRAINTS.MIN_TASK_DURATION_DAYS) {
-      toastError('태스크 기간 오류', `태스크 기간은 최소 ${TASK_CONSTRAINTS.MIN_TASK_DURATION_DAYS}일 이상이어야 합니다.`);
+      setValidationError(`태스크 기간은 최소 ${TASK_CONSTRAINTS.MIN_TASK_DURATION_DAYS}일 이상이어야 합니다.`);
       return;
     }
     
     if (duration > TASK_CONSTRAINTS.MAX_TASK_DURATION_DAYS) {
-      toastError('태스크 기간 오류', `태스크 기간은 최대 ${TASK_CONSTRAINTS.MAX_TASK_DURATION_DAYS}일을 초과할 수 없습니다.`);
+      setValidationError(`태스크 기간은 최대 ${TASK_CONSTRAINTS.MAX_TASK_DURATION_DAYS}일을 초과할 수 없습니다.`);
       return;
     }
     
@@ -171,7 +184,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       startDate,
       endDate
     });
-  }, [factoryId, taskType, startDate, endDate, onSave, toastError, projectStartDate, projectEndDate, projectId, existingTasks, mockDataService]);
+  }, [factoryId, taskType, startDate, endDate, onSave, projectStartDate, projectEndDate, projectId, existingTasks]);
   
   const handleClose = useCallback(() => {
     // Clear any existing timeout
@@ -185,6 +198,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       setTaskType('');
       setStartDate('');
       setEndDate('');
+      setValidationError(null);
       cleanupTimeoutRef.current = null;
     }, UI_DELAYS.MODAL_CLEANUP);
     onClose();
@@ -203,6 +217,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   const handleFactoryChange = useCallback((newFactoryId: string) => {
     setFactoryId(newFactoryId);
     setTaskType(''); // 공장 변경 시 태스크 타입 초기화
+    setValidationError(null); // 입력 변경 시 에러 초기화
   }, []);
 
 
@@ -227,14 +242,17 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       isOpen={isOpen}
       onClose={handleClose}
       title="태스크 추가"
-      size="sm"
+      size={MODAL_SIZES.SMALL}
       footer={
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={onClose}>
+        <div className="modal-footer__actions">
+          <Button 
+            variant={ButtonVariant.SECONDARY}
+            onClick={onClose}
+          >
             취소
           </Button>
           <Button 
-            variant="primary" 
+            variant={ButtonVariant.PRIMARY}
             onClick={handleSave}
             disabled={!factoryId || !taskType || !startDate || !endDate}
           >
@@ -243,53 +261,91 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
         </div>
       }
     >
-      <div className="space-y-4">
-        <FormSelect
-          label="공장 선택"
-          value={factoryId}
-          onChange={(e) => handleFactoryChange(e.target.value)}
-          options={factoryOptions}
-          placeholder="공장을 선택하세요"
-          disabled={!!selectedFactory}
-        />
+      <div className="modal-section-spacing">
+        {/* Validation error message */}
+        {validationError && (
+          <div className="task-modal__error">
+            <AlertCircle className="task-modal__error-icon" />
+            <span>{validationError}</span>
+          </div>
+        )}
+        
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">공장 선택</label>
+          <select
+            className="modal-input cursor-pointer"
+            value={factoryId}
+            onChange={(e) => handleFactoryChange(e.target.value)}
+            disabled={!!selectedFactory}
+          >
+            <option value="">공장을 선택하세요</option>
+            {factoryOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <FormSelect
-          label="태스크 유형"
-          value={taskType}
-          onChange={(e) => setTaskType(e.target.value)}
-          options={taskTypeOptions}
-          placeholder={!factoryId ? '먼저 공장을 선택하세요' : '태스크 유형을 선택하세요'}
-          disabled={!factoryId}
-        />
+        <div className="modal-field-spacing">
+          <label className="modal-field-label">태스크 유형</label>
+          <select
+            className="modal-input cursor-pointer"
+            value={taskType}
+            onChange={(e) => setTaskType(e.target.value)}
+            disabled={!factoryId}
+          >
+            <option value="">
+              {!factoryId ? '먼저 공장을 선택하세요' : '태스크 유형을 선택하세요'}
+            </option>
+            {taskTypeOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <FormInput
-          type="date"
-          label="시작일"
-          value={startDate}
-          onChange={(e) => {
-            const newStartDate = e.target.value;
-            setStartDate(newStartDate);
-            if (!endDate || endDate < newStartDate) {
-              setEndDate(newStartDate);
-            }
-          }}
-          min={projectStartDate}
-          max={projectEndDate}
-        />
+        <div className="modal-grid-2">
+          <div className="modal-field-spacing">
+            <label className="modal-field-label">시작일</label>
+            <input
+              type="date"
+              className="modal-input"
+              value={startDate}
+              onChange={(e) => {
+                const newStartDate = e.target.value;
+                setStartDate(newStartDate);
+                setValidationError(null);
+                if (!endDate || endDate < newStartDate) {
+                  setEndDate(newStartDate);
+                }
+              }}
+              min={projectStartDate}
+              max={projectEndDate}
+            />
+          </div>
 
-        <FormInput
-          type="date"
-          label="종료일"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          min={startDate}
-          max={projectEndDate}
-        />
+          <div className="modal-field-spacing">
+            <label className="modal-field-label">종료일</label>
+            <input
+              type="date"
+              className="modal-input"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setValidationError(null);
+              }}
+              min={startDate}
+              max={projectEndDate}
+            />
+          </div>
+        </div>
         
         {/* Task constraints info */}
-        <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-md">
-          <div className="font-medium mb-1">태스크 제약사항</div>
-          <ul className="space-y-1 text-xs">
+        <div className="task-modal__constraints">
+          <div className="task-modal__constraints-title">태스크 제약사항</div>
+          <ul className="task-modal__constraints-list">
             <li>• 태스크 기간: {TASK_CONSTRAINTS.MIN_TASK_DURATION_DAYS}일 ~ {TASK_CONSTRAINTS.MAX_TASK_DURATION_DAYS}일</li>
             <li>• 같은 공장에서는 동시에 하나의 태스크만 진행 가능</li>
             <li>• 태스크는 프로젝트 기간 내에서만 생성 가능</li>

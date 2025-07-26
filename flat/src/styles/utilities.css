@@ -340,7 +340,8 @@
 }
 
 .text-ellipsis {
-  @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  @apply overflow-hidden whitespace-nowrap;
+  text-overflow: ellipsis;
 }
 
 .text-balance {

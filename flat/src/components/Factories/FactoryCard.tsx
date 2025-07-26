@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Factory } from 'lucide-react';
-import type { Factory as FactoryType } from '../../data/factories';
+import type { Factory as FactoryDataType } from '../../data/factories';
+import { FactoryType, FactoryTypeLabel } from '../../types/enums';
+import FactoryTypeBadge from '../common/FactoryTypeBadge';
 
 interface FactoryCardProps {
-  factory: FactoryType;
-  onEdit: (factory: FactoryType) => void;
+  factory: FactoryDataType;
+  onEdit: (factory: FactoryDataType) => void;
   onDelete: (factoryId: string) => void;
 }
 
@@ -41,18 +43,7 @@ const FactoryCard: React.FC<FactoryCardProps> = ({ factory, onEdit, onDelete }) 
     setIsDropdownOpen(false);
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case '제조':
-        return 'bg-blue-100 text-blue-700';
-      case '용기':
-        return 'bg-green-100 text-green-700';
-      case '포장':
-        return 'bg-purple-100 text-purple-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
+  // Removed getTypeColor - now using FactoryTypeBadge component
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden group">
@@ -65,9 +56,7 @@ const FactoryCard: React.FC<FactoryCardProps> = ({ factory, onEdit, onDelete }) 
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">{factory.name}</h3>
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(factory.type)}`}>
-                {factory.type} 공장
-              </span>
+              <FactoryTypeBadge type={factory.type} />
             </div>
           </div>
           
@@ -144,7 +133,7 @@ const FactoryCard: React.FC<FactoryCardProps> = ({ factory, onEdit, onDelete }) 
         {factory.certifications.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-100">
             <div className="flex flex-wrap gap-2">
-              {factory.certifications.map((cert, index) => (
+              {factory.certifications.map((cert) => (
                 <span 
                   key={cert} 
                   className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"

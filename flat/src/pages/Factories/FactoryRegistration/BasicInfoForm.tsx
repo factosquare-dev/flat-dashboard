@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FactoryFormData } from './types';
-import { FACTORY_TYPE_OPTIONS, FACTORY_FORM_LABELS } from '../../../constants';
+import { FACTORY_FORM_LABELS } from '../../../constants';
+import { FactoryType, FactoryTypeLabel } from '../../../types/enums';
 
 interface BasicInfoFormProps {
   formData: FactoryFormData;
@@ -37,8 +38,8 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {FACTORY_TYPE_OPTIONS.map((type) => (
-              <option key={type} value={type}>{type}</option>
+            {Object.entries(FactoryTypeLabel).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
             ))}
           </select>
         </div>

@@ -22,24 +22,22 @@ const ScheduleDataValidator: React.FC<ScheduleDataValidatorProps> = ({
     // Validate task-factory data consistency
     const validation = validateTaskFactoryData(tasks, projects);
     
-    const dataIntegrityCheck = {
-      viewMode,
-      dataSource: 'taskControls.tasks',
-      totalTasks: tasks.length,
-      taskIds: tasks.map(t => t.id).sort(),
-      tasksByFactory: tasks.reduce((acc, task) => {
-        const factory = task.factory || 'Unknown';
-        if (!acc[factory]) acc[factory] = 0;
-        acc[factory]++;
-        return acc;
-      }, {} as Record<string, number>),
-      validation,
-      message: 'Both Table and Gantt views use the same data source (taskControls.tasks)'
-    };
-    
     // Development logging for data validation
     if (validation.issues.length > 0) {
-      // Data integrity issues detected
+      console.warn('[ScheduleDataValidator] Data integrity issues detected:', {
+        viewMode,
+        dataSource: 'taskControls.tasks',
+        totalTasks: tasks.length,
+        taskIds: tasks.map(t => t.id).sort(),
+        tasksByFactory: tasks.reduce((acc, task) => {
+          const factory = task.factory || 'Unknown';
+          if (!acc[factory]) acc[factory] = 0;
+          acc[factory]++;
+          return acc;
+        }, {} as Record<string, number>),
+        validation,
+        message: 'Both Table and Gantt views use the same data source (taskControls.tasks)'
+      });
     }
   }, [viewMode, tasks, projects, isDevelopment]);
 

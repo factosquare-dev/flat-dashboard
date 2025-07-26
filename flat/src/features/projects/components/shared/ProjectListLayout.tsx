@@ -45,7 +45,7 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
     <ProjectActions 
       selectedPriority={selectedPriority || 'all'}
       selectedServiceType={selectedServiceType || 'all'}
-      statusFilters={statusFilters || []}
+      statusFilters={statusFilters ?? []}
       searchValue={searchValue || ''}
       dateRange={dateRange || { start: null, end: null }}
       totalProjects={totalProjects || 0}

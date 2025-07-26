@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { formatErrorForDisplay } from '../../utils/error/errorHandler';
 
 interface ErrorFallbackProps {
@@ -8,6 +8,10 @@ interface ErrorFallbackProps {
 
 export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
   const formattedError = formatErrorForDisplay(error);
+  
+  const handleHomeClick = useCallback(() => {
+    window.location.href = '/';
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -43,7 +47,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError 
           )}
           
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={handleHomeClick}
             className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
           >
             홈으로 이동
