@@ -62,8 +62,11 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
     const cellRenderProps = { project, editableCell, onUpdateField };
 
     switch (columnId) {
+      case 'name':
+        return cellRenderers.renderName(cellRenderProps);
+      
       case 'productType':
-        return cellRenderers.renderProductType(project);
+        return cellRenderers.renderProductType(cellRenderProps);
       
       case 'serviceType':
         return cellRenderers.renderServiceType(cellRenderProps);

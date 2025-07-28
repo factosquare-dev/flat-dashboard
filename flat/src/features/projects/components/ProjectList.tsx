@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import type { Project } from '../../../types/project';
 import { useDynamicLayout } from '../../../components/Schedule/hooks/useDynamicLayout';
 import { useProjectListState } from './hooks/useProjectListState';
+import { useColumnVisibility } from '../../../hooks/useColumnVisibility';
+import { useColumnOrder } from '../../../hooks/useColumnOrder';
 import ProjectListLayout from './shared/ProjectListLayout';
 import ProjectTableSection from './ProjectTableSection';
 import ProjectModals from './ProjectModals';
@@ -14,6 +16,8 @@ interface ProjectListProps {
 
 const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, className = '' }) => {
   const { containerStyle } = useDynamicLayout();
+  const { hiddenColumns, toggleColumn, isColumnVisible, showAllColumns, hideAllColumns } = useColumnVisibility();
+  const { columns } = useColumnOrder();
   const {
     showEmailModal,
     setShowEmailModal,
@@ -52,10 +56,15 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     searchValue: filtersHook.searchValue,
     dateRange: filtersHook.dateRange,
     totalProjects: projectsHook.projects.length,
+    columns,
+    hiddenColumns,
     onPriorityChange: filtersHook.setSelectedPriority,
     onServiceTypeChange: filtersHook.setSelectedServiceType,
     onStatusFilterToggle: filtersHook.handleStatusFilterToggle,
     onDateRangeChange: filtersHook.setDateRange,
+    onToggleColumn: toggleColumn,
+    onShowAllColumns: showAllColumns,
+    onHideAllColumns: hideAllColumns,
   }), [
     containerStyle,
     handleRefresh,
@@ -72,6 +81,11 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     filtersHook.setSelectedServiceType,
     filtersHook.handleStatusFilterToggle,
     filtersHook.setDateRange,
+    columns,
+    hiddenColumns,
+    toggleColumn,
+    showAllColumns,
+    hideAllColumns,
   ]);
 
   // Memoize table section props
@@ -80,22 +94,24 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     isLoading: projectsHook.isLoading,
     hasMore: projectsHook.hasMore,
     filters: filtersHook,
+    hiddenColumns,
     onEdit: handleEditProject,
     onDelete: handleDeleteProject,
     onDuplicate: handleDuplicateProject,
     onSelectProject,
-    onUpdateProject: projectsHook.updateProjectBatch,
+    onUpdateProject: projectsHook.updateProject,
     loadMoreRef: projectsHook.loadMoreRef,
   }), [
     filteredProjects,
     projectsHook.isLoading,
     projectsHook.hasMore,
     filtersHook,
+    hiddenColumns,
     handleEditProject,
     handleDeleteProject,
     handleDuplicateProject,
     onSelectProject,
-    projectsHook.updateProjectBatch,
+    projectsHook.updateProject,
     projectsHook.loadMoreRef,
   ]);
 

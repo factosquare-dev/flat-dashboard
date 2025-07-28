@@ -36,7 +36,8 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onSelect(false); // 토글 트리거
+              // MASTER 프로젝트의 확장/축소는 onSelect을 통해 처리됨
+              onSelect(!project.isExpanded);
             }}
             className="p-0.5 rounded transition-colors hover:bg-gray-200"
             title={project.isExpanded ? "축소" : "확장"}

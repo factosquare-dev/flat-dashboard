@@ -11,6 +11,7 @@ interface HierarchicalProjectTableProps {
   selectedRows: string[];
   sortField: keyof Project | null;
   sortDirection: 'asc' | 'desc';
+  hiddenColumns?: Set<string>;
   onSort: (field: keyof Project) => void;
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (projectId: string, checked: boolean, index?: number) => void;
@@ -61,11 +62,11 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
     onSelectRow: (projectId: string, checked: boolean, index?: number) => {
       const project = flatProjects.find(p => p.id === projectId);
       if (project) {
-        if (!isProjectType(project.type, ProjectTypeEnum.TASK)) {
-          // 대형/소형 프로젝트 클릭 시 확장/축소
+        if (isProjectType(project.type, ProjectTypeEnum.MASTER)) {
+          // MASTER 프로젝트는 확장/축소만
           handleToggleProject(projectId);
         } else {
-          // 태스크는 기존 선택 로직 사용
+          // SUB와 TASK는 선택 가능
           props.onSelectRow(projectId, checked, index);
         }
       }

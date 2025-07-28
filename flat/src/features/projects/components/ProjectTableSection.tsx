@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { Project } from '../../../types/project';
 import type { Priority, ServiceType, ProjectStatus } from '../../../types/project';
+import type { ProjectId } from '../../../types/branded';
 import DraggableProjectTable from './DraggableProjectTable';
 import HierarchicalProjectTable from './HierarchicalProjectTable';
 import OptionsMenu from './OptionsMenu';
@@ -22,11 +23,12 @@ interface ProjectTableSectionProps {
   isLoading: boolean;
   hasMore: boolean;
   filters: ProjectFilters;
+  hiddenColumns?: Set<string>;
   onEdit: (project: Project) => void;
-  onDelete: (projectId: string) => void;
+  onDelete: (projectId: ProjectId) => void;
   onDuplicate: (project: Project) => void;
   onSelectProject: (project: Project) => void;
-  onUpdateProject?: (projectId: string, updates: Partial<Project>) => void;
+  onUpdateProject?: (projectId: ProjectId, field: keyof Project, value: any) => void;
   loadMoreRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -35,6 +37,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   isLoading,
   hasMore,
   filters,
+  hiddenColumns = new Set(),
   onEdit,
   onDelete,
   onDuplicate,
@@ -122,7 +125,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     }
   };
 
-  const handleEditProject = (projectId: string) => {
+  const handleEditProject = (projectId: ProjectId) => {
     const project = projects.find(p => p.id === projectId);
     if (project) {
       onEdit(project);
@@ -130,12 +133,12 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     }
   };
 
-  const handleDeleteProject = (projectId: string) => {
+  const handleDeleteProject = (projectId: ProjectId) => {
     onDelete(projectId);
     setShowOptionsMenu(null);
   };
   
-  const handleDuplicateProject = (projectId: string) => {
+  const handleDuplicateProject = (projectId: ProjectId) => {
     const project = projects.find(p => p.id === projectId);
     if (project) {
       onDuplicate(project);
@@ -143,9 +146,12 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     }
   };
   
-  const handleUpdateProject = (projectId: string, field: keyof Project, value: any) => {
+  const handleUpdateProject = (projectId: ProjectId, field: keyof Project, value: any) => {
+    console.log('[ProjectTableSection] handleUpdateProject called:', { projectId, field, value });
     if (onUpdateProject) {
-      onUpdateProject(projectId, { [field]: value });
+      onUpdateProject(projectId, field, value);
+    } else {
+      console.error('[ProjectTableSection] onUpdateProject is not defined!');
     }
   };
 
@@ -202,6 +208,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           selectedRows={selectedRows}
           sortField={sortField}
           sortDirection={sortDirection}
+          hiddenColumns={hiddenColumns}
           onSort={handleSort}
           onSelectAll={handleSelectAllProjects}
           onSelectRow={handleSelectRow}

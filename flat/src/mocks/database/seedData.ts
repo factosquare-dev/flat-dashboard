@@ -695,9 +695,9 @@ export const seedData = {
 
   createPriorityMappings() {
     return [
-      { id: 'priority-1', code: 'high', displayName: '높음', displayNameEn: 'High', color: '#EF4444', order: 1 },
-      { id: 'priority-2', code: 'medium', displayName: '보통', displayNameEn: 'Medium', color: '#F59E0B', order: 2 },
-      { id: 'priority-3', code: 'low', displayName: '낮음', displayNameEn: 'Low', color: '#10B981', order: 3 },
+      { id: 'priority-1', code: 'HIGH', displayName: '높음', displayNameEn: 'High', color: '#EF4444', order: 1 },
+      { id: 'priority-2', code: 'MEDIUM', displayName: '보통', displayNameEn: 'Medium', color: '#F59E0B', order: 2 },
+      { id: 'priority-3', code: 'LOW', displayName: '낮음', displayNameEn: 'Low', color: '#10B981', order: 3 },
     ];
   },
 

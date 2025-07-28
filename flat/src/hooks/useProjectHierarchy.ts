@@ -1,17 +1,32 @@
 import { useState, useCallback } from 'react';
 import type { Project } from '../types/project';
 import { ProjectType } from '../types/project';
+import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 
 export const useProjectHierarchy = () => {
-  // Mock function to update project's parentId
-  // In real implementation, this would call the backend API
+  // Update project's parentId in mock database
   const updateProjectParent = useCallback(async (projectId: string, newParentId: string | null) => {
-    // TODO: Call backend API to update project.parentId
-    // For now, just show alert
-    if (newParentId) {
-      alert(`프로젝트 이동 기능은 백엔드 API 연동이 필요합니다.`);
-    } else {
-      alert(`프로젝트를 독립 프로젝트로 만들려면 백엔드 API 연동이 필요합니다.`);
+    try {
+      const db = MockDatabaseImpl.getInstance();
+      const database = db.getDatabase();
+      const project = database.projects.get(projectId);
+      
+      if (!project) {
+        // Project not found
+        return;
+      }
+      
+      // Update the project's parentId
+      project.parentId = newParentId || undefined;
+      database.projects.set(projectId, project);
+      
+      // Force refresh by dispatching a custom event
+      window.dispatchEvent(new Event('projectHierarchyChanged'));
+      
+      // Project moved successfully
+    } catch (error) {
+      // Error updating project parent
+      alert('프로젝트 이동 중 오류가 발생했습니다.');
     }
   }, []);
 

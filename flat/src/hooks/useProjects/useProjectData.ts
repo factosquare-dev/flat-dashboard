@@ -3,7 +3,9 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import type { Project, ServiceType, ProjectStatus, Priority } from '../../types/project';
+import type { Project } from '../../types/project';
+import { ServiceType, ProjectStatus, Priority, ProductType } from '../../types/enums';
+import type { ProjectId } from '../../types/branded';
 import type { Schedule } from '../../types/schedule';
 import { factories } from '../../data/factories';
 import { scheduleApi } from '../../api/scheduleApi';
@@ -67,10 +69,10 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
           id: `project-${i + 1}`,
           client: `Client ${i + 1}`,
           manager: `Manager ${i + 1}`,
-          productType: ['식품', '의약품', '화장품', '기타'][i % 4],
-          serviceType: ['OEM', 'ODM', 'OBM'][i % 3] as ServiceType,
-          currentStage: ['기획', '개발', '테스트', '완료'].slice(0, (i % 3) + 1),
-          status: ['시작전', '진행중', '완료', '중단'][i % 4] as ProjectStatus,
+          productType: [ProductType.SKINCARE, ProductType.MAKEUP, ProductType.HAIR_CARE, ProductType.BODY_CARE][i % 4],
+          serviceType: [ServiceType.OEM, ServiceType.ODM, ServiceType.OBM][i % 3],
+          currentStage: [], // Will be populated from tasks
+          status: [ProjectStatus.PLANNING, ProjectStatus.IN_PROGRESS, ProjectStatus.COMPLETED, ProjectStatus.CANCELLED][i % 4],
           progress: Math.floor(Math.random() * 101),
           startDate: getRelativeDate(-30 + (i % 60)),
           endDate: getRelativeDate(30 + (i % 60)),
@@ -79,7 +81,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
           packaging: ['박스', '파우치', '병', '튜브'][i % 4],
           sales: `${Math.floor(Math.random() * 10000) + 1000}만원`,
           purchase: `${Math.floor(Math.random() * 8000) + 800}만원`,
-          priority: ['높음', '보통', '낮음'][i % 3] as Priority,
+          priority: [Priority.HIGH, Priority.MEDIUM, Priority.LOW][i % 3],
           depositPaid: Math.random() > 0.5,
           type: i % 10 === 0 ? 'master' : 'sub',
           scheduleId: `schedule-${i + 1}`
@@ -101,7 +103,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
     }
   }, []);
 
-  const updateProject = useCallback((projectId: string, field: keyof Project, value: any) => {
+  const updateProject = useCallback((projectId: ProjectId, field: keyof Project, value: any) => {
     setProjects(prev => prev.map(project => 
       project.id === projectId 
         ? { ...project, [field]: value }
@@ -133,7 +135,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
     }
   }, [onProjectsUpdate]);
 
-  const deleteProject = useCallback((projectId: string) => {
+  const deleteProject = useCallback((projectId: ProjectId) => {
     setProjects(prev => prev.filter(project => project.id !== projectId));
     
     if (onProjectsUpdate) {
@@ -144,7 +146,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
     }
   }, [onProjectsUpdate]);
 
-  const bulkUpdateProjects = useCallback((projectIds: string[], updates: Partial<Project>) => {
+  const bulkUpdateProjects = useCallback((projectIds: ProjectId[], updates: Partial<Project>) => {
     setProjects(prev => prev.map(project => 
       projectIds.includes(project.id)
         ? { ...project, ...updates }
@@ -173,7 +175,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
   }, [loadProjects, onProjectsUpdate]);
 
   // Load schedule for project
-  const loadSchedule = useCallback(async (projectId: string) => {
+  const loadSchedule = useCallback(async (projectId: ProjectId) => {
     if (schedules.has(projectId)) {
       return schedules.get(projectId);
     }

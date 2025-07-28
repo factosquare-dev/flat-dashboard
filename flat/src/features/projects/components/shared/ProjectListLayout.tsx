@@ -3,6 +3,7 @@ import { Plus, Mail } from 'lucide-react';
 import { PageLayout, FloatingActionButton } from '../../../../components/common';
 import ProjectActions from '../ProjectActions';
 import type { Priority, ServiceType, ProjectStatus } from '../../../../types/project';
+import type { Column } from '../../../../hooks/useColumnOrder';
 
 interface ProjectListLayoutProps {
   containerStyle: { top: string; left: string };
@@ -17,10 +18,15 @@ interface ProjectListLayoutProps {
   searchValue?: string;
   dateRange?: { start: string | null; end: string | null };
   totalProjects?: number;
+  columns?: Column[];
+  hiddenColumns?: Set<string>;
   onPriorityChange?: (priority: Priority | 'all') => void;
   onServiceTypeChange?: (serviceType: ServiceType | 'all') => void;
   onStatusFilterToggle?: (status: ProjectStatus) => void;
   onDateRangeChange?: (range: { start: string | null; end: string | null }) => void;
+  onToggleColumn?: (columnId: string) => void;
+  onShowAllColumns?: () => void;
+  onHideAllColumns?: () => void;
 }
 
 const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
@@ -36,10 +42,15 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
   searchValue,
   dateRange,
   totalProjects,
+  columns,
+  hiddenColumns,
   onPriorityChange,
   onServiceTypeChange,
   onStatusFilterToggle,
-  onDateRangeChange
+  onDateRangeChange,
+  onToggleColumn,
+  onShowAllColumns,
+  onHideAllColumns
 }) => {
   const header = (
     <ProjectActions 
@@ -49,6 +60,8 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
       searchValue={searchValue || ''}
       dateRange={dateRange || { start: null, end: null }}
       totalProjects={totalProjects || 0}
+      columns={columns}
+      hiddenColumns={hiddenColumns}
       onPriorityChange={onPriorityChange || (() => {})}
       onServiceTypeChange={onServiceTypeChange || (() => {})}
       onStatusFilterToggle={onStatusFilterToggle || (() => {})}
@@ -56,6 +69,9 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
       onSearchChange={onSearch}
       onCreateProject={onCreateProject}
       onSendEmail={onSendEmail}
+      onToggleColumn={onToggleColumn}
+      onShowAllColumns={onShowAllColumns}
+      onHideAllColumns={onHideAllColumns}
     />
   );
 

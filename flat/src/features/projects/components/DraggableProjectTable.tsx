@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { Project } from '../../../types/project';
+import type { ProjectId } from '../../../types/branded';
 import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '../../../hooks/useColumnOrder';
 import type { Column } from '../../../hooks/useColumnOrder';
+import { useColumnResize } from '../../../hooks/useColumnResize';
 import { ProjectTypeEnum } from '../../../types/enums';
 import { isProjectType } from '../../../utils/projectTypeUtils';
 import { useProjectHierarchy } from '../../../hooks/useProjectHierarchy';
+import '../../../styles/tableResize.css';
 
 interface DraggableProjectTableProps {
   projects: Project[];
   selectedRows: string[];
   sortField: keyof Project | null;
   sortDirection: 'asc' | 'desc';
+  hiddenColumns?: Set<string>;
   onSort: (field: keyof Project) => void;
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (projectId: string, checked: boolean, index?: number) => void;
   onSelectProject: (project: Project) => void;
-  onUpdateProject: (projectId: string, field: keyof Project, value: any) => void;
-  onShowOptionsMenu: (projectId: string, position: { top: number; left: number }, event?: React.MouseEvent) => void;
+  onUpdateProject: (projectId: ProjectId, field: keyof Project, value: any) => void;
+  onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }, event?: React.MouseEvent) => void;
   onMouseEnterRow?: (index: number) => void;
   isDragging?: boolean;
   onStartDrag?: (index: number) => void;
@@ -30,6 +34,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   selectedRows,
   sortField,
   sortDirection,
+  hiddenColumns = new Set(),
   onSort,
   onSelectAll,
   onSelectRow,
@@ -51,9 +56,21 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     handleDrop,
     resetColumnOrder
   } = useColumnOrder();
+
+  const {
+    columnWidths,
+    startResize,
+    getColumnWidth,
+    resetColumnWidths,
+    isResizing
+  } = useColumnResize();
   
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const { moveToMaster, canBeMoved, canAcceptChildren } = useProjectHierarchy();
+  const tableRef = useRef<HTMLTableElement>(null);
+
+  // Filter out hidden columns
+  const visibleColumns = columns.filter(col => !hiddenColumns.has(col.id));
 
   const handleProjectDragStart = (e: React.DragEvent, projectId: string) => {
     setDraggedProjectId(projectId);
@@ -91,39 +108,61 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   };
 
   const renderHeaderCell = (column: Column) => {
-    const isDraggable = column.id !== 'checkbox' && column.id !== 'options';
+    const isDraggable = column.id !== 'checkbox' && column.id !== 'options' && !isResizing;
+    const isResizable = column.id !== 'checkbox' && column.id !== 'options';
+    const width = getColumnWidth(column.id, column.width);
     
     return (
       <th
         key={column.id}
         className={`table-header-cell ${column.sortable ? 'table-header-cell-sortable' : ''} ${
           column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : ''
-        } ${draggedColumn === column.id ? 'opacity-50' : ''} ${column.width || ''}`}
+        } ${draggedColumn === column.id ? 'opacity-50' : ''} relative`}
+        style={{ 
+          width,
+          minWidth: '50px'
+        }}
         draggable={isDraggable}
         onDragStart={isDraggable ? () => handleDragStart(column.id) : undefined}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
         onDrop={isDraggable ? (e) => handleDrop(e, column.id) : undefined}
-        onClick={column.sortable ? () => onSort(column.id as keyof Project) : undefined}
+        onClick={column.sortable && !isResizing ? () => onSort(column.id as keyof Project) : undefined}
       >
         <div className={`flex items-center ${
           column.align === 'center' ? 'justify-center' : column.align === 'right' ? 'justify-end' : 'justify-between'
-        }`}>
-          <span>{column.label}</span>
+        } overflow-hidden`}>
+          <span className="truncate">{column.label}</span>
           {column.sortable && sortField === column.id && (
-            <span className="text-blue-600">
+            <span className="text-blue-600 ml-1 flex-shrink-0">
               {sortDirection === 'asc' ? '↑' : '↓'}
             </span>
           )}
         </div>
+        {isResizable && (
+          <div
+            className="resize-handle"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const th = e.currentTarget.parentElement;
+              if (th) {
+                // Add resizing class to body to prevent text selection
+                document.body.classList.add('resizing');
+                startResize(column.id, e.clientX, th.offsetWidth);
+              }
+            }}
+          />
+        )}
       </th>
     );
   };
 
 
   return (
-    <table className="w-full min-w-[1800px]" role="table">
-        <thead className="sticky top-0 z-10 bg-gray-50 border-b border-gray-100">
+    <div style={{ width: 'max-content', minWidth: '100%' }}>
+      <table ref={tableRef} role="table" style={{ width: 'max-content', minWidth: '1800px' }}>
+        <thead className="sticky top-0 z-20 bg-gray-50 border-b border-gray-100">
           <tr role="row">
             <th className="w-16 px-1 py-1.5 text-left" scope="col">
               <div className="flex items-center justify-center">
@@ -135,7 +174,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 />
               </div>
             </th>
-            {columns.map(renderHeaderCell)}
+            {visibleColumns.map(renderHeaderCell)}
             <th className="table-header-cell text-center w-12" scope="col">
               <span className="sr-only">프로젝트 옵션</span>
               <svg className="w-4 h-4 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -150,7 +189,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               <ProjectTableRow
                 project={project}
                 index={index}
-                columns={columns}
+                columns={visibleColumns}
                 isSelected={selectedRows.includes(project.id)}
                 onSelect={(checked) => onSelectRow(project.id, checked, index)}
                 onRowClick={onSelectProject}
@@ -168,6 +207,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
           ))}
         </tbody>
       </table>
+    </div>
   );
 };
 

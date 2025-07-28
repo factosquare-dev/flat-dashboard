@@ -4,13 +4,14 @@
 
 import { useCallback } from 'react';
 import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
 import { useProjects } from '@/hooks/useProjects';
 import { formatDate } from '@/utils/coreUtils';
 
 export const useProjectActions = () => {
   const projectsHook = useProjects();
 
-  const deleteProject = useCallback((projectId: string) => {
+  const deleteProject = useCallback((projectId: ProjectId) => {
     if (confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) {
       projectsHook.deleteProject(projectId);
     }

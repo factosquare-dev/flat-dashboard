@@ -38,10 +38,13 @@ export interface Project {
   customerId: CustomerId;
   customer: Customer;
   product: Product;
+  productType: ProductType;
+  serviceType: ServiceType;
   quantity: number;
   totalAmount: number;
   depositAmount: number;
   depositStatus: DepositStatus;
+  depositPaid: boolean;
   startDate: Date;
   endDate: Date;
   manufacturerId: FactoryId;
@@ -51,8 +54,22 @@ export interface Project {
   progress: number;
   scheduleId: ProjectId; // Schedule ID is same as Project ID
   createdBy: UserId;
+  managerId: UserId;
   createdAt: Date;
   updatedAt: Date;
+  
+  // UI computed/display fields - populated from relations
+  client?: string; // customer.name
+  manager?: string; // manager user name
+  manufacturer?: string; // manufacturer factory name
+  container?: string; // container factory name
+  packaging?: string; // packaging factory name
+  currentStage?: string[]; // computed from tasks
+  
+  // Hierarchy fields for UI
+  children?: Project[];
+  isExpanded?: boolean;
+  level?: number;
 }
 
 // Re-export FactoryType from enums

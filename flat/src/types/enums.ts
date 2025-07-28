@@ -21,6 +21,7 @@ export const FactoryTypeLabel: Record<FactoryType, string> = {
 export enum ProjectStatus {
   PLANNING = 'PLANNING',
   IN_PROGRESS = 'IN_PROGRESS',
+  AGING = 'AGING',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
 }
@@ -94,6 +95,28 @@ export const PriorityDisplayEnum = {
   HIGH: '높음',
   MEDIUM: '보통',
   LOW: '낮음',
+};
+
+// Product Types
+export enum ProductType {
+  SKINCARE = 'SKINCARE',
+  MAKEUP = 'MAKEUP',
+  HAIR_CARE = 'HAIR_CARE',
+  BODY_CARE = 'BODY_CARE',
+  PERFUME = 'PERFUME',
+  SUPPLEMENTS = 'SUPPLEMENTS',
+  OTHER = 'OTHER',
+}
+
+// Product Type Labels (Korean)
+export const ProductTypeLabel: Record<ProductType, string> = {
+  [ProductType.SKINCARE]: '스킨케어',
+  [ProductType.MAKEUP]: '메이크업',
+  [ProductType.HAIR_CARE]: '헤어케어',
+  [ProductType.BODY_CARE]: '바디케어',
+  [ProductType.PERFUME]: '향수',
+  [ProductType.SUPPLEMENTS]: '건강기능식품',
+  [ProductType.OTHER]: '기타',
 };
 
 // Service Types

@@ -1,6 +1,7 @@
 import React from 'react';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 import type { Priority } from '../types/project';
+import { Priority as PriorityEnum, PriorityLabel } from '../types/enums';
 import { logger } from './logger';
 
 export interface PriorityInfo {
@@ -57,33 +58,33 @@ export const getPriorityInfo = (priority: Priority): PriorityInfo => {
 
 // Get priority display name
 export const getPriorityDisplayName = (priority: Priority): string => {
-  return getPriorityInfo(priority).displayName;
+  return PriorityLabel[priority] || priority;
 };
 
 // Get priority style classes
 export const getPriorityStyles = (priority: Priority): string => {
-  const info = getPriorityInfo(priority);
-  return `${info.bgClass} ${info.textClass} ${info.borderClass}`;
+  const bgClass = getPriorityBgClass(priority);
+  const textClass = getPriorityTextClass(priority);
+  const borderClass = getPriorityBorderClass(priority);
+  return `${bgClass} ${textClass} ${borderClass}`;
 };
 
 // Get priority icon component
 export const getPriorityIcon = (priority: Priority) => {
-  const info = getPriorityInfo(priority);
-  
-  switch (info.code) {
-    case 'high':
+  switch (priority) {
+    case PriorityEnum.HIGH:
       return (
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
         </svg>
       );
-    case 'medium':
+    case PriorityEnum.MEDIUM:
       return (
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
         </svg>
       );
-    case 'low':
+    case PriorityEnum.LOW:
       return (
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -95,29 +96,29 @@ export const getPriorityIcon = (priority: Priority) => {
 };
 
 // Private helper functions
-function getPriorityBgClass(code: string): string {
-  switch (code) {
-    case 'high': return 'bg-red-100';
-    case 'medium': return 'bg-yellow-100';
-    case 'low': return 'bg-green-100';
+function getPriorityBgClass(priority: Priority): string {
+  switch (priority) {
+    case PriorityEnum.HIGH: return 'bg-red-100';
+    case PriorityEnum.MEDIUM: return 'bg-yellow-100';
+    case PriorityEnum.LOW: return 'bg-green-100';
     default: return 'bg-gray-100';
   }
 }
 
-function getPriorityTextClass(code: string): string {
-  switch (code) {
-    case 'high': return 'text-red-700';
-    case 'medium': return 'text-yellow-700';
-    case 'low': return 'text-green-700';
+function getPriorityTextClass(priority: Priority): string {
+  switch (priority) {
+    case PriorityEnum.HIGH: return 'text-red-700';
+    case PriorityEnum.MEDIUM: return 'text-yellow-700';
+    case PriorityEnum.LOW: return 'text-green-700';
     default: return 'text-gray-700';
   }
 }
 
-function getPriorityBorderClass(code: string): string {
-  switch (code) {
-    case 'high': return 'border-red-300';
-    case 'medium': return 'border-yellow-300';
-    case 'low': return 'border-green-300';
+function getPriorityBorderClass(priority: Priority): string {
+  switch (priority) {
+    case PriorityEnum.HIGH: return 'border-red-300';
+    case PriorityEnum.MEDIUM: return 'border-yellow-300';
+    case PriorityEnum.LOW: return 'border-green-300';
     default: return 'border-gray-300';
   }
 }

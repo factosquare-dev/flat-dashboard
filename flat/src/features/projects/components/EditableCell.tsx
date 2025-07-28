@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import type { Project } from '../../../types/project';
+import type { ProjectId } from '../../../types/branded';
 import { formatCurrency, parseCurrency } from '../../../utils/coreUtils';
 import { factoriesByType } from '../../../data/mockData';
 import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
@@ -9,7 +10,7 @@ interface EditableCellProps {
   field: keyof Project;
   type: 'text' | 'search' | 'date' | 'currency';
   editableCell: any; // Use the return type from useEditableCell
-  onUpdate: (projectId: string, field: keyof Project, value: any) => void;
+  onUpdate: (projectId: ProjectId, field: keyof Project, value: any) => void;
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({
@@ -141,6 +142,31 @@ const EditableCell: React.FC<EditableCellProps> = ({
             e.stopPropagation();
             (e.target as HTMLInputElement).showPicker?.();
           }}
+          className="w-full px-2 py-1 bg-white border border-blue-500 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autoFocus
+        />
+      </td>
+    );
+  }
+  
+  if (type === 'text' && editing) {
+    return (
+      <td className="px-1.5 py-1.5 js-inline-edit">
+        <input
+          type="text"
+          defaultValue={value as string}
+          onBlur={() => {
+            stopEditing();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              onUpdate(project.id, field, (e.target as HTMLInputElement).value);
+              stopEditing();
+            } else if (e.key === 'Escape') {
+              stopEditing();
+            }
+          }}
+          onClick={(e) => e.stopPropagation()}
           className="w-full px-2 py-1 bg-white border border-blue-500 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
           autoFocus
         />

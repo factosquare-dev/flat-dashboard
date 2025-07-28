@@ -1,0 +1,57 @@
+/* Table resize styles */
+.table-header-cell {
+  position: relative;
+  user-select: none;
+}
+
+/* Prevent text selection during resize */
+.resizing {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Table layout for proper resizing */
+table {
+  border-collapse: collapse;
+  table-layout: auto;
+  width: auto !important;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: rgb(249 250 251);
+}
+
+th {
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  background-color: inherit;
+}
+
+/* Resize handle */
+.resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+
+.resize-handle:hover,
+.resize-handle.active {
+  background-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Prevent column from shrinking below minimum width */
+th[style*="width"] {
+  min-width: 50px !important;
+}

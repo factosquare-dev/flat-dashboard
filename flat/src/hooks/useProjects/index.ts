@@ -5,10 +5,12 @@
 
 import { useEffect, useState } from 'react';
 import type { Project } from '../../types/project';
+import type { ProjectId } from '../../types/branded';
 import { getHierarchicalProjectsData, flattenProjects, toggleProject } from '../../data/hierarchicalProjects';
 import { useProjectData } from './useProjectData';
 import { useProjectSelection } from './useProjectSelection';
 import { useProjectPagination } from './useProjectPagination';
+import { MockDatabaseImpl } from '../../mocks/database/MockDatabase';
 
 export const useProjects = () => {
   // Hierarchical data state (temporary until API is ready)
@@ -88,6 +90,19 @@ export const useProjects = () => {
       initializePagination();
     }
   }, [initializePagination, useHierarchicalMode]);
+  
+  // Listen for hierarchy changes and refresh data
+  useEffect(() => {
+    const handleHierarchyChange = () => {
+      // Refresh hierarchical data from MockDatabase
+      setHierarchicalData(getHierarchicalProjectsData());
+    };
+    
+    window.addEventListener('projectHierarchyChanged', handleHierarchyChange);
+    return () => {
+      window.removeEventListener('projectHierarchyChanged', handleHierarchyChange);
+    };
+  }, []);
 
   // Hierarchical data methods
   const toggleProjectExpansion = (projectId: string) => {
@@ -106,26 +121,28 @@ export const useProjects = () => {
   };
 
   // Enhanced update methods that work with both modes
-  const enhancedUpdateProject = (projectId: string, field: keyof Project, value: any) => {
-    if (useHierarchicalMode) {
-      setHierarchicalData(prev => 
-        prev.map(project => {
-          if (project.id === projectId) {
-            return { ...project, [field]: value };
-          }
-          if (project.children) {
-            return {
-              ...project,
-              children: project.children.map(child =>
-                child.id === projectId ? { ...child, [field]: value } : child
-              )
-            };
-          }
-          return project;
-        })
-      );
-    } else {
-      updateProject(projectId, field, value);
+  const enhancedUpdateProject = (projectId: ProjectId, field: keyof Project, value: any) => {
+    // Update MockDatabase first
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    const project = database.projects.get(projectId);
+    
+    if (project) {
+      // Update the project in MockDatabase
+      const updatedProject = { ...project, [field]: value };
+      database.projects.set(projectId, updatedProject);
+      
+      // Refresh data from MockDatabase
+      if (useHierarchicalMode) {
+        // Get fresh data from MockDatabase
+        const freshData = getHierarchicalProjectsData();
+        setHierarchicalData(freshData);
+      } else {
+        updateProject(projectId, field, value);
+      }
+      
+      // Dispatch event to notify other components
+      window.dispatchEvent(new Event('projectHierarchyChanged'));
     }
   };
 

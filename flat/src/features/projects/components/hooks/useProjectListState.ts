@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { Project } from '@/types/project';
 import { useProjectFilters } from '@/hooks/useProjectFilters';
 import { useProjectModal } from './useProjectModal';
@@ -43,6 +43,19 @@ export const useProjectListState = () => {
   const handleSearch = useCallback((query: string) => {
     filtersHook.setSearchValue(query);
   }, [filtersHook]);
+
+  // Listen for hierarchy changes
+  useEffect(() => {
+    const handleHierarchyChange = () => {
+      // Refresh projects when hierarchy changes
+      handleRefresh();
+    };
+
+    window.addEventListener('projectHierarchyChanged', handleHierarchyChange);
+    return () => {
+      window.removeEventListener('projectHierarchyChanged', handleHierarchyChange);
+    };
+  }, [handleRefresh]);
 
   return {
     // State

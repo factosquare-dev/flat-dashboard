@@ -32,7 +32,7 @@ export const getServiceTypeInfo = (serviceType: ServiceType | string): ServiceTy
         serviceTypeCache!.set(stm.displayName, info);
       });
     } catch (error) {
-      console.error('[getServiceTypeInfo] Error loading service type mappings:', error);
+      // Error loading service type mappings
     }
   }
   
@@ -46,6 +46,9 @@ export const getServiceTypeInfo = (serviceType: ServiceType | string): ServiceTy
 
 // Get service type display name
 export const getServiceTypeDisplayName = (serviceType: ServiceType | string): string => {
+  if (!serviceType) {
+    return '서비스 유형 선택';
+  }
   return getServiceTypeInfo(serviceType).displayName;
 };
 
@@ -63,7 +66,7 @@ export const getAllServiceTypes = (): ServiceTypeInfo[] => {
         description: stm.description
       }));
   } catch (error) {
-    console.error('[getAllServiceTypes] Error:', error);
+    // Error getting all service types
     return [];
   }
 };

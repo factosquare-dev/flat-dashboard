@@ -31,7 +31,7 @@ export const getProjectTypeInfo = (projectType: string): ProjectTypeInfo => {
         projectTypeCache!.set(ptm.displayName.toLowerCase(), info);
       });
     } catch (error) {
-      console.error('[getProjectTypeInfo] Error loading project type mappings:', error);
+      // Error loading project type mappings
     }
   }
   
@@ -74,7 +74,7 @@ export const getAllProjectTypes = (): ProjectTypeInfo[] => {
         displayName: ptm.displayName
       }));
   } catch (error) {
-    console.error('[getAllProjectTypes] Error:', error);
+    // Error getting all project types
     return [];
   }
 };
