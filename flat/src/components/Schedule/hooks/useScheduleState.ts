@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { Participant, Task } from '../../../types/schedule';
+import type { Factory } from '../../../types/factory';
 import { getDaysArray } from '../../../utils/scheduleUtils';
 import { formatDate } from '../../../utils/coreUtils';
 import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
@@ -9,6 +10,7 @@ import { factories } from '../../../data/factories';
 import { storageKeys } from '../../../config';
 import { parseScheduleDate } from '../../../utils/scheduleDateParsing';
 import { addDays, startOfDay } from 'date-fns';
+import { getParticipantColor } from '../../../utils/scheduleColorManager';
 
 interface ModalState {
   showEmailModal: boolean;
@@ -40,7 +42,7 @@ interface DateRange {
 }
 
 export const useScheduleState = (
-  participants: Participant[],
+  participants: Factory[],  // Should be Factory[] not Participant[]
   projectStartDate: string,
   projectEndDate: string,
   gridWidth: number,
@@ -174,12 +176,12 @@ export const useScheduleState = (
           const scheduleData = schedule as any;
           if (scheduleData.projectId === projectId && scheduleData.participants) {
             // Schedule의 participants 사용
-            return scheduleData.participants.map((participant: any, index: number) => ({
+            return scheduleData.participants.map((participant: any) => ({
               id: participant.id,
               name: participant.name,
               type: participant.type || '',
               period: participant.period || '',
-              color: participant.color || colors[index % colors.length]
+              color: getParticipantColor(participant.id) // Use color manager
             }));
           }
         }

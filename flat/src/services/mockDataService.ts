@@ -62,6 +62,12 @@ class MockDataService {
    * Task 관련 메서드
    */
   
+  // 모든 태스크 가져오기
+  getAllTasks(): Task[] {
+    const database = this.db.getDatabase();
+    return Array.from(database.tasks.values());
+  }
+  
   // 프로젝트의 모든 태스크 가져오기
   getTasksByProjectId(projectId: string | ProjectId): Task[] {
     const database = this.db.getDatabase();
@@ -157,6 +163,14 @@ class MockDataService {
   saveDatabase(): void {
     this.db.save();
   }
+
+  // 강제 데이터 새로고침 (새 스키마 적용용)
+  forceRefresh(): void {
+    localStorage.removeItem('mockDb');
+    // DB 인스턴스 재생성
+    this.db = MockDatabaseImpl.getInstance();
+  }
+
 }
 
 // 싱글톤 인스턴스

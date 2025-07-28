@@ -1,8 +1,9 @@
 import type { Participant, Task } from '../../../types/schedule';
+import type { Factory } from '../../../types/factory';
 import type { ProjectId, FactoryId } from '../../../types/branded';
 
 export interface ScheduleProps {
-  participants: Participant[];
+  participants: Factory[];  // Should be Factory[] not Participant[]
   tasks?: Task[];
   startDate: string;
   endDate: string;

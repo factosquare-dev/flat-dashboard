@@ -3,6 +3,7 @@ import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 import { calculateProgressFromTasks } from '../utils/progressCalculator';
 import type { Task } from '../types/schedule';
 import { debugHierarchyIssue } from '../utils/debugHierarchy';
+import { TaskStatus } from '../types/enums';
 
 // Get projects from mock database instead of hardcoded data
 const getHierarchicalProjects = (): Project[] => {
@@ -11,13 +12,11 @@ const getHierarchicalProjects = (): Project[] => {
     
     // Check if database is properly initialized
     if (!db || typeof db.getDatabase !== 'function') {
-      console.error('[hierarchicalProjects] Mock database not initialized');
       return [];
     }
     
     const database = db.getDatabase();
     if (!database || !database.projects || database.projects.size === 0) {
-      console.error('[hierarchicalProjects] Database projects not available');
       return [];
     }
     
@@ -145,7 +144,6 @@ const getHierarchicalProjects = (): Project[] => {
   // Return combined list: MASTER projects with children + independent SUB projects
   return [...hierarchicalProjects, ...independentSubsAsMaster];
   } catch (error) {
-    console.error('[hierarchicalProjects] Error getting hierarchical projects:', error);
     return [];
   }
 };
@@ -195,7 +193,6 @@ const getTasksForProject = (project: Project): Project[] => {
       participants: task.participants
     } as Project));
   } catch (error) {
-    console.error('[getTasksForProject] Error getting tasks:', error);
     return [];
   }
 };
@@ -212,7 +209,6 @@ const mapTaskStatus = (status: string): string => {
     
     return statusMapping?.displayName || status;
   } catch (error) {
-    console.error('[mapTaskStatus] Error getting status mapping:', error);
     return status;
   }
 };
@@ -229,7 +225,6 @@ const mapProjectStatus = (status: string): string => {
     
     return statusMapping?.displayName || status;
   } catch (error) {
-    console.error('[mapProjectStatus] Error getting status mapping:', error);
     return status;
   }
 };
@@ -246,7 +241,6 @@ const mapServiceType = (serviceType: string): string => {
     
     return serviceMapping?.displayName || serviceType;
   } catch (error) {
-    console.error('[mapServiceType] Error getting service type mapping:', error);
     return serviceType;
   }
 };
@@ -263,7 +257,6 @@ const mapProjectType = (projectType: string): string => {
     
     return projectMapping?.displayName?.toLowerCase() || projectType.toLowerCase();
   } catch (error) {
-    console.error('[mapProjectType] Error getting project type mapping:', error);
     return projectType.toLowerCase();
   }
 };
@@ -281,6 +274,7 @@ const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[],
     // Get schedule from database
     const schedule = database.schedules.get(scheduleId);
     if (!schedule) {
+      console.log(`[getStagesFromTasks] Schedule not found for ID: ${scheduleId}`);
       return { stages: [], progress: 0 };
     }
     
@@ -288,16 +282,42 @@ const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[],
     const tasks = Array.from(database.tasks.values()).filter(task => task.scheduleId === scheduleId);
     
     if (tasks.length === 0) {
+      console.log(`[getStagesFromTasks] No tasks found for schedule: ${scheduleId}`);
       return { stages: [], progress: 0 };
     }
     
+    console.log(`[getStagesFromTasks] Found ${tasks.length} tasks for schedule: ${scheduleId}`);
+    
+    // Debug: Check last few tasks for schedules with high progress but no current stages
+    if (scheduleId === 'schedule-2' || scheduleId === 'schedule-5') {
+      const incompleteTasks = tasks.filter(t => 
+        t.status !== TaskStatus.COMPLETED && 
+        t.status !== TaskStatus.APPROVED
+      );
+      console.log(`[getStagesFromTasks] Schedule ${scheduleId} incomplete tasks:`, 
+        incompleteTasks.map(t => ({
+          title: t.title,
+          startDate: t.startDate,
+          endDate: t.endDate,
+          status: t.status
+        }))
+      );
+    }
     
     // Calculate progress and current stages from actual tasks
     const progressInfo = calculateProgressFromTasks(tasks);
     
+    console.log(`[getStagesFromTasks] Progress info:`, {
+      scheduleId,
+      currentStages: progressInfo.currentStages,
+      progress: progressInfo.progress,
+      todayTasksCount: progressInfo.todayTasks.length
+    });
+    
     // If no current stages (no tasks today), return empty array
     // Let the UI decide how to display when there are no tasks today
     if (progressInfo.currentStages.length === 0) {
+      console.log(`[getStagesFromTasks] No current stages today for schedule: ${scheduleId}`);
       return { stages: [], progress: progressInfo.progress };
     }
     
@@ -307,7 +327,7 @@ const getStagesFromTasks = (scheduleId: string | undefined): { stages: string[],
       progress: progressInfo.progress 
     };
   } catch (error) {
-    console.error('[getStagesFromTasks] Error calculating stages:', error);
+    console.error(`[getStagesFromTasks] Error for schedule ${scheduleId}:`, error);
     return { stages: [], progress: 0 };
   }
 };

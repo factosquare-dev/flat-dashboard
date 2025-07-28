@@ -14,6 +14,49 @@ import {
   deleteTaskFromSchedule
 } from './operations';
 import { mockSchedules } from './mockStore';
+import { mockDataService } from '../../services/mockDataService';
+
+/**
+ * Task 날짜 겹침 검증 - 같은 공장 내에서 겹치는 Task가 있으면 에러 발생
+ */
+function validateTaskDateOverlaps(tasks: Task[]): void {
+  if (tasks.length < 2) return;
+  
+  // 공장별로 그룹화
+  const tasksByFactory = new Map<string, Task[]>();
+  tasks.forEach(task => {
+    const factoryId = task.factoryId || 'unknown';
+    if (!tasksByFactory.has(factoryId)) {
+      tasksByFactory.set(factoryId, []);
+    }
+    tasksByFactory.get(factoryId)!.push(task);
+  });
+  
+  // 각 공장별로 날짜 겹침 검사
+  tasksByFactory.forEach((factoryTasks, factoryId) => {
+    if (factoryTasks.length < 2) return;
+    
+    // 날짜순 정렬
+    const sortedTasks = [...factoryTasks].sort((a, b) => 
+      new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    );
+    
+    for (let i = 0; i < sortedTasks.length - 1; i++) {
+      const currentTask = sortedTasks[i];
+      const nextTask = sortedTasks[i + 1];
+      
+      const currentEnd = new Date(currentTask.endDate);
+      const nextStart = new Date(nextTask.startDate);
+      
+      if (currentEnd >= nextStart) {
+        throw new Error(
+          `Task 날짜 겹침 오류 (공장: ${factoryId}): "${currentTask.title || currentTask.name}" (${currentTask.startDate} ~ ${currentTask.endDate})와 ` +
+          `"${nextTask.title || nextTask.name}" (${nextTask.startDate} ~ ${nextTask.endDate})가 겹칩니다.`
+        );
+      }
+    }
+  });
+}
 
 export const scheduleApi = {
   // 스케줄 생성
@@ -61,8 +104,31 @@ export const scheduleApi = {
     }
   },
   
-  // 프로젝트로부터 스케줄 생성 또는 조회
+  // 프로젝트로부터 스케줄 생성 또는 조회 - MockDB 직접 사용
   getOrCreateScheduleForProject: async (project: Project): Promise<Schedule> => {
+    if (USE_MOCK_DATA) {
+      const projectTasks = mockDataService.getTasksByProjectId(project.id);
+      const projectFactories = mockDataService.getFactoriesForProject(project.id);
+      
+      // Task 날짜 겹침 검증
+      validateTaskDateOverlaps(projectTasks);
+      
+      const schedule: Schedule = {
+        id: `schedule-${project.id}`,
+        projectId: project.id,
+        startDate: project.startDate,
+        endDate: project.endDate,
+        status: 'active',
+        createdAt: project.createdAt,
+        updatedAt: new Date(),
+        tasks: projectTasks,
+        factories: projectFactories
+      };
+      
+      return schedule;
+    }
+    
+    // Fallback to operations
     return getOrCreateScheduleForProject(project, mockSchedules);
   },
   

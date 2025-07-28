@@ -14,6 +14,7 @@ import {
 } from './types';
 import { seedData } from './seedData';
 import { storageKeys } from '../../config';
+import { DATABASE_CONFIG } from '../../config/database';
 
 export class MockDatabaseImpl {
   private static instance: MockDatabaseImpl;
@@ -21,7 +22,7 @@ export class MockDatabaseImpl {
   private listeners: Map<string, Set<(event: DbEvent) => void>>;
   private transactions: Map<string, DbTransaction>;
   private readonly STORAGE_KEY = storageKeys.mockDbKey;
-  private readonly VERSION = '1.0.0';
+  private readonly VERSION = DATABASE_CONFIG.VERSION;
 
   private constructor() {
     this.listeners = new Map();
@@ -131,7 +132,7 @@ export class MockDatabaseImpl {
       };
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
-      console.error('Failed to save database to storage:', error);
+      // Silently fail
     }
   }
 
@@ -143,7 +144,7 @@ export class MockDatabaseImpl {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       return stored ? JSON.parse(stored) : null;
     } catch (error) {
-      console.error('Failed to load database from storage:', error);
+      // Silently fail
       return null;
     }
   }
@@ -166,7 +167,7 @@ export class MockDatabaseImpl {
       try {
         listener(event);
       } catch (error) {
-        console.error('Error in database event listener:', error);
+        // Silently fail
       }
     });
   }

@@ -43,7 +43,6 @@ export const useProjectActions = () => {
     try {
       await projectsHook.refreshProjects();
     } catch (error) {
-      console.error('Failed to refresh projects:', error);
       throw error;
     }
   }, [projectsHook]);

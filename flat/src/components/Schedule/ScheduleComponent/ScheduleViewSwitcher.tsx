@@ -3,10 +3,11 @@ import ScheduleGridContainer from '../ScheduleGridContainer';
 import ScheduleTableView from '../components/ScheduleTableView';
 import type { ViewMode } from './types';
 import type { Participant, Task } from '../../../types/schedule';
+import type { Factory } from '../../../types/factory';
 
 interface ScheduleViewSwitcherProps {
   viewMode: ViewMode;
-  projects: Participant[];
+  projects: Factory[];  // Should be Factory[] not Participant[]
   tasks: Task[];
   dateRange: {
     days: Date[];

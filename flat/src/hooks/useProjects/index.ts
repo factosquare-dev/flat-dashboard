@@ -55,7 +55,6 @@ export const useProjects = () => {
     projects: useHierarchicalMode ? flattenProjects(hierarchicalData) : projects,
     onSelectionChange: (selectedIds) => {
       // Handle selection change if needed
-      console.log('Selection changed:', selectedIds);
     }
   });
 

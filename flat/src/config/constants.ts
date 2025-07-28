@@ -187,6 +187,16 @@ export const APP_CONSTANTS = {
       ACTIONS: '작업',
       DAYS_SUFFIX: '일',
     },
+    PROJECT: {
+      NAME: '프로젝트명',
+      STATUS: '프로젝트 상태',
+      CLIENT: '고객명',
+      MANUFACTURER: '제조사',
+      CONTAINER: '컨테이너사',
+      PACKAGING: '포장사',
+      PRIORITY: '우선순위',
+      FACTORIES: '공장 정보',
+    },
     VALIDATION: {
       REQUIRED: '필수 입력 항목입니다',
       INVALID_EMAIL: '올바른 이메일 형식이 아닙니다',

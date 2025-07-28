@@ -29,7 +29,7 @@ const TaskStatusIcons: React.FC<TaskStatusIconsProps> = ({ task }) => {
   return (
     <>
       {completedIcon}
-      <span>{task.title || task.taskType}</span>
+      <span>{task.name || task.title || task.taskType}</span>
       {delayIcon}
     </>
   );

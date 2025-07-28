@@ -8,16 +8,14 @@
 
 /**
  * Parse date string ensuring proper timezone handling
- * For date-only strings (YYYY-MM-DD), creates date at midnight local time
+ * For date-only strings (YYYY-MM-DD), assumes UTC and converts to local
  * For ISO strings with time, converts from UTC to local
  */
 export function parseDate(dateString: string): Date {
-  // Date-only format (YYYY-MM-DD) - treat as local date at midnight
+  // Date-only format (YYYY-MM-DD) - assume UTC midnight
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    // Add time component to prevent UTC interpretation
-    // Using "T00:00:00" makes it parse as local time
-    const localDateString = dateString + 'T00:00:00';
-    return new Date(localDateString);
+    // Parse as UTC and convert to local
+    return new Date(dateString + 'T00:00:00Z');
   }
   
   // ISO format with time - parse normally (will convert UTC to local)
@@ -99,12 +97,22 @@ export function isValidDateRange(startDate: string, endDate: string): boolean {
 }
 
 export function isToday(date: Date | string): boolean {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const today = new Date();
+  // For string dates, assume they're UTC from backend
+  if (typeof date === 'string') {
+    // Convert UTC to local for comparison
+    const localDate = parseDate(date);
+    const today = new Date();
+    
+    return localDate.getDate() === today.getDate() &&
+           localDate.getMonth() === today.getMonth() &&
+           localDate.getFullYear() === today.getFullYear();
+  }
   
-  return d.getDate() === today.getDate() &&
-         d.getMonth() === today.getMonth() &&
-         d.getFullYear() === today.getFullYear();
+  // If Date object, compare in local timezone
+  const today = new Date();
+  return date.getDate() === today.getDate() &&
+         date.getMonth() === today.getMonth() &&
+         date.getFullYear() === today.getFullYear();
 }
 
 export function formatDateISO(date: Date | string): string {

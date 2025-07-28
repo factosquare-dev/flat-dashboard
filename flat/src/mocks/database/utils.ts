@@ -29,7 +29,7 @@ export function getSafeDatabase(): MockDatabase | null {
     
     return db;
   } catch (error) {
-    console.error('[Database Utils] Error getting database:', error);
+    // Silently fail
     return null;
   }
 }

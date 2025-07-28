@@ -4,9 +4,11 @@ import { APP_CONSTANTS } from '../../../../config/constants';
 const TableHeader: React.FC = () => {
   const headers = [
     { key: 'taskName', label: APP_CONSTANTS.TEXT.TASK.NAME },
+    { key: 'projectStatus', label: APP_CONSTANTS.TEXT.PROJECT.STATUS },
+    { key: 'client', label: APP_CONSTANTS.TEXT.PROJECT.CLIENT },
     { key: 'schedule', label: APP_CONSTANTS.TEXT.TASK.SCHEDULE },
     { key: 'duration', label: APP_CONSTANTS.TEXT.TASK.DURATION },
-    { key: 'factory', label: APP_CONSTANTS.TEXT.TASK.FACTORY },
+    { key: 'factories', label: APP_CONSTANTS.TEXT.PROJECT.FACTORIES },
     { key: 'assignee', label: APP_CONSTANTS.TEXT.TASK.ASSIGNEE },
     { key: 'actions', label: APP_CONSTANTS.TEXT.TASK.ACTIONS, align: 'center' as const }
   ];

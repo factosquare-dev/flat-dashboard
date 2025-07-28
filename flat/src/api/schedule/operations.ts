@@ -8,11 +8,10 @@ import { createMockSchedules } from '../../data/mockSchedules';
 import { mockDataService } from '../../services/mockDataService';
 
 /**
- * Fix overlapping tasks by adjusting their dates
- * Also ensures tasks stay within project boundaries
+ * Validate task dates - throw error if tasks overlap
  */
-function fixOverlappingTasks(tasks: Task[], projectStartDate?: string, projectEndDate?: string): Task[] {
-  if (tasks.length === 0) return tasks;
+function validateTaskDates(tasks: Task[], projectStartDate?: string, projectEndDate?: string): void {
+  if (tasks.length === 0) return;
   
   const projectStart = projectStartDate ? new Date(projectStartDate) : null;
   const projectEnd = projectEndDate ? new Date(projectEndDate) : null;
@@ -22,90 +21,34 @@ function fixOverlappingTasks(tasks: Task[], projectStartDate?: string, projectEn
     new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );
   
-  // Fix overlaps and ensure within project bounds
+  // Check for overlaps and project bounds violations
   for (let i = 0; i < sortedTasks.length; i++) {
     const currentTask = sortedTasks[i];
-    const prevTask = i > 0 ? sortedTasks[i - 1] : null;
+    const taskStart = new Date(currentTask.startDate);
+    const taskEnd = new Date(currentTask.endDate);
     
-    let taskStart = new Date(currentTask.startDate);
-    let taskEnd = new Date(currentTask.endDate);
-    const duration = Math.ceil((taskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60 * 24));
-    
-    // First, ensure task starts within project bounds
+    // Check project bounds
     if (projectStart && taskStart < projectStart) {
-      taskStart = new Date(projectStart);
-      taskEnd = new Date(taskStart);
-      taskEnd.setDate(taskEnd.getDate() + duration);
+      throw new Error(`Task "${currentTask.title}" 시작일이 프로젝트 시작일보다 이릅니다.`);
+    }
+    
+    if (projectEnd && taskEnd > projectEnd) {
+      throw new Error(`Task "${currentTask.title}" 종료일이 프로젝트 종료일보다 늦습니다.`);
     }
     
     // Check for overlap with previous task
-    if (prevTask) {
+    if (i > 0) {
+      const prevTask = sortedTasks[i - 1];
       const prevEnd = new Date(prevTask.endDate);
+      
       if (taskStart <= prevEnd) {
-        taskStart = new Date(prevEnd);
-        taskStart.setDate(taskStart.getDate() + 1); // Add 1 day gap
-        taskEnd = new Date(taskStart);
-        taskEnd.setDate(taskEnd.getDate() + duration);
+        throw new Error(
+          `Task 날짜 겹침: "${prevTask.title}" (${prevTask.startDate} ~ ${prevTask.endDate})와 ` +
+          `"${currentTask.title}" (${currentTask.startDate} ~ ${currentTask.endDate})가 겹칩니다.`
+        );
       }
     }
-    
-    // Ensure task ends within project bounds
-    if (projectEnd && taskEnd > projectEnd) {
-      // If task would extend beyond project end, try to fit it before project end
-      taskEnd = new Date(projectEnd);
-      
-      // Calculate new start date maintaining original duration if possible
-      const newStartDate = new Date(taskEnd);
-      newStartDate.setDate(newStartDate.getDate() - duration);
-      
-      // Check if new start date conflicts with previous task
-      if (prevTask) {
-        const prevEnd = new Date(prevTask.endDate);
-        if (newStartDate <= prevEnd) {
-          // Can't fit with original duration, use available space
-          taskStart = new Date(prevEnd);
-          taskStart.setDate(taskStart.getDate() + 1);
-          
-          // If there's no space at all, mark for removal
-          if (taskStart >= projectEnd) {
-            currentTask.startDate = formatDate(projectEnd, 'iso');
-            currentTask.endDate = formatDate(projectEnd, 'iso');
-            continue;
-          }
-        } else {
-          taskStart = newStartDate;
-        }
-      } else {
-        taskStart = newStartDate;
-      }
-      
-      // Final check to ensure start is within bounds
-      if (projectStart && taskStart < projectStart) {
-        taskStart = new Date(projectStart);
-      }
-      
-    }
-    
-    // Update task dates
-    currentTask.startDate = formatDate(taskStart, 'iso');
-    currentTask.endDate = formatDate(taskEnd, 'iso');
   }
-  
-  // Filter out tasks that don't fit within project bounds at all
-  const validTasks = sortedTasks.filter(task => {
-    const taskStart = new Date(task.startDate);
-    const taskEnd = new Date(task.endDate);
-    
-    if (projectStart && taskEnd < projectStart) {
-      return false;
-    }
-    if (projectEnd && taskStart > projectEnd) {
-      return false;
-    }
-    return true;
-  });
-  
-  return validTasks;
 }
 
 /**
@@ -167,8 +110,8 @@ export const getOrCreateScheduleForProject = async (
             });
           
           
-          // Fix overlapping tasks and ensure within project bounds
-          const fixedTasks = fixOverlappingTasks(scheduleTasks, existingSchedule.startDate, existingSchedule.endDate);
+          // Validate task dates - throw error if overlapping
+          validateTaskDates(scheduleTasks, existingSchedule.startDate, existingSchedule.endDate);
           
           
           // Get participants from project factories
@@ -238,7 +181,7 @@ export const getOrCreateScheduleForProject = async (
             id: existingSchedule.id,
             projectId: existingSchedule.projectId,
             participants: participants,
-            tasks: fixedTasks,
+            tasks: scheduleTasks,
             startDate: typeof existingSchedule.startDate === 'string' ? existingSchedule.startDate : formatDate(new Date(existingSchedule.startDate)),
             endDate: typeof existingSchedule.endDate === 'string' ? existingSchedule.endDate : formatDate(new Date(existingSchedule.endDate)),
             createdAt: typeof existingSchedule.createdAt === 'string' ? existingSchedule.createdAt : existingSchedule.createdAt.toISOString(),

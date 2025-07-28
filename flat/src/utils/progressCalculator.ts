@@ -71,7 +71,18 @@ export function calculateProgressFromTasks(tasks: Task[]): ProgressInfo {
                           task.status !== TaskStatus.APPROVED &&
                           task.status !== TaskStatus.REJECTED;
     
-    // Individual task logging removed for cleaner console
+    // Debug logging for today's task filtering
+    if (task.scheduleId && task.scheduleId.includes('sub')) {
+      console.log(`[calculateProgress] Task "${task.title}":`, {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        today: today.toISOString().split('T')[0],
+        isTodayInTaskPeriod,
+        status: task.status,
+        isNotCompleted,
+        included: isTodayInTaskPeriod && isNotCompleted
+      });
+    }
     
     return isTodayInTaskPeriod && isNotCompleted;
   });

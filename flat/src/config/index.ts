@@ -178,3 +178,6 @@ export const storageKeys = frozenConfig.storage;
 export const validationRules = frozenConfig.validation;
 
 export type AppConfig = typeof config;
+
+// Re-export database config for convenience
+export { DATABASE_CONFIG } from './database';

@@ -24,18 +24,15 @@ export function ensureMockSystemInitialized(): boolean {
       // Verify database is accessible
       const database = db.getDatabase();
       if (!database) {
-        console.error('[Mock System] Failed to get database');
         return false;
       }
       
       // Initialize services
       initializeServices();
       
-      
       initialized = true;
       return true;
     } catch (error) {
-      console.error('[Mock System] Initialization failed:', error);
       return false;
     }
   }

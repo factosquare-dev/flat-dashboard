@@ -26,9 +26,7 @@ class PerformanceMonitor {
       entry.endTime = endTime;
       entry.duration = endTime - entry.startTime;
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[Performance] ${name}: ${entry.duration.toFixed(2)}ms`);
-      }
+      // Performance logging disabled
       
       return entry.duration;
     }

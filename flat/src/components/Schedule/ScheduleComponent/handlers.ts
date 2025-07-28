@@ -28,6 +28,7 @@ import { factories, taskTypesByFactoryType } from '../../../data/factories';
 import { findAvailableDateRange } from '../../../utils/taskUtils';
 import { projectColors } from '../../../data/mockData';
 import { getFactoryByIdOrName } from '../../../utils/factoryUtils';
+import { getParticipantColor } from '../../../utils/scheduleColorManager';
 
 export const createProjectHandlers = (
   projects: Participant[],
@@ -72,29 +73,12 @@ export const createProjectHandlers = (
   const handleAddFactory = (factory: { id: string; name: string; type: string }) => {
     // 이미 존재하지 않는 경우에만 추가
     if (!projects.find(p => p.id === factory.id)) {
-      // 색상 배열
-      const colors = [
-        "#3b82f6", // blue-500
-        "#ef4444", // red-500
-        "#22c55e", // green-500
-        "#eab308", // yellow-500
-        "#a855f7", // purple-500
-        "#ec4899", // pink-500
-        "#6366f1", // indigo-500
-        "#f97316", // orange-500
-        "#14b8a6", // teal-500
-        "#06b6d4"  // cyan-500
-      ];
-      
-      // 랜덤 색상 선택
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      
       const newProject: Participant = {
         id: factory.id,
         name: factory.name,
         type: factory.type,
         period: '',
-        color: randomColor
+        color: getParticipantColor(factory.id) // Use color manager
       };
       
       // "공장 추가" 행 바로 위에 추가하기 위해 splice 사용

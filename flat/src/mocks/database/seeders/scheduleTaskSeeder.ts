@@ -2,6 +2,7 @@ import { Schedule, Task, TaskStatus, Participant } from '@/types/schedule';
 import { Project, ProjectStatus } from '@/types/project';
 import { User, UserRole } from '@/types/user';
 import { taskTypesByFactoryType } from '../../../data/factories';
+import { parseDate, toLocalDateString, getTaskStatusByDate } from '../../../utils/unifiedDateUtils';
 
 export function createSchedulesAndTasks(projects: Project[], users: User[]): { schedules: Schedule[], tasks: Task[] } {
   const schedules: Schedule[] = [];
@@ -46,10 +47,9 @@ function createTasksForProject(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Get project timeline
-  const projectStartDate = new Date(project.startDate);
-  const projectEndDate = new Date(project.endDate);
-  const projectDurationDays = Math.ceil((projectEndDate.getTime() - projectStartDate.getTime()) / (1000 * 60 * 60 * 24));
+  // Get project timeline - parse UTC dates to local
+  const projectStartDate = parseDate(project.startDate);
+  const projectEndDate = parseDate(project.endDate);
 
   // Collect factory types
   const projectFactoryTypes: string[] = [];
@@ -60,16 +60,61 @@ function createTasksForProject(
   // Create task templates based on project status
   const taskTemplates = createTaskTemplatesForProject(project, projectFactoryTypes, pmUser, factoryManager, qaUser);
   
-  // Calculate task positions based on project progress
-  let currentStartDate = new Date(projectStartDate);
+  // 근본적인 해결: 모든 task를 단순하게 순차적으로 배치
   const totalTasks = taskTemplates.length;
   
-  taskTemplates.forEach((template, index) => {
-    // Calculate task timing based on project progress
-    const taskTiming = calculateTaskTiming(project, index, totalTasks, projectStartDate, projectEndDate, currentStartDate);
+  // IN_PROGRESS 프로젝트의 경우, progress에 맞춰 task 날짜 조정
+  let adjustedStartDate = new Date(projectStartDate);
+  if (project.status === ProjectStatus.IN_PROGRESS && project.progress > 0 && totalTasks > 0) {
+    // 완료되어야 할 task 수 계산
+    const shouldBeCompletedTasks = Math.floor((project.progress / 100) * totalTasks);
     
-    // Determine task status based on project status and progress
-    const taskStatus = determineTaskStatus(project, index, totalTasks, taskTiming.startDate, taskTiming.endDate, today);
+    // 완료된 tasks의 총 기간 계산
+    let completedDuration = 0;
+    for (let i = 0; i < shouldBeCompletedTasks && i < taskTemplates.length; i++) {
+      completedDuration += getTaskDuration(taskTemplates[i].title) + 1; // +1 for gap between tasks
+    }
+    
+    // 프로젝트 시작일을 조정하여 현재 진행 중인 task가 오늘을 포함하도록 함
+    const daysToAdjust = completedDuration + 3; // 현재 task가 3일 전에 시작하도록
+    adjustedStartDate = new Date(today.getTime() - daysToAdjust * 24 * 60 * 60 * 1000);
+  }
+  
+  let currentDate = new Date(adjustedStartDate);
+  
+  taskTemplates.forEach((template, index) => {
+    // 각 task의 기본 duration 가져오기
+    const taskDurationDays = getTaskDuration(template.title);
+    const taskDurationMs = taskDurationDays * 24 * 60 * 60 * 1000;
+    
+    // 시작일과 종료일 설정 (단순하고 명확하게)
+    const taskStartDate = new Date(currentDate);
+    const taskEndDate = new Date(currentDate.getTime() + taskDurationMs);
+    
+    // 프로젝트 종료일을 초과하지 않도록 조정
+    if (taskEndDate > projectEndDate) {
+      taskEndDate.setTime(projectEndDate.getTime());
+    }
+    
+    // Format dates as YYYY-MM-DD strings (local time)
+    const taskStartStr = toLocalDateString(taskStartDate);
+    const taskEndStr = toLocalDateString(taskEndDate);
+    
+    // Task 상태 결정 (날짜 기반으로 단순하게)
+    let taskStatus: TaskStatus;
+    if (project.status === ProjectStatus.CANCELLED) {
+      const completedTasks = Math.floor((project.progress / 100) * totalTasks);
+      if (index < completedTasks) {
+        taskStatus = TaskStatus.COMPLETED;
+      } else if (index === completedTasks) {
+        taskStatus = TaskStatus.BLOCKED;
+      } else {
+        taskStatus = TaskStatus.TODO;
+      }
+    } else {
+      // Use utility function for date-based status
+      taskStatus = getTaskStatusByDate(taskStartStr, taskEndStr, project.status);
+    }
     
     const task: Task = {
       id: `task-${project.id}-${index + 1}`,
@@ -77,8 +122,8 @@ function createTasksForProject(
       title: template.title,
       type: template.type as any,
       status: taskStatus,
-      startDate: taskTiming.startDate,
-      endDate: taskTiming.endDate,
+      startDate: taskStartStr,
+      endDate: taskEndStr,
       progress: calculateTaskProgress(project, index, totalTasks, taskStatus),
       participants: template.participants.map(userId => ({
         userId,
@@ -92,17 +137,28 @@ function createTasksForProject(
       blockedBy: [],
       createdAt: project.createdAt,
       updatedAt: new Date(),
+      
+      // Frontend convenience fields
+      projectId: project.id,  // Quick access to project
+      name: template.title,   // Alias for title
+      assigneeId: template.participants[0], // Primary assignee
+      assignee: template.participants.length > 0 ? 
+        (template.participants[0] === pmUser.id ? pmUser.name :
+         template.participants[0] === factoryManager.id ? factoryManager.name :
+         template.participants[0] === qaUser.id ? qaUser.name : '담당자') : undefined,
     };
 
     // Add completion date for completed tasks
     if (taskStatus === TaskStatus.COMPLETED) {
-      task.completedAt = new Date(taskTiming.endDate);
+      task.completedAt = new Date(taskEndDate);
       task.approvedBy = pmUser.id;
-      task.approvedAt = new Date(taskTiming.endDate);
+      task.approvedAt = new Date(taskEndDate);
     }
 
     tasks.push(task);
-    currentStartDate = new Date(taskTiming.endDate.getTime() + 24 * 60 * 60 * 1000);
+    
+    // 중요: 다음 task의 시작일을 현재 task의 종료일 다음날로 설정 (1일 간격)
+    currentDate = new Date(taskEndDate.getTime() + 24 * 60 * 60 * 1000);
   });
 
   return tasks;
@@ -147,147 +203,9 @@ function createTaskTemplatesForProject(
   return templates;
 }
 
-function calculateTaskTiming(
-  project: Project,
-  taskIndex: number,
-  totalTasks: number,
-  projectStart: Date,
-  projectEnd: Date,
-  defaultStart: Date
-) {
-  const projectDuration = projectEnd.getTime() - projectStart.getTime();
-  const taskDuration = projectDuration / totalTasks;
-  
-  // For completed projects, distribute tasks evenly across timeline
-  if (project.status === ProjectStatus.COMPLETED) {
-    const startOffset = taskDuration * taskIndex;
-    const startDate = new Date(projectStart.getTime() + startOffset);
-    const endDate = new Date(startDate.getTime() + taskDuration - 24 * 60 * 60 * 1000);
-    return { startDate, endDate };
-  }
-  
-  // For in-progress projects, calculate based on progress
-  if (project.status === ProjectStatus.IN_PROGRESS) {
-    const completedTasks = Math.floor((project.progress / 100) * totalTasks);
-    
-    if (taskIndex < completedTasks) {
-      // Completed tasks - distribute in past
-      const pastDuration = (new Date().getTime() - projectStart.getTime()) / completedTasks;
-      const startDate = new Date(projectStart.getTime() + pastDuration * taskIndex);
-      const endDate = new Date(startDate.getTime() + pastDuration - 24 * 60 * 60 * 1000);
-      return { startDate, endDate };
-    } else if (taskIndex === completedTasks) {
-      // Current task - spans today (ensure it's visible in UI)
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const startDate = new Date(today.getTime() - 5 * 24 * 60 * 60 * 1000); // Started 5 days ago
-      const endDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // Ends in 7 days
-      return { startDate, endDate };
-    } else if (taskIndex === completedTasks + 1 && completedTasks < totalTasks - 1) {
-      // Next task starts after current task ends (no overlap)
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const startDate = new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000); // Starts after current task ends
-      const endDate = new Date(today.getTime() + 20 * 24 * 60 * 60 * 1000); // Ends in 20 days
-      return { startDate, endDate };
-    } else {
-      // Future tasks
-      const remainingDuration = projectEnd.getTime() - new Date().getTime();
-      const remainingTasks = totalTasks - completedTasks;
-      const futureDuration = remainingDuration / remainingTasks;
-      const futureIndex = taskIndex - completedTasks;
-      const startDate = new Date(new Date().getTime() + futureDuration * futureIndex);
-      const endDate = new Date(startDate.getTime() + futureDuration - 24 * 60 * 60 * 1000);
-      return { startDate, endDate };
-    }
-  }
-  
-  // For CANCELLED projects, make the current task span today
-  if (project.status === ProjectStatus.CANCELLED) {
-    const completedTasks = Math.floor((project.progress / 100) * totalTasks);
-    
-    if (taskIndex < completedTasks) {
-      // Completed tasks - distribute in past
-      const elapsedTime = new Date().getTime() - projectStart.getTime();
-      const pastDuration = elapsedTime / completedTasks;
-      const startDate = new Date(projectStart.getTime() + pastDuration * taskIndex);
-      const endDate = new Date(startDate.getTime() + pastDuration - 24 * 60 * 60 * 1000);
-      return { startDate, endDate };
-    } else if (taskIndex === completedTasks) {
-      // Task that was in progress when put on hold - make it span today
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const startDate = new Date(today.getTime() - 10 * 24 * 60 * 60 * 1000); // Started 10 days ago
-      const endDate = new Date(today.getTime() + 20 * 24 * 60 * 60 * 1000); // Would end in 20 days if resumed
-      return { startDate, endDate };
-    } else {
-      // Future tasks - not started yet
-      const remainingDuration = projectEnd.getTime() - new Date().getTime();
-      const remainingTasks = totalTasks - completedTasks - 1;
-      const futureDuration = remainingDuration / Math.max(remainingTasks, 1);
-      const futureIndex = taskIndex - completedTasks - 1;
-      const startDate = new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000 + futureDuration * futureIndex);
-      const endDate = new Date(startDate.getTime() + futureDuration - 24 * 60 * 60 * 1000);
-      return { startDate, endDate };
-    }
-  }
-  
-  // For other statuses, use default timing
-  const duration = 5 * 24 * 60 * 60 * 1000; // 5 days default
-  const startDate = new Date(defaultStart);
-  const endDate = new Date(startDate.getTime() + duration);
-  return { startDate, endDate };
-}
 
-function determineTaskStatus(
-  project: Project,
-  taskIndex: number,
-  totalTasks: number,
-  taskStart: Date,
-  taskEnd: Date,
-  today: Date
-): TaskStatus {
-  // For completed projects, all tasks are completed
-  if (project.status === ProjectStatus.COMPLETED) {
-    return TaskStatus.COMPLETED;
-  }
-  
-  // For planning projects, all tasks are TODO
-  if (project.status === ProjectStatus.PLANNING) {
-    return TaskStatus.TODO;
-  }
-  
-  // For cancelled projects, determine based on progress
-  if (project.status === ProjectStatus.CANCELLED) {
-    const completedTasks = Math.floor((project.progress / 100) * totalTasks);
-    if (taskIndex < completedTasks) {
-      return TaskStatus.COMPLETED;
-    } else if (taskIndex === completedTasks) {
-      return TaskStatus.BLOCKED;
-    } else {
-      return TaskStatus.TODO;
-    }
-  }
-  
-  // For in-progress projects, check if task spans today
-  if (project.status === ProjectStatus.IN_PROGRESS) {
-    const completedTasks = Math.floor((project.progress / 100) * totalTasks);
-    
-    if (taskIndex < completedTasks) {
-      return TaskStatus.COMPLETED;
-    } else if (taskStart <= today && taskEnd >= today) {
-      // Task spans today - it's in progress
-      return TaskStatus.IN_PROGRESS;
-    } else if (taskStart > today) {
-      return TaskStatus.TODO;
-    } else {
-      // Past due but not completed
-      return TaskStatus.IN_PROGRESS;
-    }
-  }
-  
-  return TaskStatus.TODO;
-}
+// 더 이상 필요하지 않은 복잡한 함수들 제거됨
+// Task 생성 로직이 단순화되어 createTasksForProject 함수에 통합됨
 
 function calculateTaskProgress(
   project: Project,

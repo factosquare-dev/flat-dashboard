@@ -1,13 +1,16 @@
 import React, { useMemo } from 'react';
 import type { Participant, Task } from '../../../../types/schedule';
+import type { Project } from '../../../../types/project';
+import type { Factory } from '../../../../types/factory';
 import { useTaskContext } from '../../../../contexts/AppContext';
 import { useTaskStore } from '../../../../stores/taskStore';
+import { mockDataService } from '../../../../services/mockDataService';
 import TableHeader from './TableHeader';
 import TaskRow from './TaskRow';
 import EmptyState from './EmptyState';
 
 interface ScheduleTableViewProps {
-  projects?: Participant[];
+  projects?: Factory[];  // Should be Factory[] not Participant[]
   tasks?: Task[];
   projectId?: string;
   onTaskClick?: (task: Task) => void;
@@ -26,8 +29,23 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
   const { getTasksForProject } = useTaskStore();
   const storeTasks = projectId ? getTasksForProject(projectId) : [];
   
-  // Priority: props > store > context
-  const tasks = propsTasks || (storeTasks.length > 0 ? storeTasks : contextTasks);
+  // Get tasks from MockDB if not available elsewhere
+  const mockDbTasks = useMemo(() => {
+    try {
+      if (projectId) {
+        return mockDataService.getTasksByProjectId(projectId);
+      }
+      return mockDataService.getAllTasks();
+    } catch (error) {
+      // Silently fail
+      return [];
+    }
+  }, [projectId]);
+  
+  // Priority: props > store > mockDB > context
+  const tasks = propsTasks || 
+                (storeTasks.length > 0 ? storeTasks : 
+                (mockDbTasks.length > 0 ? mockDbTasks : contextTasks));
   const projects = propsProjects || participants;
 
   // Sort all tasks by start date
@@ -38,10 +56,11 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
     [tasks]
   );
 
-  // Create a map of project id to project for quick lookup
+  // Get actual Project data from MockDB for each task
+  const allProjects = useMemo(() => mockDataService.getAllProjects(), []);
   const projectMap = useMemo(
-    () => new Map(projects.map(p => [p.id, p])),
-    [projects]
+    () => new Map(allProjects.map(p => [p.id, p])),
+    [allProjects]
   );
 
   return (
@@ -54,8 +73,8 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
         <TableHeader />
         <tbody role="rowgroup">
           {sortedTasks.map((task) => {
-            // 오직 projectId로만 매칭 (factory name 매칭 제거)
-            const project = projectMap.get(task.projectId);
+            // Get actual Project data using task.projectId (new convenience field)
+            const project = projectMap.get(task.projectId || task.scheduleId);
             
             return (
               <TaskRow

@@ -1,6 +1,7 @@
 /**
  * Unified date parsing utilities for Schedule component
  * Handles various date formats including Korean format
+ * Now with UTC to local timezone conversion support
  */
 
 import { parseISO, isValid, startOfDay } from 'date-fns';
@@ -8,12 +9,15 @@ import { parseISO, isValid, startOfDay } from 'date-fns';
 /**
  * Parse various date formats to a valid Date object at start of day
  * Handles:
- * - ISO format: "2025-07-05"
+ * - ISO format: "2025-07-05" (assumes UTC if from backend)
  * - Korean format: "2025. 7. 5."
  * - Date objects
  * - Date strings with time: "2025-07-05T00:00:00"
+ * 
+ * @param dateInput - The date string or Date object to parse
+ * @param isUtc - Whether the date string is in UTC (default: true for strings)
  */
-export function parseScheduleDate(dateInput: string | Date): Date {
+export function parseScheduleDate(dateInput: string | Date, isUtc: boolean = true): Date {
   try {
     // If it's already a Date object
     if (dateInput instanceof Date) {
@@ -31,6 +35,15 @@ export function parseScheduleDate(dateInput: string | Date): Date {
         const month = parts[1].padStart(2, '0');
         const day = parts[2].padStart(2, '0');
         dateStr = `${year}-${month}-${day}`;
+      }
+    }
+    
+    // For date-only strings from backend, assume UTC midnight
+    if (isUtc && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      // Parse as UTC and convert to local
+      const date = new Date(dateStr + 'T00:00:00Z');
+      if (!isNaN(date.getTime())) {
+        return startOfDay(date);
       }
     }
     

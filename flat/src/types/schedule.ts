@@ -34,6 +34,12 @@ export interface Task {
   approvedAt?: Date;
   rejectionReason?: string;
   
+  // Frontend convenience fields (derived from other fields)
+  projectId?: ProjectId;     // Derived from scheduleId for quick access
+  name?: string;            // Alias for title (component compatibility)
+  assigneeId?: UserId;      // Primary assignee from participants
+  assignee?: string;        // Assignee name (computed from assigneeId)
+  
   // UI-specific fields (computed, not stored)
   x?: number;
   width?: number;
