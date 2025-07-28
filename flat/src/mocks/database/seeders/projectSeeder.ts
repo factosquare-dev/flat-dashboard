@@ -35,10 +35,10 @@ function createSynchronizedProjects(
   const subProjects: Project[] = [];
 
   // MASTER 프로젝트 1: 프리미엄 화장품 라인
-  const master1Start = new Date(currentDate);
-  master1Start.setDate(master1Start.getDate() - 30); // 30일 전 시작
-  const master1End = new Date(currentDate);
-  master1End.setDate(master1End.getDate() + 60); // 60일 후 종료
+  const master1Start = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  master1Start.setUTCDate(master1Start.getUTCDate() - 30); // 30일 전 시작
+  const master1End = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  master1End.setUTCDate(master1End.getUTCDate() + 60); // 60일 후 종료
 
   masterProjects.push({
     id: 'master-1',
@@ -77,10 +77,10 @@ function createSynchronizedProjects(
   });
 
   // MASTER 프로젝트 2: 천연 화장품 시리즈
-  const master2Start = new Date(currentDate);
-  master2Start.setDate(master2Start.getDate() - 45); // 45일 전 시작
-  const master2End = new Date(currentDate);
-  master2End.setDate(master2End.getDate() + 75); // 75일 후 종료
+  const master2Start = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  master2Start.setUTCDate(master2Start.getUTCDate() - 45); // 45일 전 시작
+  const master2End = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  master2End.setUTCDate(master2End.getUTCDate() + 75); // 75일 후 종료
 
   masterProjects.push({
     id: 'master-2',
@@ -120,10 +120,10 @@ function createSynchronizedProjects(
 
   // SUB 프로젝트들 - MASTER 1의 자식들
   // SUB 1-1: 프리미엄 에센스 (진행중)
-  const sub1_1Start = new Date(master1Start);
-  sub1_1Start.setDate(sub1_1Start.getDate() + 10);
-  const sub1_1End = new Date(master1End);
-  sub1_1End.setDate(sub1_1End.getDate() - 10);
+  const sub1_1Start = new Date(Date.UTC(master1Start.getUTCFullYear(), master1Start.getUTCMonth(), master1Start.getUTCDate()));
+  sub1_1Start.setUTCDate(sub1_1Start.getUTCDate() + 10);
+  const sub1_1End = new Date(Date.UTC(master1End.getUTCFullYear(), master1End.getUTCMonth(), master1End.getUTCDate()));
+  sub1_1End.setUTCDate(sub1_1End.getUTCDate() - 10);
 
   subProjects.push({
     id: 'sub-1-1',
@@ -163,10 +163,10 @@ function createSynchronizedProjects(
   });
 
   // SUB 1-2: 프리미엄 크림 (시작전)
-  const sub1_2Start = new Date(master1Start);
-  sub1_2Start.setDate(sub1_2Start.getDate() + 30);
-  const sub1_2End = new Date(master1End);
-  sub1_2End.setDate(sub1_2End.getDate() - 5);
+  const sub1_2Start = new Date(Date.UTC(master1Start.getUTCFullYear(), master1Start.getUTCMonth(), master1Start.getUTCDate()));
+  sub1_2Start.setUTCDate(sub1_2Start.getUTCDate() + 30);
+  const sub1_2End = new Date(Date.UTC(master1End.getUTCFullYear(), master1End.getUTCMonth(), master1End.getUTCDate()));
+  sub1_2End.setUTCDate(sub1_2End.getUTCDate() - 5);
 
   subProjects.push({
     id: 'sub-1-2',
@@ -207,10 +207,10 @@ function createSynchronizedProjects(
 
   // SUB 프로젝트들 - MASTER 2의 자식들
   // SUB 2-1: 천연 샴푸 (진행중)
-  const sub2_1Start = new Date(master2Start);
-  sub2_1Start.setDate(sub2_1Start.getDate() + 5);
-  const sub2_1End = new Date(master2End);
-  sub2_1End.setDate(sub2_1End.getDate() - 20);
+  const sub2_1Start = new Date(Date.UTC(master2Start.getUTCFullYear(), master2Start.getUTCMonth(), master2Start.getUTCDate()));
+  sub2_1Start.setUTCDate(sub2_1Start.getUTCDate() + 5);
+  const sub2_1End = new Date(Date.UTC(master2End.getUTCFullYear(), master2End.getUTCMonth(), master2End.getUTCDate()));
+  sub2_1End.setUTCDate(sub2_1End.getUTCDate() - 20);
 
   subProjects.push({
     id: 'sub-2-1',
@@ -251,10 +251,10 @@ function createSynchronizedProjects(
 
   // 독립적인 SUB 프로젝트들 (parentId 없음)
   // 독립 SUB 1: 선크림 (진행중)
-  const indSub1Start = new Date(currentDate);
-  indSub1Start.setDate(indSub1Start.getDate() - 60);
-  const indSub1End = new Date(currentDate);
-  indSub1End.setDate(indSub1End.getDate() + 20);
+  const indSub1Start = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  indSub1Start.setUTCDate(indSub1Start.getUTCDate() - 60);
+  const indSub1End = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  indSub1End.setUTCDate(indSub1End.getUTCDate() + 20);
 
   subProjects.push({
     id: 'sub-ind-1',
@@ -294,10 +294,10 @@ function createSynchronizedProjects(
   });
 
   // 독립 SUB 2: 클렌징 폼 (완료)
-  const indSub2Start = new Date(currentDate);
-  indSub2Start.setDate(indSub2Start.getDate() - 90);
-  const indSub2End = new Date(currentDate);
-  indSub2End.setDate(indSub2End.getDate() - 5);
+  const indSub2Start = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  indSub2Start.setUTCDate(indSub2Start.getUTCDate() - 90);
+  const indSub2End = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  indSub2End.setUTCDate(indSub2End.getUTCDate() - 5);
 
   subProjects.push({
     id: 'sub-ind-2',
@@ -337,10 +337,10 @@ function createSynchronizedProjects(
   });
 
   // 독립 SUB 3: 미스트 (중단)
-  const indSub3Start = new Date(currentDate);
-  indSub3Start.setDate(indSub3Start.getDate() - 40);
-  const indSub3End = new Date(currentDate);
-  indSub3End.setDate(indSub3End.getDate() + 50);
+  const indSub3Start = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  indSub3Start.setUTCDate(indSub3Start.getUTCDate() - 40);
+  const indSub3End = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+  indSub3End.setUTCDate(indSub3End.getUTCDate() + 50);
 
   subProjects.push({
     id: 'sub-ind-3',

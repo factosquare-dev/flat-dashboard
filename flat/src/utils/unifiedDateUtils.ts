@@ -198,8 +198,8 @@ export function getTaskStatusByDate(
   if (projectStatus === ProjectStatus.COMPLETED) return TaskStatus.COMPLETED;
   if (projectStatus === ProjectStatus.PLANNING) return TaskStatus.TODO;
   
-  const startLocal = parseDate(startDateStr);
-  const endLocal = parseDate(endDateStr);
+  const startLocal = parseDate(startDateStr, false);
+  const endLocal = parseDate(endDateStr, false);
   const today = getToday();
   
   if (endLocal < today) {
