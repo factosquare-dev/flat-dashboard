@@ -18,8 +18,8 @@ export function createSchedulesAndTasks(projects: Project[], users: User[]): { s
     const schedule: Schedule = {
       id: `schedule-${index + 1}`,
       projectId: project.id,
-      startDate: project.startDate,
-      endDate: project.endDate,
+      startDate: project.startDate, // Use project's own start date
+      endDate: project.endDate,   // Use project's own end date
       status: project.status === ProjectStatus.IN_PROGRESS ? 'active' : 
               project.status === ProjectStatus.COMPLETED ? 'completed' :
               project.status === ProjectStatus.CANCELLED ? 'archived' : 'draft',
@@ -48,8 +48,8 @@ function createTasksForProject(
   today.setHours(0, 0, 0, 0);
   
   // Get project timeline - parse UTC dates to local
-  const projectStartDate = parseDate(project.startDate);
-  const projectEndDate = parseDate(project.endDate);
+  const projectStartDate = project.startDate;
+  const projectEndDate = project.endDate;
 
   // Collect factory types
   const projectFactoryTypes: string[] = [];
@@ -66,18 +66,20 @@ function createTasksForProject(
   // IN_PROGRESS 프로젝트의 경우, progress에 맞춰 task 날짜 조정
   let adjustedStartDate = new Date(projectStartDate);
   if (project.status === ProjectStatus.IN_PROGRESS && project.progress > 0 && totalTasks > 0) {
-    // 완료되어야 할 task 수 계산
     const shouldBeCompletedTasks = Math.floor((project.progress / 100) * totalTasks);
-    
-    // 완료된 tasks의 총 기간 계산
     let completedDuration = 0;
     for (let i = 0; i < shouldBeCompletedTasks && i < taskTemplates.length; i++) {
-      completedDuration += getTaskDuration(taskTemplates[i].title) + 1; // +1 for gap between tasks
+      completedDuration += getTaskDuration(taskTemplates[i].title) + 1;
     }
-    
-    // 프로젝트 시작일을 조정하여 현재 진행 중인 task가 오늘을 포함하도록 함
-    const daysToAdjust = completedDuration + 3; // 현재 task가 3일 전에 시작하도록
-    adjustedStartDate = new Date(today.getTime() - daysToAdjust * 24 * 60 * 60 * 1000);
+    const daysToAdjust = completedDuration + 3;
+    const calculatedAdjustedDate = new Date(today.getTime() - daysToAdjust * 24 * 60 * 60 * 1000);
+
+    // Ensure adjustedStartDate is not earlier than projectStartDate
+    if (calculatedAdjustedDate.getTime() > projectStartDate.getTime()) {
+      adjustedStartDate = calculatedAdjustedDate;
+    } else {
+      adjustedStartDate = new Date(projectStartDate); // Cap it at projectStartDate
+    }
   }
   
   let currentDate = new Date(adjustedStartDate);
