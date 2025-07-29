@@ -62,7 +62,7 @@ const ProjectTable: React.FC<ProjectTableProps> = React.memo(({
           <tr>
               <th className="w-8 px-1 py-1.5 text-left">
                 <div className="flex items-center justify-center">
-                  {/* 체크박스 제거 - 레이아웃 유지용 빈 공간 */}
+                  {/* 선택/확장 컨트롤 영역 */}
                 </div>
               </th>
               {columns.map((column) => {

@@ -25,6 +25,7 @@ interface ProjectTableRowProps {
   onStartDrag?: (index: number) => void;
   onDragStart?: (e: React.DragEvent, projectId: ProjectId) => void;
   onDragEnd?: (e: React.DragEvent) => void;
+  onToggleMaster?: (projectId: ProjectId) => void;
 }
 
 const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
@@ -40,10 +41,18 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
   isDragging,
   onStartDrag,
   onDragStart,
-  onDragEnd
+  onDragEnd,
+  onToggleMaster
 }) => {
   const editableCell = useEditableCell();
   const { isExpanded, tasks, handleToggleTasks, handleTaskToggle } = useTaskManagement({ project });
+  
+  const handleMasterToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onToggleMaster) {
+      onToggleMaster(project.id);
+    }
+  };
 
   const handleRowClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -54,7 +63,14 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
   };
 
   const renderCell = (columnId: string) => {
-    const cellRenderProps = { project, editableCell, onUpdateField };
+    const cellRenderProps = { 
+      project, 
+      editableCell, 
+      onUpdateField,
+      index,
+      isDragging,
+      onStartDrag 
+    };
 
     switch (columnId) {
       case 'name':
@@ -144,6 +160,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
           onSelect={onSelect}
           onStartDrag={onStartDrag}
           handleToggleTasks={handleToggleTasks}
+          handleMasterToggle={handleMasterToggle}
         />
         
         {columns.map((column) => (

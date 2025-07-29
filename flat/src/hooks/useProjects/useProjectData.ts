@@ -91,6 +91,19 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
   const updateProject = useCallback(<K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
     console.log('[useProjectData] updateProject called:', { projectId, field, value });
     
+    // 현재 프로젝트 찾기
+    const currentProject = projects.find(p => p.id === projectId);
+    if (!currentProject) {
+      console.warn('[useProjectData] Project not found:', projectId);
+      return;
+    }
+    
+    // 값이 동일하면 업데이트하지 않음 (중복 호출 방지)
+    if (currentProject[field] === value) {
+      console.log('[useProjectData] Value unchanged, skipping update');
+      return;
+    }
+    
     // Update local state immediately for responsive UI
     setProjects(prev => {
       const updated = prev.map(project => 
@@ -98,7 +111,6 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
           ? { ...project, [field]: value }
           : project
       );
-      console.log('[useProjectData] Local state updated');
       return updated;
     });
     
@@ -117,15 +129,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
       }
     };
     updateMockDb();
-    
-    // Notify parent component
-    if (onProjectsUpdate) {
-      setProjects(current => {
-        onProjectsUpdate(current);
-        return current;
-      });
-    }
-  }, [onProjectsUpdate, mockDb]);
+  }, [onProjectsUpdate, mockDb, projects]);
 
   const addProject = useCallback((newProject: Omit<Project, 'id'>) => {
     const project: Project = {
@@ -148,14 +152,13 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
     };
     addToMockDb();
     
-    setProjects(prev => [project, ...prev]);
-    
-    if (onProjectsUpdate) {
-      setProjects(current => {
-        onProjectsUpdate(current);
-        return current;
-      });
-    }
+    setProjects(prev => {
+      const updated = [project, ...prev];
+      if (onProjectsUpdate) {
+        onProjectsUpdate(updated);
+      }
+      return updated;
+    });
   }, [onProjectsUpdate, mockDb]);
 
   const deleteProject = useCallback((projectId: ProjectId) => {
@@ -167,29 +170,27 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
       console.error('[useProjectData] Failed to delete project from MockDB:', error);
     }
     
-    setProjects(prev => prev.filter(project => project.id !== projectId));
-    
-    if (onProjectsUpdate) {
-      setProjects(current => {
-        onProjectsUpdate(current);
-        return current;
-      });
-    }
+    setProjects(prev => {
+      const updated = prev.filter(project => project.id !== projectId);
+      if (onProjectsUpdate) {
+        onProjectsUpdate(updated);
+      }
+      return updated;
+    });
   }, [onProjectsUpdate, mockDb]);
 
   const bulkUpdateProjects = useCallback((projectIds: ProjectId[], updates: Partial<Project>) => {
-    setProjects(prev => prev.map(project => 
-      projectIds.includes(project.id)
-        ? { ...project, ...updates }
-        : project
-    ));
-    
-    if (onProjectsUpdate) {
-      setProjects(current => {
-        onProjectsUpdate(current);
-        return current;
-      });
-    }
+    setProjects(prev => {
+      const updated = prev.map(project => 
+        projectIds.includes(project.id)
+          ? { ...project, ...updates }
+          : project
+      );
+      if (onProjectsUpdate) {
+        onProjectsUpdate(updated);
+      }
+      return updated;
+    });
   }, [onProjectsUpdate]);
 
   const refreshProjects = useCallback(async () => {

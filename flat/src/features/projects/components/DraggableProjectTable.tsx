@@ -27,6 +27,7 @@ interface DraggableProjectTableProps {
   onStartDrag?: (index: number) => void;
   onDragStart?: (projectId: string) => void;
   onDragEnd?: () => void;
+  onToggleMaster?: (projectId: string) => void;
 }
 
 const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
@@ -45,7 +46,8 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   isDragging,
   onStartDrag,
   onDragStart,
-  onDragEnd
+  onDragEnd,
+  onToggleMaster
 }) => {
   const {
     columns,
@@ -216,6 +218,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 onStartDrag={onStartDrag ? () => onStartDrag(index) : undefined}
                 onDragStart={handleProjectDragStart}
                 onDragEnd={handleProjectDragEnd}
+                onToggleMaster={onToggleMaster}
               />
             </React.Fragment>
           ))}

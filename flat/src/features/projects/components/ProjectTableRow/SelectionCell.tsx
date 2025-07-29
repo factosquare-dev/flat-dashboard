@@ -13,6 +13,7 @@ interface SelectionCellProps {
   onSelect: (checked: boolean) => void;
   onStartDrag?: (index: number) => void;
   handleToggleTasks: (e: React.MouseEvent) => void;
+  handleMasterToggle: (e: React.MouseEvent) => void;
 }
 
 const SelectionCell: React.FC<SelectionCellProps> = ({
@@ -23,7 +24,8 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
   index,
   onSelect,
   onStartDrag,
-  handleToggleTasks
+  handleToggleTasks,
+  handleMasterToggle
 }) => {
   return (
     <td className="px-1 py-1.5" onClick={(e) => e.stopPropagation()}>
@@ -34,11 +36,7 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
         {/* 대형 프로젝트만 확장/축소 버튼 */}
         {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              // MASTER 프로젝트의 확장/축소는 onSelect을 통해 처리됨
-              onSelect(!project.isExpanded);
-            }}
+            onClick={handleMasterToggle}
             className="p-0.5 rounded transition-colors hover:bg-gray-200"
             title={project.isExpanded ? "축소" : "확장"}
           >

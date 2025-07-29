@@ -70,7 +70,8 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
           props.onSelectRow(projectId, checked, index);
         }
       }
-    }
+    },
+    onToggleMaster: handleToggleProject
   };
 
   return <DraggableProjectTable {...modifiedProps} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd} />;
