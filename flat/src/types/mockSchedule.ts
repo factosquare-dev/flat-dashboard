@@ -26,11 +26,3 @@ export interface MockTask {
   hasWarning?: boolean;
 }
 
-// Mock Participant for Gantt chart
-export interface Participant {
-  id: string;
-  name: string;
-  type: string;
-  period: string;
-  color: string;
-}

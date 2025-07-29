@@ -8,7 +8,7 @@ import { useModalFormValidation } from '../../hooks/useModalFormValidation';
 import { AlertCircle } from 'lucide-react';
 import { FactoryType, FactoryTypeLabel, ModalSize, ButtonVariant } from '../../types/enums';
 import { MODAL_SIZES } from '../../utils/modalUtils';
-import Button from '../common/Button';
+import { Button } from '../ui/Button';
 import './FactoryModal.css';
 
 interface FactoryModalProps {

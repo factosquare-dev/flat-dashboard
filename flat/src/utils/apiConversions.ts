@@ -25,11 +25,19 @@ import type { Project } from '../types/project';
 import type { User } from '../types/user';
 import type { Task } from '../types/schedule';
 import type { Customer } from '../types/customer';
+import type {
+  ApiFactoryResponse,
+  ApiProjectResponse,
+  ApiUserResponse,
+  ApiTaskResponse,
+  ApiCustomerResponse,
+  ApiTaskParticipant
+} from '../types/api';
 
 /**
  * Convert raw API factory response to typed Factory
  */
-export const convertApiFactory = (raw: any): Factory => {
+export const convertApiFactory = (raw: ApiFactoryResponse): Factory => {
   return {
     ...raw,
     id: toFactoryId(raw.id)
@@ -39,7 +47,7 @@ export const convertApiFactory = (raw: any): Factory => {
 /**
  * Convert raw API project response to typed Project
  */
-export const convertApiProject = (raw: any): Project => {
+export const convertApiProject = (raw: ApiProjectResponse): Project => {
   return {
     ...raw,
     id: toProjectId(raw.id),
@@ -61,7 +69,7 @@ export const convertApiProject = (raw: any): Project => {
 /**
  * Convert raw API user response to typed User
  */
-export const convertApiUser = (raw: any): User => {
+export const convertApiUser = (raw: ApiUserResponse): User => {
   return {
     ...raw,
     id: toUserId(raw.id)
@@ -71,7 +79,7 @@ export const convertApiUser = (raw: any): User => {
 /**
  * Convert raw API task response to typed Task
  */
-export const convertApiTask = (raw: any): Task => {
+export const convertApiTask = (raw: ApiTaskResponse): Task => {
   return {
     ...raw,
     id: toTaskId(raw.id),
@@ -80,7 +88,7 @@ export const convertApiTask = (raw: any): Task => {
     approvedBy: raw.approvedBy ? toUserIdSafe(raw.approvedBy) : undefined,
     dependsOn: (raw.dependsOn ?? []).map((id: string) => toTaskId(id)),
     blockedBy: (raw.blockedBy ?? []).map((id: string) => toTaskId(id)),
-    participants: (raw.participants ?? []).map((p: any) => ({
+    participants: (raw.participants ?? []).map((p: ApiTaskParticipant) => ({
       ...p,
       userId: toUserId(p.userId)
     })),
@@ -97,7 +105,7 @@ export const convertApiTask = (raw: any): Task => {
 /**
  * Convert raw API customer response to typed Customer
  */
-export const convertApiCustomer = (raw: any): Customer => {
+export const convertApiCustomer = (raw: ApiCustomerResponse): Customer => {
   return {
     ...raw,
     id: toCustomerId(raw.id),
@@ -111,23 +119,23 @@ export const convertApiCustomer = (raw: any): Customer => {
 /**
  * Convert arrays of API responses
  */
-export const convertApiFactories = (raw: any[]): Factory[] => {
+export const convertApiFactories = (raw: ApiFactoryResponse[]): Factory[] => {
   return raw.map(convertApiFactory);
 };
 
-export const convertApiProjects = (raw: any[]): Project[] => {
+export const convertApiProjects = (raw: ApiProjectResponse[]): Project[] => {
   return raw.map(convertApiProject);
 };
 
-export const convertApiUsers = (raw: any[]): User[] => {
+export const convertApiUsers = (raw: ApiUserResponse[]): User[] => {
   return raw.map(convertApiUser);
 };
 
-export const convertApiTasks = (raw: any[]): Task[] => {
+export const convertApiTasks = (raw: ApiTaskResponse[]): Task[] => {
   return raw.map(convertApiTask);
 };
 
-export const convertApiCustomers = (raw: any[]): Customer[] => {
+export const convertApiCustomers = (raw: ApiCustomerResponse[]): Customer[] => {
   return raw.map(convertApiCustomer);
 };
 

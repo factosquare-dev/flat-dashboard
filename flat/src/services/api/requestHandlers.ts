@@ -13,7 +13,7 @@ export interface RequestOptions {
   retryDelay?: number;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
@@ -51,10 +51,10 @@ export class RequestHandlers {
     return `${baseURL}${path}`;
   }
 
-  private async executeRequest<T>(
+  private async executeRequest<T, B = unknown>(
     method: string,
     endpoint: string,
-    body?: any,
+    body?: B,
     options: RequestOptions = {}
   ): Promise<ApiResponse<T>> {
     const requestId = this.generateRequestId();
@@ -63,7 +63,7 @@ export class RequestHandlers {
     const maxRetries = options.retries || 0;
     
     let attempt = 0;
-    let lastError: any;
+    let lastError: Error;
 
     while (attempt <= maxRetries) {
       attempt++;
@@ -152,16 +152,16 @@ export class RequestHandlers {
     return this.executeRequest<T>('GET', endpoint, undefined, options);
   }
 
-  async post<T>(endpoint: string, body?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    return this.executeRequest<T>('POST', endpoint, body, options);
+  async post<T, B = unknown>(endpoint: string, body?: B, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.executeRequest<T, B>('POST', endpoint, body, options);
   }
 
-  async put<T>(endpoint: string, body?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    return this.executeRequest<T>('PUT', endpoint, body, options);
+  async put<T, B = unknown>(endpoint: string, body?: B, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.executeRequest<T, B>('PUT', endpoint, body, options);
   }
 
-  async patch<T>(endpoint: string, body?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    return this.executeRequest<T>('PATCH', endpoint, body, options);
+  async patch<T, B = unknown>(endpoint: string, body?: B, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.executeRequest<T, B>('PATCH', endpoint, body, options);
   }
 
   async delete<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
@@ -172,7 +172,7 @@ export class RequestHandlers {
     return this.executeRequest<void>('HEAD', endpoint, undefined, options);
   }
 
-  async options(endpoint: string, options?: RequestOptions): Promise<ApiResponse<any>> {
-    return this.executeRequest<any>('OPTIONS', endpoint, undefined, options);
+  async options(endpoint: string, options?: RequestOptions): Promise<ApiResponse<unknown>> {
+    return this.executeRequest<unknown>('OPTIONS', endpoint, undefined, options);
   }
 }

@@ -1,4 +1,5 @@
 import type { Project } from '../../types/project';
+import type { StateCreator } from 'zustand';
 
 export interface ProjectSlice {
   // State
@@ -30,7 +31,7 @@ const initialFilters = {
   dateRange: { start: null, end: null },
 };
 
-export const projectSlice = (set: any) => ({
+export const projectSlice: StateCreator<ProjectSlice> = (set) => ({
   // Initial state
   projects: [],
   selectedProject: null,

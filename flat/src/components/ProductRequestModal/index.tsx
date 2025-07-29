@@ -9,7 +9,7 @@ import ContentInfoForm from './ContentInfoForm';
 import IngredientInfoForm from './IngredientInfoForm';
 import { useModalFormValidation } from '../../hooks/useModalFormValidation';
 import { ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
-import Button from '../common/Button';
+import { Button } from '../ui/Button';
 import { getModalSizeString } from '../../utils/modalUtils';
 import './ProductRequestModal.css';
 

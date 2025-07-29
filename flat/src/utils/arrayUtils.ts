@@ -46,7 +46,7 @@ export const groupBy = <T>(
  */
 export const sortBy = <T>(
   array: T[],
-  ...keys: Array<keyof T | ((item: T) => any)>
+  ...keys: Array<keyof T | ((item: T) => unknown)>
 ): T[] => {
   return [...array].sort((a, b) => {
     for (const key of keys) {
@@ -74,7 +74,7 @@ export const chunk = <T>(array: T[], size: number): T[][] => {
 /**
  * Flatten nested array
  */
-export const flatten = <T>(array: any[]): T[] => {
+export const flatten = <T>(array: unknown[]): T[] => {
   return array.reduce((flat, item) => {
     return flat.concat(Array.isArray(item) ? flatten(item) : item);
   }, []);

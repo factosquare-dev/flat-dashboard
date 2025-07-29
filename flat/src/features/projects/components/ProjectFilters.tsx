@@ -1,7 +1,6 @@
 import React from 'react';
 import { Calendar, Mail } from 'lucide-react';
-import type { Priority, ServiceType, ProjectStatus } from '../../types/project';
-import { Priority as PriorityEnum, PriorityLabel, ServiceType as ServiceTypeEnum, ServiceTypeLabel } from '../../../types/enums';
+import { Priority, PriorityLabel, ServiceType, ServiceTypeLabel, ProjectStatus } from '../../../types/enums';
 import DateRangeFilter from './DateRangeFilter';
 import { getStatusStyles, getAllStatuses } from '../../../utils/statusUtils';
 import '../../../design-system/styles/button.css';
@@ -97,9 +96,9 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
           aria-label="우선순위 필터 선택"
       >
         <option value="all">모든 우선순위</option>
-        <option value={PriorityLabel[PriorityEnum.HIGH]}>{PriorityLabel[PriorityEnum.HIGH]}</option>
-        <option value={PriorityLabel[PriorityEnum.MEDIUM]}>{PriorityLabel[PriorityEnum.MEDIUM]}</option>
-        <option value={PriorityLabel[PriorityEnum.LOW]}>{PriorityLabel[PriorityEnum.LOW]}</option>
+        <option value={PriorityLabel[Priority.HIGH]}>{PriorityLabel[Priority.HIGH]}</option>
+        <option value={PriorityLabel[Priority.MEDIUM]}>{PriorityLabel[Priority.MEDIUM]}</option>
+        <option value={PriorityLabel[Priority.LOW]}>{PriorityLabel[Priority.LOW]}</option>
       </select>
 
         {/* Service Type Filter */}
@@ -112,12 +111,12 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
           aria-label="서비스 유형 필터 선택"
       >
         <option value="all">모든 서비스 유형</option>
-        <option value={ServiceTypeLabel[ServiceTypeEnum.OEM]}>{ServiceTypeLabel[ServiceTypeEnum.OEM]}</option>
-        <option value={ServiceTypeLabel[ServiceTypeEnum.ODM]}>{ServiceTypeLabel[ServiceTypeEnum.ODM]}</option>
-        <option value={ServiceTypeLabel[ServiceTypeEnum.OBM]}>{ServiceTypeLabel[ServiceTypeEnum.OBM]}</option>
-        <option value={ServiceTypeLabel[ServiceTypeEnum.PRIVATE_LABEL]}>{ServiceTypeLabel[ServiceTypeEnum.PRIVATE_LABEL]}</option>
-        <option value={ServiceTypeLabel[ServiceTypeEnum.WHITE_LABEL]}>{ServiceTypeLabel[ServiceTypeEnum.WHITE_LABEL]}</option>
-        <option value={ServiceTypeLabel[ServiceTypeEnum.OTHER]}>{ServiceTypeLabel[ServiceTypeEnum.OTHER]}</option>
+        <option value={ServiceTypeLabel[ServiceType.OEM]}>{ServiceTypeLabel[ServiceType.OEM]}</option>
+        <option value={ServiceTypeLabel[ServiceType.ODM]}>{ServiceTypeLabel[ServiceType.ODM]}</option>
+        <option value={ServiceTypeLabel[ServiceType.OBM]}>{ServiceTypeLabel[ServiceType.OBM]}</option>
+        <option value={ServiceTypeLabel[ServiceType.PRIVATE_LABEL]}>{ServiceTypeLabel[ServiceType.PRIVATE_LABEL]}</option>
+        <option value={ServiceTypeLabel[ServiceType.WHITE_LABEL]}>{ServiceTypeLabel[ServiceType.WHITE_LABEL]}</option>
+        <option value={ServiceTypeLabel[ServiceType.OTHER]}>{ServiceTypeLabel[ServiceType.OTHER]}</option>
         </select>
         
         <div className="h-4 w-px bg-gray-300" />

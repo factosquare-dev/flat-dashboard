@@ -15,7 +15,7 @@ interface ProjectTableProps {
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (projectId: ProjectId, checked: boolean, index?: number) => void;
   onSelectProject: (project: Project) => void;
-  onUpdateProject: (projectId: ProjectId, field: keyof Project, value: any) => void;
+  onUpdateProject: <K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => void;
   onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }) => void;
   onMouseEnterRow?: (index: number) => void;
   isDragging?: boolean;
@@ -57,7 +57,7 @@ const ProjectTable: React.FC<ProjectTableProps> = React.memo(({
           열 순서 초기화
         </button>
       </div>
-      <table className="w-full min-w-[1800px] table-fixed">
+      <table className="w-full min-w-[1950px] table-fixed">
       <thead className="sticky top-0 z-10 bg-gray-50 border-b border-gray-100">
           <tr>
               <th className="w-8 px-1 py-1.5 text-left">

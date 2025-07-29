@@ -23,4 +23,6 @@ export interface TaskData {
   endDate: string;
 }
 
-export type ViewMode = 'gantt' | 'table';
+// Use ViewMode enum from enums.ts
+import { ViewMode } from '../../../types/enums';
+export { ViewMode };

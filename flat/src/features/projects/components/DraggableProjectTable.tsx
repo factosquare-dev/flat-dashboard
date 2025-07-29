@@ -5,7 +5,7 @@ import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '../../../hooks/useColumnOrder';
 import type { Column } from '../../../hooks/useColumnOrder';
 import { useColumnResize } from '../../../hooks/useColumnResize';
-import { ProjectTypeEnum } from '../../../types/enums';
+import { ProjectType } from '../../../types/enums';
 import { isProjectType } from '../../../utils/projectTypeUtils';
 import { useProjectHierarchy } from '../../../hooks/useProjectHierarchy';
 import '../../../styles/tableResize.css';
@@ -20,7 +20,7 @@ interface DraggableProjectTableProps {
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (projectId: string, checked: boolean, index?: number) => void;
   onSelectProject: (project: Project) => void;
-  onUpdateProject: (projectId: ProjectId, field: keyof Project, value: any) => void;
+  onUpdateProject: <K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => void;
   onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }, event?: React.MouseEvent) => void;
   onMouseEnterRow?: (index: number) => void;
   isDragging?: boolean;
@@ -100,7 +100,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     if (!draggedProjectId || draggedProjectId === targetProject.id) return;
     
     // 드롭 대상이 MASTER 프로젝트인 경우
-    if (isProjectType(targetProject.type, ProjectTypeEnum.MASTER)) {
+    if (isProjectType(targetProject.type, ProjectType.MASTER)) {
       moveToMaster(draggedProjectId, targetProject.id);
     }
     
@@ -161,7 +161,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
 
   return (
     <div style={{ width: 'max-content', minWidth: '100%' }}>
-      <table ref={tableRef} role="table" style={{ width: 'max-content', minWidth: '1800px' }}>
+      <table ref={tableRef} role="table" style={{ width: 'max-content', minWidth: '1950px' }}>
         <thead className="sticky top-0 z-20 bg-gray-50 border-b border-gray-100">
           <tr role="row">
             <th className="w-16 px-1 py-1.5 text-left" scope="col">
@@ -170,7 +170,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                   type="checkbox"
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                   onChange={(e) => onSelectAll(e.target.checked)}
-                  checked={projects.length > 0 && selectedRows.length === projects.filter(p => isProjectType(p.type, ProjectTypeEnum.TASK)).length}
+                  checked={projects.length > 0 && selectedRows.length === projects.filter(p => isProjectType(p.type, ProjectType.TASK)).length}
                 />
               </div>
             </th>

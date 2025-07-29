@@ -25,7 +25,7 @@ const ProductTypeDropdown: React.FC<ProductTypeDropdownProps> = ({
       onChange={handleChange}
       disabled={disabled}
       className={`
-        w-full px-2 py-1 text-xs border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent
+        w-full min-w-[110px] px-2 py-1 text-xs border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent
         ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:border-gray-400'}
       `}
     >

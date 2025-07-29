@@ -1,117 +1,210 @@
-import { ApiResponse, PaginatedResponse, FilterOptions } from './common';
+/**
+ * API Response Type Definitions
+ * These types represent the raw data structures returned from the backend API
+ */
 
-// Type-safe parameter types
-export type QueryParams = Record<string, string | number | boolean | undefined>;
-export type RequestBody = Record<string, unknown> | FormData | string | null;
+import { 
+  FactoryType, 
+  ProjectStatus, 
+  ProjectType, 
+  Priority, 
+  ServiceType, 
+  TaskStatus, 
+  TaskType, 
+  ParticipantRole,
+  CertificateType,
+  UserRole
+} from './enums';
 
-// API Client types with improved type safety
-export interface ApiClient {
-  get<T>(url: string, params?: QueryParams): Promise<ApiResponse<T>>;
-  post<T, D = unknown>(url: string, data?: D): Promise<ApiResponse<T>>;
-  put<T, D = unknown>(url: string, data?: D): Promise<ApiResponse<T>>;
-  patch<T, D = unknown>(url: string, data?: D): Promise<ApiResponse<T>>;
-  delete<T>(url: string): Promise<ApiResponse<T>>;
+/**
+ * Common API response fields
+ */
+interface ApiTimestamps {
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
 }
 
-// Request types with proper generics
-export interface GetListRequest extends FilterOptions {
-  page?: number;
-  limit?: number;
-}
-
-export interface CreateRequest<T> {
-  data: T;
-}
-
-export interface UpdateRequest<T> {
-  id: string | number;
-  data: Partial<T>;
-}
-
-export interface DeleteRequest {
-  id: string | number;
-}
-
-// Response types with proper generics
-export interface GetListResponse<T> extends PaginatedResponse<T> {}
-
-export interface GetItemResponse<T> extends ApiResponse<T> {}
-
-export interface CreateResponse<T> extends ApiResponse<T> {}
-
-export interface UpdateResponse<T> extends ApiResponse<T> {}
-
-export interface DeleteResponse extends ApiResponse<{ id: string | number }> {}
-
-// Error types with improved type safety
-export interface ApiErrorDetails {
-  [key: string]: string | string[] | ApiErrorDetails;
-}
-
-export interface ApiError {
-  code: string;
-  message: string;
-  details?: ApiErrorDetails;
-  field?: string;
-  statusCode?: number;
-  timestamp?: string;
-}
-
-export interface ValidationError {
-  field: string;
-  message: string;
-  code: string;
-  value?: unknown;
-}
-
-// Auth types
-export interface LoginRequest {
-  email: string;
-  password: string;
-  remember?: boolean;
-}
-
-export interface LoginResponse {
-  user: {
-    id: string;
-    email: string;
+/**
+ * API Factory Response
+ */
+export interface ApiFactoryResponse extends ApiTimestamps {
+  id: string;
+  name: string;
+  type: FactoryType | string; // Backend might send string
+  address: string;
+  contactNumber: string;
+  manager: {
     name: string;
-    role: string;
-    avatar?: string;
+    phone: string;
+    email: string;
   };
-  token: string;
-  refreshToken: string;
-  expiresAt: string;
+  capacity: number;
+  certifications?: CertificateType[];
+  establishedDate?: string; // ISO date string
+  isActive: boolean;
+  description?: string;
 }
 
-export interface RefreshTokenRequest {
-  refreshToken: string;
+/**
+ * API Project Response
+ */
+export interface ApiProjectResponse extends ApiTimestamps {
+  id: string;
+  parentId?: string;
+  customerId: string;
+  client: string;
+  type: ProjectType | string;
+  status: ProjectStatus | string;
+  priority: Priority | string;
+  name: string;
+  productType: string;
+  manager: string;
+  serviceType: ServiceType | string;
+  progress: number;
+  manufacturerId: string;
+  containerId: string;
+  packagingId: string;
+  scheduleId?: string;
+  startDate: string; // ISO date string
+  endDate: string; // ISO date string
+  sales: number;
+  purchase: number;
+  level?: number;
+  isExpanded?: boolean;
+  isSelected?: boolean;
+  children?: ApiProjectResponse[];
+  deposit?: number;
+  depositDate?: string;
+  createdBy: string;
+  isVisible?: boolean;
+  notes?: string;
 }
 
-export interface RefreshTokenResponse {
-  token: string;
-  expiresAt: string;
+/**
+ * API User Response
+ */
+export interface ApiUserResponse extends ApiTimestamps {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole | string;
+  department?: string;
+  phone?: string;
+  isActive: boolean;
+  lastLoginAt?: string; // ISO date string
 }
 
-// Type guards
-export function isApiError(error: unknown): error is ApiError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'message' in error &&
-    typeof (error as ApiError).code === 'string' &&
-    typeof (error as ApiError).message === 'string'
-  );
+/**
+ * API Task Participant
+ */
+export interface ApiTaskParticipant {
+  userId: string;
+  role: ParticipantRole | string;
 }
 
-export function isValidationError(error: unknown): error is ValidationError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'field' in error &&
-    'message' in error &&
-    'code' in error &&
-    typeof (error as ValidationError).field === 'string'
-  );
+/**
+ * API Task Response
+ */
+export interface ApiTaskResponse extends ApiTimestamps {
+  id: string;
+  scheduleId: string;
+  title: string;
+  type: TaskType | string;
+  status: TaskStatus | string;
+  startDate: string; // ISO date string
+  endDate: string; // ISO date string
+  progress: number;
+  participants: ApiTaskParticipant[];
+  factoryId?: string;
+  priority: Priority | string;
+  dependsOn: string[];
+  blockedBy: string[];
+  notes?: string;
+  completedAt?: string; // ISO date string
+  approvedBy?: string;
+  approvedAt?: string; // ISO date string
+  rejectionReason?: string;
+  
+  // Legacy fields from MockTask (if still used by backend)
+  projectId?: string;
+  name?: string;
+  assigneeId?: string;
+  assignee?: string;
+}
+
+/**
+ * API Customer Response
+ */
+export interface ApiCustomerResponse extends ApiTimestamps {
+  id: string;
+  name: string;
+  companyName?: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  address?: string;
+  notes?: string;
+  isActive: boolean;
+  createdBy?: string;
+}
+
+/**
+ * API Schedule Response
+ */
+export interface ApiScheduleResponse extends ApiTimestamps {
+  id: string;
+  projectId: string;
+  startDate: string; // ISO date string
+  endDate: string; // ISO date string
+  status: 'draft' | 'active' | 'completed' | 'archived';
+  factories?: ApiFactoryResponse[];
+  tasks?: ApiTaskResponse[];
+}
+
+/**
+ * API Error Response
+ */
+export interface ApiErrorResponse {
+  error: {
+    code: string;
+    message: string;
+    details?: Record<string, any>;
+  };
+  timestamp: string;
+  path: string;
+}
+
+/**
+ * API Paginated Response
+ */
+export interface ApiPaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+  };
+}
+
+/**
+ * API Success Response
+ */
+export interface ApiSuccessResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+}
+
+/**
+ * API Batch Operation Response
+ */
+export interface ApiBatchResponse {
+  success: boolean;
+  results: Array<{
+    id: string;
+    success: boolean;
+    error?: string;
+  }>;
+  message?: string;
 }

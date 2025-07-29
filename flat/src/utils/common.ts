@@ -223,7 +223,7 @@ export function deepClone<T>(obj: T): T {
 /**
  * Check if object is empty
  */
-export function isEmpty(obj: any): boolean {
+export function isEmpty(obj: unknown): boolean {
   if (!obj) return true;
   if (Array.isArray(obj)) return obj.length === 0;
   if (typeof obj === 'object') return Object.keys(obj).length === 0;
@@ -328,21 +328,21 @@ export function getContrastColor(bgColor: string): string {
 /**
  * Check if value is a valid Date
  */
-export function isDate(value: any): value is Date {
+export function isDate(value: unknown): value is Date {
   return value instanceof Date && !isNaN(value.getTime());
 }
 
 /**
  * Check if value is a valid number
  */
-export function isNumber(value: any): value is number {
+export function isNumber(value: unknown): value is number {
   return typeof value === 'number' && !isNaN(value);
 }
 
 /**
  * Check if value is a non-empty string
  */
-export function isNonEmptyString(value: any): value is string {
+export function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
@@ -367,7 +367,7 @@ export function delay(ms: number): Promise<void> {
 /**
  * Debounce function calls
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   fn: T,
   delay: number
 ): (...args: Parameters<T>) => void {
@@ -382,7 +382,7 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * Throttle function calls
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   fn: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -418,7 +418,7 @@ export function parseQueryString(query: string): Record<string, string> {
 /**
  * Build query string from object
  */
-export function buildQueryString(params: Record<string, any>): string {
+export function buildQueryString(params: Record<string, unknown>): string {
   const searchParams = new URLSearchParams();
   
   Object.entries(params).forEach(([key, value]) => {

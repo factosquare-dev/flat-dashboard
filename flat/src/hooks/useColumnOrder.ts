@@ -27,22 +27,22 @@ const isValidColumnArray = (arr: any): arr is Column[] => {
 };
 
 const DEFAULT_COLUMNS: Column[] = [
-  { id: 'name', label: '프로젝트명', sortable: true, width: '192px' },
-  { id: 'productType', label: '제품유형', sortable: true, width: '160px' },
-  { id: 'client', label: '고객명', sortable: true, width: '128px' },
-  { id: 'serviceType', label: '서비스', sortable: true, width: '112px' },
-  { id: 'currentStage', label: '진행단계', width: '160px' },
-  { id: 'status', label: '상태', sortable: true, width: '112px' },
-  { id: 'progress', label: '진행률', align: 'center', width: '160px' },
-  { id: 'startDate', label: '시작일', sortable: true, align: 'center', width: '96px' },
-  { id: 'endDate', label: '마감일', sortable: true, align: 'center', width: '96px' },
-  { id: 'manufacturer', label: '제조', width: '112px' },
-  { id: 'container', label: '용기', width: '112px' },
-  { id: 'packaging', label: '포장', width: '112px' },
-  { id: 'sales', label: '매출', align: 'right', width: '112px' },
-  { id: 'purchase', label: '매입', align: 'right', width: '112px' },
-  { id: 'depositPaid', label: '선금입금', align: 'center', width: '96px' },
-  { id: 'priority', label: '우선순위', sortable: true, align: 'center', width: '96px' }
+  { id: 'name', label: '프로젝트명', sortable: true, width: '200px' },
+  { id: 'productType', label: '제품유형', sortable: true, width: '130px' },
+  { id: 'client', label: '고객명', sortable: true, width: '120px' },
+  { id: 'serviceType', label: '서비스', sortable: true, width: '110px' },
+  { id: 'currentStage', label: '진행단계', width: '150px' },
+  { id: 'status', label: '상태', sortable: true, width: '90px' },
+  { id: 'progress', label: '진행률', align: 'center', width: '130px' },
+  { id: 'startDate', label: '시작일', sortable: true, align: 'center', width: '100px' },
+  { id: 'endDate', label: '마감일', sortable: true, align: 'center', width: '100px' },
+  { id: 'manufacturer', label: '제조', width: '110px' },
+  { id: 'container', label: '용기', width: '110px' },
+  { id: 'packaging', label: '포장', width: '110px' },
+  { id: 'sales', label: '매출', align: 'right', width: '110px' },
+  { id: 'purchase', label: '매입', align: 'right', width: '110px' },
+  { id: 'depositPaid', label: '선금입금', align: 'center', width: '90px' },
+  { id: 'priority', label: '우선순위', sortable: true, align: 'center', width: '90px' }
 ];
 
 const STORAGE_KEY = 'projectTableColumnOrder';

@@ -28,7 +28,7 @@ interface ProjectTableSectionProps {
   onDelete: (projectId: ProjectId) => void;
   onDuplicate: (project: Project) => void;
   onSelectProject: (project: Project) => void;
-  onUpdateProject?: (projectId: ProjectId, field: keyof Project, value: any) => void;
+  onUpdateProject?: <K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => void;
   loadMoreRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -146,7 +146,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     }
   };
   
-  const handleUpdateProject = (projectId: ProjectId, field: keyof Project, value: any) => {
+  const handleUpdateProject = <K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
     console.log('[ProjectTableSection] handleUpdateProject called:', { projectId, field, value });
     if (onUpdateProject) {
       onUpdateProject(projectId, field, value);

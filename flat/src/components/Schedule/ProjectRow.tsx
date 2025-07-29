@@ -115,4 +115,4 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   );
 };
 
-export default ProjectRow;
+export default React.memo(ProjectRow);

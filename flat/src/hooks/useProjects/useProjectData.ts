@@ -11,6 +11,7 @@ import { factories } from '../../data/factories';
 import { scheduleApi } from '../../api/scheduleApi';
 import { extractProjectFromSchedule } from '../../data/mockSchedules';
 import { formatDateISO } from '../../utils/coreUtils';
+import { MockDatabaseImpl } from '../../mocks/database/MockDatabase';
 
 // Helper functions
 const getRelativeDate = (daysOffset: number): string => {
@@ -39,6 +40,9 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
   const [schedules, setSchedules] = useState<Map<string, Schedule>>(new Map());
   const [isLoading, setIsLoading] = useState(false);
   
+  // MockDB instance
+  const mockDb = MockDatabaseImpl.getInstance();
+  
   // Race condition prevention
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -59,37 +63,18 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
       
       if (signal.aborted) return [];
       
-      // Generate mock projects for pagination
-      const newProjects: Project[] = [];
-      const startIndex = (page - 1) * 50;
+      // Load projects from MockDB
+      const dbResponse = await mockDb.getAll('projects');
+      const dbProjects = dbResponse.success ? dbResponse.data : [];
+      console.log(`[useProjectData] Loaded ${dbProjects.length} projects from MockDB`);
       
-      for (let i = startIndex; i < startIndex + 50 && i < SIMULATION_CONSTANTS.TOTAL_COUNT; i++) {
-        const factory = getRandomFactory('제조');
-        const project: Project = {
-          id: `project-${i + 1}`,
-          client: `Client ${i + 1}`,
-          manager: `Manager ${i + 1}`,
-          productType: [ProductType.SKINCARE, ProductType.MAKEUP, ProductType.HAIR_CARE, ProductType.BODY_CARE][i % 4],
-          serviceType: [ServiceType.OEM, ServiceType.ODM, ServiceType.OBM][i % 3],
-          currentStage: [], // Will be populated from tasks
-          status: [ProjectStatus.PLANNING, ProjectStatus.IN_PROGRESS, ProjectStatus.COMPLETED, ProjectStatus.CANCELLED][i % 4],
-          progress: Math.floor(Math.random() * 101),
-          startDate: getRelativeDate(-30 + (i % 60)),
-          endDate: getRelativeDate(30 + (i % 60)),
-          manufacturer: factory?.name || 'Unknown Factory',
-          container: ['플라스틱', '유리', '금속', '종이'][i % 4],
-          packaging: ['박스', '파우치', '병', '튜브'][i % 4],
-          sales: `${Math.floor(Math.random() * 10000) + 1000}만원`,
-          purchase: `${Math.floor(Math.random() * 8000) + 800}만원`,
-          priority: [Priority.HIGH, Priority.MEDIUM, Priority.LOW][i % 3],
-          depositPaid: Math.random() > 0.5,
-          type: i % 10 === 0 ? 'master' : 'sub',
-          scheduleId: `schedule-${i + 1}`
-        };
-        newProjects.push(project);
-      }
+      // Convert to pagination format (simulate pagination)
+      const itemsPerPage = 50;
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedProjects = dbProjects.slice(startIndex, endIndex);
       
-      return newProjects;
+      return paginatedProjects;
     } catch (error) {
       if (!signal.aborted) {
         // Error handled silently
@@ -103,12 +88,35 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
     }
   }, []);
 
-  const updateProject = useCallback((projectId: ProjectId, field: keyof Project, value: any) => {
-    setProjects(prev => prev.map(project => 
-      project.id === projectId 
-        ? { ...project, [field]: value }
-        : project
-    ));
+  const updateProject = useCallback(<K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
+    console.log('[useProjectData] updateProject called:', { projectId, field, value });
+    
+    // Update local state immediately for responsive UI
+    setProjects(prev => {
+      const updated = prev.map(project => 
+        project.id === projectId 
+          ? { ...project, [field]: value }
+          : project
+      );
+      console.log('[useProjectData] Local state updated');
+      return updated;
+    });
+    
+    // Update MockDB asynchronously
+    const updateMockDb = async () => {
+      try {
+        const updateData = { [field]: value };
+        const result = await mockDb.update('projects', projectId, updateData);
+        if (result.success) {
+          console.log('[useProjectData] MockDB updated successfully');
+        } else {
+          console.error('[useProjectData] Failed to update MockDB:', result.error);
+        }
+      } catch (error) {
+        console.error('[useProjectData] Failed to update MockDB:', error);
+      }
+    };
+    updateMockDb();
     
     // Notify parent component
     if (onProjectsUpdate) {
@@ -117,13 +125,28 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
         return current;
       });
     }
-  }, [onProjectsUpdate]);
+  }, [onProjectsUpdate, mockDb]);
 
   const addProject = useCallback((newProject: Omit<Project, 'id'>) => {
     const project: Project = {
       ...newProject,
       id: `project-${Date.now()}`,
     };
+    
+    // Add to MockDB asynchronously
+    const addToMockDb = async () => {
+      try {
+        const result = await mockDb.create('projects', project.id, project);
+        if (result.success) {
+          console.log('[useProjectData] Project added to MockDB:', project.id);
+        } else {
+          console.error('[useProjectData] Failed to add project to MockDB:', result.error);
+        }
+      } catch (error) {
+        console.error('[useProjectData] Failed to add project to MockDB:', error);
+      }
+    };
+    addToMockDb();
     
     setProjects(prev => [project, ...prev]);
     
@@ -133,9 +156,17 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
         return current;
       });
     }
-  }, [onProjectsUpdate]);
+  }, [onProjectsUpdate, mockDb]);
 
   const deleteProject = useCallback((projectId: ProjectId) => {
+    // Delete from MockDB first
+    try {
+      mockDb.deleteProject(projectId);
+      console.log('[useProjectData] Project deleted from MockDB:', projectId);
+    } catch (error) {
+      console.error('[useProjectData] Failed to delete project from MockDB:', error);
+    }
+    
     setProjects(prev => prev.filter(project => project.id !== projectId));
     
     if (onProjectsUpdate) {
@@ -144,7 +175,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
         return current;
       });
     }
-  }, [onProjectsUpdate]);
+  }, [onProjectsUpdate, mockDb]);
 
   const bulkUpdateProjects = useCallback((projectIds: ProjectId[], updates: Partial<Project>) => {
     setProjects(prev => prev.map(project => 

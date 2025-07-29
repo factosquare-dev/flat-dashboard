@@ -26,8 +26,6 @@ export enum ProjectStatus {
   CANCELLED = 'CANCELLED',
 }
 
-// Legacy support - will be removed
-export const ProjectStatusEnum = ProjectStatus;
 
 // Project Status Labels (Korean)
 export const ProjectStatusLabel: Record<ProjectStatus, string> = {
@@ -37,13 +35,6 @@ export const ProjectStatusLabel: Record<ProjectStatus, string> = {
   [ProjectStatus.CANCELLED]: '중단',
 };
 
-// Legacy support - will be removed
-export const ProjectStatusDisplayEnum = {
-  PLANNING: '시작전',
-  IN_PROGRESS: '진행중',
-  COMPLETED: '완료',
-  CANCELLED: '중단',
-};
 
 // Project Type
 export enum ProjectType {
@@ -52,8 +43,6 @@ export enum ProjectType {
   TASK = 'TASK',
 }
 
-// Legacy support - will be removed
-export const ProjectTypeEnum = ProjectType;
 
 // Project Type Labels (Korean)
 export const ProjectTypeLabel: Record<ProjectType, string> = {
@@ -62,12 +51,6 @@ export const ProjectTypeLabel: Record<ProjectType, string> = {
   [ProjectType.TASK]: '작업',
 };
 
-// Legacy support - will be removed
-export const ProjectTypeDisplayEnum = {
-  MASTER: '대형',
-  SUB: '소형',
-  TASK: '작업',
-};
 
 // Priority
 export enum Priority {
@@ -76,12 +59,6 @@ export enum Priority {
   LOW = 'LOW',
 }
 
-// Legacy support - will be removed
-export const PriorityEnum = {
-  HIGH: 'high',
-  MEDIUM: 'medium',
-  LOW: 'low',
-};
 
 // Priority Labels (Korean)
 export const PriorityLabel: Record<Priority, string> = {
@@ -90,12 +67,6 @@ export const PriorityLabel: Record<Priority, string> = {
   [Priority.LOW]: '낮음',
 };
 
-// Legacy support - will be removed
-export const PriorityDisplayEnum = {
-  HIGH: '높음',
-  MEDIUM: '보통',
-  LOW: '낮음',
-};
 
 // Product Types
 export enum ProductType {
@@ -129,12 +100,6 @@ export enum ServiceType {
   OTHER = 'OTHER',
 }
 
-// Legacy support - will be removed
-export const ServiceTypeEnum = {
-  OEM: 'OEM',
-  ODM: 'ODM',
-  OBM: 'OBM',
-};
 
 // Service Type Labels
 export const ServiceTypeLabel: Record<ServiceType, string> = {
@@ -155,13 +120,6 @@ export enum TaskStatus {
   CANCELLED = 'CANCELLED',
 }
 
-// Legacy support - will be removed
-export const TaskStatusEnum = {
-  PLANNING: 'planning',
-  IN_PROGRESS: 'in-progress',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled',
-};
 
 // Task Status Labels (Korean)
 export const TaskStatusLabel: Record<TaskStatus, string> = {
@@ -172,13 +130,6 @@ export const TaskStatusLabel: Record<TaskStatus, string> = {
   [TaskStatus.CANCELLED]: '취소',
 };
 
-// Legacy support - will be removed
-export const TaskStatusDisplayEnum = {
-  PLANNING: '시작전',
-  IN_PROGRESS: '진행중',
-  COMPLETED: '완료',
-  CANCELLED: '중단',
-};
 
 // Deposit Status
 export enum DepositStatus {
@@ -255,46 +206,26 @@ export const getTaskStatusFromLabel = (label: string): TaskStatus | undefined =>
 };
 
 // Type guards
-export const isFactoryType = (value: any): value is FactoryType => {
-  return Object.values(FactoryType).includes(value);
+export const isFactoryType = (value: unknown): value is FactoryType => {
+  return Object.values(FactoryType).includes(value as FactoryType);
 };
 
-export const isProjectStatus = (value: any): value is ProjectStatus => {
-  return Object.values(ProjectStatus).includes(value);
+export const isProjectStatus = (value: unknown): value is ProjectStatus => {
+  return Object.values(ProjectStatus).includes(value as ProjectStatus);
 };
 
-export const isPriority = (value: any): value is Priority => {
-  return Object.values(Priority).includes(value);
+export const isPriority = (value: unknown): value is Priority => {
+  return Object.values(Priority).includes(value as Priority);
 };
 
-export const isServiceType = (value: any): value is ServiceType => {
-  return Object.values(ServiceType).includes(value);
+export const isServiceType = (value: unknown): value is ServiceType => {
+  return Object.values(ServiceType).includes(value as ServiceType);
 };
 
-export const isTaskStatus = (value: any): value is TaskStatus => {
-  return Object.values(TaskStatus).includes(value);
+export const isTaskStatus = (value: unknown): value is TaskStatus => {
+  return Object.values(TaskStatus).includes(value as TaskStatus);
 };
 
-// Legacy mapping functions - will be removed
-export const mapProjectStatus = (status: string): string => {
-  const enumValue = getProjectStatusFromLabel(status) || status as ProjectStatus;
-  return ProjectStatusLabel[enumValue] || status;
-};
-
-export const mapTaskStatus = (status: string): string => {
-  const enumValue = getTaskStatusFromLabel(status) || status as TaskStatus;
-  return TaskStatusLabel[enumValue] || status;
-};
-
-export const mapPriority = (priority: string): string => {
-  const enumValue = getPriorityFromLabel(priority) || priority as Priority;
-  return PriorityLabel[enumValue] || priority;
-};
-
-export const mapProjectType = (type: string): string => {
-  const enumValue = type as ProjectType;
-  return ProjectTypeLabel[enumValue] || type;
-};
 
 // UI Component Variants
 export enum BadgeVariant {
@@ -469,4 +400,97 @@ export enum ModalSize {
   MD = 'MD',
   LG = 'LG',
   XL = 'XL',
+}
+
+// View Mode for Schedule and other views
+export enum ViewMode {
+  GANTT = 'GANTT',
+  TABLE = 'TABLE',
+  CALENDAR = 'CALENDAR',
+  LIST = 'LIST',
+  BOARD = 'BOARD',
+}
+
+// View Mode Labels (Korean)
+export const ViewModeLabel: Record<ViewMode, string> = {
+  [ViewMode.GANTT]: '간트차트',
+  [ViewMode.TABLE]: '테이블',
+  [ViewMode.CALENDAR]: '캘린더',
+  [ViewMode.LIST]: '리스트',
+  [ViewMode.BOARD]: '보드',
+};
+
+// Period Types for Factory/Participant
+export enum PeriodType {
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  QUARTERLY = 'QUARTERLY',
+  YEARLY = 'YEARLY',
+  CUSTOM = 'CUSTOM',
+}
+
+// Period Type Labels (Korean)
+export const PeriodTypeLabel: Record<PeriodType, string> = {
+  [PeriodType.DAILY]: '일간',
+  [PeriodType.WEEKLY]: '주간',
+  [PeriodType.MONTHLY]: '월간',
+  [PeriodType.QUARTERLY]: '분기',
+  [PeriodType.YEARLY]: '연간',
+  [PeriodType.CUSTOM]: '사용자정의',
+};
+
+// Special Row Types for Schedule
+export enum SpecialRowType {
+  ADD_FACTORY = 'ADD_FACTORY',
+  ADD_PARTICIPANT = 'ADD_PARTICIPANT',
+  SUMMARY = 'SUMMARY',
+}
+
+// Workflow Action Types
+export enum WorkflowActionType {
+  SET_TASK = 'SET_TASK',
+  SET_START_DATE = 'SET_START_DATE',
+  SET_END_DATE = 'SET_END_DATE',
+  SET_FACTORY = 'SET_FACTORY',
+  INITIALIZE_QUICK_ADD = 'INITIALIZE_QUICK_ADD',
+  RESET = 'RESET',
+  SUBMIT = 'SUBMIT',
+}
+
+// Drag Item Types
+export enum DragItemType {
+  TASK = 'TASK',
+  PROJECT = 'PROJECT',
+  FACTORY = 'FACTORY',
+  RESOURCE = 'RESOURCE',
+}
+
+// API Response Status
+export enum ApiStatus {
+  IDLE = 'IDLE',
+  LOADING = 'LOADING',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR',
+}
+
+// Sort Direction
+export enum SortDirection {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
+// Filter Operator
+export enum FilterOperator {
+  EQUALS = 'EQUALS',
+  NOT_EQUALS = 'NOT_EQUALS',
+  CONTAINS = 'CONTAINS',
+  NOT_CONTAINS = 'NOT_CONTAINS',
+  STARTS_WITH = 'STARTS_WITH',
+  ENDS_WITH = 'ENDS_WITH',
+  GREATER_THAN = 'GREATER_THAN',
+  LESS_THAN = 'LESS_THAN',
+  BETWEEN = 'BETWEEN',
+  IN = 'IN',
+  NOT_IN = 'NOT_IN',
 }

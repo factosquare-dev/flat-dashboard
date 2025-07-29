@@ -14,7 +14,7 @@ import { useModalFormValidation } from '../../../hooks/useModalFormValidation';
 import { AlertCircle } from 'lucide-react';
 import { MODAL_SIZES } from '../../../utils/modalUtils';
 import { ButtonVariant } from '../../../types/enums';
-import Button from '../../common/Button';
+import { Button } from '../../ui/Button';
 import './UserModal.css';
 
 const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData }) => {

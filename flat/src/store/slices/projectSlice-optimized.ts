@@ -3,6 +3,7 @@ import type { Project } from '../../types/project';
 import { createImmerUpdater, createAsyncAction } from '../utils/storeUtils';
 import { projectsApi } from '../../api/projects';
 import { ProjectStatus, getProjectStatusFromLabel } from '../../types/enums';
+import type { StateCreator } from 'zustand';
 
 export interface ProjectFilters {
   status: string[];
@@ -47,7 +48,7 @@ const initialFilters: ProjectFilters = {
   search: '',
 };
 
-export const createProjectSlice = (set: any, get: any) => {
+export const createProjectSlice: StateCreator<ProjectSlice> = (set, get) => {
   const immerSet = createImmerUpdater<ProjectSlice>(set);
   
   return {

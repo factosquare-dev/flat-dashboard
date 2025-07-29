@@ -14,10 +14,10 @@ export interface ClickableProps extends BaseProps {
   loading?: boolean;
 }
 
-export interface FormProps extends BaseProps {
+export interface FormProps<T = string | number | boolean | null> extends BaseProps {
   name?: string;
-  value?: any;
-  onChange?: (value: any) => void;
+  value?: T;
+  onChange?: (value: T) => void;
   onBlur?: (event: React.FocusEvent) => void;
   onFocus?: (event: React.FocusEvent) => void;
   required?: boolean;
@@ -108,8 +108,8 @@ export interface LoadingProps extends BaseProps {
 }
 
 // Table component props
-export interface TableProps extends BaseProps {
-  data: any[];
+export interface TableProps<T = unknown> extends BaseProps {
+  data: T[];
   columns: TableColumn[];
   loading?: boolean;
   emptyMessage?: string;
@@ -134,7 +134,7 @@ export interface TableColumn {
   sortable?: boolean;
   width?: string | number;
   align?: 'left' | 'center' | 'right';
-  render?: (value: any, row: any, index: number) => ReactNode;
+  render?: <T = unknown>(value: unknown, row: T, index: number) => ReactNode;
   className?: string;
 }
 
@@ -202,7 +202,7 @@ export interface DropdownItem {
 // Error boundary props
 export interface ErrorBoundaryProps extends BaseProps {
   fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: any) => void;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
   resetOnPropsChange?: boolean;
 }
 
@@ -218,13 +218,13 @@ export interface LayoutProps extends BaseProps {
 }
 
 // Event handler types
-export type EventHandler<T = any> = (event: T) => void;
-export type ChangeHandler<T = any> = (value: T) => void;
-export type AsyncEventHandler<T = any> = (event: T) => Promise<void>;
-export type AsyncChangeHandler<T = any> = (value: T) => Promise<void>;
+export type EventHandler<T = React.SyntheticEvent> = (event: T) => void;
+export type ChangeHandler<T = unknown> = (value: T) => void;
+export type AsyncEventHandler<T = React.SyntheticEvent> = (event: T) => Promise<void>;
+export type AsyncChangeHandler<T = unknown> = (value: T) => Promise<void>;
 
 // Common state types
-export interface AsyncState<T = any> {
+export interface AsyncState<T = unknown> {
   data: T | null;
   loading: boolean;
   error: string | null;
@@ -238,9 +238,9 @@ export interface ValidationState {
 }
 
 // Component state types
-export interface ComponentState<T = any> {
+export interface ComponentState<T = unknown> {
   mounted: boolean;
   initialized: boolean;
   data: T | null;
-  meta: Record<string, any>;
+  meta: Record<string, unknown>;
 }

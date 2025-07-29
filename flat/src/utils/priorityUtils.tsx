@@ -1,7 +1,6 @@
 import React from 'react';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import type { Priority } from '../types/project';
-import { Priority as PriorityEnum, PriorityLabel } from '../types/enums';
+import { Priority, PriorityLabel } from '../types/enums';
 import { logger } from './logger';
 
 export interface PriorityInfo {
@@ -72,19 +71,19 @@ export const getPriorityStyles = (priority: Priority): string => {
 // Get priority icon component
 export const getPriorityIcon = (priority: Priority) => {
   switch (priority) {
-    case PriorityEnum.HIGH:
+    case Priority.HIGH:
       return (
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
         </svg>
       );
-    case PriorityEnum.MEDIUM:
+    case Priority.MEDIUM:
       return (
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
         </svg>
       );
-    case PriorityEnum.LOW:
+    case Priority.LOW:
       return (
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -98,27 +97,27 @@ export const getPriorityIcon = (priority: Priority) => {
 // Private helper functions
 function getPriorityBgClass(priority: Priority): string {
   switch (priority) {
-    case PriorityEnum.HIGH: return 'bg-red-100';
-    case PriorityEnum.MEDIUM: return 'bg-yellow-100';
-    case PriorityEnum.LOW: return 'bg-green-100';
+    case Priority.HIGH: return 'bg-red-100';
+    case Priority.MEDIUM: return 'bg-yellow-100';
+    case Priority.LOW: return 'bg-green-100';
     default: return 'bg-gray-100';
   }
 }
 
 function getPriorityTextClass(priority: Priority): string {
   switch (priority) {
-    case PriorityEnum.HIGH: return 'text-red-700';
-    case PriorityEnum.MEDIUM: return 'text-yellow-700';
-    case PriorityEnum.LOW: return 'text-green-700';
+    case Priority.HIGH: return 'text-red-700';
+    case Priority.MEDIUM: return 'text-yellow-700';
+    case Priority.LOW: return 'text-green-700';
     default: return 'text-gray-700';
   }
 }
 
 function getPriorityBorderClass(priority: Priority): string {
   switch (priority) {
-    case PriorityEnum.HIGH: return 'border-red-300';
-    case PriorityEnum.MEDIUM: return 'border-yellow-300';
-    case PriorityEnum.LOW: return 'border-green-300';
+    case Priority.HIGH: return 'border-red-300';
+    case Priority.MEDIUM: return 'border-yellow-300';
+    case Priority.LOW: return 'border-green-300';
     default: return 'border-gray-300';
   }
 }

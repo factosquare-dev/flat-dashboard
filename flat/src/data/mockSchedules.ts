@@ -463,7 +463,7 @@ export const extractProjectFromSchedule = (schedule: Schedule): ProjectFromSched
     .filter(task => {
       const startDate = new Date(task.startDate);
       const endDate = new Date(task.endDate);
-      return task.status === TaskStatus.IN_PROGRESS && startDate <= today && endDate >= today;
+      return task.status === TaskStatus.IN_PROGRESS && startDate.getTime() <= today.getTime() && endDate.getTime() >= today.getTime();
     })
     .map(task => task.taskType);
   

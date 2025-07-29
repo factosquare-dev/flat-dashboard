@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { Priority } from '../../../types/project';
-import { Priority as PriorityEnum } from '../../../types/enums';
+import { Priority } from '../../../types/enums';
 import { getPriorityDisplayName, getPriorityStyles, getPriorityIcon } from '../../../utils/priorityUtils';
 import '../../../design-system/styles/dropdown.css';
 
@@ -24,7 +23,7 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const priorities: Priority[] = Object.values(PriorityEnum);
+  const priorities: Priority[] = Object.values(Priority);
 
   const handleToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();

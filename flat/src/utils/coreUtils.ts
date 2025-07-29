@@ -308,7 +308,7 @@ export function validateRequiredFields<T extends Record<string, unknown>>(
 // ARRAY UTILITIES
 // ============================================================================
 
-export function removeDuplicates<T>(array: T[], keyFn?: (item: T) => any): T[] {
+export function removeDuplicates<T>(array: T[], keyFn?: (item: T) => unknown): T[] {
   if (!keyFn) {
     return [...new Set(array)];
   }
@@ -335,7 +335,7 @@ export function groupBy<T>(array: T[], keyFn: (item: T) => string): Record<strin
   }, {} as Record<string, T[]>);
 }
 
-export function sortBy<T>(array: T[], keyFn: (item: T) => any, direction: 'asc' | 'desc' = 'asc'): T[] {
+export function sortBy<T>(array: T[], keyFn: (item: T) => unknown, direction: 'asc' | 'desc' = 'asc'): T[] {
   return [...array].sort((a, b) => {
     const aVal = keyFn(a);
     const bVal = keyFn(b);
@@ -407,7 +407,7 @@ export function deepClone<T>(obj: T): T {
   return cloned;
 }
 
-export function pick<T extends Record<string, any>, K extends keyof T>(
+export function pick<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
   keys: K[]
 ): Pick<T, K> {
@@ -420,7 +420,7 @@ export function pick<T extends Record<string, any>, K extends keyof T>(
   return result;
 }
 
-export function omit<T extends Record<string, any>, K extends keyof T>(
+export function omit<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
   keys: K[]
 ): Omit<T, K> {
@@ -435,7 +435,7 @@ export function omit<T extends Record<string, any>, K extends keyof T>(
 // ASYNC UTILITIES
 // ============================================================================
 
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -447,7 +447,7 @@ export function debounce<T extends (...args: any[]) => any>(
   };
 }
 
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {

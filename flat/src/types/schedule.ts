@@ -46,15 +46,6 @@ export interface Task {
   color?: string;
 }
 
-// Legacy Factory interface for schedule participants
-// Will be replaced by the Factory interface from factory.ts
-export interface ScheduleFactory {
-  id: FactoryId;
-  name: string;
-  period: string;
-  color: string;
-  order?: number;
-}
 
 export interface Schedule {
   id: ProjectId; // Schedule ID is same as Project ID

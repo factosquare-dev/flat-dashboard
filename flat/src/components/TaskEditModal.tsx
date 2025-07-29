@@ -3,7 +3,7 @@ import { Calendar, Building2, CheckSquare } from 'lucide-react';
 import BaseModal, { ModalFooter } from './common/BaseModal';
 import { MODAL_SIZES } from '../utils/modalUtils';
 import { ButtonVariant } from '../types/enums';
-import Button from './common/Button';
+import { Button } from './ui/Button';
 
 interface Task {
   id: number | string;

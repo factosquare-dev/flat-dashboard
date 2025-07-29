@@ -3,7 +3,7 @@ import type { Project } from '../../../types/project';
 import { ChevronDown, ChevronRight, Folder, FolderOpen, FileSpreadsheet } from 'lucide-react';
 import DraggableProjectTable from './DraggableProjectTable';
 import { flattenProjects, toggleProject } from '../../../data/hierarchicalProjects';
-import { ProjectTypeEnum } from '../../../types/enums';
+import { ProjectType } from '../../../types/enums';
 import { isProjectType } from '../../../utils/projectTypeUtils';
 
 interface HierarchicalProjectTableProps {
@@ -62,7 +62,7 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
     onSelectRow: (projectId: string, checked: boolean, index?: number) => {
       const project = flatProjects.find(p => p.id === projectId);
       if (project) {
-        if (isProjectType(project.type, ProjectTypeEnum.MASTER)) {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
           // MASTER 프로젝트는 확장/축소만
           handleToggleProject(projectId);
         } else {

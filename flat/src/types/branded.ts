@@ -150,3 +150,49 @@ export class InvalidUserIdError extends Error {
     this.name = 'InvalidUserIdError';
   }
 }
+
+export class InvalidTaskIdError extends Error {
+  constructor(value: string) {
+    super(`Invalid task ID: ${value}`);
+    this.name = 'InvalidTaskIdError';
+  }
+}
+
+export class InvalidCustomerIdError extends Error {
+  constructor(value: string) {
+    super(`Invalid customer ID: ${value}`);
+    this.name = 'InvalidCustomerIdError';
+  }
+}
+
+// ID Generation Functions
+export const generateFactoryId = (type: 'manufacturing' | 'container' | 'packaging' = 'manufacturing'): FactoryId => {
+  const prefix = type === 'manufacturing' ? 'mfg' : type === 'container' ? 'cont' : 'pack';
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 6);
+  return toFactoryId(`${prefix}-${timestamp}-${random}`);
+};
+
+export const generateProjectId = (): ProjectId => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 6);
+  return toProjectId(`proj-${timestamp}-${random}`);
+};
+
+export const generateUserId = (): UserId => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 6);
+  return toUserId(`user-${timestamp}-${random}`);
+};
+
+export const generateTaskId = (): TaskId => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 6);
+  return toTaskId(`task-${timestamp}-${random}`);
+};
+
+export const generateCustomerId = (): CustomerId => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 6);
+  return toCustomerId(`cust-${timestamp}-${random}`);
+};

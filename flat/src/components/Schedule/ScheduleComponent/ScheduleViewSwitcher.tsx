@@ -4,6 +4,7 @@ import ScheduleTableView from '../components/ScheduleTableView';
 import type { ViewMode } from './types';
 import type { Participant, Task } from '../../../types/schedule';
 import type { Factory } from '../../../types/factory';
+import { ViewMode as ViewModeEnum } from '../../../types/enums';
 
 interface ScheduleViewSwitcherProps {
   viewMode: ViewMode;
@@ -59,7 +60,7 @@ const ScheduleViewSwitcher: React.FC<ScheduleViewSwitcherProps> = React.memo(({
   onGridWidthChange,
   onQuickTaskCreate,
 }) => {
-  if (viewMode === 'gantt') {
+  if (viewMode === ViewModeEnum.GANTT) {
     return (
       <ScheduleGridContainer
         projects={projects}

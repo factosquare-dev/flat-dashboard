@@ -14,7 +14,7 @@ import { managerNames } from '../../data/mockData';
 import { ProjectStatusLabel, ProjectStatus, PriorityLabel, Priority, ServiceTypeLabel, ServiceType, ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
 import { useModalFormValidation } from '../../hooks/useModalFormValidation';
 import { AlertCircle } from 'lucide-react';
-import Button from '../common/Button';
+import { Button } from '../ui/Button';
 import { getModalSizeString } from '../../utils/modalUtils';
 import './ProjectModal.css';
 

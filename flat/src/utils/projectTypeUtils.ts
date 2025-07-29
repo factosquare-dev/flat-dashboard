@@ -1,5 +1,5 @@
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { ProjectTypeEnum } from '../types/enums';
+import { ProjectType } from '../types/enums';
 
 export interface ProjectTypeInfo {
   code: string;
@@ -49,7 +49,7 @@ export const getProjectTypeDisplayName = (projectType: string): string => {
 };
 
 // Check if project type matches enum
-export const isProjectType = (type: string, targetType: ProjectTypeEnum): boolean => {
+export const isProjectType = (type: string, targetType: ProjectType): boolean => {
   const info = getProjectTypeInfo(type);
   
   // Check if code matches

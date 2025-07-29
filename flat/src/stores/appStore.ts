@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type { Project, Customer, Task, Participant } from '../types';
+import { generateProjectId, generateCustomerId, generateTaskId } from '../types/branded';
 
 interface ModalState<T = unknown> {
   isOpen: boolean;
@@ -136,7 +137,7 @@ export const useAppStore = create<AppState>()(
               // Add new project
               const newProject = {
                 ...project,
-                id: `proj_${Date.now()}`, // Generate temporary ID
+                id: generateProjectId(),
               } as Project;
               state.projects.push(newProject);
             }
@@ -154,7 +155,7 @@ export const useAppStore = create<AppState>()(
               // Add new customer
               const newCustomer = {
                 ...customer,
-                id: `cust_${Date.now()}`, // Generate temporary ID
+                id: generateCustomerId(),
               } as Customer;
               state.customers.push(newCustomer);
             }
@@ -172,7 +173,7 @@ export const useAppStore = create<AppState>()(
               // Add new task
               const newTask = {
                 ...task,
-                id: `task_${Date.now()}`, // Generate temporary ID
+                id: generateTaskId(),
               } as Task;
               state.tasks.push(newTask);
             }

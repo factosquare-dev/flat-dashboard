@@ -10,7 +10,7 @@ import { mockDataService } from '../services/mockDataService';
 import { TaskStatus, ModalSize, ButtonVariant, ButtonSize } from '../types/enums';
 import { getFactoryByIdSafe, getFactoryByIdOrName } from '../utils/factoryUtils';
 import { MODAL_SIZES } from '../utils/modalUtils';
-import Button from './common/Button';
+import { Button } from './ui/Button';
 import './TaskCreateModal.css';
 import { FactoryId, ProjectId, toFactoryId, toFactoryIdSafe, extractIdString } from '../types/branded';
 

@@ -9,7 +9,7 @@ import StatusDropdown from '../StatusDropdown';
 import ProductTypeDropdown from '../ProductTypeDropdown';
 import ProgressBar from '../ProgressBar';
 import type { UseEditableCellReturn } from '@/hooks/useEditableCell';
-import { ProjectType as ProjectTypeEnum } from '@/types/enums';
+import { ProjectType } from '@/types/enums';
 import { isProjectType } from '@/utils/projectTypeUtils';
 import { getSubProjectCount } from '@/utils/projectUtils';
 
@@ -31,19 +31,21 @@ export const renderName = ({ project, editableCell, onUpdateField }: CellRenderP
 
 export const renderProductType = ({ project, onUpdateField }: CellRenderProps) => {
   // MASTER 프로젝트의 경우 서브 프로젝트 개수 표시
-  if (isProjectType(project.type, ProjectTypeEnum.MASTER)) {
+  if (isProjectType(project.type, ProjectType.MASTER)) {
     const subProjectCount = getSubProjectCount(project.id);
     return (
-      <td className="px-3 py-1.5 text-xs text-gray-900 truncate">
-        {subProjectCount > 0 ? `${subProjectCount}종` : '-'}
+      <td className="px-3 py-1.5 text-xs text-gray-900 min-w-[120px]">
+        <div className="text-center">
+          {subProjectCount > 0 ? `${subProjectCount}종` : '-'}
+        </div>
       </td>
     );
   }
   
   // SUB 프로젝트의 경우 드롭다운으로 선택 가능
-  if (isProjectType(project.type, ProjectTypeEnum.SUB)) {
+  if (isProjectType(project.type, ProjectType.SUB)) {
     return (
-      <td className="px-3 py-1.5">
+      <td className="px-3 py-1.5 min-w-[120px]">
         <ProductTypeDropdown
           value={project.productType}
           onChange={(value) => onUpdateField(project.id, 'productType', value)}
@@ -54,8 +56,10 @@ export const renderProductType = ({ project, onUpdateField }: CellRenderProps) =
   
   // 기본적으로 텍스트로 표시
   return (
-    <td className="px-3 py-1.5 text-xs text-gray-900 truncate" title={project.productType}>
-      {project.productType}
+    <td className="px-3 py-1.5 text-xs text-gray-900 min-w-[120px]" title={project.productType}>
+      <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+        {project.productType}
+      </div>
     </td>
   );
 };
@@ -100,14 +104,16 @@ export const renderStatus = ({ project, onUpdateField }: CellRenderProps) => (
 );
 
 export const renderProgress = (project: Project) => (
-  <td className="px-3 py-1.5">
+  <td className="px-3 py-2.5">
     <ProgressBar progress={project.progress} />
   </td>
 );
 
 export const renderClient = ({ project }: CellRenderProps) => (
-  <td className="px-3 py-1.5 text-xs text-gray-900 truncate" title={project.client}>
-    {project.client}
+  <td className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px]" title={project.client}>
+    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+      {project.client}
+    </div>
   </td>
 );
 
@@ -124,8 +130,10 @@ export const renderDate = (field: 'startDate' | 'endDate', { project, editableCe
 export const renderFactory = (field: 'manufacturer' | 'container' | 'packaging', { project }: CellRenderProps) => {
   const value = project[field] as string;
   return (
-    <td className="px-3 py-1.5 text-xs text-gray-900 truncate" title={value}>
-      {value || '-'}
+    <td className="px-3 py-1.5 text-xs text-gray-900 min-w-[100px]" title={value}>
+      <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+        {value || '-'}
+      </div>
     </td>
   );
 };

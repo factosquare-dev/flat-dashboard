@@ -112,7 +112,7 @@ export const useProjects = () => {
   };
 
   // Enhanced update methods that work with both modes
-  const enhancedUpdateProject = (projectId: string, field: keyof Project, value: any) => {
+  const enhancedUpdateProject = <K extends keyof Project>(projectId: string, field: K, value: Project[K]) => {
     if (useHierarchicalMode) {
       setHierarchicalData(prev => 
         prev.map(project => {

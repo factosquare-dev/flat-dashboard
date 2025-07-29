@@ -1,5 +1,6 @@
 import { UserRole } from '../../types/enums';
 import { UserId } from '../../types/branded';
+import type { StateCreator } from 'zustand';
 
 export interface User {
   id: UserId;
@@ -20,17 +21,17 @@ export interface UserSlice {
   updateUser: (updates: Partial<User>) => void;
 }
 
-export const userSlice = (set: any) => ({
+export const userSlice: StateCreator<UserSlice> = (set) => ({
   // Initial state
   user: null,
   isAuthenticated: false,
   
   // Actions
-  login: (user) => set({ user, isAuthenticated: true }),
+  login: (user: User) => set({ user, isAuthenticated: true }),
   
   logout: () => set({ user: null, isAuthenticated: false }),
   
-  updateUser: (updates) =>
+  updateUser: (updates: Partial<User>) =>
     set((state) => ({
       user: state.user ? { ...state.user, ...updates } : null,
     })),
