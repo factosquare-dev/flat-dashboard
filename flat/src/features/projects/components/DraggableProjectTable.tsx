@@ -93,6 +93,10 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };
+  
+  const handleProjectDragLeave = (e: React.DragEvent) => {
+    // 드래그가 떠날 때 처리
+  };
 
   const handleProjectDrop = (e: React.DragEvent, targetProject: Project) => {
     e.preventDefault();
@@ -212,8 +216,6 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 onStartDrag={onStartDrag ? () => onStartDrag(index) : undefined}
                 onDragStart={handleProjectDragStart}
                 onDragEnd={handleProjectDragEnd}
-                onDragOver={handleProjectDragOver}
-                onDrop={handleProjectDrop}
               />
             </React.Fragment>
           ))}

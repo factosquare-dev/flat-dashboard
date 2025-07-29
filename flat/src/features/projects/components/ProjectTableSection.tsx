@@ -54,7 +54,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  const { makeIndependent } = useProjectHierarchy();
+  const { makeIndependent, moveToMaster } = useProjectHierarchy();
   
   // 계층형 데이터에서 모든 프로젝트를 평면화하여 가져오기
   const allProjects = useMemo(() => {
@@ -177,61 +177,58 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
 
 
   const handleContainerDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDraggingOver(false);
+    // 이벤트가 이미 처리되었는지 확인
+    if (e.defaultPrevented) {
+      setIsDraggingOver(false);
+      return;
+    }
     
-    // 케이스 1: 프로젝트 ID 확인
     const projectId = e.dataTransfer.getData('projectId');
     if (!projectId) {
       return;
     }
     
-    // 케이스 2: 프로젝트 정보 가져오기
     const draggedProject = allProjects.find(p => p.id === projectId);
-    if (!draggedProject) {
+    if (!draggedProject || !isProjectType(draggedProject.type, ProjectType.SUB)) {
       return;
     }
     
-    // 케이스 3: SUB 프로젝트가 아니면 무시
-    if (!isProjectType(draggedProject.type, ProjectType.SUB)) {
-      return;
-    }
-    
-    // 케이스 4: 이미 독립 프로젝트면 무시
-    if (!draggedProject.parentId) {
-      return;
-    }
-    
-    // 케이스 5: 드롭 위치 확인
+    // 드롭 위치 확인
     const target = e.target as HTMLElement;
-    const projectRow = target.closest('tr[role="row"]');
+    const droppedOnRow = target.closest('tr[role="row"]');
     
-    if (projectRow) {
-      const targetProjectId = projectRow.getAttribute('data-id');
+    if (droppedOnRow) {
+      const targetProjectId = droppedOnRow.getAttribute('data-id');
       if (targetProjectId) {
         const targetProject = allProjects.find(p => p.id === targetProjectId);
         
-        if (targetProject) {
-          // 케이스 1: MASTER 프로젝트에 드롭
-          // 이 경우는 이미 DraggableProjectTable에서 처리되었을 것임 (stopPropagation 때문에 여기까지 안 옴)
-          // 하지만 혹시 모르니 체크
-          if (isProjectType(targetProject.type, ProjectType.MASTER)) {
-            return;
-          }
+        if (targetProject && isProjectType(targetProject.type, ProjectType.MASTER)) {
+          // MASTER에 드롭 - 여기서 직접 처리
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDraggingOver(false);
           
-          // 케이스 2: 같은 MASTER 내의 SUB에 드롭 -> 아무 동작 안함
-          if (isProjectType(targetProject.type, ProjectType.SUB) && targetProject.parentId) {
-            if (draggedProject.parentId === targetProject.parentId) {
-              return;
-            }
+          // 같은 부모가 아닌 경우에만 이동
+          if (draggedProject.parentId !== targetProjectId) {
+            moveToMaster(projectId, targetProjectId);
           }
-          
-          // 케이스 3: 독립 SUB 또는 다른 MASTER의 SUB에 드롭 -> 독립 프로젝트로
-          makeIndependent(projectId);
+          return;
+        }
+        
+        // 같은 MASTER 내의 SUB에 드롭한 경우
+        if (targetProject && isProjectType(targetProject.type, ProjectType.SUB) && 
+            targetProject.parentId && draggedProject.parentId === targetProject.parentId) {
+          e.preventDefault();
+          setIsDraggingOver(false);
+          return; // 아무 동작 안함
         }
       }
-    } else {
-      // 빈 공간에 드롭하면 독립 프로젝트로 만들기
+    }
+    
+    // 빈 공간이나 독립 프로젝트로 만들 수 있는 위치에 드롭
+    if (draggedProject.parentId) {
+      e.preventDefault();
+      setIsDraggingOver(false);
       makeIndependent(projectId);
     }
   };
@@ -272,16 +269,16 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
       const projectId = projectRow.getAttribute('data-id');
       if (projectId) {
         const targetProject = allProjects.find(p => p.id === projectId);
-        // MASTER 프로젝트 위가 아니면 드롭 가능
-        if (targetProject && !isProjectType(targetProject.type, ProjectType.MASTER)) {
+        // MASTER 프로젝트 위면 드롭 가능
+        if (targetProject && isProjectType(targetProject.type, ProjectType.MASTER)) {
           e.dataTransfer.dropEffect = 'move';
-          setIsDraggingOver(true);
+          setIsDraggingOver(false); // MASTER에 드롭할 때는 독립 영역 표시 안함
           return;
         }
       }
-      // MASTER 위면 드롭 불가
-      e.dataTransfer.dropEffect = 'none';
-      setIsDraggingOver(false);
+      // MASTER가 아닌 곳에 드롭하면 독립 영역 표시
+      e.dataTransfer.dropEffect = 'move';
+      setIsDraggingOver(true);
     } else {
       // 빈 공간이면 항상 드롭 가능
       e.dataTransfer.dropEffect = 'move';
@@ -313,6 +310,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
         onDrop={handleContainerDrop}
         onDragOver={handleContainerDragOver}
         onDragLeave={handleContainerDragLeave}
+        onDragEnter={(e) => e.preventDefault()}
       >
         {/* 계층형 프로젝트 테이블 */}
         <HierarchicalProjectTable
