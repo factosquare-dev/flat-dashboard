@@ -187,6 +187,13 @@ export function toLocalDateString(date: Date): string {
 }
 
 /**
+ * Get current date/time as ISO string
+ */
+export function getCurrentISOString(): string {
+  return new Date().toISOString();
+}
+
+/**
  * Get task status based on date range
  * Assumes dates are in UTC format from backend
  */
@@ -298,3 +305,113 @@ export function getTimezoneOffset(): number {
 
 // Re-export commonly used date-fns functions for consistency
 export { isValid, parseISO };
+
+/**
+ * Format relative time (e.g., "3분 전", "2시간 전")
+ */
+export function formatRelativeTime(date: Date | string, isUtc: boolean = true): string {
+  const d = typeof date === 'string' ? parseDate(date, isUtc) : date;
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffSecs < 60) return '방금 전';
+  if (diffMins < 60) return `${diffMins}분 전`;
+  if (diffHours < 24) return `${diffHours}시간 전`;
+  if (diffDays < 7) return `${diffDays}일 전`;
+  
+  return formatDateLocale(d, 'short', 'ko-KR', false);
+}
+
+/**
+ * Check if date string is valid format (YYYY-MM-DD)
+ */
+export function isValidDateString(date: string): boolean {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(date)) return false;
+  
+  const parsedDate = parseDate(date);
+  return isValid(parsedDate);
+}
+
+/**
+ * Check if date range is valid (start <= end)
+ */
+export function isValidDateRange(startDate: string, endDate: string): boolean {
+  if (!isValidDateString(startDate) || !isValidDateString(endDate)) {
+    return false;
+  }
+  
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+  
+  return start <= end;
+}
+
+/**
+ * Check if date is weekend
+ */
+export function isWeekend(date: Date | string, isUtc: boolean = true): boolean {
+  const d = typeof date === 'string' ? parseDate(date, isUtc) : date;
+  const day = d.getDay();
+  return day === 0 || day === 6; // Sunday is 0, Saturday is 6
+}
+
+/**
+ * Get week number of the year
+ */
+export function getWeekNumber(date: Date | string, isUtc: boolean = true): number {
+  const d = typeof date === 'string' ? parseDate(date, isUtc) : date;
+  const tempDate = new Date(d.valueOf());
+  tempDate.setDate(tempDate.getDate() + 3 - (tempDate.getDay() + 6) % 7);
+  const week1 = new Date(tempDate.getFullYear(), 0, 4);
+  return 1 + Math.round(((tempDate.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
+
+// ============================================================================
+// GANTT/SCHEDULE SPECIFIC DATE CALCULATIONS
+// ============================================================================
+
+/**
+ * Calculate date from X coordinate in Gantt chart
+ */
+export function calculateResizeDateFromX(
+  x: number,
+  containerLeft: number,
+  cellWidth: number,
+  days: Date[]
+): Date {
+  const relativeX = x - containerLeft;
+  const dayIndex = Math.floor(relativeX / cellWidth);
+  const clampedIndex = Math.max(0, Math.min(dayIndex, days.length - 1));
+  return days[clampedIndex];
+}
+
+/**
+ * Calculate hovered date index from X coordinate
+ */
+export function calculateHoveredDateIndex(
+  x: number,
+  containerLeft: number,
+  cellWidth: number,
+  daysCount: number
+): number {
+  const relativeX = x - containerLeft;
+  const index = Math.floor(relativeX / cellWidth);
+  return Math.max(0, Math.min(index, daysCount - 1));
+}
+
+/**
+ * Calculate snap indicator X position
+ */
+export function calculateSnapIndicatorX(
+  dateIndex: number,
+  cellWidth: number,
+  isEnd: boolean = false
+): number {
+  // If it's the end position, add cellWidth to position at the end of the cell
+  return dateIndex * cellWidth + (isEnd ? cellWidth : 0);
+}

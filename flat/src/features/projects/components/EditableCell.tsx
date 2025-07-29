@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import type { Project } from '../../../types/project';
 import type { ProjectId } from '../../../types/branded';
 import { formatCurrency, parseCurrency } from '../../../utils/coreUtils';
+import { formatDate } from '../../../utils/unifiedDateUtils';
 import { factoriesByType } from '../../../data/mockData';
 import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
 
@@ -214,7 +215,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       <div className="relative">
         <div className={`${type === 'currency' ? 'tabular-nums' : type === 'date' ? 'whitespace-nowrap' : 'truncate max-w-[140px]'} group-hover:text-gray-900 transition-colors`} title={value as string}>
           {type === 'currency' ? formatCurrency(parseInt(value as string)) : 
-           type === 'date' ? new Date(value as string).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' }).replace(/\. /g, '-').replace('.', '') :
+           type === 'date' ? formatDate(value as string, 'yy-MM-dd') :
            value}
         </div>
       </div>

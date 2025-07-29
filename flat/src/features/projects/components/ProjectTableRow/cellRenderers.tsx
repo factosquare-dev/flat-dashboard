@@ -12,6 +12,8 @@ import type { UseEditableCellReturn } from '@/hooks/useEditableCell';
 import { ProjectType } from '@/types/enums';
 import { isProjectType } from '@/utils/projectTypeUtils';
 import { getSubProjectCount } from '@/utils/projectUtils';
+import { mockDataService } from '@/services/mockDataService';
+import { isToday, isDateInRange } from '@/utils/unifiedDateUtils';
 
 interface CellRenderProps {
   project: Project;
@@ -35,7 +37,7 @@ export const renderProductType = ({ project, onUpdateField }: CellRenderProps) =
     const subProjectCount = getSubProjectCount(project.id);
     return (
       <td className="px-3 py-1.5 text-xs text-gray-900 min-w-[120px]">
-        <div className="text-center">
+        <div className="text-left">
           {subProjectCount > 0 ? `${subProjectCount}종` : '-'}
         </div>
       </td>
@@ -75,24 +77,48 @@ export const renderServiceType = ({ project, onUpdateField }: CellRenderProps) =
   );
 };
 
-export const renderCurrentStage = (project: Project) => (
-  <td className="px-3 py-1.5">
-    <div className="flex flex-wrap gap-1">
-      {project.currentStage.length > 0 ? (
-        project.currentStage.map((stage, index) => (
-          <span
-            key={index}
-            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200"
-          >
-            {stage}
-          </span>
-        ))
-      ) : (
-        <span className="text-xs text-gray-400">-</span>
-      )}
-    </div>
-  </td>
-);
+export const renderCurrentStage = (project: Project) => {
+  // 오늘 진행 중인 작업 가져오기
+  const todayTasks = React.useMemo(() => {
+    try {
+      const tasks = mockDataService.getTasksByProjectId(project.id);
+      return tasks
+        .filter(task => {
+          // 오늘이 작업 기간에 포함되는지 확인
+          const today = new Date();
+          const startDate = new Date(task.startDate);
+          const endDate = new Date(task.endDate);
+          return today >= startDate && today <= endDate;
+        })
+        .map(task => task.name || task.title || '')
+        .filter(name => name.length > 0);
+    } catch (error) {
+      return [];
+    }
+  }, [project.id]);
+  
+  // 오늘 작업이 있으면 표시, 없으면 기존 currentStage 표시
+  const stagesToShow = todayTasks.length > 0 ? todayTasks : project.currentStage;
+  
+  return (
+    <td className="px-3 py-1.5">
+      <div className="flex flex-wrap gap-1">
+        {stagesToShow.length > 0 ? (
+          stagesToShow.map((stage, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200"
+            >
+              {stage}
+            </span>
+          ))
+        ) : (
+          <span className="text-xs text-gray-400">-</span>
+        )}
+      </div>
+    </td>
+  );
+};
 
 export const renderStatus = ({ project, onUpdateField }: CellRenderProps) => (
   <td className="px-3 py-1.5">

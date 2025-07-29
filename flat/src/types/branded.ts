@@ -129,6 +129,12 @@ export const extractIdString = <T extends string>(brandedId: Brand<string, T>): 
   return brandedId as string;
 };
 
+// ProductCategory ID branded type
+export type ProductCategoryId = Brand<string, 'ProductCategoryId'>;
+
+// Product ID branded type
+export type ProductId = Brand<string, 'ProductId'>;
+
 // Validation error classes
 export class InvalidFactoryIdError extends Error {
   constructor(value: string) {
@@ -195,4 +201,75 @@ export const generateCustomerId = (): CustomerId => {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substring(2, 6);
   return toCustomerId(`cust-${timestamp}-${random}`);
+};
+
+// ProductCategory ID functions
+export const isProductCategoryId = (value: unknown): value is ProductCategoryId => {
+  return typeof value === 'string' && /^[1-9]\d*$/.test(value);
+};
+
+export const toProductCategoryId = (value: string): ProductCategoryId => {
+  if (!isProductCategoryId(value)) {
+    throw new Error(`Invalid product category ID format: "${value}". Expected format: numeric string`);
+  }
+  return value as ProductCategoryId;
+};
+
+export const toProductCategoryIdSafe = (value: string | undefined): ProductCategoryId | undefined => {
+  if (!value) return undefined;
+  try {
+    return toProductCategoryId(value);
+  } catch {
+    console.warn(`Invalid product category ID: ${value}`);
+    return undefined;
+  }
+};
+
+// Product ID functions  
+export const isProductId = (value: unknown): value is ProductId => {
+  return typeof value === 'string' && /^[1-9]\d*$/.test(value);
+};
+
+export const toProductId = (value: string): ProductId => {
+  if (!isProductId(value)) {
+    throw new Error(`Invalid product ID format: "${value}". Expected format: numeric string`);
+  }
+  return value as ProductId;
+};
+
+export const toProductIdSafe = (value: string | undefined): ProductId | undefined => {
+  if (!value) return undefined;
+  try {
+    return toProductId(value);
+  } catch {
+    console.warn(`Invalid product ID: ${value}`);
+    return undefined;
+  }
+};
+
+// 자동 증가하는 ID 생성을 위한 카운터들
+export const generateProductCategoryId = (): ProductCategoryId => {
+  // window 객체에서 카운터 관리 (브라우저 환경에서만)
+  if (typeof window !== 'undefined') {
+    if (!(window as any).__productCategoryIdCounter) {
+      (window as any).__productCategoryIdCounter = 1000;
+    }
+    return toProductCategoryId((++(window as any).__productCategoryIdCounter).toString());
+  }
+  
+  // 서버 환경에서는 랜덤 ID 생성
+  return toProductCategoryId(Math.floor(Math.random() * 1000000).toString());
+};
+
+export const generateProductId = (): ProductId => {
+  // window 객체에서 카운터 관리 (브라우저 환경에서만)
+  if (typeof window !== 'undefined') {
+    if (!(window as any).__productIdCounter) {
+      (window as any).__productIdCounter = 2000;
+    }
+    return toProductId((++(window as any).__productIdCounter).toString());
+  }
+  
+  // 서버 환경에서는 랜덤 ID 생성
+  return toProductId(Math.floor(Math.random() * 1000000).toString());
 };

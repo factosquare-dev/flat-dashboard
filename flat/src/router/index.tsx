@@ -9,6 +9,7 @@ const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Projects = lazy(() => import('../pages/Projects'));
 const Users = lazy(() => import('../pages/Users'));
 const Factories = lazy(() => import('../pages/Factories'));
+const ProductTypes = lazy(() => import('../pages/ProductTypes'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 const router = createBrowserRouter([
@@ -27,10 +28,6 @@ const router = createBrowserRouter([
       },
       {
         path: 'projects',
-        element: <Navigate to="/projects/list" replace />,
-      },
-      {
-        path: 'projects/list',
         element: (
           <Suspense fallback={<LoadingScreen />}>
             <Projects />
@@ -38,7 +35,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'projects/sample',
+        path: 'samples',
         element: (
           <Suspense fallback={<LoadingScreen />}>
             <Projects />
@@ -58,6 +55,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingScreen />}>
             <Factories />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'products',
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <ProductTypes />
           </Suspense>
         ),
       },

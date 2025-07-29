@@ -18,6 +18,8 @@ import { createCustomers } from './seeders/customerSeeder';
 import { createFactories } from './seeders/factorySeeder';
 import { createProjects } from './seeders/projectSeeder';
 import { createSchedulesAndTasks } from './seeders/scheduleTaskSeeder';
+import { createProductCategories } from './seeders/productCategorySeeder';
+import { createProducts } from './seeders/productSeeder';
 
 export const seedData = {
   createInitialData(): MockDatabase {
@@ -29,6 +31,8 @@ export const seedData = {
       schedules: new Map(),
       tasks: new Map(),
       comments: new Map(),
+      productCategories: new Map(),
+      products: new Map(),
       userFactories: new Map(),
       projectAssignments: new Map(),
       factoryProjects: new Map(),
@@ -55,16 +59,24 @@ export const seedData = {
     const projects = createProjects(customers, users);
     projects.forEach(project => db.projects.set(project.id, project));
 
-    // 5. Create Schedules and Tasks with consistent manager data
+    // 5. Create Product Categories
+    const productCategories = createProductCategories();
+    productCategories.forEach(category => db.productCategories.set(category.id, category));
+
+    // 6. Create Products
+    const products = createProducts();
+    products.forEach(product => db.products.set(product.id, product));
+
+    // 7. Create Schedules and Tasks with consistent manager data
     const { schedules, tasks } = createSchedulesAndTasks(projects, users);
     schedules.forEach(schedule => db.schedules.set(schedule.id, schedule));
     tasks.forEach(task => db.tasks.set(task.id, task));
 
-    // 6. Create Comments
+    // 8. Create Comments
     const comments = this.createComments(projects, users);
     comments.forEach(comment => db.comments.set(comment.id, comment));
 
-    // 7. Create Relationships
+    // 9. Create Relationships
     const userFactories = this.createUserFactoryRelations(users, factories);
     userFactories.forEach(uf => db.userFactories.set(uf.id, uf));
 
@@ -77,7 +89,7 @@ export const seedData = {
     const userCustomers = this.createUserCustomerRelations(users, customers);
     userCustomers.forEach(uc => db.userCustomers.set(uc.id, uc));
 
-    // 8. Create Status and Priority Mappings
+    // 10. Create Status and Priority Mappings
     const statusMappings = this.createStatusMappings();
     statusMappings.forEach(sm => db.statusMappings.set(sm.id, sm));
 

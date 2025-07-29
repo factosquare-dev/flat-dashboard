@@ -1,6 +1,6 @@
-// Re-export from centralized coreUtils
+// Re-export from unifiedDateUtils
 export { 
   calculateResizeDateFromX, 
   calculateHoveredDateIndex, 
   calculateSnapIndicatorX 
-} from '@/utils/coreUtils';
+} from '@/utils/unifiedDateUtils';

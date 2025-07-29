@@ -1,7 +1,11 @@
 import React from 'react';
 import { APP_CONSTANTS } from '../../../../config/constants';
+import { formatDate } from '../../../../utils/unifiedDateUtils';
 
 const TableHeader: React.FC = () => {
+  const today = new Date();
+  const todayFormatted = formatDate(today, 'MM/dd', false);
+  
   const headers = [
     { key: 'taskName', label: APP_CONSTANTS.TEXT.TASK.NAME },
     { key: 'projectStatus', label: APP_CONSTANTS.TEXT.PROJECT.STATUS },
@@ -15,6 +19,13 @@ const TableHeader: React.FC = () => {
 
   return (
     <thead className="bg-gray-50/50">
+      <tr role="row">
+        <th colSpan={headers.length} className="px-4 py-2 text-right">
+          <span className="text-xs text-blue-600 font-medium">
+            오늘: {todayFormatted}
+          </span>
+        </th>
+      </tr>
       <tr role="row">
         {headers.map(({ key, label, align }) => (
           <th

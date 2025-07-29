@@ -3,166 +3,26 @@
  */
 
 // ============================================================================
-// DATE & TIME UTILITIES
+// RE-EXPORTS FROM UNIFIED DATE UTILS
+// All date utilities have been moved to unifiedDateUtils.ts
 // ============================================================================
 
-/**
- * Parse date string ensuring proper timezone handling
- * For date-only strings (YYYY-MM-DD), assumes UTC and converts to local
- * For ISO strings with time, converts from UTC to local
- */
-export function parseDate(dateString: string): Date {
-  // Date-only format (YYYY-MM-DD) - assume UTC midnight
-  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    // Parse as UTC and convert to local
-    return new Date(dateString + 'T00:00:00Z');
-  }
-  
-  // ISO format with time - parse normally (will convert UTC to local)
-  return new Date(dateString);
-}
-
-/**
- * Normalize date to start of day in local timezone
- */
-export function normalizeToStartOfDay(date: Date): Date {
-  const normalized = new Date(date);
-  normalized.setHours(0, 0, 0, 0);
-  return normalized;
-}
-
-export function formatDate(date: Date | string, format: 'short' | 'long' | 'iso' = 'short'): string {
-  const d = typeof date === 'string' ? parseDate(date) : date;
-  
-  if (isNaN(d.getTime())) {
-    return 'Invalid Date';
-  }
-  
-  switch (format) {
-    case 'long':
-      return d.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long'
-      });
-    case 'iso':
-      return d.toISOString().split('T')[0];
-    default:
-      return d.toLocaleDateString('ko-KR');
-  }
-}
-
-export function formatRelativeTime(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSecs < 60) return '방금 전';
-  if (diffMins < 60) return `${diffMins}분 전`;
-  if (diffHours < 24) return `${diffHours}시간 전`;
-  if (diffDays < 7) return `${diffDays}일 전`;
-  
-  return formatDate(d);
-}
-
-export function getDaysBetween(startDate: Date | string, endDate: Date | string): number {
-  const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
-  const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
-  const diffTime = Math.abs(end.getTime() - start.getTime());
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-}
-
-export function isValidDateString(date: string): boolean {
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateRegex.test(date)) return false;
-  
-  const parsedDate = new Date(date);
-  return !isNaN(parsedDate.getTime());
-}
-
-export function isValidDateRange(startDate: string, endDate: string): boolean {
-  if (!isValidDateString(startDate) || !isValidDateString(endDate)) {
-    return false;
-  }
-  
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  
-  return start <= end;
-}
-
-export function isToday(date: Date | string): boolean {
-  // For string dates, assume they're UTC from backend
-  if (typeof date === 'string') {
-    // Convert UTC to local for comparison
-    const localDate = parseDate(date);
-    const today = new Date();
-    
-    return localDate.getDate() === today.getDate() &&
-           localDate.getMonth() === today.getMonth() &&
-           localDate.getFullYear() === today.getFullYear();
-  }
-  
-  // If Date object, compare in local timezone
-  const today = new Date();
-  return date.getDate() === today.getDate() &&
-         date.getMonth() === today.getMonth() &&
-         date.getFullYear() === today.getFullYear();
-}
-
-export function formatDateISO(date: Date | string): string {
-  return formatDate(date, 'iso');
-}
-
-export function isWeekend(date: Date | string): boolean {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const day = d.getDay();
-  return day === 0 || day === 6; // Sunday is 0, Saturday is 6
-}
-
-export function getWeekNumber(date: Date | string): number {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const firstDayOfYear = new Date(d.getFullYear(), 0, 1);
-  const pastDaysOfYear = (d.getTime() - firstDayOfYear.getTime()) / 86400000;
-  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-}
-
-export function calculateResizeDateFromX(
-  x: number,
-  containerLeft: number,
-  cellWidth: number,
-  days: Date[]
-): Date {
-  const relativeX = x - containerLeft;
-  const dayIndex = Math.floor(relativeX / cellWidth);
-  const clampedIndex = Math.max(0, Math.min(dayIndex, days.length - 1));
-  return days[clampedIndex];
-}
-
-export function calculateHoveredDateIndex(
-  x: number,
-  containerLeft: number,
-  cellWidth: number,
-  daysCount: number
-): number {
-  const relativeX = x - containerLeft;
-  const index = Math.floor(relativeX / cellWidth);
-  return Math.max(0, Math.min(index, daysCount - 1));
-}
-
-export function calculateSnapIndicatorX(
-  dateIndex: number,
-  cellWidth: number,
-  isEnd: boolean = false
-): number {
-  // If it's the end position, add cellWidth to position at the end of the cell
-  return dateIndex * cellWidth + (isEnd ? cellWidth : 0);
-}
+export { 
+  parseDate,
+  formatDate,
+  getDaysBetween,
+  isToday,
+  startOfDay as normalizeToStartOfDay,
+  toLocalDateString as formatDateISO,
+  formatRelativeTime,
+  isValidDateString,
+  isValidDateRange,
+  isWeekend,
+  getWeekNumber,
+  calculateResizeDateFromX,
+  calculateHoveredDateIndex,
+  calculateSnapIndicatorX
+} from './unifiedDateUtils';
 
 // ============================================================================
 // NUMBER & CURRENCY UTILITIES

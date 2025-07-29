@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import type { ScheduleProps, ViewMode } from './types';
+import type { ScheduleProps } from './types';
+import { ViewMode } from '../../../types/enums';
 import { useScheduleState } from '../hooks/useScheduleState';
 import { useScheduleEffects } from '../hooks/useScheduleEffects';
 import { useDynamicLayout } from '../hooks/useDynamicLayout';
@@ -22,7 +23,7 @@ const Schedule: React.FC<ScheduleProps> = ({
   onBack
 }) => {
   const [gridWidth, setGridWidth] = useState(0);
-  const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.TABLE);
   const { containerStyle } = useDynamicLayout();
   const { error: toastError } = useToast();
   
@@ -90,7 +91,7 @@ const Schedule: React.FC<ScheduleProps> = ({
 
   const handleToggleTableView = useCallback(() => {
     setViewMode(prevMode => {
-      const newMode = prevMode === 'gantt' ? 'table' : 'gantt';
+      const newMode = prevMode === ViewMode.GANTT ? ViewMode.TABLE : ViewMode.GANTT;
       return newMode;
     });
   }, []);
@@ -128,7 +129,7 @@ const Schedule: React.FC<ScheduleProps> = ({
         onAddTask={handleAddTask}
         projectName={projectName}
         onToggleTableView={handleToggleTableView}
-        isTableView={viewMode === 'table'}
+        isTableView={viewMode === ViewMode.TABLE}
       >
         <ScheduleViewSwitcher
           viewMode={viewMode}

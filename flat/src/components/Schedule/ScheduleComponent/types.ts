@@ -23,6 +23,5 @@ export interface TaskData {
   endDate: string;
 }
 
-// Use ViewMode enum from enums.ts
-import { ViewMode } from '../../../types/enums';
-export { ViewMode };
+// Re-export ViewMode type from enums
+export { ViewMode } from '../../../types/enums';

@@ -30,12 +30,20 @@ const navigation: NavItem[] = [
     path: '/projects', 
     icon: FolderOpen,
     children: [
-      { name: 'Project Lists', path: '/projects/list', icon: FolderOpen },
-      { name: 'Sample List', path: '/projects/sample', icon: FolderOpen },
+      { name: 'Projects', path: '/projects', icon: FolderOpen },
+      { name: 'Samples', path: '/samples', icon: FolderOpen },
     ]
   },
   { name: 'Users', path: '/users', icon: Users },
-  { name: 'Factories', path: '/factories', icon: Factory },
+  { 
+    name: 'Factories', 
+    path: '/factories', 
+    icon: Factory,
+    children: [
+      { name: 'Factories', path: '/factories', icon: Factory },
+      { name: 'Products', path: '/products', icon: Factory },
+    ]
+  },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
@@ -57,6 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
       <div key={item.name}>
         <NavLink
           to={item.path}
+          end={!hasChildren}
           onClick={(e) => {
             if (hasChildren) {
               e.preventDefault();

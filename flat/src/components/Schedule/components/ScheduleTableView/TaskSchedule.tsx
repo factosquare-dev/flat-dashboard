@@ -1,4 +1,5 @@
 import React from 'react';
+import { isToday, isDateInRange, formatDate } from '../../../../utils/unifiedDateUtils';
 
 interface TaskScheduleProps {
   startDate: string;
@@ -8,20 +9,28 @@ interface TaskScheduleProps {
 const TaskSchedule: React.FC<TaskScheduleProps> = ({ startDate, endDate }) => {
   const formatDateShort = (dateString: string) => {
     try {
-      const date = new Date(dateString);
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${month}/${day}`;
+      return formatDate(dateString, 'MM/dd');
     } catch {
       return dateString;
     }
   };
+  
+  // Check if today is within the task schedule
+  const isTodayInSchedule = isDateInRange(new Date(), startDate, endDate);
 
   return (
-    <div className="flex items-center gap-2 text-xs text-gray-600">
-      <span>{formatDateShort(startDate)}</span>
-      <span className="text-gray-300">~</span>
-      <span>{formatDateShort(endDate)}</span>
+    <div className={`flex items-center gap-2 text-xs ${
+      isTodayInSchedule 
+        ? 'bg-blue-100 text-blue-700 px-2 py-1 rounded-md font-medium' 
+        : 'text-gray-600'
+    }`}>
+      <span className={isToday(startDate) ? 'font-bold' : ''}>
+        {formatDateShort(startDate)}
+      </span>
+      <span className={isTodayInSchedule ? 'text-blue-400' : 'text-gray-300'}>~</span>
+      <span className={isToday(endDate) ? 'font-bold' : ''}>
+        {formatDateShort(endDate)}
+      </span>
     </div>
   );
 };

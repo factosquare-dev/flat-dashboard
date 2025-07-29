@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { factories, type Factory as FactoryType } from '../../data/factories';
 import FactoryModal, { type FactoryFormData } from '../../components/Factories/FactoryModal';
 import FactoryCard from '../../components/Factories/FactoryCard';
@@ -6,7 +7,7 @@ import FactoryToolbar from '../../components/Factories/FactoryToolbar';
 import FloatingActionButton from '../../components/common/FloatingActionButton';
 import { useFactoryFilter } from '../../hooks/useFactoryFilter';
 import { useModalState } from '../../hooks/useModalState';
-import { Building2 } from 'lucide-react';
+import { Building2, Tags } from 'lucide-react';
 import { LoadingState } from '../../components/loading/LoadingState';
 import { logError } from '../../utils/errorHandling';
 import { useToast } from '../../hooks/useToast';
@@ -73,6 +74,20 @@ const FactoriesPage: React.FC = () => {
         onTypeChange={setSelectedType}
         onSearchChange={setSearchTerm}
       />
+
+      {/* 관리 메뉴 */}
+      <div className="bg-white border-b border-gray-200 px-6 py-3">
+        <div className="flex items-center gap-4">
+          <h2 className="text-sm font-medium text-gray-600">관리 메뉴</h2>
+          <Link
+            to="/factories/product-types"
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+          >
+            <Tags className="w-4 h-4" />
+            제품유형 카테고리 관리
+          </Link>
+        </div>
+      </div>
 
       {/* 메인 컨텐츠 영역 */}
       <div className="flex-1 overflow-auto p-6">

@@ -9,7 +9,9 @@ import { FACTORY_TYPES, TASK_TYPES } from '../constants/factory';
 import type { Factory } from '../types/factory';
 import type { Task } from '../types/schedule';
 import type { Project } from '../types/project';
-import { FactoryId, ProjectId, TaskId, toFactoryId, toProjectId } from '../types/branded';
+import type { ProductCategory, ProductCategoryId } from '../types/productCategory';
+import type { Product, ProductId } from '../types/product';
+import { FactoryId, ProjectId, TaskId, toFactoryId, toProjectId, generateProductCategoryId, generateProductId } from '../types/branded';
 
 class MockDataService {
   private db: MockDatabaseImpl;
@@ -145,6 +147,234 @@ class MockDataService {
     }
     
     return '담당자 미정';
+  }
+
+  /**
+   * ProductCategory 관련 메서드
+   */
+  
+  // 모든 제품 카테고리 가져오기
+  getProductCategories(): ProductCategory[] {
+    const database = this.db.getDatabase();
+    return Array.from(database.productCategories?.values() || []);
+  }
+
+  // 계층 구조로 정렬된 제품 카테고리 가져오기
+  getProductCategoriesHierarchy(): ProductCategory[] {
+    const categories = this.getProductCategories();
+    const rootCategories = categories.filter(cat => !cat.parentId);
+    
+    const buildHierarchy = (parent: ProductCategory): ProductCategory => {
+      const children = categories
+        .filter(cat => cat.parentId === parent.id)
+        .sort((a, b) => a.order - b.order)
+        .map(buildHierarchy);
+      
+      return { ...parent, children };
+    };
+
+    return rootCategories
+      .sort((a, b) => a.order - b.order)
+      .map(buildHierarchy);
+  }
+
+  // 제품 카테고리 추가
+  addProductCategory(category: Omit<ProductCategory, 'id'>): ProductCategory {
+    const database = this.db.getDatabase();
+    if (!database.productCategories) {
+      database.productCategories = new Map();
+    }
+
+    const newCategory: ProductCategory = {
+      ...category,
+      id: generateProductCategoryId(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    database.productCategories.set(newCategory.id, newCategory);
+    this.db.save();
+    return newCategory;
+  }
+
+  // 제품 카테고리 업데이트
+  updateProductCategory(id: ProductCategoryId, updates: Partial<ProductCategory>): ProductCategory | null {
+    const database = this.db.getDatabase();
+    const category = database.productCategories?.get(id);
+    
+    if (!category) return null;
+
+    const updatedCategory: ProductCategory = {
+      ...category,
+      ...updates,
+      id,
+      updatedAt: new Date().toISOString(),
+    };
+
+    database.productCategories!.set(id, updatedCategory);
+    this.db.save();
+    return updatedCategory;
+  }
+
+  // 제품 카테고리 삭제
+  deleteProductCategory(id: ProductCategoryId): boolean {
+    const database = this.db.getDatabase();
+    if (!database.productCategories) return false;
+
+    const result = database.productCategories.delete(id);
+    this.db.save();
+    return result;
+  }
+
+  // 플랫 리스트로 제품 카테고리 가져오기 (드롭다운용)
+  getProductCategoriesFlat(): Array<{ id: string; name: string; fullPath: string }> {
+    const categories = this.getProductCategories();
+    const result: Array<{ id: string; name: string; fullPath: string }> = [];
+
+    const getDepth = (categoryId: ProductCategoryId, visited = new Set<string>()): number => {
+      if (visited.has(categoryId)) return 0; // 순환 참조 방지
+      visited.add(categoryId);
+
+      const category = categories.find(cat => cat.id === categoryId);
+      if (!category || !category.parentId) return 0;
+      
+      return 1 + getDepth(category.parentId, visited);
+    };
+
+    const buildDisplayName = (category: ProductCategory): string => {
+      const depth = getDepth(category.id);
+      const indent = '  '.repeat(depth); // 2칸 공백으로 들여쓰기
+      return depth > 0 ? `${indent}${category.name}` : category.name;
+    };
+
+    // 정렬을 위해 모든 카테고리에 대해 full path 구축
+    const buildSortPath = (categoryId: ProductCategoryId, visited = new Set<string>()): string => {
+      if (visited.has(categoryId)) return ''; // 순환 참조 방지
+      visited.add(categoryId);
+
+      const category = categories.find(cat => cat.id === categoryId);
+      if (!category) return '';
+
+      if (category.parentId) {
+        const parentPath = buildSortPath(category.parentId, visited);
+        return parentPath ? `${parentPath}/${category.name}` : category.name;
+      }
+
+      return category.name;
+    };
+
+    categories.forEach(category => {
+      result.push({
+        id: category.id,
+        name: category.name,
+        fullPath: buildDisplayName(category)
+      });
+    });
+
+    // 계층 구조 순서로 정렬
+    return result.sort((a, b) => {
+      const aPath = buildSortPath(a.id as ProductCategoryId);
+      const bPath = buildSortPath(b.id as ProductCategoryId);
+      return aPath.localeCompare(bPath);
+    });
+  }
+
+  /**
+   * Product 관련 메서드
+   */
+  
+  // 모든 제품 가져오기
+  getProducts(): Product[] {
+    const database = this.db.getDatabase();
+    return Array.from(database.products?.values() || []);
+  }
+
+  // 카테고리별 제품 가져오기
+  getProductsByCategory(categoryId: ProductCategoryId): Product[] {
+    const products = this.getProducts();
+    return products.filter(product => product.categoryId === categoryId);
+  }
+
+  // ID로 제품 가져오기
+  getProductById(id: ProductId): Product | undefined {
+    const database = this.db.getDatabase();
+    return database.products?.get(id);
+  }
+
+  // 제품 추가
+  addProduct(product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Product {
+    const database = this.db.getDatabase();
+    if (!database.products) {
+      database.products = new Map();
+    }
+
+    const newProduct: Product = {
+      ...product,
+      id: generateProductId(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    database.products.set(newProduct.id, newProduct);
+    this.db.save();
+    return newProduct;
+  }
+
+  // 제품 업데이트
+  updateProduct(id: ProductId, updates: Partial<Product>): Product | null {
+    const database = this.db.getDatabase();
+    const product = database.products?.get(id);
+    
+    if (!product) return null;
+
+    const updatedProduct: Product = {
+      ...product,
+      ...updates,
+      id,
+      updatedAt: new Date().toISOString(),
+    };
+
+    database.products!.set(id, updatedProduct);
+    this.db.save();
+    return updatedProduct;
+  }
+
+  // 제품 삭제
+  deleteProduct(id: ProductId): boolean {
+    const database = this.db.getDatabase();
+    if (!database.products) return false;
+
+    const result = database.products.delete(id);
+    this.db.save();
+    return result;
+  }
+
+  // 제품 검색
+  searchProducts(query: string): Product[] {
+    const products = this.getProducts();
+    const searchTerm = query.toLowerCase();
+    
+    return products.filter(product => 
+      product.name.toLowerCase().includes(searchTerm) ||
+      product.description?.toLowerCase().includes(searchTerm) ||
+      product.sku?.toLowerCase().includes(searchTerm) ||
+      product.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
+    );
+  }
+
+  // 카테고리 정보와 함께 제품 가져오기
+  getProductsWithCategory(): Array<Product & { categoryName: string; categoryPath: string }> {
+    const products = this.getProducts();
+    const categories = this.getProductCategoriesFlat();
+    
+    return products.map(product => {
+      const category = categories.find(cat => cat.id === product.categoryId);
+      return {
+        ...product,
+        categoryName: category?.name || '미분류',
+        categoryPath: category?.fullPath || '미분류'
+      };
+    });
   }
 
   /**

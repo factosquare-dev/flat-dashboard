@@ -5,6 +5,7 @@ import { APP_CONSTANTS } from '../../../../config/constants';
 import { gridColors } from '../../../../design-system/colors/grid';
 import { getStatusDisplayName, getStatusStyles } from '../../../../utils/statusUtils';
 import { mockDataService } from '../../../../services/mockDataService';
+import { isDateInRange } from '../../../../utils/unifiedDateUtils';
 import TaskStatusIcons from './TaskStatusIcons';
 import TaskSchedule from './TaskSchedule';
 import TaskFactory from './TaskFactory';
@@ -29,6 +30,9 @@ const TaskRow: React.FC<TaskRowProps> = ({
   const handleTaskClick = useCallback(() => {
     onTaskClick?.(task);
   }, [onTaskClick, task]);
+  
+  // Check if today is within the task schedule
+  const isTodayInSchedule = isDateInRange(new Date(), task.startDate, task.endDate);
 
   // Get factory information for the project
   const getProjectFactories = () => {
@@ -53,7 +57,11 @@ const TaskRow: React.FC<TaskRowProps> = ({
 
 
   return (
-    <tr className={`${gridColors.row.hover} transition-colors border-b ${gridColors.row.border}`} role="row">
+    <tr className={`${
+      isTodayInSchedule 
+        ? 'bg-blue-50 hover:bg-blue-100' 
+        : gridColors.row.hover
+    } transition-colors border-b ${gridColors.row.border}`} role="row">
       {/* 작업명 */}
       <td className="px-4 py-3" role="gridcell">
         <button

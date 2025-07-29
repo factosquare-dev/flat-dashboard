@@ -9,6 +9,8 @@ import type { Project, ProjectType, ProjectStatus } from '@/types/project';
 import type { Schedule, Task } from '@/types/schedule';
 import type { Comment } from '@/types/comment';
 import type { Customer } from '@/types/customer';
+import type { ProductCategory, ProductCategoryId } from '@/types/productCategory';
+import type { Product, ProductId } from '@/types/product';
 import type { UserId, FactoryId, ProjectId, TaskId, CustomerId } from '@/types/branded';
 
 /**
@@ -22,6 +24,8 @@ export interface MockDatabase {
   schedules: Map<ProjectId, Schedule>;
   tasks: Map<TaskId, Task>;
   comments: Map<string, Comment>;
+  productCategories: Map<ProductCategoryId, ProductCategory>;
+  products: Map<ProductId, Product>;
   
   // Relationship tables
   userFactories: Map<string, UserFactory>;

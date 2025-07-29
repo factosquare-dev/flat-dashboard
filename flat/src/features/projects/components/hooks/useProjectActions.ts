@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import { useProjects } from '@/hooks/useProjects';
-import { formatDate } from '@/utils/coreUtils';
+import { toLocalDateString } from '@/utils/unifiedDateUtils';
 
 export const useProjectActions = () => {
   const projectsHook = useProjects();
@@ -22,8 +22,8 @@ export const useProjectActions = () => {
     const newProject = {
       ...projectWithoutId,
       client: `${project.client} (복사본)`,
-      startDate: formatDate(new Date(), 'iso'),
-      endDate: formatDate(new Date(), 'iso')
+      startDate: toLocalDateString(new Date()),
+      endDate: toLocalDateString(new Date())
     };
     projectsHook.addProject(newProject);
   }, [projectsHook]);
