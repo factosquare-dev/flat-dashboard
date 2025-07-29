@@ -129,9 +129,10 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
         onMouseEnter={onMouseEnter}
         role="row"
         tabIndex={0}
-        draggable={isProjectType(project.type, ProjectType.SUB) && project.parentId !== null}
-        onDragStart={onDragStart && isProjectType(project.type, ProjectType.SUB) && project.parentId !== null ? (e) => {
+        draggable={isProjectType(project.type, ProjectType.SUB)}
+        onDragStart={onDragStart && isProjectType(project.type, ProjectType.SUB) ? (e) => {
           e.dataTransfer.effectAllowed = 'move';
+          console.log('[ProjectTableRow] Drag started for SUB:', project.id, 'parent:', project.parentId);
           onDragStart(e, project.id);
         } : undefined}
         onDragEnd={onDragEnd}
@@ -139,13 +140,19 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
           setIsDragOver(true);
+          console.log('[ProjectTableRow] DragOver on MASTER:', project.id);
           if (onDragOver) onDragOver(e);
         } : undefined}
         onDragLeave={isProjectType(project.type, ProjectType.MASTER) ? () => setIsDragOver(false) : undefined}
-        onDrop={isProjectType(project.type, ProjectType.MASTER) && onDrop ? (e) => {
+        onDrop={isProjectType(project.type, ProjectType.MASTER) ? (e) => {
           e.preventDefault();
           setIsDragOver(false);
-          onDrop(e, project);
+          console.log('[ProjectTableRow] onDrop on MASTER:', project.id, 'onDrop exists:', !!onDrop);
+          if (onDrop) {
+            onDrop(e, project);
+          } else {
+            console.error('[ProjectTableRow] onDrop prop is missing!');
+          }
         } : undefined}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {

@@ -49,16 +49,9 @@ export const getProjectTypeDisplayName = (projectType: string): string => {
 };
 
 // Check if project type matches enum
-export const isProjectType = (type: string, targetType: ProjectType): boolean => {
-  const info = getProjectTypeInfo(type);
-  
-  // Check if code matches
-  if (info.code === targetType) return true;
-  
-  // Check if display name matches the enum's display name
-  const targetInfo = getProjectTypeInfo(targetType);
-  return info.displayName === targetInfo.displayName || 
-         info.displayName.toLowerCase() === targetInfo.displayName.toLowerCase();
+export const isProjectType = (type: string | ProjectType, targetType: ProjectType): boolean => {
+  // Direct comparison - both should be ProjectType enum values
+  return type === targetType;
 };
 
 // Get all project types

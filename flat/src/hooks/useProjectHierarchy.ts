@@ -12,26 +12,40 @@ export const useProjectHierarchy = () => {
       const project = database.projects.get(projectId);
       
       if (!project) {
-        // Project not found
+        console.error('[updateProjectParent] Project not found:', projectId);
         return;
       }
+      
+      console.log('[updateProjectParent] Before update:', {
+        projectId,
+        oldParentId: project.parentId,
+        newParentId
+      });
       
       // Update the project's parentId
       project.parentId = newParentId || undefined;
       database.projects.set(projectId, project);
       
+      // Save to localStorage to persist changes
+      (db as any).saveToStorage(database);
+      
+      const allProjects = Array.from(database.projects.values());
+      console.log('[updateProjectParent] After update, total projects:', allProjects.length);
+      console.log('[updateProjectParent] Updated project:', project);
+      
       // Force refresh by dispatching a custom event
       window.dispatchEvent(new Event('projectHierarchyChanged'));
       
-      // Project moved successfully
+      console.log('[updateProjectParent] Event dispatched: projectHierarchyChanged');
     } catch (error) {
-      // Error updating project parent
+      console.error('[updateProjectParent] Error:', error);
       alert('프로젝트 이동 중 오류가 발생했습니다.');
     }
   }, []);
 
   // Move SUB project to a MASTER project
   const moveToMaster = useCallback(async (subProjectId: string, masterProjectId: string) => {
+    console.log('[useProjectHierarchy] moveToMaster called:', subProjectId, '->', masterProjectId);
     await updateProjectParent(subProjectId, masterProjectId);
   }, [updateProjectParent]);
 

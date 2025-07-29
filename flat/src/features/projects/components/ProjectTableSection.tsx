@@ -189,7 +189,6 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     // 케이스 2: 프로젝트 정보 가져오기
     const draggedProject = allProjects.find(p => p.id === projectId);
     if (!draggedProject) {
-      console.log('[Drop] Project not found:', projectId);
       return;
     }
     
@@ -211,15 +210,28 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
       const targetProjectId = projectRow.getAttribute('data-id');
       if (targetProjectId) {
         const targetProject = allProjects.find(p => p.id === targetProjectId);
-        // MASTER 프로젝트가 아닌 곳에 드롭하면 독립 프로젝트로 만들기
-        if (targetProject && !isProjectType(targetProject.type, ProjectType.MASTER)) {
-          console.log('[ProjectTableSection] Making SUB project independent:', projectId);
+        
+        if (targetProject) {
+          // 케이스 1: MASTER 프로젝트에 드롭
+          // 이 경우는 이미 DraggableProjectTable에서 처리되었을 것임 (stopPropagation 때문에 여기까지 안 옴)
+          // 하지만 혹시 모르니 체크
+          if (isProjectType(targetProject.type, ProjectType.MASTER)) {
+            return;
+          }
+          
+          // 케이스 2: 같은 MASTER 내의 SUB에 드롭 -> 아무 동작 안함
+          if (isProjectType(targetProject.type, ProjectType.SUB) && targetProject.parentId) {
+            if (draggedProject.parentId === targetProject.parentId) {
+              return;
+            }
+          }
+          
+          // 케이스 3: 독립 SUB 또는 다른 MASTER의 SUB에 드롭 -> 독립 프로젝트로
           makeIndependent(projectId);
         }
       }
     } else {
       // 빈 공간에 드롭하면 독립 프로젝트로 만들기
-      console.log('[ProjectTableSection] Making SUB project independent:', projectId);
       makeIndependent(projectId);
     }
   };
@@ -235,7 +247,6 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     // 케이스 2: 드래그 중인 프로젝트 정보 가져오기
     const draggedProject = allProjects.find(p => p.id === draggedProjectId);
     if (!draggedProject) {
-      console.log('[DragOver] Project not found:', draggedProjectId);
       return;
     }
     
