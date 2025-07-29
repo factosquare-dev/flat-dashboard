@@ -96,15 +96,16 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
 
   const handleProjectDrop = (e: React.DragEvent, targetProject: Project) => {
     e.preventDefault();
-    e.stopPropagation(); // 이벤트 버블링 중지
+    
     if (!draggedProjectId || draggedProjectId === targetProject.id) return;
     
-    // 드롭 대상이 MASTER 프로젝트인 경우
+    // 드롭 대상이 MASTER 프로젝트인 경우에만 처리하고 이벤트 전파 중지
     if (isProjectType(targetProject.type, ProjectType.MASTER)) {
+      e.stopPropagation(); // MASTER에 드롭할 때만 버블링 중지
       moveToMaster(draggedProjectId, targetProject.id);
+      setDraggedProjectId(null);
     }
-    
-    setDraggedProjectId(null);
+    // MASTER가 아닌 곳에 드롭하면 이벤트가 부모로 전파되어 독립 프로젝트 처리
   };
 
   const renderHeaderCell = (column: Column) => {

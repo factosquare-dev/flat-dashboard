@@ -11,6 +11,8 @@ import { useInfiniteScroll } from '../../../hooks/useInfiniteScroll';
 import { useDragSelection } from '../../../hooks/useDragSelection';
 import { getHierarchicalProjectsData } from '../../../data/hierarchicalProjects';
 import { useProjectHierarchy } from '../../../hooks/useProjectHierarchy';
+import { ProjectType } from '../../../types/enums';
+import { isProjectType } from '../../../utils/projectTypeUtils';
 
 interface ProjectFilters {
   sortField: keyof Project | null;
@@ -53,6 +55,24 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   
   const { makeIndependent } = useProjectHierarchy();
+  
+  // 계층형 데이터에서 모든 프로젝트를 평면화하여 가져오기
+  const allProjects = useMemo(() => {
+    const hierarchicalData = getHierarchicalProjectsData();
+    const flattened: Project[] = [];
+    
+    const flatten = (items: Project[]) => {
+      items.forEach(item => {
+        flattened.push(item);
+        if (item.children) {
+          flatten(item.children);
+        }
+      });
+    };
+    
+    flatten(hierarchicalData);
+    return flattened;
+  }, [projects]); // projects가 변경될 때마다 재계산
   
   const sortField = filters?.sortField || null;
   const sortDirection = filters?.sortDirection || 'asc';
@@ -158,44 +178,125 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
 
   const handleContainerDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const projectId = e.dataTransfer.getData('projectId');
+    setIsDraggingOver(false);
     
-    // 컨테이너에 직접 드롭됐다면 (MASTER 프로젝트가 아닌 곳) 독립 프로젝트로
-    if (projectId) {
+    // 케이스 1: 프로젝트 ID 확인
+    const projectId = e.dataTransfer.getData('projectId');
+    if (!projectId) {
+      return;
+    }
+    
+    // 케이스 2: 프로젝트 정보 가져오기
+    const draggedProject = allProjects.find(p => p.id === projectId);
+    if (!draggedProject) {
+      console.log('[Drop] Project not found:', projectId);
+      return;
+    }
+    
+    // 케이스 3: SUB 프로젝트가 아니면 무시
+    if (!isProjectType(draggedProject.type, ProjectType.SUB)) {
+      return;
+    }
+    
+    // 케이스 4: 이미 독립 프로젝트면 무시
+    if (!draggedProject.parentId) {
+      return;
+    }
+    
+    // 케이스 5: 드롭 위치 확인
+    const target = e.target as HTMLElement;
+    const projectRow = target.closest('tr[role="row"]');
+    
+    if (projectRow) {
+      const targetProjectId = projectRow.getAttribute('data-id');
+      if (targetProjectId) {
+        const targetProject = allProjects.find(p => p.id === targetProjectId);
+        // MASTER 프로젝트가 아닌 곳에 드롭하면 독립 프로젝트로 만들기
+        if (targetProject && !isProjectType(targetProject.type, ProjectType.MASTER)) {
+          console.log('[ProjectTableSection] Making SUB project independent:', projectId);
+          makeIndependent(projectId);
+        }
+      }
+    } else {
+      // 빈 공간에 드롭하면 독립 프로젝트로 만들기
+      console.log('[ProjectTableSection] Making SUB project independent:', projectId);
       makeIndependent(projectId);
     }
-    setIsDraggingOver(false);
   };
 
   const handleContainerDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     
-    // 현재 드래그 중인 프로젝트 확인
-    if (draggedProjectId) {
-      const draggedProject = projects.find(p => p.id === draggedProjectId);
-      // 이미 독립 프로젝트(parentId가 null)인 경우에는 드롭 영역 표시하지 않음
-      if (draggedProject && draggedProject.parentId === null) {
-        e.dataTransfer.dropEffect = 'none';
-        return;
-      }
+    // 케이스 1: 드래그 중인 프로젝트가 없으면 무시
+    if (!draggedProjectId) {
+      return;
     }
     
-    e.dataTransfer.dropEffect = 'move';
-    setIsDraggingOver(true);
+    // 케이스 2: 드래그 중인 프로젝트 정보 가져오기
+    const draggedProject = allProjects.find(p => p.id === draggedProjectId);
+    if (!draggedProject) {
+      console.log('[DragOver] Project not found:', draggedProjectId);
+      return;
+    }
+    
+    // 케이스 3: SUB 프로젝트가 아니면 드롭 영역 표시 안함
+    if (!isProjectType(draggedProject.type, ProjectType.SUB)) {
+      setIsDraggingOver(false);
+      return;
+    }
+    
+    // 케이스 4: 이미 독립 프로젝트인 SUB는 드롭 영역 표시 안함
+    if (!draggedProject.parentId) {
+      setIsDraggingOver(false);
+      return;
+    }
+    
+    // 케이스 5: MASTER 안의 SUB 프로젝트를 드래그하는 경우
+    // 드롭 위치 확인
+    const target = e.target as HTMLElement;
+    const projectRow = target.closest('tr[role="row"]');
+    
+    // 드롭 위치가 프로젝트 행인 경우, 해당 프로젝트 확인
+    if (projectRow) {
+      const projectId = projectRow.getAttribute('data-id');
+      if (projectId) {
+        const targetProject = allProjects.find(p => p.id === projectId);
+        // MASTER 프로젝트 위가 아니면 드롭 가능
+        if (targetProject && !isProjectType(targetProject.type, ProjectType.MASTER)) {
+          e.dataTransfer.dropEffect = 'move';
+          setIsDraggingOver(true);
+          return;
+        }
+      }
+      // MASTER 위면 드롭 불가
+      e.dataTransfer.dropEffect = 'none';
+      setIsDraggingOver(false);
+    } else {
+      // 빈 공간이면 항상 드롭 가능
+      e.dataTransfer.dropEffect = 'move';
+      setIsDraggingOver(true);
+    }
   };
 
   const handleContainerDragLeave = (e: React.DragEvent) => {
-    // 컨테이너를 벗어날 때만 처리
-    if (e.currentTarget === e.target) {
-      setIsDraggingOver(false);
+    // 컨테이너를 완전히 벗어날 때만 처리
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    
+    // 컨테이너 내부의 다른 요소로 이동하는 경우는 무시
+    if (containerRef.current && containerRef.current.contains(relatedTarget)) {
+      return;
     }
+    
+    setIsDraggingOver(false);
   };
 
   return (
     <div className="h-full flex flex-col">
       <div 
         ref={containerRef}
-        className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 project-table-container"
+        className={`flex-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 project-table-container ${
+          isDraggingOver ? 'bg-blue-50' : ''
+        }`}
         onMouseUp={handleEndDrag}
         onMouseLeave={handleEndDrag}
         onDrop={handleContainerDrop}
@@ -230,8 +331,8 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
           loadMoreRef={loadMoreRef}
         />
         
-        {isDraggingOver && !hasMore && (
-          <div className="text-center py-4 text-blue-600">
+        {isDraggingOver && (
+          <div className="text-center py-4 text-blue-600 bg-blue-50 border-2 border-dashed border-blue-300 mx-4 my-2 rounded-lg">
             <p className="font-medium">
               여기에 놓아 독립 프로젝트로 만들기
             </p>
