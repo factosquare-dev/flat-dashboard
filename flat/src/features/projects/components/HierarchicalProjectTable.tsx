@@ -26,16 +26,44 @@ interface HierarchicalProjectTableProps {
 }
 
 const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props) => {
-  const [projectData, setProjectData] = useState<Project[]>(props.projects);
+  const [expandedState, setExpandedState] = useState<Record<string, boolean>>({});
   
-  // Sync local state with props when props change
-  useEffect(() => {
-    setProjectData(props.projects);
-  }, [props.projects]);
+  // Merge props.projects with local expanded state
+  const projectData = React.useMemo(() => {
+    const mergeExpandedState = (projects: Project[]): Project[] => {
+      return projects.map(project => ({
+        ...project,
+        isExpanded: expandedState[project.id] !== undefined 
+          ? expandedState[project.id] 
+          : project.isExpanded,
+        children: project.children ? mergeExpandedState(project.children) : undefined
+      }));
+    };
+    
+    return mergeExpandedState(props.projects);
+  }, [props.projects, expandedState]);
   
   const handleToggleProject = (projectId: string) => {
-    const toggled = toggleProject(projectData, projectId);
-    setProjectData(toggled);
+    console.log('[HierarchicalProjectTable] handleToggleProject called for:', projectId);
+    // Find current expanded state from projectData
+    const findProject = (projects: Project[]): boolean | undefined => {
+      for (const project of projects) {
+        if (project.id === projectId) {
+          return project.isExpanded;
+        }
+        if (project.children) {
+          const found = findProject(project.children);
+          if (found !== undefined) return found;
+        }
+      }
+      return undefined;
+    };
+    
+    const currentExpanded = findProject(projectData);
+    setExpandedState(prev => ({
+      ...prev,
+      [projectId]: currentExpanded !== undefined ? !currentExpanded : false
+    }));
   };
 
   // 평면화된 프로젝트 리스트 생성 (그룹 지원)

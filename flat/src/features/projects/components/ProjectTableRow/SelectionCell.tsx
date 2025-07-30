@@ -101,11 +101,23 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
         {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
           <button
             onClick={(e) => {
+              console.log('[SelectionCell] Master toggle button clicked');
               e.stopPropagation();
               e.preventDefault();
               handleMasterToggle(e);
             }}
             onMouseDown={(e) => {
+              console.log('[SelectionCell] Master button mouseDown');
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onMouseLeave={(e) => {
+              console.log('[SelectionCell] Master button mouseLeave - chevron button left');
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onMouseUp={(e) => {
+              console.log('[SelectionCell] Master button mouseUp');
               e.stopPropagation();
               e.preventDefault();
             }}

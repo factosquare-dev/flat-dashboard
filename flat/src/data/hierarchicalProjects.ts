@@ -55,7 +55,7 @@ const getHierarchicalProjects = (): Project[] => {
     const mappedMaster = {
       ...master,
       level: 0,
-      isExpanded: true,
+      isExpanded: master.isExpanded !== undefined ? master.isExpanded : true, // Preserve existing state or default to true
       client: customerName, // Use customer name from database
       manager: users.find(u => u.id === master.managerId)?.name || 'Unknown',
       currentStage: [], // MASTER projects don't show individual task stages
@@ -246,6 +246,7 @@ let _hierarchicalProjects: Project[] | null = null;
 
 export const getHierarchicalProjectsData = (): Project[] => {
   // Always get fresh data, don't cache
+  console.log('[getHierarchicalProjectsData] Getting fresh data - this will reset isExpanded to true!');
   _hierarchicalProjects = getHierarchicalProjects();
   return _hierarchicalProjects;
 };
