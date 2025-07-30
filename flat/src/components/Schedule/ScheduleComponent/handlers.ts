@@ -3,6 +3,7 @@ import type { TaskData } from './types';
 import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
 import { DB_COLLECTIONS } from '../../../mocks/database/types';
 import { storageKeys } from '../../../config';
+import { FactoryType } from '../../../types/enums';
 
 interface TaskControls {
   tasks: Task[];
@@ -59,39 +60,30 @@ export const createProjectHandlers = (
           const project = database.projects.get(currentProjectId);
           
           if (project) {
-            // 각 공장 타입별로 ID 배열 업데이트
-            const manufacturerIds: string[] = [];
-            const containerIds: string[] = [];
-            const packagingIds: string[] = [];
+            // 삭제할 공장의 타입에 따라 해당 배열에서만 제거
+            const updates: any = {};
             
-            updatedProjects.forEach(p => {
-              if (p.id !== 'ADD_FACTORY_ROW') {
-                if (p.type === 'MANUFACTURER') {
-                  manufacturerIds.push(p.id);
-                } else if (p.type === 'CONTAINER') {
-                  containerIds.push(p.id);
-                } else if (p.type === 'PACKAGING') {
-                  packagingIds.push(p.id);
-                }
-              }
-            });
+            if (projectToDelete.type === FactoryType.MANUFACTURING && project.manufacturerId) {
+              const ids = Array.isArray(project.manufacturerId) ? project.manufacturerId : [project.manufacturerId];
+              const filtered = ids.filter(id => id !== projectId);
+              updates.manufacturerId = filtered.length > 0 ? filtered : undefined;
+            } else if (projectToDelete.type === FactoryType.CONTAINER && project.containerId) {
+              const ids = Array.isArray(project.containerId) ? project.containerId : [project.containerId];
+              const filtered = ids.filter(id => id !== projectId);
+              updates.containerId = filtered.length > 0 ? filtered : undefined;
+            } else if (projectToDelete.type === FactoryType.PACKAGING && project.packagingId) {
+              const ids = Array.isArray(project.packagingId) ? project.packagingId : [project.packagingId];
+              const filtered = ids.filter(id => id !== projectId);
+              updates.packagingId = filtered.length > 0 ? filtered : undefined;
+            }
             
-            // Project 업데이트
-            const updatedProject = {
-              ...project,
-              manufacturerId: manufacturerIds.length > 0 ? manufacturerIds : undefined,
-              containerId: containerIds.length > 0 ? containerIds : undefined,
-              packagingId: packagingIds.length > 0 ? packagingIds : undefined
-            };
-            
-            // update 메서드 사용
-            db.update(DB_COLLECTIONS.PROJECTS, currentProjectId, updatedProject);
-            console.log('[Schedule] Project factory deleted:', {
+            // update 메서드 사용 - 부분 업데이트만 전달
+            db.update(DB_COLLECTIONS.PROJECTS, currentProjectId, updates);
+            console.log('[Schedule] Factory removed from project:', {
               projectId: currentProjectId,
               deletedFactoryId: projectId,
-              remainingManufacturerIds: manufacturerIds,
-              remainingContainerIds: containerIds,
-              remainingPackagingIds: packagingIds
+              factoryType: projectToDelete.type,
+              updates
             });
           }
         } catch (error) {
@@ -117,6 +109,31 @@ export const createProjectHandlers = (
       });
       
       // Project deletion result logging removed for cleaner console
+      
+      // MockDB에서도 태스크 삭제
+      if (currentProjectId) {
+        const deletedTasks = taskControls.tasks.filter((t: Task) => {
+          if (currentProjectId && t.projectId && t.projectId !== currentProjectId) {
+            return false;
+          }
+          return t.factoryId === projectId;
+        });
+        
+        // MockDB에서 각 태스크 삭제
+        const db = MockDatabaseImpl.getInstance();
+        deletedTasks.forEach((task: Task) => {
+          if (task.id) {
+            db.delete(DB_COLLECTIONS.TASKS, task.id).catch(() => {
+              // Error deleting task from MockDB
+            });
+          }
+        });
+        
+        console.log('[Schedule] Cascade deleted tasks:', {
+          factoryId: projectId,
+          deletedTaskCount: deletedTasks.length
+        });
+      }
       
       taskControls.setTasks(remainingTasks);
     }
@@ -184,39 +201,47 @@ export const createProjectHandlers = (
           const project = database.projects.get(currentProjectId);
           
           if (project) {
-            // 각 공장 타입별로 ID 배열 업데이트
-            const manufacturerIds: string[] = [];
-            const containerIds: string[] = [];
-            const packagingIds: string[] = [];
+            // 기존 ID 배열에 새로운 공장 ID들만 추가
+            const updates: any = {};
             
-            newProjects.forEach(p => {
-              if (p.id !== 'ADD_FACTORY_ROW') {
-                if (p.type === 'MANUFACTURER') {
-                  manufacturerIds.push(p.id);
-                } else if (p.type === 'CONTAINER') {
-                  containerIds.push(p.id);
-                } else if (p.type === 'PACKAGING') {
-                  packagingIds.push(p.id);
-                }
+            // 새로 추가되는 공장들을 타입별로 그룹화
+            const newManufacturerIds: string[] = [];
+            const newContainerIds: string[] = [];
+            const newPackagingIds: string[] = [];
+            
+            factoriesToAdd.forEach(factory => {
+              if (factory.type === FactoryType.MANUFACTURING) {
+                newManufacturerIds.push(factory.id);
+              } else if (factory.type === FactoryType.CONTAINER) {
+                newContainerIds.push(factory.id);
+              } else if (factory.type === FactoryType.PACKAGING) {
+                newPackagingIds.push(factory.id);
               }
             });
             
-            // Project 업데이트
-            const updatedProject = {
-              ...project,
-              manufacturerId: manufacturerIds.length > 0 ? manufacturerIds : undefined,
-              containerId: containerIds.length > 0 ? containerIds : undefined,
-              packagingId: packagingIds.length > 0 ? packagingIds : undefined
-            };
+            // 기존 배열에 새 ID들 추가
+            if (newManufacturerIds.length > 0) {
+              const existing = project.manufacturerId ? 
+                (Array.isArray(project.manufacturerId) ? project.manufacturerId : [project.manufacturerId]) : [];
+              updates.manufacturerId = [...existing, ...newManufacturerIds];
+            }
+            if (newContainerIds.length > 0) {
+              const existing = project.containerId ? 
+                (Array.isArray(project.containerId) ? project.containerId : [project.containerId]) : [];
+              updates.containerId = [...existing, ...newContainerIds];
+            }
+            if (newPackagingIds.length > 0) {
+              const existing = project.packagingId ? 
+                (Array.isArray(project.packagingId) ? project.packagingId : [project.packagingId]) : [];
+              updates.packagingId = [...existing, ...newPackagingIds];
+            }
             
-            // update 메서드 사용
-            db.update(DB_COLLECTIONS.PROJECTS, currentProjectId, updatedProject);
-            console.log('[Schedule] Project factories added:', {
+            // update 메서드 사용 - 부분 업데이트만 전달
+            db.update(DB_COLLECTIONS.PROJECTS, currentProjectId, updates);
+            console.log('[Schedule] Factories added to project:', {
               projectId: currentProjectId,
               addedFactories: factoriesToAdd.map(f => ({ id: f.id, name: f.name, type: f.type })),
-              updatedManufacturerIds: manufacturerIds,
-              updatedContainerIds: containerIds,
-              updatedPackagingIds: packagingIds
+              updates
             });
           }
         } catch (error) {
