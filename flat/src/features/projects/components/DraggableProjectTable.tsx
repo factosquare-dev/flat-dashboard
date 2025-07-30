@@ -180,9 +180,9 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   return (
     <div style={{ width: 'max-content', minWidth: '100%' }}>
       <table ref={tableRef} role="table" style={{ width: 'max-content', minWidth: '1950px' }}>
-        <thead className="sticky top-0 z-20 bg-gray-50 border-b border-gray-100">
+        <thead className="sticky top-0 z-20 bg-white border-b border-gray-200">
           <tr role="row">
-            <th className="w-16 px-1 py-1.5 text-left" scope="col">
+            <th className="w-16 px-1 py-1.5 text-left bg-white" scope="col">
               <div className="flex items-center justify-center">
                 <input
                   type="checkbox"
@@ -193,7 +193,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               </div>
             </th>
             {visibleColumns.map(renderHeaderCell)}
-            <th className="table-header-cell text-center w-12" scope="col">
+            <th className="table-header-cell text-center w-12 bg-white" scope="col">
               <span className="sr-only">프로젝트 옵션</span>
               <svg className="w-4 h-4 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />

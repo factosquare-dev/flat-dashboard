@@ -1,15 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 import type { Project } from '../../../types/project';
 import type { ProjectId } from '../../../types/branded';
-import { formatCurrency, parseCurrency } from '../../../utils/coreUtils';
+import { formatKoreanNumber, parseKoreanNumber } from '../../../utils/coreUtils';
 import { formatDate } from '../../../utils/unifiedDateUtils';
 import { factoriesByType } from '../../../data/mockData';
 import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
+import { EditableCellType } from '../../../types/enums';
 
 interface EditableCellProps {
   project: Project;
   field: keyof Project;
-  type: 'text' | 'search' | 'date' | 'currency';
+  type: EditableCellType;
   editableCell: any; // Use the return type from useEditableCell
   onUpdate: (projectId: ProjectId, field: keyof Project, value: any) => void;
 }
@@ -46,7 +47,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
     };
   }, []);
 
-  if (type === 'search' && editing) {
+  if (type === EditableCellType.SEARCH && editing) {
     // 필드에 따라 다른 검색 리스트 사용
     let searchList: string[] = [];
     if (field === 'client') {
@@ -119,7 +120,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
     );
   }
   
-  if (type === 'date' && editing) {
+  if (type === EditableCellType.DATE && editing) {
     return (
       <td className="px-1.5 py-1.5 js-inline-edit text-center">
         <input
@@ -139,18 +140,23 @@ const EditableCell: React.FC<EditableCellProps> = ({
           onBlur={() => {
             stopEditing();
           }}
-          onClick={(e) => {
+          onFocus={(e) => {
+            // 포커스 시 달력 자동 열기
             e.stopPropagation();
-            (e.target as HTMLInputElement).showPicker?.();
+            try {
+              (e.target as HTMLInputElement).showPicker?.();
+            } catch (error) {
+              // showPicker가 지원되지 않는 브라우저에서는 무시
+            }
           }}
-          className="w-full px-2 py-1 bg-white border border-blue-500 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-[90px] px-1 py-0.5 bg-white border border-blue-500 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           autoFocus
         />
       </td>
     );
   }
   
-  if (type === 'text' && editing) {
+  if (type === EditableCellType.TEXT && editing) {
     return (
       <td className="px-1.5 py-1.5 js-inline-edit">
         <input
@@ -175,12 +181,15 @@ const EditableCell: React.FC<EditableCellProps> = ({
     );
   }
   
-  if (type === 'currency' && editing) {
+  if (type === EditableCellType.CURRENCY && editing) {
+    // Parse the current value to get the raw number
+    const currentValue = value ? parseKoreanNumber(value.toString()) : '';
+    
     return (
       <td className="px-1.5 py-1.5 js-inline-edit text-center">
         <input
           type="number"
-          defaultValue={value}
+          defaultValue={currentValue}
           onBlur={() => {
             stopEditing();
           }}
@@ -205,7 +214,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   return (
     <td 
       className={`px-2 py-2 text-xs text-gray-700 cursor-pointer group js-inline-edit ${
-        type === 'currency' ? 'text-right' : type === 'date' ? 'text-center' : ''
+        type === EditableCellType.CURRENCY ? 'text-right' : type === EditableCellType.DATE ? 'text-center' : ''
       }`}
       onClick={(e) => {
         e.stopPropagation();
@@ -213,10 +222,10 @@ const EditableCell: React.FC<EditableCellProps> = ({
       }}
     >
       <div className="relative">
-        <div className={`${type === 'currency' ? 'tabular-nums' : type === 'date' ? 'whitespace-nowrap' : 'truncate max-w-[140px]'} group-hover:text-gray-900 transition-colors`} title={value as string}>
-          {type === 'currency' ? formatCurrency(parseInt(value as string)) : 
-           type === 'date' ? formatDate(value as string, 'yy-MM-dd') :
-           value}
+        <div className={`${type === EditableCellType.CURRENCY ? 'tabular-nums' : type === EditableCellType.DATE ? 'whitespace-nowrap' : 'truncate max-w-[140px]'} group-hover:text-gray-900 transition-colors`} title={value as string}>
+          {type === EditableCellType.CURRENCY ? formatKoreanNumber(value) : 
+           type === EditableCellType.DATE ? formatDate(value as string, 'yy-MM-dd') :
+           (value instanceof Date ? formatDate(value, 'yy-MM-dd') : value || '')}
         </div>
       </div>
     </td>

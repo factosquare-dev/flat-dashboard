@@ -88,19 +88,8 @@ export function daysBetween(date1: Date | string, date2: Date | string): number 
 // Number Formatting Utilities
 // ========================================
 
-/**
- * Format number as currency (KRW)
- */
-export function formatCurrency(amount: number | null | undefined): string {
-  if (amount === null || amount === undefined) return '-';
-  
-  return new Intl.NumberFormat('ko-KR', {
-    style: 'currency',
-    currency: 'KRW',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+// formatCurrency has been moved to coreUtils.ts
+// Use: import { formatCurrency } from '../utils/coreUtils';
 
 /**
  * Format number with thousand separators

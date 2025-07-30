@@ -23,7 +23,7 @@ thead {
   position: sticky;
   top: 0;
   z-index: 20;
-  background-color: rgb(249 250 251);
+  background-color: white;
 }
 
 th {
@@ -31,7 +31,7 @@ th {
   overflow: hidden;
   white-space: nowrap;
   position: relative;
-  background-color: inherit;
+  background-color: white;
 }
 
 /* Resize handle */
@@ -90,7 +90,7 @@ th:nth-child(9), th:nth-child(10) { /* 시작일, 마감일 */
 }
 
 th:nth-child(11), th:nth-child(12), th:nth-child(13) { /* 제조, 용기, 포장 */
-  min-width: 100px !important;
+  min-width: 120px !important;
 }
 
 th:nth-child(14), th:nth-child(15) { /* 매출, 매입 */

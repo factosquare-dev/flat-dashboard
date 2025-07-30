@@ -44,7 +44,23 @@ export class MockDatabaseImpl {
     const stored = this.loadFromStorage();
     
     if (stored && stored.version === this.VERSION) {
-      return this.deserializeDatabase(stored.data);
+      const db = this.deserializeDatabase(stored.data);
+      
+      // Check if factories have old Korean string types and force refresh if needed
+      const hasOldFactoryTypes = Array.from(db.factories.values()).some(factory => 
+        typeof factory.type === 'string' && ['제조', '용기', '포장'].includes(factory.type)
+      );
+      
+      if (hasOldFactoryTypes) {
+        console.log('[MockDB] Detected old factory types, reinitializing database with enum types');
+        localStorage.removeItem(this.STORAGE_KEY);
+        // Create new database with seed data
+        const newDb = seedData.createInitialData();
+        this.saveToStorage(newDb);
+        return newDb;
+      }
+      
+      return db;
     }
 
     // Initialize with seed data
@@ -556,6 +572,13 @@ export class MockDatabaseImpl {
       collection: 'users',
       timestamp: new Date(),
     });
+  }
+
+  /**
+   * Save database
+   */
+  save(): void {
+    this.saveToStorage(this.db);
   }
 
   /**

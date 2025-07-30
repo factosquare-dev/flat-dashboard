@@ -23,6 +23,7 @@ export interface Task {
   progress: number; // 0-100
   participants: Participant[];
   factoryId?: FactoryId;
+  factory?: string;         // Factory name for display
   priority: Priority;
   dependsOn: TaskId[]; // Task IDs this task depends on
   blockedBy: TaskId[]; // Task IDs blocking this task

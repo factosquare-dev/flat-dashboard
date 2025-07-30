@@ -58,7 +58,7 @@ const ProjectTable: React.FC<ProjectTableProps> = React.memo(({
         </button>
       </div>
       <table className="w-full min-w-[1950px] table-fixed">
-      <thead className="sticky top-0 z-10 bg-gray-50 border-b border-gray-100">
+      <thead className="sticky top-0 z-10 bg-white border-b border-gray-200">
           <tr>
               <th className="w-8 px-1 py-1.5 text-left">
                 <div className="flex items-center justify-center">

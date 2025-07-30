@@ -101,13 +101,34 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
         return cellRenderers.renderDate('endDate', cellRenderProps);
       
       case 'manufacturer':
-        return cellRenderers.renderFactory('manufacturer', cellRenderProps);
+        return (
+          <cellRenderers.FactoryCell 
+            field="manufacturer"
+            project={project}
+            editableCell={editableCell}
+            onUpdateField={onUpdateField}
+          />
+        );
       
       case 'container':
-        return cellRenderers.renderFactory('container', cellRenderProps);
+        return (
+          <cellRenderers.FactoryCell 
+            field="container"
+            project={project}
+            editableCell={editableCell}
+            onUpdateField={onUpdateField}
+          />
+        );
       
       case 'packaging':
-        return cellRenderers.renderFactory('packaging', cellRenderProps);
+        return (
+          <cellRenderers.FactoryCell 
+            field="packaging"
+            project={project}
+            editableCell={editableCell}
+            onUpdateField={onUpdateField}
+          />
+        );
       
       case 'sales':
         return cellRenderers.renderCurrency('sales', cellRenderProps);
@@ -163,11 +184,68 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
           handleMasterToggle={handleMasterToggle}
         />
         
-        {columns.map((column) => (
-          <React.Fragment key={column.id}>
-            {renderCell(column.id)}
-          </React.Fragment>
-        ))}
+        {columns.map((column) => {
+          const cellRenderProps = { project, editableCell, onUpdateField, index, isDragging };
+          
+          switch (column.id) {
+            case 'name':
+              return <React.Fragment key={column.id}>{cellRenderers.renderName(cellRenderProps)}</React.Fragment>;
+            case 'productType':
+              return <React.Fragment key={column.id}>{cellRenderers.renderProductType(cellRenderProps)}</React.Fragment>;
+            case 'serviceType':
+              return <React.Fragment key={column.id}>{cellRenderers.renderServiceType(cellRenderProps)}</React.Fragment>;
+            case 'status':
+              return <React.Fragment key={column.id}>{cellRenderers.renderStatus(cellRenderProps)}</React.Fragment>;
+            case 'progress':
+              return <React.Fragment key={column.id}>{cellRenderers.renderProgress(project)}</React.Fragment>;
+            case 'client':
+              return <React.Fragment key={column.id}>{cellRenderers.renderClient(cellRenderProps)}</React.Fragment>;
+            case 'startDate':
+              return <React.Fragment key={column.id}>{cellRenderers.renderDate('startDate', cellRenderProps)}</React.Fragment>;
+            case 'endDate':
+              return <React.Fragment key={column.id}>{cellRenderers.renderDate('endDate', cellRenderProps)}</React.Fragment>;
+            case 'manufacturer':
+              return (
+                <cellRenderers.FactoryCell 
+                  key={column.id}
+                  field="manufacturer"
+                  project={project}
+                  editableCell={editableCell}
+                  onUpdateField={onUpdateField}
+                />
+              );
+            case 'container':
+              return (
+                <cellRenderers.FactoryCell 
+                  key={column.id}
+                  field="container"
+                  project={project}
+                  editableCell={editableCell}
+                  onUpdateField={onUpdateField}
+                />
+              );
+            case 'packaging':
+              return (
+                <cellRenderers.FactoryCell 
+                  key={column.id}
+                  field="packaging"
+                  project={project}
+                  editableCell={editableCell}
+                  onUpdateField={onUpdateField}
+                />
+              );
+            case 'sales':
+              return <React.Fragment key={column.id}>{cellRenderers.renderCurrency('sales', cellRenderProps)}</React.Fragment>;
+            case 'purchase':
+              return <React.Fragment key={column.id}>{cellRenderers.renderCurrency('purchase', cellRenderProps)}</React.Fragment>;
+            case 'depositPaid':
+              return <React.Fragment key={column.id}>{cellRenderers.renderDepositPaid(cellRenderProps)}</React.Fragment>;
+            case 'priority':
+              return <React.Fragment key={column.id}>{cellRenderers.renderPriority(cellRenderProps)}</React.Fragment>;
+            default:
+              return <React.Fragment key={column.id}>{cellRenderers.renderDefault()}</React.Fragment>;
+          }
+        })}
         
         <td className="px-1.5 py-1.5 text-center">
           <div className="relative inline-block">

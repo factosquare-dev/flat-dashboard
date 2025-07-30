@@ -494,3 +494,11 @@ export enum FilterOperator {
   IN = 'IN',
   NOT_IN = 'NOT_IN',
 }
+
+// Editable Cell Types
+export enum EditableCellType {
+  TEXT = 'TEXT',
+  SEARCH = 'SEARCH',
+  DATE = 'DATE',
+  CURRENCY = 'CURRENCY',
+}

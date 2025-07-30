@@ -3,6 +3,7 @@
  */
 
 import { MockDatabase, UserFactory, ProjectAssignment, FactoryProject, UserCustomer } from './types';
+import { MockDatabaseImpl } from './MockDatabase';
 import { User, UserRole } from '@/types/user';
 import { Customer } from '@/types/customer';
 import { Factory } from '@/types/factory';
@@ -149,22 +150,46 @@ export const seedData = {
     const projectEndDate = new Date(project.endDate);
     const projectDurationDays = Math.ceil((projectEndDate.getTime() - projectStartDate.getTime()) / (1000 * 60 * 60 * 24));
 
+    // Get database to look up factory names
+    const database = MockDatabaseImpl.getInstance().getDatabase();
+
     // Collect all factory types and their tasks dynamically
-    const projectFactoryTypes: string[] = [];
+    const projectFactoryTypes: { type: string; factoryId: string; factoryName: string }[] = [];
     
     // Add manufacturing factory type if exists
     if (project.manufacturerId) {
-      projectFactoryTypes.push('제조');
+      const factory = database.factories.get(project.manufacturerId);
+      if (factory) {
+        projectFactoryTypes.push({
+          type: '제조',
+          factoryId: project.manufacturerId,
+          factoryName: factory.name
+        });
+      }
     }
     
     // Add container factory type if exists  
     if (project.containerId) {
-      projectFactoryTypes.push('용기');
+      const factory = database.factories.get(project.containerId);
+      if (factory) {
+        projectFactoryTypes.push({
+          type: '용기',
+          factoryId: project.containerId,
+          factoryName: factory.name
+        });
+      }
     }
     
     // Add packaging factory type if exists
     if (project.packagingId) {
-      projectFactoryTypes.push('포장');
+      const factory = database.factories.get(project.packagingId);
+      if (factory) {
+        projectFactoryTypes.push({
+          type: '포장',
+          factoryId: project.packagingId,
+          factoryName: factory.name
+        });
+      }
     }
 
     // Create tasks dynamically based on factory types
@@ -175,12 +200,14 @@ export const seedData = {
       participants: string[];
       dependsOn?: string[];
       factoryType: string;
+      factoryId: string;
+      factoryName: string;
     }> = [];
     
     let previousTasks: string[] = [];
     
-    projectFactoryTypes.forEach((factoryType, factoryIndex) => {
-      const factoryTasks = taskTypesByFactoryType[factoryType as keyof typeof taskTypesByFactoryType] || [];
+    projectFactoryTypes.forEach((factoryInfo, factoryIndex) => {
+      const factoryTasks = taskTypesByFactoryType[factoryInfo.type as keyof typeof taskTypesByFactoryType] || [];
       
       
       factoryTasks.forEach((taskTitle, taskIndex) => {
@@ -190,7 +217,9 @@ export const seedData = {
           duration: this.getTaskDuration(taskTitle),
           participants: this.getTaskParticipants(taskTitle, pmUser.id, factoryManager.id, qaUser.id),
           dependsOn: taskIndex === 0 ? previousTasks : [factoryTasks[taskIndex - 1]],
-          factoryType
+          factoryType: factoryInfo.type,
+          factoryId: factoryInfo.factoryId,
+          factoryName: factoryInfo.factoryName
         };
         
         taskTemplates.push(template);
@@ -232,7 +261,8 @@ export const seedData = {
           userId,
           role: userId === pmUser.id ? 'manager' : 'member',
         } as Participant)),
-        factoryId: this.getFactoryForTask(template.factoryType, project),
+        factoryId: template.factoryId,
+        factory: template.factoryName,
         priority: project.priority,
         dependsOn: template.dependsOn?.map(depTitle => 
           `task-${project.id}-${taskTemplates.findIndex(t => t.title === depTitle) + 1}`

@@ -34,25 +34,18 @@ const TaskRow: React.FC<TaskRowProps> = ({
   // Check if today is within the task schedule
   const isTodayInSchedule = isDateInRange(new Date(), task.startDate, task.endDate);
 
-  // Get factory information for the project
-  const getProjectFactories = () => {
-    if (!project) return '정보 없음';
-    
-    const factories = [];
-    if (project.manufacturerId) {
-      const factory = mockDataService.getFactoryById(project.manufacturerId);
-      if (factory) factories.push(`제조: ${factory.name}`);
-    }
-    if (project.containerId) {
-      const factory = mockDataService.getFactoryById(project.containerId);
-      if (factory) factories.push(`컨테이너: ${factory.name}`);
-    }
-    if (project.packagingId) {
-      const factory = mockDataService.getFactoryById(project.packagingId);
-      if (factory) factories.push(`포장: ${factory.name}`);
+  // Get factory information for the task
+  const getTaskFactory = () => {
+    // For TASK type projects, only show the specific factory assigned to this task
+    if (task.factoryId) {
+      const factory = mockDataService.getFactoryById(task.factoryId);
+      if (factory) {
+        return factory.name;
+      }
     }
     
-    return factories.length > 0 ? factories.join(', ') : '정보 없음';
+    // If no factory assigned to task, return no info
+    return '정보 없음';
   };
 
 
@@ -104,7 +97,7 @@ const TaskRow: React.FC<TaskRowProps> = ({
       {/* 공장 정보 */}
       <td className="px-4 py-3" role="gridcell">
         <span className="text-sm text-gray-700">
-          {getProjectFactories()}
+          {getTaskFactory()}
         </span>
       </td>
       
