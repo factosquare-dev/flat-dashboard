@@ -27,7 +27,7 @@ function App() {
         <ThemeInitializer />
         <ModalProvider>
           <AppRouter />
-          <ToastContainer />
+          {/* <ToastContainer /> */}
           <ModalRenderer />
           <LoadingRenderer />
         </ModalProvider>
