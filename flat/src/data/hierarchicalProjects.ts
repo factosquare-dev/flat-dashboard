@@ -51,6 +51,34 @@ const getHierarchicalProjects = (): Project[] => {
     const containerFactory = factories.find(f => f.id === master.containerId);
     const packagingFactory = factories.find(f => f.id === master.packagingId);
     
+    // Calculate aggregated values from SUB projects
+    const aggregatedSales = subProjects.reduce((sum, sub) => {
+      const sales = typeof sub.sales === 'string' ? parseFloat(sub.sales) || 0 : sub.sales || 0;
+      return sum + sales;
+    }, 0);
+    
+    const aggregatedPurchase = subProjects.reduce((sum, sub) => {
+      const purchase = typeof sub.purchase === 'string' ? parseFloat(sub.purchase) || 0 : sub.purchase || 0;
+      return sum + purchase;
+    }, 0);
+
+    // Calculate date range from SUB projects
+    const subStartDates = subProjects.map(sub => sub.startDate).filter(Boolean);
+    const subEndDates = subProjects.map(sub => sub.endDate).filter(Boolean);
+    const earliestStartDate = subStartDates.length > 0 ? subStartDates.sort()[0] : master.startDate;
+    const latestEndDate = subEndDates.length > 0 ? subEndDates.sort().reverse()[0] : master.endDate;
+
+    // Collect all schedule IDs from SUB projects for aggregated view
+    const allScheduleIds = [master.scheduleId, ...subProjects.map(sub => sub.scheduleId)].filter(Boolean);
+    
+    // Calculate overall progress from all SUB projects
+    const overallProgress = subProjects.length > 0 
+      ? Math.round(subProjects.reduce((sum, sub) => {
+          const subProgress = getStagesFromTasks(sub.scheduleId).progress;
+          return sum + subProgress;
+        }, 0) / subProjects.length)
+      : getStagesFromTasks(master.scheduleId).progress;
+
     // Map to UI display format
     const mappedMaster = {
       ...master,
@@ -59,10 +87,16 @@ const getHierarchicalProjects = (): Project[] => {
       client: customerName, // Use customer name from database
       manager: users.find(u => u.id === master.managerId)?.name || 'Unknown',
       currentStage: [], // MASTER projects don't show individual task stages
-      progress: getStagesFromTasks(master.scheduleId).progress, // Only show overall progress
+      progress: overallProgress, // Show aggregated progress from all SUB projects
+      allScheduleIds: allScheduleIds, // For Schedule/TableView aggregation
       manufacturer: manufacturerFactory?.name || master.manufacturerId,
       container: containerFactory?.name || master.containerId,
       packaging: packagingFactory?.name || master.packagingId,
+      // Aggregated values from SUB projects
+      sales: aggregatedSales,
+      purchase: aggregatedPurchase,
+      startDate: earliestStartDate,
+      endDate: latestEndDate,
       children: subProjects.map(sub => {
         // SUB projects should inherit MASTER's customer
         const subCustomer = customers.find(c => c.id === sub.customerId);
@@ -75,11 +109,14 @@ const getHierarchicalProjects = (): Project[] => {
         
         return {
           ...sub,
-          // UI display fields
+          // Inherit from MASTER (Master → Sub)
           name: master.name, // SUB project inherits MASTER's project name
+          serviceType: master.serviceType, // Inherit service type
+          client: customerName, // SUB project inherits MASTER's customer
+          status: master.status, // Inherit status
+          // UI display fields
           level: 1,
           parentId: master.id,
-          client: customerName, // SUB project inherits MASTER's customer
           manager: users.find(u => u.id === sub.managerId)?.name || 'Unknown',
           currentStage: getStagesFromTasks(sub.scheduleId).stages,
           progress: getStagesFromTasks(sub.scheduleId).progress,
@@ -87,11 +124,13 @@ const getHierarchicalProjects = (): Project[] => {
           container: subContainerFactory?.name || sub.containerId,
           packaging: subPackagingFactory?.name || sub.packagingId,
           children: getTasksForProject(sub.scheduleId), // Get tasks as children for SUB projects
-          // Keep original enum values
-          serviceType: sub.serviceType,
+          // Keep SUB-specific values (not inherited)
           productType: sub.productType,
           priority: sub.priority,
-          status: sub.status
+          sales: sub.sales,
+          purchase: sub.purchase,
+          startDate: sub.startDate,
+          endDate: sub.endDate
         };
       })
     };
