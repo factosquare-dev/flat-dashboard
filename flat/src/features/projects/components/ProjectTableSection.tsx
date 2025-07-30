@@ -56,9 +56,14 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   
   const { makeIndependent, moveToMaster } = useProjectHierarchy();
   
+  // 계층형 데이터를 메모이제이션
+  const hierarchicalProjects = useMemo(() => {
+    console.log('[ProjectTableSection] Getting hierarchical projects data');
+    return getHierarchicalProjectsData();
+  }, [projects]); // projects가 변경될 때만 재계산
+  
   // 계층형 데이터에서 모든 프로젝트를 평면화하여 가져오기
   const allProjects = useMemo(() => {
-    const hierarchicalData = getHierarchicalProjectsData();
     const flattened: Project[] = [];
     
     const flatten = (items: Project[]) => {
@@ -70,9 +75,9 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
       });
     };
     
-    flatten(hierarchicalData);
+    flatten(hierarchicalProjects);
     return flattened;
-  }, [projects]); // projects가 변경될 때마다 재계산
+  }, [hierarchicalProjects]);
   
   const sortField = filters?.sortField || null;
   const sortDirection = filters?.sortDirection || 'asc';
@@ -328,7 +333,7 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
       >
         {/* 계층형 프로젝트 테이블 */}
         <HierarchicalProjectTable
-          projects={getHierarchicalProjectsData()}
+          projects={hierarchicalProjects}
           selectedRows={selectedRows}
           sortField={sortField}
           sortDirection={sortDirection}
