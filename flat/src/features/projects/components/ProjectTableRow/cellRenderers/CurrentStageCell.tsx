@@ -64,7 +64,7 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
             e.stopPropagation();
             setIsExpanded(!isExpanded);
           }}
-          className="p-0.5 rounded transition-colors hover:bg-gray-200"
+          className="p-0.5 rounded transition-colors hover:bg-gray-200 flex-shrink-0"
           title={isExpanded ? "접기" : "펼치기"}
         >
           {isExpanded ? (
@@ -74,7 +74,7 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
           )}
         </button>
       )}
-      <div className={`flex ${isExpanded ? 'flex-wrap' : 'flex-nowrap items-center'} gap-1`}>
+      <div className={`flex gap-1 ${isExpanded ? 'flex-wrap' : 'items-center'}`}>
         {displayStages.map((stage, index) => {
           const displayText = stage.length > 5 && !isExpanded ? `${stage.slice(0, 5)}...` : stage;
           return (
