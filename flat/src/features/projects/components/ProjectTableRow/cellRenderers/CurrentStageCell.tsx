@@ -75,18 +75,22 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
         </button>
       )}
       <div className={`flex ${isExpanded ? 'flex-wrap' : 'flex-nowrap items-center'} gap-1`}>
-        {displayStages.map((stage, index) => (
-          <span
-            key={index}
-            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
-              hasToday 
-                ? 'bg-purple-100 text-purple-700 border-purple-200' 
-                : 'bg-purple-100 text-purple-700 border-purple-200'
-            }`}
-          >
-            {stage}
-          </span>
-        ))}
+        {displayStages.map((stage, index) => {
+          const displayText = stage.length > 5 && !isExpanded ? `${stage.slice(0, 5)}...` : stage;
+          return (
+            <span
+              key={index}
+              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+                hasToday 
+                  ? 'bg-purple-100 text-purple-700 border-purple-200' 
+                  : 'bg-purple-100 text-purple-700 border-purple-200'
+              }`}
+              title={stage.length > 5 && !isExpanded ? stage : undefined}
+            >
+              {displayText}
+            </span>
+          );
+        })}
         {!isExpanded && hasMultipleStages && (
           <span className="text-xs text-gray-500 ml-1">
             +{stagesToShow.length - 1}
