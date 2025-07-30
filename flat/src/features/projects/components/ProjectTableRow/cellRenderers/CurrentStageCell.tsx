@@ -80,7 +80,7 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
           return (
             <span
               key={index}
-              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${
                 hasToday 
                   ? 'bg-purple-100 text-purple-700 border-purple-200' 
                   : 'bg-purple-100 text-purple-700 border-purple-200'
