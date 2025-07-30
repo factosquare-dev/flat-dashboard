@@ -62,16 +62,26 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
     onSelectRow: (projectId: string, checked: boolean, index?: number) => {
       const project = flatProjects.find(p => p.id === projectId);
       if (project) {
-        if (isProjectType(project.type, ProjectType.MASTER)) {
-          // MASTER 프로젝트는 확장/축소만
-          handleToggleProject(projectId);
-        } else {
-          // SUB와 TASK는 선택 가능
+        // Master 프로젝트는 onSelectRow에서 처리하지 않음
+        // SelectionCell에서 별도의 버튼으로 처리
+        if (!isProjectType(project.type, ProjectType.MASTER)) {
+          // SUB와 TASK만 선택 가능
           props.onSelectRow(projectId, checked, index);
         }
       }
     },
-    onToggleMaster: handleToggleProject
+    onToggleMaster: handleToggleProject,
+    onMouseEnterRow: props.onMouseEnterRow,
+    onStartDrag: (index: number) => {
+      // Master 프로젝트에서는 드래그 시작 방지
+      const project = flatProjects[index];
+      if (project && isProjectType(project.type, ProjectType.MASTER)) {
+        return;
+      }
+      if (props.onStartDrag) {
+        props.onStartDrag(index);
+      }
+    }
   };
 
   return <DraggableProjectTable {...modifiedProps} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd} />;

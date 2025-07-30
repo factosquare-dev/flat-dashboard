@@ -119,11 +119,25 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     }
   };
   
+  // Wrapper to prevent drag selection on Master projects
+  const handleStartDragWrapper = (index: number) => {
+    const project = projects[index];
+    if (project && isProjectType(project.type, ProjectType.MASTER)) {
+      return; // Don't start drag selection on Master projects
+    }
+    handleStartDrag(index);
+  };
+  
   const handleSelectRow = (projectId: string, checked: boolean, index?: number) => {
     handleSelectItem(projectId, checked);
   };
 
   const handleMouseEnterRow = (index: number) => {
+    // Master 프로젝트는 드래그 선택에서 제외
+    const project = projects[index];
+    if (project && isProjectType(project.type, ProjectType.MASTER)) {
+      return;
+    }
     handleMouseEnterItem(index);
   };
 

@@ -156,7 +156,37 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
           isProjectType(project.type, ProjectType.SUB) ? 'cursor-move' : 'cursor-pointer'
         }`}
         onClick={handleRowClick}
-        onMouseEnter={onMouseEnter}
+        onMouseEnter={(e) => {
+          // Master 프로젝트에서는 모든 마우스 이벤트 차단
+          if (isProjectType(project.type, ProjectType.MASTER)) {
+            e.stopPropagation();
+            return;
+          }
+          if (onMouseEnter) onMouseEnter();
+        }}
+        onMouseDown={(e) => {
+          // Master 프로젝트에서는 드래그 시작 방지
+          if (isProjectType(project.type, ProjectType.MASTER)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
+        onMouseUp={(e) => {
+          if (isProjectType(project.type, ProjectType.MASTER)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
+        onMouseMove={(e) => {
+          if (isProjectType(project.type, ProjectType.MASTER)) {
+            e.stopPropagation();
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (isProjectType(project.type, ProjectType.MASTER)) {
+            e.stopPropagation();
+          }
+        }}
         role="row"
         tabIndex={0}
         draggable={isProjectType(project.type, ProjectType.SUB)}

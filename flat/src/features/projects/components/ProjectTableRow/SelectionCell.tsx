@@ -28,15 +28,92 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
   handleMasterToggle
 }) => {
   return (
-    <td className="px-1 py-1.5" onClick={(e) => e.stopPropagation()}>
+    <td 
+      className="px-1 py-1.5" 
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => {
+        // Master 프로젝트에서는 모든 마우스 이벤트 차단
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      }}
+      onMouseUp={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      }}
+      onMouseMove={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      }}
+      onMouseEnter={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      }}
+      onDragStart={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      onDragOver={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      onDragEnter={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      onDragLeave={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      onDrop={(e) => {
+        if (isProjectType(project.type, ProjectType.MASTER)) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+    >
       <div 
-        className="flex items-center gap-1"
+        className="flex items-center gap-1 select-none"
         style={{ paddingLeft: `${(project.level || 0) * 20}px` }}
       >
         {/* 대형 프로젝트만 확장/축소 버튼 */}
         {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
           <button
-            onClick={handleMasterToggle}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleMasterToggle(e);
+            }}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onDragStart={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            style={{ userSelect: 'none' }}
             className="p-0.5 rounded transition-colors hover:bg-gray-200"
             title={project.isExpanded ? "축소" : "확장"}
           >
@@ -60,6 +137,16 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
           <>
             <button
               onClick={handleToggleTasks}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onMouseUp={(e) => {
+                e.stopPropagation();
+              }}
+              onMouseLeave={(e) => {
+                e.stopPropagation();
+              }}
               className="p-0.5 rounded transition-colors hover:bg-gray-200"
               title={isExpanded ? "태스크 숨기기" : "태스크 표시"}
             >
