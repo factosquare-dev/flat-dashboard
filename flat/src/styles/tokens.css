@@ -194,10 +194,10 @@
   /* Modal Tokens */
   --modal-padding: var(--spacing-6);
   --modal-border-radius: var(--radius-lg);
-  --modal-max-width-sm: 480px;
-  --modal-max-width-md: 640px;
-  --modal-max-width-lg: 800px;
-  --modal-max-width-xl: 1024px;
+  --modal-max-width-sm: 400px;
+  --modal-max-width-md: 500px;
+  --modal-max-width-lg: 640px;
+  --modal-max-width-xl: 800px;
   --modal-text-xs: var(--font-size-xs);
   --modal-icon-sm: 16px;
   

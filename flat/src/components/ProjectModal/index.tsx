@@ -191,7 +191,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
       onClose={onClose}
       title={modalTitle}
       description="프로젝트 정보를 입력해주세요"
-      size={getModalSizeString(ModalSize.XL)}
+      size={getModalSizeString(ModalSize.LG)}
       footer={
         <ModalFooter>
           <Button

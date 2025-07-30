@@ -28,7 +28,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
   onClose,
   title,
   children,
-  size = ModalSize.MD,
+  size = ModalSize.SM,
   showCloseButton = true,
   footer,
   className = '',

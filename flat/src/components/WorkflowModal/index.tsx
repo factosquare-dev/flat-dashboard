@@ -126,7 +126,7 @@ const WorkflowModal: React.FC<WorkflowModalProps> = ({
       isOpen={isOpen}
       onClose={handleCancel}
       title="워크플로우 추가"
-      size={getModalSizeString(ModalSize.LG)}
+      size={getModalSizeString(ModalSize.MD)}
       footer={
         <ModalFooter>
           <Button

@@ -179,7 +179,7 @@ const ProductRequestModal: React.FC<ProductRequestModalProps> = React.memo(({
             제품 개발 정보
           </span>
         }
-        size={getModalSizeString(ModalSize.XL)}
+        size={getModalSizeString(ModalSize.LG)}
         footer={
           <ModalFooter>
             <div className="flex justify-between items-center w-full">

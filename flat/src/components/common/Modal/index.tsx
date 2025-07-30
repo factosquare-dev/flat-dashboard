@@ -220,7 +220,7 @@ interface ModalWithSizeProps extends ModalRootProps {
 }
 
 const ModalWithSize: React.FC<ModalWithSizeProps> = ({ 
-  size = ModalSize.MD, 
+  size = ModalSize.SM, 
   className,
   ...props 
 }) => {

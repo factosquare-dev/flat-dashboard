@@ -153,7 +153,7 @@ const EmailModal: React.FC<EmailModalProps> = ({
           </span>
         </div>
       }
-      size={getModalSizeString(ModalSize.LG)}
+      size={getModalSizeString(ModalSize.MD)}
       footer={
         <ModalFooter>
           <Button

@@ -70,7 +70,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={getModalTitle()}
-      size={getModalSizeString(ModalSize.MD)}
+      size={getModalSizeString(ModalSize.SM)}
     >
       <div className="bg-gray-50 -mx-6 -my-6 px-6 py-6">
         <div className="modal-section-spacing">
