@@ -69,9 +69,14 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
   // 평면화된 프로젝트 리스트 생성 (그룹 지원)
   const flatProjects = React.useMemo(() => {
     const flattened: any[] = [];
+    const seenIds = new Set<string>();
     
     const flatten = (items: any[], level: number = 0) => {
       items.forEach(item => {
+        if (seenIds.has(item.id)) {
+          console.warn(`[HierarchicalProjectTable] Duplicate project ID found: ${item.id}`, item);
+        }
+        seenIds.add(item.id);
         flattened.push({ ...item, level });
         if (item.children && item.isExpanded) {
           flatten(item.children, level + 1);

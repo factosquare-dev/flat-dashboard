@@ -185,6 +185,10 @@ function getStatusColorByCode(code: string): string {
 }
 
 function getStatusBgClassByCode(code: string): string {
+  if (!code) {
+    console.warn('[getStatusBgClassByCode] Status code is undefined');
+    return 'bg-gray-100';
+  }
   const upperCode = code.toUpperCase();
   
   if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
