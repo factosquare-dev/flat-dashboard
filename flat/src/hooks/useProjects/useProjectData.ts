@@ -12,6 +12,7 @@ import { scheduleApi } from '../../api/scheduleApi';
 import { extractProjectFromSchedule } from '../../data/mockSchedules';
 import { formatDateISO } from '../../utils/coreUtils';
 import { MockDatabaseImpl } from '../../mocks/database/MockDatabase';
+import { simplifyCompanyName } from '../../utils/coreUtils';
 
 // Helper functions
 const getRelativeDate = (daysOffset: number): string => {
@@ -68,11 +69,37 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
       const dbProjects = dbResponse.success ? dbResponse.data : [];
       console.log(`[useProjectData] Loaded ${dbProjects.length} projects from MockDB`);
       
+      // Enrich projects with factory names
+      const enrichedProjects = dbProjects.map(project => {
+        const enrichedProject = { ...project };
+        
+        // Convert factory IDs to names
+        const factoryFields = ['manufacturer', 'container', 'packaging'] as const;
+        factoryFields.forEach(field => {
+          const idField = `${field}Id` as keyof typeof project;
+          const factoryIds = project[idField];
+          
+          if (factoryIds) {
+            if (Array.isArray(factoryIds)) {
+              enrichedProject[field] = factoryIds.map(id => {
+                const factory = mockDb.getDatabase().factories.get(id);
+                return factory ? simplifyCompanyName(factory.name) : id;
+              });
+            } else {
+              const factory = mockDb.getDatabase().factories.get(factoryIds);
+              enrichedProject[field] = factory ? simplifyCompanyName(factory.name) : factoryIds;
+            }
+          }
+        });
+        
+        return enrichedProject;
+      });
+      
       // Convert to pagination format (simulate pagination)
       const itemsPerPage = 50;
       const startIndex = (page - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
-      const paginatedProjects = dbProjects.slice(startIndex, endIndex);
+      const paginatedProjects = enrichedProjects.slice(startIndex, endIndex);
       
       return paginatedProjects;
     } catch (error) {
@@ -106,11 +133,33 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
     
     // Update local state immediately for responsive UI
     setProjects(prev => {
-      const updated = prev.map(project => 
-        project.id === projectId 
-          ? { ...project, [field]: value }
-          : project
-      );
+      const updated = prev.map(project => {
+        if (project.id === projectId) {
+          const updatedProject = { ...project, [field]: value };
+          
+          // If updating factory IDs, also update the display names
+          if (field === 'manufacturerId' || field === 'containerId' || field === 'packagingId') {
+            const factoryType = field.replace('Id', '') as 'manufacturer' | 'container' | 'packaging';
+            const factoryIds = value as string | string[];
+            
+            if (Array.isArray(factoryIds)) {
+              const names = factoryIds.map(id => {
+                const factory = mockDb.getDatabase().factories.get(id);
+                return factory ? simplifyCompanyName(factory.name) : id;
+              });
+              updatedProject[factoryType] = names;
+            } else if (factoryIds) {
+              const factory = mockDb.getDatabase().factories.get(factoryIds);
+              updatedProject[factoryType] = factory ? simplifyCompanyName(factory.name) : factoryIds;
+            } else {
+              updatedProject[factoryType] = null;
+            }
+          }
+          
+          return updatedProject;
+        }
+        return project;
+      });
       return updated;
     });
     
