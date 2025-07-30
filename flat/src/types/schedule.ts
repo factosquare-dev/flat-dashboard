@@ -60,6 +60,16 @@ export interface Schedule {
   tasks?: Task[];
 }
 
+// Schedule에서 Factory를 표시하기 위한 타입
+// Factory의 일부 필드와 UI 표시를 위한 추가 필드
+export interface ScheduleFactory {
+  id: FactoryId;
+  name: string;
+  type: FactoryType;
+  period?: string;
+  color?: string;
+}
+
 export interface DragTooltip {
   x: number;
   y: number;

@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import type { Participant, Task } from '../../../types/schedule';
+import { useState, useMemo, useEffect } from 'react';
+import type { ScheduleFactory, Task } from '../../../types/schedule';
 import type { Factory } from '../../../types/factory';
 import { getDaysArray } from '../../../utils/scheduleUtils';
 import { formatDate } from '../../../utils/coreUtils';
@@ -21,7 +21,7 @@ interface ModalState {
   showFactoryModal: boolean;
   selectedTask: Task | null;
   selectedFactories: string[];
-  selectedProjectId: string | null;
+  selectedFactoryId: string | null;
   selectedDate: string | null;
   selectedFactory: string | null;
   hoveredTaskId: number | null;
@@ -42,7 +42,7 @@ interface DateRange {
 }
 
 export const useScheduleState = (
-  participants: Factory[],  // Should be Factory[] not Participant[]
+  participants: Factory[],
   projectStartDate: string,
   projectEndDate: string,
   gridWidth: number,
@@ -158,46 +158,126 @@ export const useScheduleState = (
     "#06b6d4"  // cyan-500
   ], []);
 
-  // 공장 데이터를 기반으로 초기 프로젝트 생성 - projectId로 MockDB에서 가져오기
-  const getProjectParticipants = () => {
-    // 이미 participants가 있으면 그대로 사용
+  // Project의 factory ID들을 기반으로 공장 목록 생성
+  const getProjectFactories = () => {
+    // projectId가 있으면 MockDB에서 Project의 공장 정보 가져오기 (우선순위)
+    if (projectId) {
+      try {
+        const mockDbKey = storageKeys.mockDbKey || 'mockDb';
+        const rawData = localStorage.getItem(mockDbKey);
+        
+        if (!rawData) {
+          console.log('[Schedule] No MockDB data found in localStorage');
+          return [];
+        }
+        
+        const storedData = JSON.parse(rawData);
+        
+        // MockDB stores data in a nested structure
+        const dbData = storedData.data || storedData;
+        
+        // Convert array entries back to object
+        const projects = {};
+        const factoriesData = {};
+        
+        if (dbData.projects) {
+          dbData.projects.forEach(([id, project]: [string, any]) => {
+            projects[id] = project;
+          });
+        }
+        
+        if (dbData.factories) {
+          dbData.factories.forEach(([id, factory]: [string, any]) => {
+            factoriesData[id] = factory;
+          });
+        }
+        
+        // Check project and factories
+        
+        // Project에서 공장 정보 가져오기
+        const project = projects[projectId];
+        if (project) {
+          const factoryList: ScheduleFactory[] = [];
+          
+          // manufacturerId 처리
+          if (project.manufacturerId) {
+            const manufacturerIds = Array.isArray(project.manufacturerId) ? project.manufacturerId : [project.manufacturerId];
+            manufacturerIds.forEach((id: string) => {
+              const factory = factoriesData[id];
+              if (factory) {
+                factoryList.push({
+                  id: factory.id,
+                  name: factory.name,
+                  type: factory.type || 'MANUFACTURER',
+                  period: '',
+                  color: getParticipantColor(factory.id)
+                });
+              }
+            });
+          }
+          
+          // containerId 처리
+          if (project.containerId) {
+            const containerIds = Array.isArray(project.containerId) ? project.containerId : [project.containerId];
+            containerIds.forEach((id: string) => {
+              const factory = factoriesData[id];
+              if (factory) {
+                factoryList.push({
+                  id: factory.id,
+                  name: factory.name,
+                  type: factory.type || 'CONTAINER',
+                  period: '',
+                  color: getParticipantColor(factory.id)
+                });
+              }
+            });
+          }
+          
+          // packagingId 처리
+          if (project.packagingId) {
+            const packagingIds = Array.isArray(project.packagingId) ? project.packagingId : [project.packagingId];
+            packagingIds.forEach((id: string) => {
+              const factory = factoriesData[id];
+              if (factory) {
+                factoryList.push({
+                  id: factory.id,
+                  name: factory.name,
+                  type: factory.type || 'PACKAGING',
+                  period: '',
+                  color: getParticipantColor(factory.id)
+                });
+              }
+            });
+          }
+          
+          console.log('[Schedule] ✅ Factories loaded from MockDB:', {
+            projectId,
+            count: factoryList.length,
+            factories: factoryList.map(f => f.name)
+          });
+          
+          return factoryList;
+        } else {
+          console.log('[Schedule] ❌ Project not found in MockDB:', projectId);
+        }
+      } catch (error) {
+        // Error loading factories
+      }
+    }
+
+    // projectId가 없으면 participants 사용 (하위 호환성)
     if (participants && participants.length > 0) {
       return participants;
     }
 
-    // projectId가 있으면 MockDB에서 해당 프로젝트의 Schedule 정보 가져오기
-    if (projectId) {
-      try {
-        const database = JSON.parse(localStorage.getItem(storageKeys.mockDbKey) || '{}');
-        const schedules = database.schedules || {};
-        
-        // schedules에서 projectId와 일치하는 Schedule 찾기
-        for (const [scheduleId, schedule] of Object.entries(schedules)) {
-          const scheduleData = schedule as any;
-          if (scheduleData.projectId === projectId && scheduleData.participants) {
-            // Schedule의 participants 사용
-            return scheduleData.participants.map((participant: any) => ({
-              id: participant.id,
-              name: participant.name,
-              type: participant.type || '',
-              period: participant.period || '',
-              color: getParticipantColor(participant.id) // Use color manager
-            }));
-          }
-        }
-      } catch (error) {
-        console.error('[useScheduleState] Error loading participants from MockDB:', error);
-      }
-    }
-
-    // participants가 없고 projectId도 없으면 빈 배열 반환
+    // 둘 다 없으면 빈 배열 반환
     return [];
   };
 
-  const participantsList = getProjectParticipants();
+  const participantsList = useMemo(() => getProjectFactories(), [participants, projectId]);
   
   // "공장 추가" 행을 마지막에 추가 (항상 표시)
-  const initialProjects = [
+  const initialProjects = useMemo(() => [
     ...participantsList,
     {
       id: 'ADD_FACTORY_ROW',
@@ -206,11 +286,25 @@ export const useScheduleState = (
       period: '',
       color: ''
     }
-  ];
+  ], [participantsList]);
 
-  const [projects, setProjects] = useState<Participant[]>(initialProjects);
+  const [projects, setProjects] = useState<ScheduleFactory[]>(initialProjects);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [sliderValue, setSliderValue] = useState(0);
+  
+  // participantsList가 변경되면 projects도 업데이트
+  useEffect(() => {
+    setProjects([
+      ...participantsList,
+      {
+        id: 'ADD_FACTORY_ROW',
+        name: '공장 추가',
+        type: 'ADD_FACTORY',
+        period: '',
+        color: ''
+      }
+    ]);
+  }, [participantsList]);
   
   const [modalState, setModalState] = useState<ModalState>({
     showEmailModal: false,
@@ -221,7 +315,7 @@ export const useScheduleState = (
     showFactoryModal: false,
     selectedTask: null,
     selectedFactories: [],
-    selectedProjectId: null,
+    selectedFactoryId: null,
     selectedDate: null,
     selectedFactory: null,
     hoveredTaskId: null,

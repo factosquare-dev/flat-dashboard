@@ -152,6 +152,15 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
   } = useModalFormValidation(formData, {
     rules: validationRules,
     onSubmit: async (data) => {
+      console.log('[ProjectModal] Saving project with factories:', {
+        projectId: data.id,
+        manufacturer: data.manufacturer,
+        container: data.container,
+        packaging: data.packaging,
+        manufacturerId: data.manufacturerId,
+        containerId: data.containerId,
+        packagingId: data.packagingId
+      });
       await onSave(data);
       onClose();
     }

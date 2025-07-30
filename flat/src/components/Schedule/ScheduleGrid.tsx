@@ -47,11 +47,11 @@ interface ScheduleGridProps {
   onProjectDragOver: (e: React.DragEvent) => void;
   onProjectDrop: (e: React.DragEvent, index: number) => void;
   onDeleteProject: (projectId: string) => void;
-  onGridClick: (e: React.MouseEvent, projectId: string, date: string) => void;
+  onGridClick: (e: React.MouseEvent, factoryId: string, date: string) => void;
   onProjectSelect: (projectId: string, checked: boolean) => void;
   onSelectAll: (checked: boolean) => void;
   onAddFactory?: () => void;
-  onTaskCreate?: (task: { projectId: string; factory: string; startDate: string; endDate: string }) => void;
+  onTaskCreate?: (task: { projectId: string; factoryId: string; factory: string; startDate: string; endDate: string }) => void;
   onTaskDelete?: (taskId: number) => void;
 }
 

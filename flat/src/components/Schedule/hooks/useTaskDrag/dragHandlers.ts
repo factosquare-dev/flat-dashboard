@@ -120,7 +120,7 @@ export const createDragHandlers = (
         factory: targetProject
       });
     } catch (error) {
-      console.error('[DRAG DROP] Failed to update task:', error);
+      // Failed to update task
       toastError('작업 업데이트에 실패했습니다.');
     }
   };

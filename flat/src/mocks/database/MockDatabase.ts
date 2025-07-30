@@ -8,25 +8,32 @@ import {
   DbResponse, 
   DbEvent, 
   DbEventType,
-  DbTransaction,
-  DbOperation,
   DbStats
 } from './types';
 import { seedData } from './seedData';
-import { storageKeys } from '../../config';
-import { DATABASE_CONFIG } from '../../config/database';
+import { StorageManager } from './managers/StorageManager';
+import { EventManager } from './managers/EventManager';
+import { TransactionManager } from './managers/TransactionManager';
+import { CrudOperations } from './managers/CrudOperations';
 
 export class MockDatabaseImpl {
   private static instance: MockDatabaseImpl;
   private db: MockDatabase;
-  private listeners: Map<string, Set<(event: DbEvent) => void>>;
-  private transactions: Map<string, DbTransaction>;
-  private readonly STORAGE_KEY = storageKeys.mockDbKey;
-  private readonly VERSION = DATABASE_CONFIG.VERSION;
+  
+  // Managers
+  private storageManager: StorageManager;
+  private eventManager: EventManager;
+  private transactionManager: TransactionManager;
+  private crudOperations: CrudOperations;
 
   private constructor() {
-    this.listeners = new Map();
-    this.transactions = new Map();
+    // Initialize managers
+    this.storageManager = new StorageManager();
+    this.eventManager = new EventManager();
+    this.transactionManager = new TransactionManager();
+    this.crudOperations = new CrudOperations(this.eventManager);
+    
+    // Initialize database
     this.db = this.initializeDatabase();
   }
 
@@ -41,10 +48,10 @@ export class MockDatabaseImpl {
    * Initialize database from localStorage or seed data
    */
   private initializeDatabase(): MockDatabase {
-    const stored = this.loadFromStorage();
+    const stored = this.storageManager.loadFromStorage();
     
-    if (stored && stored.version === this.VERSION) {
-      const db = this.deserializeDatabase(stored.data);
+    if (stored && stored.version === this.storageManager.getVersion()) {
+      const db = this.storageManager.deserializeDatabase(stored.data);
       
       // Check if factories have old Korean string types and force refresh if needed
       const hasOldFactoryTypes = Array.from(db.factories.values()).some(factory => 
@@ -53,10 +60,10 @@ export class MockDatabaseImpl {
       
       if (hasOldFactoryTypes) {
         console.log('[MockDB] Detected old factory types, reinitializing database with enum types');
-        localStorage.removeItem(this.STORAGE_KEY);
+        localStorage.removeItem(this.storageManager.getStorageKey());
         // Create new database with seed data
         const newDb = seedData.createInitialData();
-        this.saveToStorage(newDb);
+        this.storageManager.saveToStorage(newDb);
         return newDb;
       }
       
@@ -65,434 +72,149 @@ export class MockDatabaseImpl {
 
     // Initialize with seed data
     const db = seedData.createInitialData();
-    this.saveToStorage(db);
+    this.storageManager.saveToStorage(db);
     return db;
   }
 
   /**
-   * Serialize database for storage
-   */
-  private serializeDatabase(db: MockDatabase): any {
-    return {
-      users: Array.from(db.users.entries()),
-      customers: Array.from(db.customers.entries()),
-      factories: Array.from(db.factories.entries()),
-      projects: Array.from(db.projects.entries()),
-      schedules: Array.from(db.schedules.entries()),
-      tasks: Array.from(db.tasks.entries()),
-      comments: Array.from(db.comments.entries()),
-      productCategories: Array.from(db.productCategories.entries()),
-      products: Array.from(db.products.entries()),
-      userFactories: Array.from(db.userFactories.entries()),
-      projectAssignments: Array.from(db.projectAssignments.entries()),
-      factoryProjects: Array.from(db.factoryProjects.entries()),
-      userCustomers: Array.from(db.userCustomers.entries()),
-      statusMappings: Array.from(db.statusMappings.entries()),
-      priorityMappings: Array.from(db.priorityMappings.entries()),
-      serviceTypeMappings: Array.from(db.serviceTypeMappings.entries()),
-      projectTypeMappings: Array.from(db.projectTypeMappings.entries()),
-    };
-  }
-
-  /**
-   * Deserialize database from storage
-   */
-  private deserializeDatabase(data: any): MockDatabase {
-    // Helper function to convert date strings to Date objects
-    const convertDates = (obj: any): any => {
-      if (!obj) return obj;
-      
-      // Date fields to convert
-      const dateFields = ['createdAt', 'updatedAt', 'startDate', 'endDate', 'establishedDate', 'lastLoginAt', 'assignedAt', 'approvedAt', 'completedAt'];
-      
-      dateFields.forEach(field => {
-        if (obj[field] && typeof obj[field] === 'string') {
-          obj[field] = new Date(obj[field]);
-        }
-      });
-      
-      return obj;
-    };
-    
-    // Convert all entries to restore Date objects
-    const processEntries = (entries: any[]) => {
-      return entries?.map(([key, value]) => [key, convertDates(value)]) || [];
-    };
-    
-    return {
-      users: new Map(processEntries(data.users)),
-      customers: new Map(processEntries(data.customers)),
-      factories: new Map(processEntries(data.factories)),
-      projects: new Map(processEntries(data.projects)),
-      schedules: new Map(processEntries(data.schedules)),
-      tasks: new Map(processEntries(data.tasks)),
-      comments: new Map(processEntries(data.comments)),
-      productCategories: new Map(processEntries(data.productCategories)),
-      products: new Map(processEntries(data.products)),
-      userFactories: new Map(processEntries(data.userFactories)),
-      projectAssignments: new Map(processEntries(data.projectAssignments)),
-      factoryProjects: new Map(processEntries(data.factoryProjects)),
-      userCustomers: new Map(processEntries(data.userCustomers)),
-      statusMappings: new Map(processEntries(data.statusMappings)),
-      priorityMappings: new Map(processEntries(data.priorityMappings)),
-      serviceTypeMappings: new Map(processEntries(data.serviceTypeMappings)),
-      projectTypeMappings: new Map(processEntries(data.projectTypeMappings)),
-    };
-  }
-
-  /**
-   * Save database to localStorage
-   */
-  private saveToStorage(db: MockDatabase): void {
-    try {
-      const data = {
-        version: this.VERSION,
-        timestamp: new Date().toISOString(),
-        data: this.serializeDatabase(db),
-      };
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-    } catch (error) {
-      // Silently fail
-    }
-  }
-
-  /**
-   * Load database from localStorage
-   */
-  private loadFromStorage(): any {
-    try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
-    } catch (error) {
-      // Silently fail
-      return null;
-    }
-  }
-
-  /**
-   * Get the database instance
+   * Get database instance
    */
   getDatabase(): MockDatabase {
     return this.db;
   }
 
   /**
-   * Emit database event
+   * CRUD Operations
    */
-  private emitEvent(event: DbEvent): void {
-    const listeners = this.listeners.get(event.collection) || new Set();
-    const globalListeners = this.listeners.get('*') || new Set();
+  async create<T>(collection: keyof MockDatabase, id: string, data: T): Promise<DbResponse<T>> {
+    // Check referential integrity before creating
+    const integrityCheck = this.crudOperations.checkReferentialIntegrity(this.db, collection, id);
+    if (!integrityCheck.success) {
+      return integrityCheck as DbResponse<T>;
+    }
+    
+    const result = await this.crudOperations.create(this.db, collection, id, data);
+    if (result.success) {
+      this.storageManager.saveToStorage(this.db);
+    }
+    return result;
+  }
 
-    [...listeners, ...globalListeners].forEach(listener => {
-      try {
-        listener(event);
-      } catch (error) {
-        // Silently fail
-      }
-    });
+  async get<T>(collection: keyof MockDatabase, id: string): Promise<DbResponse<T>> {
+    return this.crudOperations.get(this.db, collection, id);
+  }
+
+  async getAll<T>(collection: keyof MockDatabase): Promise<DbResponse<T[]>> {
+    return this.crudOperations.getAll(this.db, collection);
+  }
+
+  async update<T>(collection: keyof MockDatabase, id: string, updates: Partial<T>): Promise<DbResponse<T>> {
+    const result = await this.crudOperations.update(this.db, collection, id, updates);
+    if (result.success) {
+      this.storageManager.saveToStorage(this.db);
+    }
+    return result;
+  }
+
+  async delete(collection: keyof MockDatabase, id: string): Promise<DbResponse<void>> {
+    // Check referential integrity before deleting
+    const integrityCheck = this.crudOperations.checkReferentialIntegrity(this.db, collection, id);
+    if (!integrityCheck.success) {
+      return integrityCheck;
+    }
+    
+    const result = await this.crudOperations.delete(this.db, collection, id);
+    if (result.success) {
+      this.storageManager.saveToStorage(this.db);
+    }
+    return result;
   }
 
   /**
-   * Generic CRUD Operations
+   * Specialized delete for projects (includes cascade)
    */
-  async create<T extends keyof MockDatabase>(
-    collection: T,
-    id: string,
-    data: MockDatabase[T] extends Map<string, infer V> ? V : never
-  ): Promise<DbResponse<typeof data>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        try {
-          const map = this.db[collection] as Map<string, typeof data>;
-          
-          if (map.has(id)) {
-            resolve({
-              success: false,
-              error: `${collection} with id ${id} already exists`,
-            });
-            return;
-          }
-
-          map.set(id, data);
-          this.saveToStorage(this.db);
-          
-          this.emitEvent({
-            type: 'created',
-            collection,
-            id,
-            data,
-            timestamp: new Date(),
-          });
-
-          resolve({
-            success: true,
-            data,
-            message: `${collection} created successfully`,
-          });
-        } catch (error) {
-          resolve({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
-        }
-      }, 100); // Simulate network delay
-    });
-  }
-
-  async update<T extends keyof MockDatabase>(
-    collection: T,
-    id: string,
-    data: Partial<MockDatabase[T] extends Map<string, infer V> ? V : never>
-  ): Promise<DbResponse<MockDatabase[T] extends Map<string, infer V> ? V : never>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        try {
-          const map = this.db[collection] as Map<string, any>;
-          const existing = map.get(id);
-          
-          if (!existing) {
-            resolve({
-              success: false,
-              error: `${collection} with id ${id} not found`,
-            });
-            return;
-          }
-
-          const updated = { ...existing, ...data };
-          map.set(id, updated);
-          this.saveToStorage(this.db);
-          
-          this.emitEvent({
-            type: 'updated',
-            collection,
-            id,
-            data: updated,
-            timestamp: new Date(),
-          });
-
-          resolve({
-            success: true,
-            data: updated,
-            message: `${collection} updated successfully`,
-          });
-        } catch (error) {
-          resolve({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
-        }
-      }, 100);
-    });
-  }
-
-  async delete<T extends keyof MockDatabase>(
-    collection: T,
-    id: string
-  ): Promise<DbResponse<void>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        try {
-          const map = this.db[collection] as Map<string, any>;
-          
-          if (!map.has(id)) {
-            resolve({
-              success: false,
-              error: `${collection} with id ${id} not found`,
-            });
-            return;
-          }
-
-          // Check for referential integrity
-          const canDelete = this.checkReferentialIntegrity(collection, id);
-          if (!canDelete.success) {
-            resolve(canDelete);
-            return;
-          }
-
-          map.delete(id);
-          this.saveToStorage(this.db);
-          
-          this.emitEvent({
-            type: 'deleted',
-            collection,
-            id,
-            timestamp: new Date(),
-          });
-
-          resolve({
-            success: true,
-            message: `${collection} deleted successfully`,
-          });
-        } catch (error) {
-          resolve({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
-        }
-      }, 100);
-    });
-  }
-
-  async get<T extends keyof MockDatabase>(
-    collection: T,
-    id: string
-  ): Promise<DbResponse<MockDatabase[T] extends Map<string, infer V> ? V : never>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        try {
-          const map = this.db[collection] as Map<string, any>;
-          const data = map.get(id);
-          
-          if (!data) {
-            resolve({
-              success: false,
-              error: `${collection} with id ${id} not found`,
-            });
-            return;
-          }
-
-          resolve({
-            success: true,
-            data,
-          });
-        } catch (error) {
-          resolve({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
-        }
-      }, 50);
-    });
-  }
-
-  async getAll<T extends keyof MockDatabase>(
-    collection: T
-  ): Promise<DbResponse<Array<MockDatabase[T] extends Map<string, infer V> ? V : never>>> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        try {
-          const map = this.db[collection] as Map<string, any>;
-          const data = Array.from(map.values());
-          
-          resolve({
-            success: true,
-            data,
-          });
-        } catch (error) {
-          resolve({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
-        }
-      }, 50);
-    });
-  }
-
-  /**
-   * Check referential integrity before deletion
-   */
-  private checkReferentialIntegrity(collection: keyof MockDatabase, id: string): DbResponse<void> {
-    // Check if user is referenced
-    if (collection === 'users') {
-      const hasFactoryRelation = Array.from(this.db.userFactories.values())
-        .some(uf => uf.userId === id);
-      const hasProjectRelation = Array.from(this.db.projectAssignments.values())
-        .some(pa => pa.userId === id);
+  deleteProject(projectId: string): DbResponse<void> {
+    const db = this.db;
+    
+    // Delete related data
+    // 1. Delete project assignments
+    const assignments = Array.from(db.projectAssignments.values())
+      .filter(pa => pa.projectId === projectId);
+    assignments.forEach(pa => db.projectAssignments.delete(pa.id));
+    
+    // 2. Delete factory projects
+    const factoryProjects = Array.from(db.factoryProjects.values())
+      .filter(fp => fp.projectId === projectId);
+    factoryProjects.forEach(fp => db.factoryProjects.delete(fp.id));
+    
+    // 3. Delete schedules and tasks
+    const schedules = Array.from(db.schedules.values())
+      .filter(s => s.projectId === projectId);
+    schedules.forEach(schedule => {
+      // Delete tasks
+      const tasks = Array.from(db.tasks.values())
+        .filter(t => t.scheduleId === schedule.id);
+      tasks.forEach(task => db.tasks.delete(task.id));
       
-      if (hasFactoryRelation || hasProjectRelation) {
-        return {
-          success: false,
-          error: 'Cannot delete user: has active relationships',
-        };
-      }
+      // Delete schedule
+      db.schedules.delete(schedule.id);
+    });
+    
+    // 4. Delete comments
+    const comments = Array.from(db.comments.values())
+      .filter(c => c.entityType === 'project' && c.entityId === projectId);
+    comments.forEach(comment => db.comments.delete(comment.id));
+    
+    // 5. Delete the project
+    const existed = db.projects.delete(projectId);
+    
+    if (existed) {
+      this.eventManager.emitEvent(
+        this.eventManager.createEvent(DbEventType.DELETED, 'projects', projectId)
+      );
+      this.storageManager.saveToStorage(db);
+      return { success: true };
     }
-
-    // Check if factory is referenced
-    if (collection === 'factories') {
-      const hasProjectRelation = Array.from(this.db.factoryProjects.values())
-        .some(fp => fp.factoryId === id);
-      
-      if (hasProjectRelation) {
-        return {
-          success: false,
-          error: 'Cannot delete factory: assigned to projects',
-        };
-      }
-    }
-
-    // Check if project is referenced
-    if (collection === 'projects') {
-      const hasSchedule = Array.from(this.db.schedules.values())
-        .some(s => s.projectId === id);
-      
-      if (hasSchedule) {
-        return {
-          success: false,
-          error: 'Cannot delete project: has associated schedules',
-        };
-      }
-    }
-
-    return { success: true };
+    
+    return {
+      success: false,
+      error: 'Project not found',
+    };
   }
 
   /**
    * Transaction support
    */
   beginTransaction(): string {
-    const transactionId = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    this.transactions.set(transactionId, {
-      id: transactionId,
-      operations: [],
-      status: 'pending',
-      timestamp: new Date(),
-    });
-    return transactionId;
+    return this.transactionManager.beginTransaction();
   }
 
   async commitTransaction(transactionId: string): Promise<DbResponse<void>> {
-    const transaction = this.transactions.get(transactionId);
-    if (!transaction) {
-      return {
-        success: false,
-        error: 'Transaction not found',
-      };
-    }
-
-    try {
-      // Apply all operations
-      for (const op of transaction.operations) {
-        // Apply operation logic here
+    const result = await this.transactionManager.commitTransaction(transactionId, async (op) => {
+      // Apply operation logic here
+      switch (op.type) {
+        case 'create':
+          await this.create(op.collection, op.id, op.data);
+          break;
+        case 'update':
+          await this.update(op.collection, op.id, op.data);
+          break;
+        case 'delete':
+          await this.delete(op.collection, op.id);
+          break;
       }
-
-      transaction.status = 'committed';
-      this.saveToStorage(this.db);
-      
-      return {
-        success: true,
-        message: 'Transaction committed successfully',
-      };
-    } catch (error) {
-      await this.rollbackTransaction(transactionId);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Transaction failed',
-      };
+    });
+    
+    if (result.success) {
+      this.storageManager.saveToStorage(this.db);
     }
+    
+    return result;
   }
 
   async rollbackTransaction(transactionId: string): Promise<DbResponse<void>> {
-    const transaction = this.transactions.get(transactionId);
-    if (!transaction) {
-      return {
-        success: false,
-        error: 'Transaction not found',
-      };
-    }
-
-    // Rollback operations in reverse order
-    for (let i = transaction.operations.length - 1; i >= 0; i--) {
-      const op = transaction.operations[i];
+    return this.transactionManager.rollbackTransaction(transactionId, async (op) => {
+      // Rollback operation logic
       if (op.type === 'create') {
         this.db[op.collection].delete(op.id);
       } else if (op.type === 'update' && op.previousData) {
@@ -500,111 +222,84 @@ export class MockDatabaseImpl {
       } else if (op.type === 'delete' && op.previousData) {
         (this.db[op.collection] as Map<string, any>).set(op.id, op.previousData);
       }
-    }
-
-    transaction.status = 'rolled-back';
-    this.saveToStorage(this.db);
-    
-    return {
-      success: true,
-      message: 'Transaction rolled back successfully',
-    };
+    });
   }
 
   /**
    * Event subscription
    */
   subscribe(collection: keyof MockDatabase | '*', callback: (event: DbEvent) => void): () => void {
-    if (!this.listeners.has(collection)) {
-      this.listeners.set(collection, new Set());
-    }
-    
-    this.listeners.get(collection)!.add(callback);
-    
-    // Return unsubscribe function
-    return () => {
-      this.listeners.get(collection)?.delete(callback);
-    };
+    return this.eventManager.subscribe(collection, callback);
   }
 
   /**
-   * Database statistics
+   * Get database statistics
    */
   getStats(): DbStats {
-    const stats: DbStats = {
-      collections: {} as any,
-      relationships: {
-        userFactories: this.db.userFactories.size,
-        projectAssignments: this.db.projectAssignments.size,
-        factoryProjects: this.db.factoryProjects.size,
+    const db = this.db;
+    
+    return {
+      collections: {
+        users: db.users.size,
+        customers: db.customers.size,
+        factories: db.factories.size,
+        projects: db.projects.size,
+        schedules: db.schedules.size,
+        tasks: db.tasks.size,
+        comments: db.comments.size,
+        productCategories: db.productCategories.size,
+        products: db.products.size,
       },
-      totalSize: 0,
-      version: this.VERSION,
+      relationships: {
+        userFactories: db.userFactories.size,
+        projectAssignments: db.projectAssignments.size,
+        factoryProjects: db.factoryProjects.size,
+        userCustomers: db.userCustomers.size,
+      },
+      totalSize: Object.values(db).reduce((sum, collection) => 
+        sum + (collection instanceof Map ? collection.size : 0), 0
+      ),
     };
-
-    // Calculate collection stats
-    Object.keys(this.db).forEach((key) => {
-      const collection = key as keyof MockDatabase;
-      if (collection.includes('Map')) return;
-      
-      const map = this.db[collection];
-      stats.collections[collection] = {
-        count: map.size,
-        lastModified: new Date(), // In real implementation, track this
-      };
-    });
-
-    // Calculate total size
-    const dbString = JSON.stringify(this.serializeDatabase(this.db));
-    stats.totalSize = new Blob([dbString]).size;
-
-    return stats;
   }
 
   /**
-   * Reset database
+   * Reset database to initial state
    */
   reset(): void {
-    localStorage.removeItem(this.STORAGE_KEY);
-    this.db = this.initializeDatabase();
-    this.emitEvent({
-      type: 'disconnected',
-      collection: 'users',
-      timestamp: new Date(),
-    });
+    this.db = seedData.createInitialData();
+    this.storageManager.saveToStorage(this.db);
+    this.eventManager.clearListeners();
+    this.transactionManager.clearTransactions();
+    console.log('[MockDB] Database reset to initial state');
   }
 
   /**
-   * Save database
+   * Save current state
    */
   save(): void {
-    this.saveToStorage(this.db);
+    this.storageManager.saveToStorage(this.db);
   }
 
   /**
-   * Export database
+   * Export database as JSON
    */
   export(): string {
-    return JSON.stringify(this.serializeDatabase(this.db), null, 2);
+    return this.storageManager.exportDatabase(this.db);
   }
 
   /**
-   * Import database
+   * Import database from JSON
    */
   import(data: string): DbResponse<void> {
-    try {
-      const parsed = JSON.parse(data);
-      this.db = this.deserializeDatabase(parsed);
-      this.saveToStorage(this.db);
-      return {
-        success: true,
-        message: 'Database imported successfully',
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Invalid database format',
-      };
+    const imported = this.storageManager.importDatabase(data);
+    if (imported) {
+      this.db = imported;
+      this.storageManager.saveToStorage(this.db);
+      return { success: true };
     }
+    return {
+      success: false,
+      error: 'Failed to import data',
+    };
   }
 }

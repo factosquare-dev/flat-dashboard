@@ -39,7 +39,7 @@ interface ProjectRowProps {
   };
   scrollRef: React.RefObject<HTMLDivElement>;
   allRows: Participant[];
-  onGridClick: (e: React.MouseEvent, projectId: string, date: string) => void;
+  onGridClick: (e: React.MouseEvent, factoryId: string, date: string) => void;
   onTaskClick: (task: Task) => void;
   onTaskDragStart: (e: React.DragEvent, task: Task, index: number) => void;
   onTaskDragEnd: () => void;
@@ -97,7 +97,7 @@ const ProjectRow: React.FC<ProjectRowProps> = React.memo(({
         <ProjectRowGrid
           days={days}
           cellWidth={cellWidth}
-          projectId={project.id}
+          factoryId={project.id}
           isAddFactoryRow={isAddFactoryRow}
           modalState={modalState}
           onGridClick={onGridClick}

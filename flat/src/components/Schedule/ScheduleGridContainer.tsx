@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Participant, Task, TaskControls, DragControls, ModalState } from '../../types/schedule';
+import type { ScheduleFactory, Task, TaskControls, DragControls, ModalState } from '../../types/schedule';
 import { findAvailableDateRange } from '../../utils/taskUtils';
 import ScheduleGrid from './ScheduleGrid';
 import { factories, taskTypesByFactoryType } from '../../data/factories';
@@ -7,7 +7,7 @@ import { useTaskDrag } from './hooks/useTaskDrag';
 import { useTaskResize } from './hooks/useTaskResize';
 
 interface ScheduleGridContainerProps {
-  projects: Participant[];
+  projects: ScheduleFactory[];
   tasks: Task[];
   days: Date[];
   cellWidth: number;
@@ -17,12 +17,12 @@ interface ScheduleGridContainerProps {
   modalState: ModalState;
   setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
   selectedProjects: string[];
-  setProjects: (projects: Participant[]) => void;
+  setProjects: (projects: ScheduleFactory[]) => void;
   onDeleteProject: (projectId: string) => void;
   onProjectSelect: (projectId: string, checked: boolean) => void;
   onSelectAll: (checked: boolean) => void;
   onAddFactory?: () => void;
-  onTaskCreate?: (task: { projectId: string; factory: string; startDate: string; endDate: string }) => void;
+  onTaskCreate?: (task: { projectId: string; factoryId: string; factory: string; startDate: string; endDate: string }) => void;
 }
 
 import { getInteractionState, setInteractionMode, setPreventClickUntil } from './utils/globalState';
@@ -89,7 +89,7 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     }
   };
 
-  const handleGridClick = (e: React.MouseEvent, projectId: string, date: string) => {
+  const handleGridClick = (e: React.MouseEvent, factoryId: string, date: string) => {
     // Check interaction state
     const now = Date.now();
     const state = getInteractionState();
@@ -106,9 +106,9 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     setModalState((prev: ModalState) => ({
       ...prev,
       showTaskModal: true,
-      selectedProjectId: projectId,
+      selectedFactoryId: factoryId,
       selectedDate: date,
-      selectedFactory: projects.find(p => p.id === projectId)?.name || '',
+      selectedFactory: projects.find(p => p.id === factoryId)?.name || '',
       // Clear drag states
       isDraggingTask: false,
       draggedTask: null,
@@ -118,24 +118,25 @@ const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({
     }));
   };
 
-  const handleQuickTaskCreate = (taskData: { projectId: string; factory: string; startDate: string; endDate: string }) => {
-    const factory = factories.find(f => f.name === taskData.factory);
+  const handleQuickTaskCreate = (taskData: { projectId: string; factoryId: string; factory: string; startDate: string; endDate: string }) => {
+    const factory = factories.find(f => f.id === taskData.factoryId);
     const defaultTaskType = factory ? taskTypesByFactoryType[factory.type]?.[0] || '태스크' : '태스크';
     
     const duration = Math.ceil((new Date(taskData.endDate).getTime() - new Date(taskData.startDate).getTime()) / (1000 * 60 * 60 * 24));
     const availableRange = findAvailableDateRange(
-      taskData.projectId,
+      taskData.projectId, // 이제 올바른 projectId
       taskData.startDate,
       duration,
       taskControls.tasks
     );
     
     taskControls.addTask({
-      projectId: taskData.projectId,
+      projectId: taskData.projectId, // 올바른 projectId
       title: defaultTaskType,
       startDate: availableRange.startDate,
       endDate: availableRange.endDate,
-      factory: taskData.factory
+      factory: factory?.name || taskData.factory,
+      factoryId: taskData.factoryId // factoryId 추가
     });
   };
 

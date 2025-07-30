@@ -160,6 +160,29 @@ export interface DbTransaction {
   timestamp: Date;
 }
 
+// Database collection names as constants
+export const DB_COLLECTIONS = {
+  USERS: 'users',
+  CUSTOMERS: 'customers',
+  FACTORIES: 'factories',
+  PROJECTS: 'projects',
+  SCHEDULES: 'schedules',
+  TASKS: 'tasks',
+  COMMENTS: 'comments',
+  PRODUCT_CATEGORIES: 'productCategories',
+  PRODUCTS: 'products',
+  USER_FACTORIES: 'userFactories',
+  PROJECT_ASSIGNMENTS: 'projectAssignments',
+  FACTORY_PROJECTS: 'factoryProjects',
+  USER_CUSTOMERS: 'userCustomers',
+  STATUS_MAPPINGS: 'statusMappings',
+  PRIORITY_MAPPINGS: 'priorityMappings',
+  SERVICE_TYPE_MAPPINGS: 'serviceTypeMappings',
+  PROJECT_TYPE_MAPPINGS: 'projectTypeMappings'
+} as const;
+
+export type DbCollectionName = keyof MockDatabase;
+
 export interface DbOperation {
   type: 'create' | 'update' | 'delete';
   collection: keyof MockDatabase;
@@ -171,13 +194,20 @@ export interface DbOperation {
 /**
  * Database Events
  */
-export type DbEventType = 'created' | 'updated' | 'deleted' | 'connected' | 'disconnected';
+export enum DbEventType {
+  CREATED = 'created',
+  UPDATED = 'updated',
+  DELETED = 'deleted',
+  CONNECTED = 'connected',
+  DISCONNECTED = 'disconnected'
+}
 
 export interface DbEvent {
   type: DbEventType;
   collection: keyof MockDatabase;
   id?: string;
   data?: any;
+  previousData?: any;
   timestamp: Date;
   userId?: string;
 }

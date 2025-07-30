@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import type { Participant, Task } from '../../types/schedule';
+import type { ScheduleFactory, Task } from '../../types/schedule';
 import { factories } from '../../data/factories';
 import { getFactoryTypeColor } from '../../utils/factoryUtils';
 
@@ -20,7 +20,7 @@ interface ModalState {
   showFactoryModal: boolean;
   selectedTask: Task | null;
   selectedFactories: string[];
-  selectedProjectId: string | null;
+  selectedFactoryId: string | null;
   selectedDate: string | null;
   selectedFactory: string | null;
   hoveredTaskId: number | null;
@@ -36,21 +36,25 @@ interface ModalState {
 interface ScheduleModalsProps {
   modalState: ModalState;
   setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
-  projects: Participant[];
+  projects: ScheduleFactory[];
+  projectId?: string;
   onTaskSave: (task: Task) => void;
   onTaskDelete: () => void;
   onTaskCreate: (task: { factory: string; taskType: string; startDate: string; endDate: string }) => void;
   onFactoryAdd?: (factory: { id: string; name: string; type: string }) => void;
+  onFactoriesAdd?: (factories: Array<{ id: string; name: string; type: string }>) => void;
 }
 
 const ScheduleModals: React.FC<ScheduleModalsProps> = ({
   modalState,
   setModalState,
   projects,
+  projectId,
   onTaskSave,
   onTaskDelete,
   onTaskCreate,
-  onFactoryAdd
+  onFactoryAdd,
+  onFactoriesAdd
 }) => {
   const handleEmailSend = () => {
     setModalState(prev => ({ ...prev, showEmailModal: false }));
@@ -74,8 +78,11 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
   };
 
   const handleFactoriesSelect = (selectedFactories: Array<{ id: string; name: string; type: string }>) => {
-    if (onFactoryAdd) {
-      // 선택된 각 공장을 추가
+    if (onFactoriesAdd) {
+      // 새로운 함수를 사용해서 여러 공장을 한 번에 추가
+      onFactoriesAdd(selectedFactories);
+    } else if (onFactoryAdd) {
+      // fallback: 기존 방식 사용
       selectedFactories.forEach(factory => {
         onFactoryAdd(factory);
       });
@@ -149,12 +156,13 @@ const ScheduleModals: React.FC<ScheduleModalsProps> = ({
       <Suspense fallback={null}>
         <TaskCreateModal
           isOpen={modalState.showTaskModal}
-          onClose={() => setModalState(prev => ({ ...prev, showTaskModal: false, selectedProjectId: null, selectedDate: null, selectedFactory: null }))}
+          onClose={() => setModalState(prev => ({ ...prev, showTaskModal: false, selectedFactoryId: null, selectedDate: null, selectedFactory: null }))}
           onSave={handleTaskCreate}
           availableFactories={projects.map(p => p.name)}
           initialDate={modalState.selectedDate || undefined}
-          projectId={modalState.selectedProjectId || undefined}
+          factoryId={modalState.selectedFactoryId || undefined}
           selectedFactory={modalState.selectedFactory || undefined}
+          projectId={projectId}
         />
       </Suspense>
 

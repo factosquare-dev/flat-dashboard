@@ -74,13 +74,15 @@ class MockDataService {
   getTasksByProjectId(projectId: string | ProjectId): Task[] {
     const database = this.db.getDatabase();
     const tasks = Array.from(database.tasks.values());
-    return tasks.filter(task => {
+    const schedules = Array.from(database.schedules.values());
+    
+    const filteredTasks = tasks.filter(task => {
       // schedule을 통해 projectId 매칭
-      const schedule = Array.from(database.schedules.values()).find(
-        s => s.id === task.scheduleId
-      );
+      const schedule = schedules.find(s => s.id === task.scheduleId);
       return schedule?.projectId === projectId;
     });
+    
+    return filteredTasks;
   }
 
   // 공장별 태스크 가져오기

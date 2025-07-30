@@ -21,6 +21,7 @@ interface TaskCreateModalProps {
   availableFactories: FactoryId[];
   initialDate?: string;
   projectId?: ProjectId;
+  factoryId?: FactoryId;
   selectedFactory?: string;
   projectStartDate?: string;
   projectEndDate?: string;
@@ -34,6 +35,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
   availableFactories,
   initialDate,
   projectId,
+  factoryId: propFactoryId,
   selectedFactory,
   projectStartDate,
   projectEndDate,
@@ -64,13 +66,11 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({
       const allFactories = mockDataService.getAllFactories();
       const factory = getFactoryByIdOrName(allFactories, selectedFactory);
       setFactoryId(factory?.id || '');
-    } else if (projectId && isOpen) {
-      const projectFactory = getFactoryByIdSafe(factories, projectId);
-      if (projectFactory) {
-        setFactoryId(projectFactory.id);
-      }
+    } else if (propFactoryId && isOpen) {
+      // propFactoryId가 있으면 직접 사용
+      setFactoryId(extractIdString(propFactoryId));
     }
-  }, [selectedFactory, projectId, isOpen]);
+  }, [selectedFactory, propFactoryId, isOpen]);
   
   // Cleanup timeout on unmount
   React.useEffect(() => {

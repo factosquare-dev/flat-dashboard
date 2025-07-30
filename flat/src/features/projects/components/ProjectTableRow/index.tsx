@@ -194,6 +194,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
               return <React.Fragment key={column.id}>{cellRenderers.renderProductType(cellRenderProps)}</React.Fragment>;
             case 'serviceType':
               return <React.Fragment key={column.id}>{cellRenderers.renderServiceType(cellRenderProps)}</React.Fragment>;
+            case 'currentStage':
+              return <React.Fragment key={column.id}>{cellRenderers.renderCurrentStage(project)}</React.Fragment>;
             case 'status':
               return <React.Fragment key={column.id}>{cellRenderers.renderStatus(cellRenderProps)}</React.Fragment>;
             case 'progress':

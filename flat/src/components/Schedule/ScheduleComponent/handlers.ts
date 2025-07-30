@@ -1,5 +1,8 @@
-import type { Task, Participant } from '../../../types/schedule';
+import type { Task, ScheduleFactory } from '../../../types/schedule';
 import type { TaskData } from './types';
+import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
+import { DB_COLLECTIONS } from '../../../mocks/database/types';
+import { storageKeys } from '../../../config';
 
 interface TaskControls {
   tasks: Task[];
@@ -13,7 +16,7 @@ interface ModalState {
   showTaskEditModal?: boolean;
   selectedTask?: Task | null;
   showTaskModal?: boolean;
-  selectedProjectId?: string | null;
+  selectedFactoryId?: string | null;
   selectedDate?: string | null;
   showProductRequestModal?: boolean;
   showWorkflowModal?: boolean;
@@ -31,8 +34,8 @@ import { getFactoryByIdOrName } from '../../../utils/factoryUtils';
 import { getParticipantColor } from '../../../utils/scheduleColorManager';
 
 export const createProjectHandlers = (
-  projects: Participant[],
-  setProjects: React.Dispatch<React.SetStateAction<Participant[]>>,
+  projects: ScheduleFactory[],
+  setProjects: React.Dispatch<React.SetStateAction<ScheduleFactory[]>>,
   taskControls: TaskControls,
   currentProjectId?: string
 ) => {
@@ -45,7 +48,56 @@ export const createProjectHandlers = (
       // Project deletion logging removed for cleaner console
       
       // 프로젝트 삭제
-      setProjects(projects.filter(p => p.id !== projectId));
+      const updatedProjects = projects.filter(p => p.id !== projectId);
+      setProjects(updatedProjects);
+      
+      // Project의 factory ID들을 업데이트
+      if (currentProjectId) {
+        try {
+          const db = MockDatabaseImpl.getInstance();
+          const database = db.getDatabase();
+          const project = database.projects.get(currentProjectId);
+          
+          if (project) {
+            // 각 공장 타입별로 ID 배열 업데이트
+            const manufacturerIds: string[] = [];
+            const containerIds: string[] = [];
+            const packagingIds: string[] = [];
+            
+            updatedProjects.forEach(p => {
+              if (p.id !== 'ADD_FACTORY_ROW') {
+                if (p.type === 'MANUFACTURER') {
+                  manufacturerIds.push(p.id);
+                } else if (p.type === 'CONTAINER') {
+                  containerIds.push(p.id);
+                } else if (p.type === 'PACKAGING') {
+                  packagingIds.push(p.id);
+                }
+              }
+            });
+            
+            // Project 업데이트
+            const updatedProject = {
+              ...project,
+              manufacturerId: manufacturerIds.length > 0 ? manufacturerIds : undefined,
+              containerId: containerIds.length > 0 ? containerIds : undefined,
+              packagingId: packagingIds.length > 0 ? packagingIds : undefined
+            };
+            
+            // update 메서드 사용
+            db.update(DB_COLLECTIONS.PROJECTS, currentProjectId, updatedProject);
+            console.log('[Schedule] Project factory deleted:', {
+              projectId: currentProjectId,
+              deletedFactoryId: projectId,
+              remainingManufacturerIds: manufacturerIds,
+              remainingContainerIds: containerIds,
+              remainingPackagingIds: packagingIds
+            });
+          }
+        } catch (error) {
+          // Error saving to MockDB
+        }
+      }
       
       // 안전성을 위해 projectId와 factoryId 모두 확인
       const remainingTasks = taskControls.tasks.filter((t: Task) => {
@@ -73,7 +125,7 @@ export const createProjectHandlers = (
   const handleAddFactory = (factory: { id: string; name: string; type: string }) => {
     // 이미 존재하지 않는 경우에만 추가
     if (!projects.find(p => p.id === factory.id)) {
-      const newProject: Participant = {
+      const newProject: ScheduleFactory = {
         id: factory.id,
         name: factory.name,
         type: factory.type,
@@ -97,11 +149,90 @@ export const createProjectHandlers = (
     }
   };
 
-  return { handleDeleteProject, handleAddFactory };
+  const handleAddFactories = (factories: Array<{ id: string; name: string; type: string }>) => {
+    setProjects(prev => {
+      const newProjects = [...prev];
+      const addFactoryIndex = newProjects.findIndex(p => p.id === 'ADD_FACTORY_ROW');
+      
+      // 이미 존재하지 않는 공장들만 필터링
+      const factoriesToAdd = factories.filter(factory => 
+        !newProjects.find(p => p.id === factory.id)
+      );
+      
+      // 새로운 프로젝트 객체들 생성
+      const newParticipants = factoriesToAdd.map(factory => ({
+        id: factory.id,
+        name: factory.name,
+        type: factory.type,
+        period: '',
+        color: getParticipantColor(factory.id)
+      }));
+      
+      if (addFactoryIndex !== -1) {
+        // "공장 추가" 행 바로 위에 모든 새 공장들을 삽입
+        newProjects.splice(addFactoryIndex, 0, ...newParticipants);
+      } else {
+        // "공장 추가" 행이 없으면 마지막에 추가
+        newProjects.push(...newParticipants);
+      }
+      
+      // Project의 factory ID들을 업데이트
+      if (currentProjectId) {
+        try {
+          const db = MockDatabaseImpl.getInstance();
+          const database = db.getDatabase();
+          const project = database.projects.get(currentProjectId);
+          
+          if (project) {
+            // 각 공장 타입별로 ID 배열 업데이트
+            const manufacturerIds: string[] = [];
+            const containerIds: string[] = [];
+            const packagingIds: string[] = [];
+            
+            newProjects.forEach(p => {
+              if (p.id !== 'ADD_FACTORY_ROW') {
+                if (p.type === 'MANUFACTURER') {
+                  manufacturerIds.push(p.id);
+                } else if (p.type === 'CONTAINER') {
+                  containerIds.push(p.id);
+                } else if (p.type === 'PACKAGING') {
+                  packagingIds.push(p.id);
+                }
+              }
+            });
+            
+            // Project 업데이트
+            const updatedProject = {
+              ...project,
+              manufacturerId: manufacturerIds.length > 0 ? manufacturerIds : undefined,
+              containerId: containerIds.length > 0 ? containerIds : undefined,
+              packagingId: packagingIds.length > 0 ? packagingIds : undefined
+            };
+            
+            // update 메서드 사용
+            db.update(DB_COLLECTIONS.PROJECTS, currentProjectId, updatedProject);
+            console.log('[Schedule] Project factories added:', {
+              projectId: currentProjectId,
+              addedFactories: factoriesToAdd.map(f => ({ id: f.id, name: f.name, type: f.type })),
+              updatedManufacturerIds: manufacturerIds,
+              updatedContainerIds: containerIds,
+              updatedPackagingIds: packagingIds
+            });
+          }
+        } catch (error) {
+          // Error saving to MockDB
+        }
+      }
+      
+      return newProjects;
+    });
+  };
+
+  return { handleDeleteProject, handleAddFactory, handleAddFactories };
 };
 
 export const createTaskHandlers = (
-  projects: Participant[],
+  projects: ScheduleFactory[],
   taskControls: TaskControls,
   modalState: ModalState,
   setModalState: SetModalState,
@@ -127,52 +258,52 @@ export const createTaskHandlers = (
     }
   };
 
-  const handleQuickTaskCreate = (taskData: TaskData & { projectId: string }) => {
-    // Use ID-based lookup with name fallback for backward compatibility
-    const factory = getFactoryByIdOrName(factories, taskData.factoryId || taskData.factory || '');
+  const handleQuickTaskCreate = (taskData: TaskData & { projectId: string; factoryId: string }) => {
+    const factory = getFactoryByIdOrName(factories, taskData.factoryId);
     const defaultTaskType = factory ? taskTypesByFactoryType[factory.type]?.[0] || '태스크' : '태스크';
     
     const duration = Math.ceil((new Date(taskData.endDate).getTime() - new Date(taskData.startDate).getTime()) / (1000 * 60 * 60 * 24));
     const availableRange = findAvailableDateRange(
-      taskData.projectId,
+      taskData.projectId || currentProjectId || '', // 올바른 projectId 사용
       taskData.startDate,
       duration,
       taskControls.tasks
     );
     
     taskControls.addTask({
-      projectId: taskData.projectId,
+      projectId: taskData.projectId || currentProjectId || '', // 올바른 projectId
       title: defaultTaskType,
       taskType: defaultTaskType,
       startDate: availableRange.startDate,
       endDate: availableRange.endDate,
-      factory: taskData.factory || factory?.name,
-      factoryId: taskData.factoryId || factory?.id
+      factory: factory?.name,
+      factoryId: taskData.factoryId // 올바른 factoryId
     });
   };
   
   const handleTaskCreate = (taskData: TaskData) => {
-    const projectId = modalState.selectedProjectId || projects[0]?.id || '';
+    const factoryId = modalState.selectedFactoryId || projects[0]?.id || '';
+    const factory = getFactoryByIdOrName(factories, factoryId);
     
     const duration = Math.ceil((new Date(taskData.endDate).getTime() - new Date(taskData.startDate).getTime()) / (1000 * 60 * 60 * 24));
     const availableRange = findAvailableDateRange(
-      projectId,
+      currentProjectId || '', // projectId를 전달해야 함
       taskData.startDate,
       duration,
       taskControls.tasks
     );
     
     taskControls.addTask({
-      projectId: projectId,
+      projectId: currentProjectId || '', // 실제 projectId 사용
       title: taskData.taskType || '태스크',
       taskType: taskData.taskType || '태스크',
       startDate: availableRange.startDate,
       endDate: availableRange.endDate,
-      factory: taskData.factory,
-      factoryId: taskData.factoryId
+      factory: taskData.factory || factory?.name,
+      factoryId: taskData.factoryId || factoryId
     });
     
-    setModalState(prev => ({ ...prev, showTaskModal: false, selectedProjectId: null, selectedDate: null }));
+    setModalState(prev => ({ ...prev, showTaskModal: false, selectedFactoryId: null, selectedDate: null }));
   };
 
   return {
@@ -184,7 +315,7 @@ export const createTaskHandlers = (
 };
 
 export const createModalHandlers = (
-  projects: Participant[],
+  projects: ScheduleFactory[],
   selectedProjects: string[],
   setModalState: SetModalState
 ) => {

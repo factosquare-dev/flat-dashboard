@@ -21,7 +21,7 @@ interface ScheduleTimelineGridProps {
     isDraggingTask?: boolean;
   };
   scrollRef: React.RefObject<HTMLDivElement>;
-  onGridClick: (e: React.MouseEvent, projectId: string, date: string) => void;
+  onGridClick: (e: React.MouseEvent, factoryId: string, date: string) => void;
   onTaskClick: (task: Task) => void;
   onTaskDragStart: (e: React.DragEvent, task: Task, index: number) => void;
   onTaskDragEnd: () => void;

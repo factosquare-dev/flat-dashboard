@@ -58,7 +58,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     setSliderValue
   );
 
-  const { handleDeleteProject, handleAddFactory } = createProjectHandlers(
+  const { handleDeleteProject, handleAddFactory, handleAddFactories } = createProjectHandlers(
     projects,
     setProjects,
     taskControls,
@@ -112,11 +112,12 @@ const Schedule: React.FC<ScheduleProps> = ({
   
   
   // Render data validator (only in development)
-  const dataValidator = <ScheduleDataValidator 
-    viewMode={viewMode}
-    tasks={taskControls.tasks}
-    projects={projects}
-  />;
+  // const dataValidator = <ScheduleDataValidator 
+  //   viewMode={viewMode}
+  //   tasks={taskControls.tasks}
+  //   projects={projects}
+  // />;
+  const dataValidator = null;
 
   return (
     <>
@@ -158,10 +159,12 @@ const Schedule: React.FC<ScheduleProps> = ({
         modalState={modalState}
         setModalState={setModalState}
         projects={projects}
+        projectId={projectId}
         onTaskSave={handleTaskSave}
         onTaskDelete={handleTaskDelete}
         onTaskCreate={handleTaskCreate}
         onFactoryAdd={handleAddFactory}
+        onFactoriesAdd={handleAddFactories}
       />
     </>
   );

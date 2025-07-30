@@ -7,19 +7,19 @@ import './ProjectRowGrid.css';
 interface ProjectRowGridProps {
   days: Date[];
   cellWidth: number;
-  projectId: string;
+  factoryId: string;
   isAddFactoryRow: boolean;
   modalState: {
     isResizingTask?: boolean;
     isDraggingTask?: boolean;
   };
-  onGridClick: (e: React.MouseEvent, projectId: string, date: string) => void;
+  onGridClick: (e: React.MouseEvent, factoryId: string, date: string) => void;
 }
 
 export const ProjectRowGrid: React.FC<ProjectRowGridProps> = React.memo(({
   days,
   cellWidth,
-  projectId,
+  factoryId,
   isAddFactoryRow,
   modalState,
   onGridClick,
@@ -42,8 +42,8 @@ export const ProjectRowGrid: React.FC<ProjectRowGridProps> = React.memo(({
     }
     
     const clickedDate = formatDateISO(day);
-    onGridClick(e, projectId, clickedDate);
-  }, [modalState.isResizingTask, modalState.isDraggingTask, onGridClick, projectId]);
+    onGridClick(e, factoryId, clickedDate);
+  }, [modalState.isResizingTask, modalState.isDraggingTask, onGridClick, factoryId]);
 
   const handleDragOver = React.useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -58,7 +58,7 @@ export const ProjectRowGrid: React.FC<ProjectRowGridProps> = React.memo(({
           key={dayIndex}
           day={day}
           cellWidth={cellWidth}
-          projectId={projectId}
+          projectId={factoryId}
           isAddFactoryRow={isAddFactoryRow}
           onClick={!isAddFactoryRow ? (e) => handleCellClick(e, day) : undefined}
           onDragOver={!isAddFactoryRow ? handleDragOver : undefined}
