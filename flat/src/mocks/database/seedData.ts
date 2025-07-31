@@ -131,9 +131,12 @@ export const seedData = {
       };
       schedules.push(schedule);
 
-      // Create tasks for each schedule with consistent manager assignment
-      const projectTasks = this.createTasksForProject(project, schedule.id, pmUser, factoryManager, qaUser);
-      tasks.push(...projectTasks);
+      // Only create tasks for SUB projects
+      // Master projects will aggregate tasks from their SUB projects
+      if (project.type === ProjectType.SUB) {
+        const projectTasks = this.createTasksForProject(project, schedule.id, pmUser, factoryManager, qaUser);
+        tasks.push(...projectTasks);
+      }
     });
 
     return { schedules, tasks };

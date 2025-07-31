@@ -46,10 +46,15 @@ const getHierarchicalProjects = (): Project[] => {
     const masterCustomer = customers.find(c => c.id === master.customerId);
     const customerName = masterCustomer?.name || 'Unknown Customer';
     
-    // Get factory names from database
-    const manufacturerFactory = factories.find(f => f.id === master.manufacturerId);
-    const containerFactory = factories.find(f => f.id === master.containerId);
-    const packagingFactory = factories.find(f => f.id === master.packagingId);
+    // Aggregate factory information from SUB projects
+    const manufacturerIds = [...new Set(subProjects.map(sub => sub.manufacturerId).filter(Boolean))];
+    const containerIds = [...new Set(subProjects.map(sub => sub.containerId).filter(Boolean))];
+    const packagingIds = [...new Set(subProjects.map(sub => sub.packagingId).filter(Boolean))];
+    
+    // Get unique factory names from SUB projects
+    const manufacturerNames = manufacturerIds.map(id => factories.find(f => f.id === id)?.name).filter(Boolean);
+    const containerNames = containerIds.map(id => factories.find(f => f.id === id)?.name).filter(Boolean);
+    const packagingNames = packagingIds.map(id => factories.find(f => f.id === id)?.name).filter(Boolean);
     
     // Calculate aggregated values from SUB projects
     const aggregatedSales = subProjects.reduce((sum, sub) => {
@@ -89,9 +94,12 @@ const getHierarchicalProjects = (): Project[] => {
       currentStage: [], // MASTER projects don't show individual task stages
       progress: overallProgress, // Show aggregated progress from all SUB projects
       allScheduleIds: allScheduleIds, // For Schedule/TableView aggregation
-      manufacturer: manufacturerFactory?.name || master.manufacturerId,
-      container: containerFactory?.name || master.containerId,
-      packaging: packagingFactory?.name || master.packagingId,
+      manufacturer: manufacturerNames.length > 0 ? manufacturerNames : '',
+      container: containerNames.length > 0 ? containerNames : '',
+      packaging: packagingNames.length > 0 ? packagingNames : '',
+      manufacturerId: manufacturerIds,
+      containerId: containerIds,
+      packagingId: packagingIds,
       // Aggregated values from SUB projects
       sales: aggregatedSales,
       purchase: aggregatedPurchase,
@@ -228,7 +236,7 @@ const getTasksForProject = (scheduleId: ProjectId): Project[] => {
 
 // Remove all mapping functions - keep enum values as-is
 
-// Helper function to get stages from tasks
+// Helper function to get stages from tasks for SUB projects
 const getStagesFromTasks = (scheduleId: ProjectId | undefined): { stages: string[], progress: number } => {
   if (!scheduleId) {
     return { stages: [], progress: 0 };
@@ -262,6 +270,39 @@ const getStagesFromTasks = (scheduleId: ProjectId | undefined): { stages: string
     };
   } catch (error) {
     // Error calculating stages
+    return { stages: [], progress: 0 };
+  }
+};
+
+// Helper function to get aggregated stages from multiple SUB projects
+const getAggregatedStagesFromSubProjects = (scheduleIds: ProjectId[]): { stages: string[], progress: number } => {
+  if (!scheduleIds || scheduleIds.length === 0) {
+    return { stages: [], progress: 0 };
+  }
+  
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    // Get all tasks from all SUB project schedules
+    const allTasks: Task[] = [];
+    scheduleIds.forEach(scheduleId => {
+      const tasks = Array.from(database.tasks.values()).filter(task => task.scheduleId === scheduleId);
+      allTasks.push(...tasks);
+    });
+    
+    if (allTasks.length === 0) {
+      return { stages: [], progress: 0 };
+    }
+    
+    // Calculate aggregated progress
+    const progressInfo = calculateProgressFromTasks(allTasks);
+    
+    return {
+      stages: progressInfo.currentStages,
+      progress: progressInfo.progress
+    };
+  } catch (error) {
     return { stages: [], progress: 0 };
   }
 };
