@@ -58,11 +58,13 @@ const ProjectTable: React.FC<ProjectTableProps> = React.memo(({
         </button>
       </div>
       <table className="w-full min-w-[1950px] table-fixed">
-      <thead className="sticky top-0 z-10 bg-white border-b border-gray-200">
+      {columns.length > 0 && (
+        <thead className="sticky top-0 z-10 bg-white border-b border-gray-200">
           <tr>
               <th className="w-8 px-1 py-1.5 text-left">
                 <div className="flex items-center justify-center">
-                  {/* 선택/확장 컨트롤 영역 */}
+                  {/* 시각적으로 숨김 - 선택/확장 컨트롤 영역 */}
+                  <span className="sr-only">선택/확장</span>
                 </div>
               </th>
               {columns.map((column) => {
@@ -105,12 +107,12 @@ const ProjectTable: React.FC<ProjectTableProps> = React.memo(({
                 );
               })}
               <th className="table-header-cell text-center w-12">
-                <svg className="w-4 h-4 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                </svg>
+                {/* 시각적으로 숨김 - 옵션 메뉴용 */}
+                <span className="sr-only">옵션</span>
               </th>
             </tr>
           </thead>
+      )}
           <tbody className="divide-y divide-gray-100">
             {projects?.map((project, index) => (
               <ProjectTableRow

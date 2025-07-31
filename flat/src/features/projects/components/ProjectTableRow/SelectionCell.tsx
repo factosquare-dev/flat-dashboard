@@ -93,60 +93,51 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
         }
       }}
     >
-      <div 
-        className="flex items-center gap-1 select-none"
-        style={{ paddingLeft: `${(project.level || 0) * 20}px` }}
-      >
-        {/* 대형 프로젝트만 확장/축소 버튼 */}
-        {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
-          <button
-            onClick={(e) => {
-              console.log('[SelectionCell] Master toggle button clicked');
-              e.stopPropagation();
-              e.preventDefault();
-              handleMasterToggle(e);
-            }}
-            onMouseDown={(e) => {
-              console.log('[SelectionCell] Master button mouseDown');
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            onMouseLeave={(e) => {
-              console.log('[SelectionCell] Master button mouseLeave - chevron button left');
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            onMouseUp={(e) => {
-              console.log('[SelectionCell] Master button mouseUp');
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            onDragStart={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            style={{ userSelect: 'none' }}
-            className="p-0.5 rounded transition-colors hover:bg-gray-200"
-            title={project.isExpanded ? "축소" : "확장"}
-          >
-            {project.isExpanded ? (
-              <ChevronDown className="w-4 h-4 text-gray-600" />
-            ) : (
-              <ChevronRight className="w-4 h-4 text-gray-600" />
-            )}
-          </button>
-        )}
+      <div className="flex items-center gap-1 select-none">
+        {/* 들여쓰기 */}
+        <div style={{ width: `${(project.level || 0) * 20}px` }} />
         
-        {/* 대형 프로젝트만 폴더 아이콘 */}
-        {isProjectType(project.type, ProjectType.MASTER) && (
-          project.isExpanded ? 
-            <FolderOpen className="w-4 h-4 text-blue-600" /> : 
-            <Folder className="w-4 h-4 text-blue-600" />
-        )}
-        
-        {/* 소형 프로젝트는 기존처럼 확장/축소 버튼과 체크박스 */}
-        {isProjectType(project.type, ProjectType.SUB) && (
-          <>
+        {/* 확장/축소 버튼 영역 - 모든 타입에서 동일한 공간 차지 */}
+        <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+          {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
+            <button
+              onClick={(e) => {
+                console.log('[SelectionCell] Master toggle button clicked');
+                e.stopPropagation();
+                e.preventDefault();
+                handleMasterToggle(e);
+              }}
+              onMouseDown={(e) => {
+                console.log('[SelectionCell] Master button mouseDown');
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onMouseLeave={(e) => {
+                console.log('[SelectionCell] Master button mouseLeave - chevron button left');
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onMouseUp={(e) => {
+                console.log('[SelectionCell] Master button mouseUp');
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onDragStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              style={{ userSelect: 'none' }}
+              className="p-0.5 rounded transition-colors hover:bg-gray-200"
+              title={project.isExpanded ? "축소" : "확장"}
+            >
+              {project.isExpanded ? (
+                <ChevronDown className="w-4 h-4 text-gray-600" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-gray-600" />
+              )}
+            </button>
+          )}
+          {isProjectType(project.type, ProjectType.SUB) && (
             <button
               onClick={handleToggleTasks}
               onMouseDown={(e) => {
@@ -168,58 +159,43 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
                 <ChevronRight className="w-3 h-3" />
               )}
             </button>
-            <input
-              type="checkbox"
-              checked={isSelected}
-              onChange={(e) => {
-                e.stopPropagation();
-                onSelect(e.target.checked);
-              }}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                if (index !== undefined && onStartDrag) {
-                  onStartDrag(index);
-                }
-              }}
-              onMouseEnter={(e) => {
-                if (isDragging && e.buttons === 1) {
-                  e.stopPropagation();
-                }
-              }}
-              className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
-              style={{ userSelect: 'none' }}
-              aria-label={`프로젝트 ${project.client} 선택`}
-            />
-          </>
-        )}
+          )}
+        </div>
         
-        {/* 태스크는 들여쓰기와 체크박스만 */}
-        {isProjectType(project.type, ProjectType.TASK) && (
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={(e) => {
+        {/* 아이콘 영역 - Master만 폴더 아이콘, 나머지는 빈 공간 */}
+        <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+          {isProjectType(project.type, ProjectType.MASTER) && (
+            project.isExpanded ? 
+              <FolderOpen className="w-4 h-4 text-blue-600" /> : 
+              <Folder className="w-4 h-4 text-blue-600" />
+          )}
+        </div>
+        
+        {/* 체크박스 - 모든 타입에서 동일한 위치 */}
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={(e) => {
+            e.stopPropagation();
+            onSelect(e.target.checked);
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            if (isProjectType(project.type, ProjectType.MASTER)) {
+              e.preventDefault();
+            } else if (index !== undefined && onStartDrag) {
+              onStartDrag(index);
+            }
+          }}
+          onMouseEnter={(e) => {
+            if (isDragging && e.buttons === 1 && !isProjectType(project.type, ProjectType.MASTER)) {
               e.stopPropagation();
-              onSelect(e.target.checked);
-            }}
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              // 드래그 시작
-              if (index !== undefined && onStartDrag) {
-                onStartDrag(index);
-              }
-            }}
-            onMouseEnter={(e) => {
-              if (isDragging && e.buttons === 1) {
-                e.stopPropagation();
-                // 드래그 중에는 행의 onMouseEnter가 처리하므로 여기서는 아무것도 하지 않음
-              }
-            }}
-            className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400"
-            style={{ userSelect: 'none' }}
-            aria-label={`프로젝트 ${project.client} 선택`}
-          />
-        )}
+            }
+          }}
+          className="w-4 h-4 rounded border border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-400 flex-shrink-0"
+          style={{ userSelect: 'none' }}
+          aria-label={`${isProjectType(project.type, ProjectType.MASTER) ? '마스터 ' : ''}프로젝트 ${project.client} 선택`}
+        />
       </div>
     </td>
   );

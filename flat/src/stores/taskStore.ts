@@ -244,25 +244,29 @@ export const useTaskStore = create<TaskStore>()(
 
       // 태스크 수정
       updateTask: async (projectId: string, taskId: string | number, updates: Partial<Task>) => {
-        const schedule = get().getScheduleForProject(projectId);
-        
-        if (!schedule) {
-          throw new Error('Schedule not found for project');
-        }
-
         set({ isLoading: true, error: null });
         
         try {
-          const updatedTask = await scheduleApi.updateTask(schedule.id, taskId, updates);
+          // projectId를 scheduleId로 사용
+          const updatedTask = await scheduleApi.updateTask(projectId, taskId, updates);
+          
+          // MockDatabase에도 업데이트
+          const { MockDatabaseImpl } = await import('../mocks/database/MockDatabase');
+          const mockDb = MockDatabaseImpl.getInstance();
+          await mockDb.update('tasks', String(taskId), updates);
           
           // 로컬 상태 업데이트
           set((state) => {
             const updatedSchedules = new Map(state.schedules);
-            const updatedSchedule = { ...schedule };
-            updatedSchedule.tasks = updatedSchedule.tasks.map(task => 
-              task.id === taskId ? updatedTask : task
-            );
-            updatedSchedules.set(schedule.id, updatedSchedule);
+            const schedule = Array.from(updatedSchedules.values()).find(s => s.projectId === projectId);
+            
+            if (schedule) {
+              const updatedSchedule = { ...schedule };
+              updatedSchedule.tasks = updatedSchedule.tasks.map(task => 
+                task.id === taskId ? updatedTask : task
+              );
+              updatedSchedules.set(schedule.id, updatedSchedule);
+            }
             
             return {
               schedules: updatedSchedules,

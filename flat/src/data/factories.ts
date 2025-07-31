@@ -204,6 +204,46 @@ export const factories: Factory[] = [
     email: 'info@saehanpack.com',
     capacity: '월 1200만개',
     certifications: ['ISO 9001', 'ISO 14001']
+  },
+
+  // 영문 회사명을 가진 추가 공장들 (formatManufacturerDisplay 테스트용)
+  {
+    id: toFactoryId('mfg-6'),
+    name: 'Global Cosmetics Co., Ltd.',
+    type: FactoryType.MANUFACTURING,
+    address: '경기도 용인시 기흥구 하갈로 110',
+    contact: '031-280-8000',
+    email: 'info@globalcosmetics.com',
+    capacity: '월 120톤',
+    certifications: ['ISO 22716', 'CGMP', 'ISO 9001'],
+    managers: [
+      {
+        name: 'John Kim',
+        email: 'john@globalcosmetics.com',
+        phone: '010-8888-9999',
+        position: 'Factory Director'
+      }
+    ]
+  },
+  {
+    id: toFactoryId('cont-6'),
+    name: 'Korea Packaging Solutions Ltd.',
+    type: FactoryType.CONTAINER,
+    address: '경기도 시흥시 공단1대로 237',
+    contact: '031-499-7777',
+    email: 'sales@kps.co.kr',
+    capacity: '월 900만개',
+    certifications: ['ISO 9001', 'ISO 14001']
+  },
+  {
+    id: toFactoryId('pack-6'),
+    name: 'Beauty Box Corporation',
+    type: FactoryType.PACKAGING,
+    address: '경기도 광주시 오포읍 신현로 55',
+    contact: '031-798-5555',
+    email: 'contact@beautybox.kr',
+    capacity: '월 1600만개',
+    certifications: ['ISO 9001', 'FSC', 'ISO 14001']
   }
 ];
 

@@ -226,6 +226,72 @@ export const isTaskStatus = (value: unknown): value is TaskStatus => {
   return Object.values(TaskStatus).includes(value as TaskStatus);
 };
 
+// Project Fields
+export enum ProjectField {
+  ID = 'id',
+  PROJECT_NUMBER = 'projectNumber',
+  NAME = 'name',
+  TYPE = 'type',
+  PARENT_ID = 'parentId',
+  STATUS = 'status',
+  CUSTOMER_ID = 'customerId',
+  CUSTOMER = 'customer',
+  PRODUCT = 'product',
+  PRODUCT_TYPE = 'productType',
+  SERVICE_TYPE = 'serviceType',
+  QUANTITY = 'quantity',
+  TOTAL_AMOUNT = 'totalAmount',
+  DEPOSIT_AMOUNT = 'depositAmount',
+  DEPOSIT_STATUS = 'depositStatus',
+  DEPOSIT_PAID = 'depositPaid',
+  START_DATE = 'startDate',
+  END_DATE = 'endDate',
+  MANUFACTURER_ID = 'manufacturerId',
+  CONTAINER_ID = 'containerId',
+  PACKAGING_ID = 'packagingId',
+  PRIORITY = 'priority',
+  PROGRESS = 'progress',
+  SCHEDULE_ID = 'scheduleId',
+  CREATED_BY = 'createdBy',
+  MANAGER_ID = 'managerId',
+  CREATED_AT = 'createdAt',
+  UPDATED_AT = 'updatedAt',
+  // UI fields
+  CLIENT = 'client',
+  MANAGER = 'manager',
+  MANUFACTURER = 'manufacturer',
+  CONTAINER = 'container',
+  PACKAGING = 'packaging',
+  CURRENT_STAGE = 'currentStage',
+  SALES = 'sales',
+  PURCHASE = 'purchase',
+}
+
+// Factory ID fields (for easier checking)
+export const FACTORY_ID_FIELDS = [
+  ProjectField.MANUFACTURER_ID,
+  ProjectField.CONTAINER_ID,
+  ProjectField.PACKAGING_ID,
+] as const;
+
+// Date fields
+export const DATE_FIELDS = [
+  ProjectField.START_DATE,
+  ProjectField.END_DATE,
+  ProjectField.CREATED_AT,
+  ProjectField.UPDATED_AT,
+] as const;
+
+// Master project editable fields
+export const MASTER_EDITABLE_FIELDS = [
+  ProjectField.NAME,
+  ProjectField.CLIENT,
+  ProjectField.STATUS,
+  ProjectField.START_DATE,
+  ProjectField.END_DATE,
+  ProjectField.SERVICE_TYPE,
+] as const;
+
 
 // UI Component Variants
 export enum BadgeVariant {

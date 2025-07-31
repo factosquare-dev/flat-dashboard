@@ -4,7 +4,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { Project } from '../../types/project';
-import { ServiceType, ProjectStatus, Priority, ProductType } from '../../types/enums';
+import { ServiceType, ProjectStatus, Priority, ProductType, ProjectType, ProjectField, FACTORY_ID_FIELDS, DATE_FIELDS } from '../../types/enums';
 import type { ProjectId } from '../../types/branded';
 import type { Schedule } from '../../types/schedule';
 import { factories } from '../../data/factories';
@@ -12,7 +12,7 @@ import { scheduleApi } from '../../api/scheduleApi';
 import { extractProjectFromSchedule } from '../../data/mockSchedules';
 import { formatDateISO } from '../../utils/coreUtils';
 import { MockDatabaseImpl } from '../../mocks/database/MockDatabase';
-import { simplifyCompanyName } from '../../utils/coreUtils';
+import { isProjectType } from '../../utils/projectTypeUtils';
 
 // Helper functions
 const getRelativeDate = (daysOffset: number): string => {
@@ -67,7 +67,6 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
       // Load projects from MockDB
       const dbResponse = await mockDb.getAll('projects');
       const dbProjects = dbResponse.success ? dbResponse.data : [];
-      console.log(`[useProjectData] Loaded ${dbProjects.length} projects from MockDB`);
       
       // Enrich projects with factory names
       const enrichedProjects = dbProjects.map(project => {
@@ -83,11 +82,11 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
             if (Array.isArray(factoryIds)) {
               enrichedProject[field] = factoryIds.map(id => {
                 const factory = mockDb.getDatabase().factories.get(id);
-                return factory ? simplifyCompanyName(factory.name) : id;
+                return factory ? factory.name : id;
               });
             } else {
               const factory = mockDb.getDatabase().factories.get(factoryIds);
-              enrichedProject[field] = factory ? simplifyCompanyName(factory.name) : factoryIds;
+              enrichedProject[field] = factory ? factory.name : factoryIds;
             }
           }
         });
@@ -116,18 +115,14 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
   }, []);
 
   const updateProject = useCallback(<K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
-    console.log('[useProjectData] updateProject called:', { projectId, field, value });
-    
     // 현재 프로젝트 찾기
     const currentProject = projects.find(p => p.id === projectId);
     if (!currentProject) {
-      console.warn('[useProjectData] Project not found:', projectId);
       return;
     }
     
     // 값이 동일하면 업데이트하지 않음 (중복 호출 방지)
     if (currentProject[field] === value) {
-      console.log('[useProjectData] Value unchanged, skipping update');
       return;
     }
     
@@ -138,14 +133,14 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
           const updatedProject = { ...project, [field]: value };
           
           // If updating factory IDs, also update the display names
-          if (field === 'manufacturerId' || field === 'containerId' || field === 'packagingId') {
+          if (FACTORY_ID_FIELDS.includes(field as any)) {
             const factoryType = field.replace('Id', '') as 'manufacturer' | 'container' | 'packaging';
             const factoryIds = value as string | string[];
             
             if (Array.isArray(factoryIds)) {
               const names = factoryIds.map(id => {
                 const factory = mockDb.getDatabase().factories.get(id);
-                return factory ? simplifyCompanyName(factory.name) : id;
+                return factory ? factory.name : id;
               });
               updatedProject[factoryType] = names;
             } else if (factoryIds) {
@@ -160,6 +155,55 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
         }
         return project;
       });
+      
+      // SUB 프로젝트가 변경되었을 때 Master 프로젝트의 집계 데이터 업데이트
+      if (isProjectType(currentProject.type, ProjectType.SUB) && currentProject.parentId) {
+        // Master 프로젝트의 모든 집계 데이터를 업데이트
+        const updateMasterAggregates = async () => {
+          try {
+            const result = await mockDb.updateMasterProjectAggregates(currentProject.parentId);
+            if (result.success) {
+              // Master project aggregates updated
+              
+              // UI 상태도 업데이트하기 위해 Master 프로젝트 다시 로드
+              const masterResult = await mockDb.getById('projects', currentProject.parentId);
+              if (masterResult.success && masterResult.data) {
+                const updatedMaster = masterResult.data;
+                
+                // Factory names 업데이트
+                const factoryFields = ['manufacturer', 'container', 'packaging'] as const;
+                factoryFields.forEach(field => {
+                  const idField = `${field}Id` as keyof typeof updatedMaster;
+                  const factoryIds = updatedMaster[idField];
+                  
+                  if (factoryIds) {
+                    if (Array.isArray(factoryIds)) {
+                      updatedMaster[field] = factoryIds.map(id => {
+                        const factory = mockDb.getDatabase().factories.get(id);
+                        return factory ? factory.name : id;
+                      });
+                    } else {
+                      const factory = mockDb.getDatabase().factories.get(factoryIds);
+                      updatedMaster[field] = factory ? simplifyCompanyName(factory.name) : factoryIds;
+                    }
+                  }
+                });
+                
+                // UI 상태 업데이트
+                setProjects(prev => prev.map(p => 
+                  p.id === currentProject.parentId ? updatedMaster : p
+                ));
+              }
+            }
+          } catch (error) {
+            console.error('[useProjectData] Failed to update master aggregates:', error);
+          }
+        };
+        
+        // 비동기로 Master 프로젝트 업데이트
+        updateMasterAggregates();
+      }
+      
       return updated;
     });
     
@@ -192,6 +236,44 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
         const result = await mockDb.create('projects', project.id, project);
         if (result.success) {
           console.log('[useProjectData] Project added to MockDB:', project.id);
+          
+          // If adding a SUB project, update Master aggregates
+          if (isProjectType(project.type, ProjectType.SUB) && project.parentId) {
+            const aggregateResult = await mockDb.updateMasterProjectAggregates(project.parentId);
+            if (aggregateResult.success) {
+              // Master project aggregates updated after adding SUB project
+              
+              // Reload Master project to update UI
+              const masterResult = await mockDb.getById('projects', project.parentId);
+              if (masterResult.success && masterResult.data) {
+                const updatedMaster = masterResult.data;
+                
+                // Update factory names
+                const factoryFields = ['manufacturer', 'container', 'packaging'] as const;
+                factoryFields.forEach(field => {
+                  const idField = `${field}Id` as keyof typeof updatedMaster;
+                  const factoryIds = updatedMaster[idField];
+                  
+                  if (factoryIds) {
+                    if (Array.isArray(factoryIds)) {
+                      updatedMaster[field] = factoryIds.map(id => {
+                        const factory = mockDb.getDatabase().factories.get(id);
+                        return factory ? factory.name : id;
+                      });
+                    } else {
+                      const factory = mockDb.getDatabase().factories.get(factoryIds);
+                      updatedMaster[field] = factory ? simplifyCompanyName(factory.name) : factoryIds;
+                    }
+                  }
+                });
+                
+                // Update UI state
+                setProjects(prev => prev.map(p => 
+                  p.id === project.parentId ? updatedMaster : p
+                ));
+              }
+            }
+          }
         } else {
           console.error('[useProjectData] Failed to add project to MockDB:', result.error);
         }

@@ -213,17 +213,18 @@ const EditableCell: React.FC<EditableCellProps> = ({
   // Display mode
   return (
     <td 
-      className={`px-2 py-2 text-xs text-gray-700 cursor-pointer group js-inline-edit ${
-        type === EditableCellType.CURRENCY ? 'text-right' : type === EditableCellType.DATE ? 'text-center' : ''
+      className={`px-3 py-1.5 text-xs text-gray-700 cursor-pointer group js-inline-edit ${
+        type === EditableCellType.CURRENCY ? 'text-right min-w-[90px]' : type === EditableCellType.DATE ? 'text-center min-w-[90px]' : ''
       }`}
       onClick={(e) => {
         e.stopPropagation();
         startEditing(project.id, field);
       }}
     >
-      <div className="relative">
-        <div className={`${type === EditableCellType.CURRENCY ? 'tabular-nums' : type === EditableCellType.DATE ? 'whitespace-nowrap' : 'truncate max-w-[140px]'} group-hover:text-gray-900 transition-colors`} title={value as string}>
-          {type === EditableCellType.CURRENCY ? formatKoreanNumber(value) : 
+      <div className={type === EditableCellType.CURRENCY ? 'overflow-hidden text-ellipsis whitespace-nowrap' : 'relative'}>
+        <div className={`${type === EditableCellType.CURRENCY ? 'text-blue-600 font-medium' : type === EditableCellType.DATE ? 'whitespace-nowrap' : 'truncate max-w-[140px]'} transition-colors`} title={value as string}>
+          {type === EditableCellType.CURRENCY ? 
+            (value !== null && value !== undefined && value !== '' ? `${formatKoreanNumber(value)}원` : '0원') : 
            type === EditableCellType.DATE ? formatDate(value as string, 'yy-MM-dd') :
            (value instanceof Date ? formatDate(value, 'yy-MM-dd') : value || '')}
         </div>

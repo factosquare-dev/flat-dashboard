@@ -34,23 +34,23 @@ export function createMasterProjects(
     product: {
       name: '프리미엄 라인',
       volume: 'Various',
-      unitPrice: 35000,
+      unitPrice: 0, // SUB에서 집계
     },
-    quantity: 50000,
-    totalAmount: 1750000000,
-    depositAmount: 525000000,
-    depositStatus: DepositStatus.RECEIVED,
+    quantity: 0, // SUB에서 집계
+    totalAmount: 0, // SUB에서 집계
+    depositAmount: 0, // SUB에서 집계
+    depositStatus: DepositStatus.PENDING,
     startDate: master1Start,
     endDate: master1End,
-    manufacturerId: 'mfg-1',
-    containerId: 'cont-1',
-    packagingId: 'pack-1',
-    priority: Priority.HIGH,
-    progress: 45,
+    manufacturerId: [], // SUB에서 집계
+    containerId: [], // SUB에서 집계
+    packagingId: [], // SUB에서 집계
+    priority: Priority.MEDIUM, // Master는 중간 우선순위
+    progress: 0, // SUB에서 집계
     scheduleId: 'schedule-1',
-    productType: ProductType.SKINCARE,
+    productType: ProductType.SKINCARE, // 표시용
     serviceType: ServiceType.ODM,
-    depositPaid: true,
+    depositPaid: false,
     managerId: pmUsers[0].id,
     createdBy: pmUsers[0].id,
     createdAt: new Date(currentDate.getTime() - 35 * 24 * 60 * 60 * 1000),
@@ -80,23 +80,23 @@ export function createMasterProjects(
     product: {
       name: '천연 라인',
       volume: 'Various',
-      unitPrice: 28000,
+      unitPrice: 0, // SUB에서 집계
     },
-    quantity: 40000,
-    totalAmount: 1120000000,
-    depositAmount: 336000000,
-    depositStatus: DepositStatus.RECEIVED,
+    quantity: 0, // SUB에서 집계
+    totalAmount: 0, // SUB에서 집계
+    depositAmount: 0, // SUB에서 집계
+    depositStatus: DepositStatus.PENDING,
     startDate: master2Start,
     endDate: master2End,
-    manufacturerId: 'mfg-2',
-    containerId: 'cont-1',
-    packagingId: 'pack-1',
-    priority: Priority.HIGH,
-    progress: 30,
+    manufacturerId: [], // SUB에서 집계
+    containerId: [], // SUB에서 집계
+    packagingId: [], // SUB에서 집계
+    priority: Priority.MEDIUM, // Master는 중간 우선순위
+    progress: 0, // SUB에서 집계
     scheduleId: 'schedule-2',
-    productType: ProductType.HAIR_CARE,
+    productType: ProductType.HAIR_CARE, // 표시용
     serviceType: ServiceType.OEM,
-    depositPaid: true,
+    depositPaid: false,
     managerId: pmUsers[0].id,
     createdBy: pmUsers[0].id,
     createdAt: new Date(currentDate.getTime() - 50 * 24 * 60 * 60 * 1000),

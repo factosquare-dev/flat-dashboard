@@ -93,15 +93,8 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
     ...props,
     projects: flatProjects,
     onSelectRow: (projectId: string, checked: boolean, index?: number) => {
-      const project = flatProjects.find(p => p.id === projectId);
-      if (project) {
-        // Master 프로젝트는 onSelectRow에서 처리하지 않음
-        // SelectionCell에서 별도의 버튼으로 처리
-        if (!isProjectType(project.type, ProjectType.MASTER)) {
-          // SUB와 TASK만 선택 가능
-          props.onSelectRow(projectId, checked, index);
-        }
-      }
+      // Now all project types including Master can be selected
+      props.onSelectRow(projectId, checked, index);
     },
     onToggleMaster: handleToggleProject,
     onMouseEnterRow: props.onMouseEnterRow,

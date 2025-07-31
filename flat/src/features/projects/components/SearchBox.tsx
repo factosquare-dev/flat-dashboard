@@ -8,6 +8,7 @@ import './SearchBox.css';
 interface SearchItem {
   id: string;
   name: string;
+  originalName?: string; // 툴팁용 원본 이름
   subText?: string;
   additionalText?: string;
   searchableText: string;
@@ -192,6 +193,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
               'search-box__item',
               index === selectedIndex && 'search-box__item--selected'
             )}
+            title={item.originalName || item.name}
           >
             <div className="search-box__item-name">{item.name}</div>
             {item.subText && (

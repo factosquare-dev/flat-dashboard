@@ -2,9 +2,10 @@ import React from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import type { UseEditableCellReturn } from '@/hooks/useEditableCell';
-import { FactoryType } from '@/types/enums';
+import { FactoryType, ProjectType } from '@/types/enums';
 import { mockDataService } from '@/services/mockDataService';
-import { simplifyCompanyName } from '@/utils/coreUtils';
+import { formatManufacturerDisplay } from '@/utils/companyUtils';
+import { isProjectType } from '@/utils/projectTypeUtils';
 import SearchBox from '../../SearchBox';
 
 interface FactoryCellProps {
@@ -32,6 +33,42 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
     }
   };
   
+  // Get original factory names for tooltip
+  const originalFactoryNames = React.useMemo(() => {
+    if (value) {
+      if (Array.isArray(value)) {
+        const firstValue = value[0];
+        if (firstValue && firstValue.match(/^(mfg|cont|pack)-\d+$/)) {
+          const factoryType = getFactoryType();
+          const factoriesData = mockDataService.getFactoriesByType(factoryType);
+          return value.map(id => {
+            const factory = factoriesData.find(f => f.id === id);
+            return factory ? factory.name : id;
+          });
+        }
+        return value;
+      }
+      if (typeof value === 'string') {
+        return value.split(',').map(f => f.trim()).filter(f => f);
+      }
+    }
+    
+    if (!factoryIds) return [];
+    
+    const factoryType = getFactoryType();
+    const factoriesData = mockDataService.getFactoriesByType(factoryType);
+    
+    if (Array.isArray(factoryIds)) {
+      return factoryIds.map(id => {
+        const factory = factoriesData.find(f => f.id === id);
+        return factory ? factory.name : id;
+      });
+    } else {
+      const factory = factoriesData.find(f => f.id === factoryIds);
+      return factory ? [factory.name] : [factoryIds];
+    }
+  }, [value, factoryIds, field]);
+  
   // Get factory names - use value if it has names, otherwise convert IDs
   const factories = React.useMemo(() => {
     // First try to use the value (which should contain names)
@@ -45,14 +82,14 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
           const factoriesData = mockDataService.getFactoriesByType(factoryType);
           return value.map(id => {
             const factory = factoriesData.find(f => f.id === id);
-            return factory ? simplifyCompanyName(factory.name) : id;
+            return factory ? formatManufacturerDisplay(factory.name) : id;
           });
         }
-        // These are already names
-        return value;
+        // These are already names - apply formatting
+        return value.map(name => formatManufacturerDisplay(name));
       }
       if (typeof value === 'string') {
-        return value.split(',').map(f => f.trim()).filter(f => f);
+        return value.split(',').map(f => f.trim()).filter(f => f).map(name => formatManufacturerDisplay(name));
       }
     }
     
@@ -65,11 +102,11 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
     if (Array.isArray(factoryIds)) {
       return factoryIds.map(id => {
         const factory = factoriesData.find(f => f.id === id);
-        return factory ? simplifyCompanyName(factory.name) : id;
+        return factory ? formatManufacturerDisplay(factory.name) : id;
       });
     } else {
       const factory = factoriesData.find(f => f.id === factoryIds);
-      return factory ? [simplifyCompanyName(factory.name)] : [factoryIds];
+      return factory ? [formatManufacturerDisplay(factory.name)] : [factoryIds];
     }
   }, [value, factoryIds, field]);
   
@@ -92,7 +129,8 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
         const manager = factory.manager;
         
         const searchableText = [
-          factory.name,
+          factory.name, // 원본 이름으로 검색 가능
+          formatManufacturerDisplay(factory.name), // 축약된 이름으로도 검색 가능
           factory.address,
           factory.contactNumber,
           manager?.name,
@@ -102,7 +140,8 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
         
         return {
           id: factory.id,
-          name: simplifyCompanyName(factory.name),
+          name: factory.name, // SearchBox에서는 원본 이름 표시
+          originalName: factory.name, // 툴팁용 원본 이름
           searchableText,
           subText: factory.address || '',
           additionalText: manager ? `담당자: ${manager.name}` : ''
@@ -120,20 +159,28 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
   const visibleFactories = factories.slice(0, visibleCount);
   const hiddenCount = factories.length - visibleCount;
   
+  // Master 프로젝트는 공장 정보를 편집할 수 없음 (SUB에서 집계된 정보 표시)
+  const isMaster = isProjectType(project.type, ProjectType.MASTER);
+  
   return (
     <td className="px-3 py-1.5 min-w-[120px] group">
       <div className="flex items-center gap-1.5 flex-nowrap overflow-hidden">
         {/* Factory pills */}
         {visibleFactories.map((factory, index) => {
-          // factory는 이미 simplifyCompanyName이 적용된 상태
+          // factory는 이미 formatManufacturerDisplay가 적용된 상태
           // 최소 3자는 보이도록, 너무 길면 말줄임
-          const displayName = factory.length > 5 ? factory.substring(0, 4) + '..' : factory;
+          const displayName = factory.length > 5 ? factory.substring(0, 3) + '..' : factory;
+          const originalName = originalFactoryNames[index] || factory;
           
           return (
             <span
               key={index}
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 whitespace-nowrap"
-              title={factory}
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                isMaster 
+                  ? 'bg-gray-50 text-gray-500 border border-gray-100' 
+                  : 'bg-gray-100 text-gray-700 border border-gray-200'
+              }`}
+              title={originalName}
             >
               {displayName}
             </span>
@@ -154,20 +201,22 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
           </button>
         )}
         
-        {/* Add button */}
-        <button
-          ref={buttonRef}
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowAddFactory(true);
-          }}
-          className="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full transition-all duration-200"
-          title={`${typeLabel} 공장 추가`}
-        >
-          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
+        {/* Add button - Master 프로젝트에서는 숨김 */}
+        {!isMaster && (
+          <button
+            ref={buttonRef}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowAddFactory(true);
+            }}
+            className="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full transition-all duration-200"
+            title={`${typeLabel} 공장 추가`}
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        )}
       </div>
       
       {/* SearchBox dropdown */}

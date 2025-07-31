@@ -202,17 +202,19 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
           }
         }}
       >
-        <SelectionCell
-          project={project}
-          isExpanded={isExpanded}
-          isSelected={isSelected}
-          isDragging={isDragging}
-          index={index}
-          onSelect={onSelect}
-          onStartDrag={onStartDrag}
-          handleToggleTasks={handleToggleTasks}
-          handleMasterToggle={handleMasterToggle}
-        />
+        {columns.length > 0 && (
+          <SelectionCell
+            project={project}
+            isExpanded={isExpanded}
+            isSelected={isSelected}
+            isDragging={isDragging}
+            index={index}
+            onSelect={onSelect}
+            onStartDrag={onStartDrag}
+            handleToggleTasks={handleToggleTasks}
+            handleMasterToggle={handleMasterToggle}
+          />
+        )}
         
         {columns.map((column) => {
           const cellRenderProps = { project, editableCell, onUpdateField, index, isDragging };
@@ -279,30 +281,32 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
           }
         })}
         
-        <td className="px-1.5 py-1.5 text-center">
-          <div className="relative inline-block">
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                const buttonRect = (e.target as HTMLElement).getBoundingClientRect();
-                const dropdownWidth = 160;
-                onShowOptionsMenu(project.id, {
-                  top: buttonRect.bottom + 2,
-                  left: buttonRect.right - dropdownWidth
-                }, e);
-              }}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors options-menu-button"
-              aria-label={`프로젝트 ${project.client} 옵션 메뉴`}
-              aria-haspopup="true"
-            >
-              <MoreVertical className="icon-sm text-gray-600" aria-hidden="true" />
-            </button>
-          </div>
-        </td>
+        {columns.length > 0 && (
+          <td className="px-1.5 py-1.5 text-center">
+            <div className="relative inline-block">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const buttonRect = (e.target as HTMLElement).getBoundingClientRect();
+                  const dropdownWidth = 160;
+                  onShowOptionsMenu(project.id, {
+                    top: buttonRect.bottom + 2,
+                    left: buttonRect.right - dropdownWidth
+                  }, e);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors options-menu-button"
+                aria-label={`프로젝트 ${project.client} 옵션 메뉴`}
+                aria-haspopup="true"
+              >
+                <MoreVertical className="icon-sm text-gray-600" aria-hidden="true" />
+              </button>
+            </div>
+          </td>
+        )}
       </tr>
       {isExpanded && (
         <tr className="bg-white border-b border-gray-200">
-          <td colSpan={columns.length + 2} className="p-0">
+          <td colSpan={columns.length + (columns.length > 0 ? 2 : 0)} className="p-0">
             <TaskList 
               projectId={project.id}
               tasks={tasks}

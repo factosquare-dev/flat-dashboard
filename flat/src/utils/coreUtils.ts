@@ -43,7 +43,7 @@ export {
 // RE-EXPORTS FROM COMPANY UTILITIES
 // ============================================================================
 
-export { simplifyCompanyName } from './companyUtils';
+export { simplifyCompanyName, formatCompanyNameForDisplay, formatManufacturerDisplay } from './companyUtils';
 
 // ============================================================================
 // RE-EXPORTS FROM STRING UTILITIES

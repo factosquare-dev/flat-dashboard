@@ -253,25 +253,11 @@ const getStagesFromTasks = (scheduleId: ProjectId | undefined): { stages: string
       return { stages: [], progress: 0 };
     }
     
-    // Found tasks
-    
-    // Check incomplete tasks if needed
-    
     // Calculate progress and current stages from actual tasks
     const progressInfo = calculateProgressFromTasks(tasks);
     
-    // Progress calculated
-    
-    // If no current stages (no tasks today), return empty array
-    // Let the UI decide how to display when there are no tasks today
-    if (progressInfo.currentStages.length === 0) {
-      // No current stages today
-      return { stages: [], progress: progressInfo.progress };
-    }
-    
-    
     return { 
-      stages: progressInfo.currentStages, 
+      stages: progressInfo.currentStages, // Return only today's task names
       progress: progressInfo.progress 
     };
   } catch (error) {
@@ -285,7 +271,6 @@ let _hierarchicalProjects: Project[] | null = null;
 
 export const getHierarchicalProjectsData = (): Project[] => {
   // Always get fresh data, don't cache
-  console.log('[getHierarchicalProjectsData] Getting fresh data - this will reset isExpanded to true!');
   _hierarchicalProjects = getHierarchicalProjects();
   return _hierarchicalProjects;
 };

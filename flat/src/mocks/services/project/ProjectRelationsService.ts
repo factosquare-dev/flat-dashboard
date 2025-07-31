@@ -40,8 +40,8 @@ export class ProjectRelationsService extends BaseService<Project> {
     
     const project = projectResult.data;
     
-    // Create schedule for the project
-    const scheduleId = this.generateId();
+    // Create schedule for the project with same ID as project
+    const scheduleId = project.id; // Use project ID as schedule ID
     const schedule: Schedule = {
       id: scheduleId,
       projectId: project.id,

@@ -6,9 +6,27 @@ import PriorityDropdown from '../../PriorityDropdown';
 import ServiceTypeDropdown from '../../ServiceTypeDropdown';
 import StatusDropdown from '../../StatusDropdown';
 import ProductTypeDropdown from '../../ProductTypeDropdown';
-import { ProjectType } from '@/types/enums';
+import { ProjectType, Priority, PriorityLabel } from '@/types/enums';
 import { isProjectType } from '@/utils/projectTypeUtils';
 import { getSubProjectCount } from '@/utils/projectUtils';
+
+// Master 프로젝트에서 편집 가능한 필드 정의
+const MASTER_EDITABLE_FIELDS = new Set([
+  'name',        // 프로젝트명
+  'client',      // 고객명  
+  'status',      // 상태
+  'startDate',   // 시작일
+  'endDate',     // 마감일
+  'serviceType'  // 서비스 타입
+]);
+
+// Master 프로젝트에서 필드 편집 가능 여부 확인
+const isMasterFieldEditable = (project: Project, field: string): boolean => {
+  if (!isProjectType(project.type, ProjectType.MASTER)) {
+    return true; // Master가 아니면 모든 필드 편집 가능
+  }
+  return MASTER_EDITABLE_FIELDS.has(field);
+};
 
 interface CellRenderProps {
   project: Project;
@@ -74,11 +92,28 @@ export const renderStatus = ({ project, onUpdateField }: CellRenderProps) => (
   </td>
 );
 
-export const renderPriority = ({ project, onUpdateField }: CellRenderProps) => (
-  <td className="px-3 py-1.5">
-    <PriorityDropdown 
-      value={project.priority}
-      onChange={(value) => onUpdateField(project.id, 'priority', value)}
-    />
-  </td>
-);
+export const renderPriority = ({ project, onUpdateField }: CellRenderProps) => {
+  const isEditable = isMasterFieldEditable(project, 'priority');
+  
+  if (!isEditable) {
+    // Master 프로젝트는 우선순위를 편집할 수 없음 (집계된 값 또는 기본값 표시)
+    const priorityText = PriorityLabel[project.priority] || '보통';
+    
+    return (
+      <td className="px-3 py-1.5 text-xs text-gray-900" title={priorityText}>
+        <div className="overflow-hidden text-ellipsis whitespace-nowrap text-gray-500">
+          {priorityText}
+        </div>
+      </td>
+    );
+  }
+  
+  return (
+    <td className="px-3 py-1.5">
+      <PriorityDropdown 
+        value={project.priority}
+        onChange={(value) => onUpdateField(project.id, 'priority', value)}
+      />
+    </td>
+  );
+};

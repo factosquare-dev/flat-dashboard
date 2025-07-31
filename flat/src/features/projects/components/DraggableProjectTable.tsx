@@ -208,7 +208,19 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 project={project}
                 index={index}
                 columns={visibleColumns}
-                isSelected={selectedRows.includes(project.id)}
+                isSelected={(() => {
+                  if (isProjectType(project.type, ProjectType.MASTER)) {
+                    // For Master projects, check if all children are selected
+                    const children = projects.filter(p => p.parentId === project.id);
+                    if (children.length === 0) {
+                      return selectedRows.includes(project.id);
+                    }
+                    // Master is selected if all its children are selected
+                    const allChildrenSelected = children.every(child => selectedRows.includes(child.id));
+                    return allChildrenSelected && selectedRows.includes(project.id);
+                  }
+                  return selectedRows.includes(project.id);
+                })()}
                 onSelect={(checked) => onSelectRow(project.id, checked, index)}
                 onRowClick={onSelectProject}
                 onUpdateField={onUpdateProject}

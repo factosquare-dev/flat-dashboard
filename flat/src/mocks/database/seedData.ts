@@ -103,6 +103,9 @@ export const seedData = {
     const projectTypeMappings = this.createProjectTypeMappings();
     projectTypeMappings.forEach(ptm => db.projectTypeMappings.set(ptm.id, ptm));
 
+    // Note: Master project aggregates will be updated after database initialization
+    // to avoid circular dependency with MockDatabaseImpl.getInstance()
+    
     return db;
   },
 

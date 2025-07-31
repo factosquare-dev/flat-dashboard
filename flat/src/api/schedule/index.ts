@@ -87,9 +87,26 @@ export const scheduleApi = {
   // 프로젝트 ID로 스케줄 조회
   getScheduleByProjectId: async (projectId: string): Promise<Schedule | null> => {
     if (USE_MOCK_DATA) {
-      const schedule = Array.from(mockSchedules.values())
+      // MockDatabase에서 직접 가져오기
+      const { MockDatabaseImpl } = await import('../../mocks/database/MockDatabase');
+      const mockDb = MockDatabaseImpl.getInstance();
+      const database = mockDb.getDatabase();
+      
+      const schedule = Array.from(database.schedules.values())
         .find(s => s.projectId === projectId);
-      return schedule || null;
+      
+      if (schedule) {
+        // Schedule에 연관된 tasks 가져오기
+        const tasks = Array.from(database.tasks.values())
+          .filter(task => task.scheduleId === schedule.id);
+        
+        return {
+          ...schedule,
+          tasks
+        };
+      }
+      
+      return null;
     }
 
     try {
@@ -145,37 +162,59 @@ export const scheduleApi = {
   // 태스크 추가
   addTask: async (scheduleId: string, task: Omit<Task, 'id'>): Promise<Task> => {
     if (USE_MOCK_DATA) {
-      const schedule = mockSchedules.get(scheduleId);
+      // MockDatabase에서 직접 추가
+      const { MockDatabaseImpl } = await import('../../mocks/database/MockDatabase');
+      const mockDb = MockDatabaseImpl.getInstance();
+      const database = mockDb.getDatabase();
+      
+      const schedule = database.schedules.get(scheduleId);
       if (!schedule) throw new Error('Schedule not found');
       
-      const updatedSchedule = addTaskToSchedule(schedule, task);
-      mockSchedules.set(scheduleId, updatedSchedule);
+      // 새 Task ID 생성
+      const taskId = `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
-      return updatedSchedule.tasks[updatedSchedule.tasks.length - 1];
+      const newTask: Task = {
+        ...task,
+        id: taskId,
+        scheduleId,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      await mockDb.create('tasks', taskId, newTask);
+      
+      return newTask;
     }
 
     const response = await apiClient.post<Task>(`/schedules/${scheduleId}/tasks`, task);
     return response.data;
   },
 
-  // 태스크 수정
-  updateTask: async (scheduleId: string, taskId: number | string, updates: Partial<Task>): Promise<Task> => {
+  // 태스크 수정 (projectId를 받음)
+  updateTask: async (projectId: string, taskId: number | string, updates: Partial<Task>): Promise<Task> => {
     if (USE_MOCK_DATA) {
-      const schedule = mockSchedules.get(scheduleId);
-      if (!schedule) throw new Error('Schedule not found');
+      // MockDatabase에서 직접 업데이트
+      const { MockDatabaseImpl } = await import('../../mocks/database/MockDatabase');
+      const mockDb = MockDatabaseImpl.getInstance();
+      const database = mockDb.getDatabase();
       
-      const updatedSchedule = updateTaskInSchedule(schedule, taskId, updates);
-      if (!updatedSchedule) throw new Error('Task not found');
+      // task를 직접 찾아서 업데이트
+      const task = database.tasks.get(String(taskId));
+      if (!task) throw new Error('Task not found');
       
-      mockSchedules.set(scheduleId, updatedSchedule);
+      // Task 업데이트
+      const updatedTask = {
+        ...task,
+        ...updates,
+        updatedAt: new Date()
+      };
       
-      const updatedTask = updatedSchedule.tasks.find(t => t.id === taskId);
-      if (!updatedTask) throw new Error('Task not found');
+      await mockDb.update('tasks', String(taskId), updatedTask);
       
       return updatedTask;
     }
 
-    const response = await apiClient.put<Task>(`/schedules/${scheduleId}/tasks/${taskId}`, updates);
+    const response = await apiClient.put<Task>(`/schedules/${projectId}/tasks/${taskId}`, updates);
     return response.data;
   },
 

@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTaskStore } from '../../../../stores/taskStore';
 import type { Project } from '../../../../types/project';
-
-interface Task {
-  id: string;
-  name: string;
-  completed: boolean;
-}
+import { TaskStatus } from '../../../../types/enums';
 
 interface UseTaskManagementProps {
   project?: Project;
@@ -27,12 +22,8 @@ export const useTaskManagement = (props?: UseTaskManagementProps) => {
   // Get tasks from store
   const scheduleTasks = project ? getTasksForProject(project.id) : [];
   
-  // Convert schedule tasks to simplified format for TaskList component
-  const tasks: Task[] = scheduleTasks.map(task => ({
-    id: String(task.id),
-    name: task.title || task.taskType || 'Unnamed Task',
-    completed: task.status === 'completed'
-  }));
+  // Pass full task information to TaskList
+  const tasks = scheduleTasks;
 
   const handleToggleTasks = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -44,7 +35,7 @@ export const useTaskManagement = (props?: UseTaskManagementProps) => {
     
     const task = scheduleTasks.find(t => String(t.id) === taskId);
     if (task) {
-      const newStatus = task.status === 'completed' ? 'in-progress' : 'completed';
+      const newStatus = task.status === TaskStatus.COMPLETED ? TaskStatus.IN_PROGRESS : TaskStatus.COMPLETED;
       await updateTask(project.id, task.id, { status: newStatus });
     }
   };

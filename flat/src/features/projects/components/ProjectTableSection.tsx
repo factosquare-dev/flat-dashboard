@@ -58,7 +58,6 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   
   // 계층형 데이터를 메모이제이션
   const hierarchicalProjects = useMemo(() => {
-    console.log('[ProjectTableSection] Getting hierarchical projects data');
     return getHierarchicalProjectsData();
   }, [projects]); // projects가 변경될 때만 재계산
   
@@ -134,7 +133,32 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
   
   const handleSelectRow = (projectId: string, checked: boolean, index?: number) => {
-    handleSelectItem(projectId, checked);
+    // Check if this is a Master project
+    const project = allProjects.find(p => p.id === projectId);
+    
+    if (project && isProjectType(project.type, ProjectType.MASTER)) {
+      // For Master projects, select/deselect all its children
+      const childrenIds = allProjects
+        .filter(p => p.parentId === projectId)
+        .map(p => p.id);
+      
+      if (checked) {
+        // Add Master and all children to selection
+        const newSelection = new Set(selectedRows);
+        newSelection.add(projectId);
+        childrenIds.forEach(id => newSelection.add(id));
+        setSelectedRows(Array.from(newSelection));
+      } else {
+        // Remove Master and all children from selection
+        const newSelection = selectedRows.filter(id => 
+          id !== projectId && !childrenIds.includes(id)
+        );
+        setSelectedRows(newSelection);
+      }
+    } else {
+      // For non-Master projects, use the regular selection logic
+      handleSelectItem(projectId, checked);
+    }
   };
 
   const handleMouseEnterRow = (index: number) => {
@@ -186,11 +210,8 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
   
   const handleUpdateProject = <K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
-    console.log('[ProjectTableSection] handleUpdateProject called:', { projectId, field, value });
     if (onUpdateProject) {
       onUpdateProject(projectId, field, value);
-    } else {
-      console.error('[ProjectTableSection] onUpdateProject is not defined!');
     }
   };
 
