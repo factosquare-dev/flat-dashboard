@@ -6,7 +6,7 @@ import { FactoryType, ProjectType, ProjectFactoryField, ProjectFactoryIdField, F
 import { mockDataService } from '@/services/mockDataService';
 import { formatManufacturerDisplay } from '@/utils/companyUtils';
 import { isProjectType } from '@/utils/projectTypeUtils';
-import SearchBox from '../../SearchBox';
+import SearchBox from '@/features/projects/components/SearchBox';
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 interface FactoryCellProps {
@@ -99,20 +99,6 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
   
   // Get factory names - use value if it has names, otherwise convert IDs
   const factories = React.useMemo(() => {
-    // Debug log for Master projects
-    if (isProjectType(project.type, ProjectType.MASTER)) {
-      console.log('[FactoryCell] Master project factory data:', {
-        projectId: project.id,
-        field,
-        value,
-        valueType: typeof value,
-        isArray: Array.isArray(value),
-        valueStringified: JSON.stringify(value),
-        factoryIds,
-        factoryIdsType: typeof factoryIds,
-        factoryIdsIsArray: Array.isArray(factoryIds)
-      });
-    }
     
     // First try to use the value (which should contain names)
     if (value) {
@@ -279,12 +265,10 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
             
             // 중첩 배열 감지 및 평탄화
             if (currentIds.length === 1 && Array.isArray(currentIds[0])) {
-              console.warn('[FactoryCell] Detected nested array in currentIds, flattening');
               currentIds = currentIds[0];
             }
             
             if (currentIds.includes(item.id)) {
-              console.warn(`Factory ${item.id} already added`);
               setShowAddFactory(false);
               return;
             }

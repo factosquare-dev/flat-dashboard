@@ -1,6 +1,7 @@
 import React from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
+import { ModalSize } from '@/types/enums';
 
 interface LoadingStateProps {
   isLoading: boolean;
@@ -26,7 +27,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   if (isLoading) {
     return (
       <div className={cn('flex items-center justify-center min-h-[200px]', className)}>
-        {loadingComponent || <LoadingSpinner size="lg" />}
+        {loadingComponent || <LoadingSpinner size={ModalSize.LG} />}
       </div>
     );
   }

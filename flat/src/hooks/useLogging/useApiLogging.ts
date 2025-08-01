@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { logger, PerformanceLogger } from '../../utils/logger';
+import { logger, PerformanceLogger } from '@/utils/logger';
 
 /**
  * Hook for API request logging with automatic retry logic

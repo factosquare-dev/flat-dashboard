@@ -4,8 +4,9 @@ import CategoryTree from './CategoryTree';
 import CategoryEditModal from './CategoryEditModal';
 import FloatingActionButton from '../common/FloatingActionButton';
 import type { ProductCategory, ProductCategoryId } from '../../types/productCategory';
-import { generateProductCategoryId } from '../../types/branded';
-import { mockDataService } from '../../services/mockDataService';
+import { generateProductCategoryId } from '@/types/branded';
+import { mockDataService } from '@/services/mockDataService';
+import { ButtonVariant } from '@/types/enums';
 
 const ProductTypeCategoryManager: React.FC = () => {
   const [categories, setCategories] = useState<ProductCategory[]>(() => {
@@ -266,7 +267,7 @@ const ProductTypeCategoryManager: React.FC = () => {
         onClick={() => handleAddCategory()}
         icon={<Plus />}
         label="카테고리 추가"
-        variant="primary"
+        variant={ButtonVariant.PRIMARY}
         position="first"
       />
 

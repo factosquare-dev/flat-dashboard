@@ -3,9 +3,9 @@
  */
 
 import type { Task, Participant } from '../../../../types/schedule';
-import { findAvailableDateRange } from '../../../../utils/taskUtils';
-import { factories } from '../../../../data/factories';
-import { mockDataService } from '../../../../services/mockDataService';
+import { findAvailableDateRange } from '@/utils/taskUtils';
+import { factories } from '@/data/factories';
+import { mockDataService } from '@/services/mockDataService';
 
 export const validateFactoryCompatibility = (
   task: Task,

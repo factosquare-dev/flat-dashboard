@@ -4,7 +4,7 @@
 
 import type { Task, ModalState } from '../../../../types/schedule';
 import type { DragState } from './types';
-import { setInteractionMode, setDragImageElement } from '../../utils/globalState';
+import { setInteractionMode, setDragImageElement } from '@/utils/schedule/globalState';
 
 export const initializeDragState = (
   task: Task,

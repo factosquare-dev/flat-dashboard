@@ -3,11 +3,11 @@
  */
 
 import React, { useMemo } from 'react';
-import { logError } from '../../utils/errorHandling';
-import { ModalVariant, ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
+import { logError } from '@/utils/errorHandling';
+import { ModalVariant, ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
 import { Button } from '../ui/Button';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 import './ConfirmationModal.css';
 
 interface ConfirmationModalProps {

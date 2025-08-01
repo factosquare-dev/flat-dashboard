@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback } from 'react';
 import type { DragState } from '../../types/gantt';
-import { GANTT_CONSTANTS, TOTAL_DAYS } from '../../constants/gantt';
-import { getTodayIndex, isTodayInRange, isWeekendColumn } from '../../utils/ganttUtils';
-import { cn } from '../../utils/cn';
+import { GANTT_CONSTANTS, TOTAL_DAYS } from '@/constants/gantt';
+import { getTodayIndex, isTodayInRange, isWeekendColumn } from '@/utils/ganttUtils';
+import { cn } from '@/utils/cn';
 import './GanttGrid.css';
 
 interface GanttGridProps {

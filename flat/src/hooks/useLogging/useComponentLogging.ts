@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { logger } from '../../utils/logger';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook for component lifecycle logging

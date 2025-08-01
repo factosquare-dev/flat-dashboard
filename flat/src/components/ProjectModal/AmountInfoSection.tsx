@@ -1,7 +1,7 @@
 import React from 'react';
 import { DollarSign } from 'lucide-react';
 import type { ProjectData } from './types';
-import { formatCurrency } from '../../utils/coreUtils';
+import { formatCurrency } from '@/utils/coreUtils';
 import './AmountInfoSection.css';
 
 interface AmountInfoSectionProps {

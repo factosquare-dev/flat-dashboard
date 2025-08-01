@@ -1,6 +1,6 @@
 import type { Factory, FactoryType } from '../../types/factory';
 import type { ApiResponse } from '../../types/api';
-import { toFactoryId, toFactoryIdSafe, toUserId } from '../../types/branded';
+import { toFactoryId, toFactoryIdSafe, toUserId } from '@/types/branded';
 
 // API Response interfaces
 interface ApiFactory {

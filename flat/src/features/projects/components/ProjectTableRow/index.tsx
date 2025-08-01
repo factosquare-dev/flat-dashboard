@@ -25,6 +25,8 @@ interface ProjectTableRowProps {
   onStartDrag?: (index: number) => void;
   onDragStart?: (e: React.DragEvent, projectId: ProjectId) => void;
   onDragEnd?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent, project: Project) => void;
   onToggleMaster?: (projectId: ProjectId) => void;
 }
 
@@ -42,10 +44,13 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
   onStartDrag,
   onDragStart,
   onDragEnd,
+  onDragOver,
+  onDrop,
   onToggleMaster
 }) => {
   const editableCell = useEditableCell();
   const { isExpanded, tasks, handleToggleTasks, handleTaskToggle } = useTaskManagement({ project });
+  const [isDragOver, setIsDragOver] = React.useState(false);
   
   const handleMasterToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -153,6 +158,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
         data-id={project.id}
         data-project-type={project.type}
         className={`group hover:bg-gray-50/30 transition-all duration-200 border-b border-gray-50 ${
+          isProjectType(project.type, ProjectType.MASTER) && isDragOver ? 'bg-blue-100' : ''
+        } ${
           isProjectType(project.type, ProjectType.SUB) ? 'cursor-move' : 'cursor-pointer'
         }`}
         onClick={handleRowClick}
@@ -195,6 +202,18 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
           onDragStart(e, project.id);
         } : undefined}
         onDragEnd={onDragEnd}
+        onDragOver={isProjectType(project.type, ProjectType.MASTER) ? (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          setIsDragOver(true);
+          if (onDragOver) onDragOver(e);
+        } : undefined}
+        onDragLeave={isProjectType(project.type, ProjectType.MASTER) ? () => setIsDragOver(false) : undefined}
+        onDrop={onDrop ? (e) => {
+          e.preventDefault();
+          setIsDragOver(false);
+          onDrop(e, project);
+        } : undefined}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();

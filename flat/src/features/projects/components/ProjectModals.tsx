@@ -1,10 +1,10 @@
 import React, { lazy, useCallback } from 'react';
 import type { Project } from '../../../types/project';
-import LazyBoundary from '../../../components/common/LazyBoundary';
+import LazyBoundary from '@/components/common/LazyBoundary';
 
 // Lazy load modal components
-const EmailModal = lazy(() => import('../../../components/EmailModal/index'));
-const ProjectModal = lazy(() => import('../../../components/ProjectModal/index'));
+const EmailModal = lazy(() => import('@/components/EmailModal/index'));
+const ProjectModal = lazy(() => import('@/components/ProjectModal/index'));
 
 interface ProjectModalsProps {
   showEmailModal: boolean;

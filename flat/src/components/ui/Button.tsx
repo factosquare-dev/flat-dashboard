@@ -1,7 +1,7 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
-import { ButtonVariant, Size } from '../../types/enums';
-import { cn } from '../../utils/cn';
+import { ButtonVariant, Size } from '@/types/enums';
+import { cn } from '@/utils/cn';
 import './Button.css';
 
 const variantClassMap = {

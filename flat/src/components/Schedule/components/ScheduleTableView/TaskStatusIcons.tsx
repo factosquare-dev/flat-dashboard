@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Task } from '../../../../types/schedule';
-import { TaskStatus } from '../../../../types/enums';
+import { TaskStatus } from '@/types/enums';
 
 interface TaskStatusIconsProps {
   task: Task;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentSize } from '../../types/enums';
+import { ComponentSize } from '@/types/enums';
 import './EmptyState.css';
 
 interface EmptyStateAction {

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FactoryFormData } from './types';
-import { FACTORY_FORM_LABELS } from '../../../constants';
-import { FactoryType, FactoryTypeLabel } from '../../../types/enums';
+import { FACTORY_FORM_LABELS } from '@/constants';
+import { FactoryType, FactoryTypeLabel } from '@/types/enums';
 
 interface BasicInfoFormProps {
   formData: FactoryFormData;

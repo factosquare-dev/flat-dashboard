@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { ArrowUp, ArrowDown, Users, FolderOpen, Package, TrendingUp } from 'lucide-react';
-import { useStore } from '../../store';
-import { ProjectStatus } from '../../types/enums';
-import { logError } from '../../utils/errorHandling';
-import { LoadingState } from '../../components/loading/LoadingState';
-import { EmptyState } from '../../components/common';
+import { useStore } from '@/store';
+import { ProjectStatus } from '@/types/enums';
+import { logError } from '@/utils/errorHandling';
+import { LoadingState } from '@/components/loading/LoadingState';
+import { EmptyState } from '@/components/common';
 
 const Dashboard: React.FC = () => {
   const { projects } = useStore();

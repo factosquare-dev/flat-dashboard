@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { MoreVertical, User } from 'lucide-react';
-import { useClickOutside } from '../../hooks/useClickOutside';
-import { cn } from '../../utils/classNames';
+import { useClickOutside } from '@/hooks/useClickOutside';
+import { cn } from '@/utils/classNames';
 import type { UserRole } from '../../store/slices/userSlice';
 import styles from './UserCard.module.css';
 

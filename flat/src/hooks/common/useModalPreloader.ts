@@ -39,20 +39,20 @@ const defaultPreloadConfigs: ModalPreloadConfig[] = [
 
 // Modal import registry
 const modalImports = {
-  'confirmation': () => import('../../components/Modal/ConfirmationModal'),
-  'project-create': () => import('../../features/projects/components/ProjectCreateModal'),
-  'project-edit': () => import('../../features/projects/components/ProjectEditModal'),
-  'project-delete': () => import('../../features/projects/components/ProjectDeleteModal'),
-  'task-create': () => import('../../components/Schedule/components/TaskCreateModal'),
-  'task-edit': () => import('../../components/Schedule/components/TaskEditModal'),
-  'task-delete': () => import('../../components/Schedule/components/TaskDeleteModal'),
-  'factory-create': () => import('../../features/factories/components/FactoryCreateModal'),
-  'factory-edit': () => import('../../features/factories/components/FactoryEditModal'),
-  'user-create': () => import('../../features/users/components/UserCreateModal'),
-  'user-edit': () => import('../../features/users/components/UserEditModal'),
-  'email-compose': () => import('../../features/email/components/ComposeEmailModal'),
-  'workflow-create': () => import('../../features/workflow/components/WorkflowCreateModal'),
-  'settings': () => import('../../features/settings/components/SettingsModal'),
+  'confirmation': () => import('@/components/Modal/ConfirmationModal'),
+  'project-create': () => import('@/features/projects/components/ProjectCreateModal'),
+  'project-edit': () => import('@/features/projects/components/ProjectEditModal'),
+  'project-delete': () => import('@/features/projects/components/ProjectDeleteModal'),
+  'task-create': () => import('@/components/Schedule/components/TaskCreateModal'),
+  'task-edit': () => import('@/components/Schedule/components/TaskEditModal'),
+  'task-delete': () => import('@/components/Schedule/components/TaskDeleteModal'),
+  'factory-create': () => import('@/features/factories/components/FactoryCreateModal'),
+  'factory-edit': () => import('@/features/factories/components/FactoryEditModal'),
+  'user-create': () => import('@/features/users/components/UserCreateModal'),
+  'user-edit': () => import('@/features/users/components/UserEditModal'),
+  'email-compose': () => import('@/features/email/components/ComposeEmailModal'),
+  'workflow-create': () => import('@/features/workflow/components/WorkflowCreateModal'),
+  'settings': () => import('@/features/settings/components/SettingsModal'),
 } as const;
 
 // Track preloaded modals to avoid duplicate requests

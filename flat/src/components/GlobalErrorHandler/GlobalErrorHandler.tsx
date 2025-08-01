@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useErrorHandler } from '../../hooks/useErrorHandler';
-import { logger } from '../../utils/logger';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { logger } from '@/utils/logger';
 
 export const GlobalErrorHandler: React.FC = () => {
   const { handleError } = useErrorHandler();

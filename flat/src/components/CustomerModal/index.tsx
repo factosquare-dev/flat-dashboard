@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Save } from 'lucide-react';
-import { APP_CONSTANTS } from '../../config/constants';
+import { APP_CONSTANTS } from '@/config/constants';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
 import { Button } from '../ui/Button';
 import BasicInfoSection from './components/BasicInfoSection';
 import ContactInfoSection from './components/ContactInfoSection';
 import AdditionalInfoSection from './components/AdditionalInfoSection';
-import { validateCustomerForm, getInitialFormData, CustomerFormData } from './utils/validation';
-import { ModalSize } from '../../types/enums';
-import { getModalSizeString } from '../../utils/modalUtils';
+import { validateCustomerForm, getInitialFormData, CustomerFormData } from '@/utils/customer/validation';
+import { ModalSize } from '@/types/enums';
+import { getModalSizeString } from '@/utils/modalUtils';
 import type { Customer } from '@/types/customer';
 
 interface CustomerModalProps {

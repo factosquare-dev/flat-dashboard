@@ -1,5 +1,5 @@
 import type { ProductCategory, ProductCategoryId } from '../../../types/productCategory';
-import { generateProductCategoryId } from '../../../types/branded';
+import { generateProductCategoryId } from '@/types/branded';
 
 export function createProductCategories(): ProductCategory[] {
   const categories: ProductCategory[] = [

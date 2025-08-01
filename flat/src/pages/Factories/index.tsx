@@ -1,16 +1,17 @@
 import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { factories, type Factory as FactoryType } from '../../data/factories';
+import { factories, type Factory as FactoryType } from '@/data/factories';
 import FactoryModal, { type FactoryFormData } from '../../components/Factories/FactoryModal';
-import FactoryCard from '../../components/Factories/FactoryCard';
-import FactoryToolbar from '../../components/Factories/FactoryToolbar';
-import FloatingActionButton from '../../components/common/FloatingActionButton';
-import { useFactoryFilter } from '../../hooks/useFactoryFilter';
-import { useModalState } from '../../hooks/useModalState';
+import FactoryCard from '@/components/Factories/FactoryCard';
+import FactoryToolbar from '@/components/Factories/FactoryToolbar';
+import FloatingActionButton from '@/components/common/FloatingActionButton';
+import { useFactoryFilter } from '@/hooks/useFactoryFilter';
+import { useModalState } from '@/hooks/useModalState';
 import { Building2, Tags } from 'lucide-react';
-import { LoadingState } from '../../components/loading/LoadingState';
-import { logError } from '../../utils/errorHandling';
-import { useToast } from '../../hooks/useToast';
+import { LoadingState } from '@/components/loading/LoadingState';
+import { logError } from '@/utils/errorHandling';
+import { useToast } from '@/hooks/useToast';
+import { ButtonVariant } from '@/types/enums';
 
 const FactoriesPage: React.FC = () => {
   const modalState = useModalState<FactoryType | null>(false, null);
@@ -136,7 +137,7 @@ const FactoriesPage: React.FC = () => {
         onClick={handleAddFactory}
         icon={<Building2 />}
         label="새 공장 추가"
-        variant="primary"
+        variant={ButtonVariant.PRIMARY}
         position="first"
       />
 

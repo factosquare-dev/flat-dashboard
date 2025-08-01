@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useProjects } from '../../../../features/projects/hooks/useProjects';
-import { projectService } from '../../../../features/projects/services';
+import { useProjects } from '@/features/projects/hooks/useProjects';
+import { projectService } from '@/features/projects/services';
 
 // Mock the project service
 vi.mock('../../../../features/projects/services', () => ({

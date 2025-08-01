@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ServiceType } from '../../../types/project';
-import { getServiceTypeDisplayName, getAllServiceTypes } from '../../../utils/serviceTypeUtils';
+import { getServiceTypeDisplayName, getAllServiceTypes } from '@/utils/serviceTypeUtils';
 import '../../../design-system/styles/dropdown.css';
 
 interface ServiceTypeDropdownProps {

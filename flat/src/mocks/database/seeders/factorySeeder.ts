@@ -1,7 +1,7 @@
 import { Factory } from '@/types/factory';
-import { TIME_CONSTANTS } from '../../../constants/time';
+import { TIME_CONSTANTS } from '@/constants/time';
 import { FactoryType } from '@/types/enums';
-import { factories as originalFactories } from '../../../data/factories';
+import { factories as originalFactories } from '@/data/factories';
 
 export const createFactories = (): Factory[] => {
   // Convert all 15 factories from the original data

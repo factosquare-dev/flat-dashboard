@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckSquare } from 'lucide-react';
-import { mockDataService } from '../../services/mockDataService';
+import { mockDataService } from '@/services/mockDataService';
 
 interface TaskSelectionProps {
   selectedFactory: string;

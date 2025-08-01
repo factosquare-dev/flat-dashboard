@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Task } from '../../../types/schedule';
-import { getInteractionState } from '../utils/globalState';
-import { TaskStatus } from '../../../types/enums';
+import { getInteractionState } from '@/utils/schedule/globalState';
+import { TaskStatus } from '@/types/enums';
 import './TaskItem.css';
 
 interface TaskItemProps {

@@ -2,12 +2,12 @@ import React, { useState, useRef } from 'react';
 import type { Project } from '../../../types/project';
 import type { ProjectId } from '../../../types/branded';
 import ProjectTableRow from './ProjectTableRow/index';
-import { useColumnOrder } from '../../../hooks/useColumnOrder';
+import { useColumnOrder } from '@/hooks/useColumnOrder';
 import type { Column } from '../../../hooks/useColumnOrder';
-import { useColumnResize } from '../../../hooks/useColumnResize';
-import { ProjectType } from '../../../types/enums';
-import { isProjectType } from '../../../utils/projectTypeUtils';
-import { useProjectHierarchy } from '../../../hooks/useProjectHierarchy';
+import { useColumnResize } from '@/hooks/useColumnResize';
+import { ProjectType } from '@/types/enums';
+import { isProjectType } from '@/utils/projectTypeUtils';
+import { useProjectHierarchy } from '@/hooks/useProjectHierarchy';
 import '../../../styles/tableResize.css';
 
 interface DraggableProjectTableProps {
@@ -102,27 +102,38 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
 
   const handleProjectDrop = (e: React.DragEvent, targetProject: Project) => {
     e.preventDefault();
-    e.stopPropagation(); // 항상 버블링 중지 - 상위 컨테이너로 전파 방지
     
-    console.log('[DraggableProjectTable] Drop event:', {
-      draggedProjectId,
-      targetProjectId: targetProject.id,
-      targetProjectType: targetProject.type,
-      isMaster: isProjectType(targetProject.type, ProjectType.MASTER),
-      ProjectType,
-      targetTypeRaw: targetProject.type
-    });
+    // If dropping on itself, stop propagation and do nothing
+    if (!draggedProjectId || draggedProjectId === targetProject.id) {
+      e.stopPropagation();
+      setDraggedProjectId(null);
+      return;
+    }
     
-    if (!draggedProjectId || draggedProjectId === targetProject.id) return;
+    // Find dragged project first
+    const draggedProject = projects.find(p => p.id === draggedProjectId);
+    if (!draggedProject) return;
     
-    // 드롭 대상이 MASTER 프로젝트인 경우 처리
+    // Check if dropping on MASTER project
     if (isProjectType(targetProject.type, ProjectType.MASTER)) {
-      console.log('[DraggableProjectTable] Calling moveToMaster:', draggedProjectId, '->', targetProject.id);
+      e.stopPropagation(); // Always stop propagation when dropping on MASTER
+      
+      // Check if already in the same parent
+      if (draggedProject.parentId === targetProject.id) {
+        // Already in the same parent, do nothing
+        setDraggedProjectId(null);
+        return;
+      }
+      
       moveToMaster(draggedProjectId, targetProject.id);
       setDraggedProjectId(null);
-    } else {
-      console.log('[DraggableProjectTable] Not a MASTER project, skipping');
+    } else if (isProjectType(targetProject.type, ProjectType.SUB)) {
+      // Dropping on SUB project - always stop propagation to prevent making it independent
+      e.stopPropagation();
+      setDraggedProjectId(null);
+      return;
     }
+    // If not handled above, let event bubble to container for independent project handling
   };
 
   const renderHeaderCell = (column: Column) => {
@@ -230,6 +241,8 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 onStartDrag={onStartDrag ? () => onStartDrag(index) : undefined}
                 onDragStart={handleProjectDragStart}
                 onDragEnd={handleProjectDragEnd}
+                onDragOver={handleProjectDragOver}
+                onDrop={(e) => handleProjectDrop(e, project)}
                 onToggleMaster={onToggleMaster}
               />
             </React.Fragment>

@@ -5,7 +5,7 @@
 
 import { BaseService } from '../BaseService';
 import { Project, ProjectStatus, ProjectType } from '@/types/project';
-import { DbResponse } from '../../database/types';
+import { DbResponse } from '@/mocks/database/types';
 
 export class ProjectQueryService extends BaseService<Project> {
   constructor() {

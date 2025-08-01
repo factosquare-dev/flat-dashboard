@@ -5,7 +5,7 @@
 
 import { BaseService } from '../BaseService';
 import { Project, ProjectType, ProjectStatus } from '@/types/project';
-import { DbResponse } from '../../database/types';
+import { DbResponse } from '@/mocks/database/types';
 import { 
   validateSubProjectSync, 
   syncSubWithMaster, 

@@ -1,9 +1,9 @@
 import type { Task, ResizePreview, ModalState } from '../../../../types/schedule';
-import { setInteractionMode, setPreventClickUntil } from '../../utils/globalState';
-import { SCHEDULE_CONSTANTS } from '../../constants';
+import { setInteractionMode, setPreventClickUntil } from '@/utils/schedule/globalState';
+import { SCHEDULE_CONSTANTS } from '@/components/Schedule/constants';
 import { calculateResizeDateFromX, calculateHoveredDateIndex, calculateSnapIndicatorX } from './dateCalculations';
 import { validateResizeStartDate, validateResizeEndDate, getProjectTasks } from './resizeValidation';
-import { formatDateISO } from '../../../../utils/dateUtils';
+import { formatDateISO } from '@/utils/dateUtils';
 
 export interface ResizeEventHandlers {
   handleTaskMouseDown: (e: React.MouseEvent, task: Task, direction: 'start' | 'end') => void;

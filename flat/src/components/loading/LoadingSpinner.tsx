@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
-import { Size } from '../../types/enums';
+import { cn } from '@/utils/cn';
+import { Size } from '@/types/enums';
 import './LoadingSpinner.css';
 
 interface LoadingSpinnerProps {

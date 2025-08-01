@@ -1,7 +1,8 @@
 import React from 'react';
 import { Mail, FileEdit, Plus } from 'lucide-react';
-import { PageLayout, FloatingActionButton } from '../../common';
+import { PageLayout, FloatingActionButton } from '@/components/common';
 import ScheduleHeader from '../ScheduleHeader';
+import { ButtonVariant } from '@/types/enums';
 
 interface ScheduleLayoutProps {
   containerStyle: { top: string; left: string };
@@ -46,21 +47,21 @@ const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
         onClick={onAddProject}
         icon={<FileEdit />}
         label="의뢰서 편집"
-        variant="secondary"
+        variant={ButtonVariant.SECONDARY}
         position="third"
       />
       <FloatingActionButton
         onClick={onOpenEmail}
         icon={<Mail />}
         label="메일"
-        variant="secondary"
+        variant={ButtonVariant.SECONDARY}
         position="second"
       />
       <FloatingActionButton
         onClick={onAddTask}
         icon={<Plus />}
         label="태스크 추가"
-        variant="primary"
+        variant={ButtonVariant.PRIMARY}
         position="first"
         draggable
         onDragStart={(e) => {

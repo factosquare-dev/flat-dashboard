@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Search } from 'lucide-react';
-import { useDebouncedSearch } from '../../../hooks/common';
-import { cn } from '../../../utils/cn';
+import { useDebouncedSearch } from '@/hooks/common';
+import { cn } from '@/utils/cn';
 import './SearchBox.css';
 
 interface SearchItem {

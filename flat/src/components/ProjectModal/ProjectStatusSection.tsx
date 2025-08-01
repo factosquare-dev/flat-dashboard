@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import type { ProjectData } from './types';
-import { ProjectStatus, ProjectStatusLabel, Priority, PriorityLabel } from '../../types/enums';
+import { ProjectStatus, ProjectStatusLabel, Priority, PriorityLabel } from '@/types/enums';
 
 interface ProjectStatusSectionProps {
   formData: ProjectData;

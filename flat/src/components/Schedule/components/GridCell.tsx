@@ -1,7 +1,7 @@
 import React from 'react';
-import { isWeekend, isToday, formatDateISO } from '../../../utils/coreUtils';
-import { getCellBackgroundClasses, getCellHoverClasses, gridColors } from '../../../design-system/colors/grid';
-import { cn } from '../../../utils/cn';
+import { isWeekend, isToday, formatDateISO } from '@/utils/coreUtils';
+import { getCellBackgroundClasses, getCellHoverClasses, gridColors } from '@/design-system/colors/grid';
+import { cn } from '@/utils/cn';
 import './GridCell.css';
 
 interface GridCellProps {

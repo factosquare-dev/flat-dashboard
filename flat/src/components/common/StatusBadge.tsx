@@ -6,7 +6,7 @@ import {
   TaskStatusLabel,
   Priority,
   PriorityLabel
-} from '../../types/enums';
+} from '@/types/enums';
 import './StatusBadge.css';
 
 interface StatusBadgeProps {

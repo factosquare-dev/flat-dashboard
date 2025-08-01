@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { useModal } from '../../../../hooks/common/useModal';
+import { useModal } from '@/hooks/common/useModal';
 
 describe('useModal', () => {
   it('should initialize with closed state by default', () => {

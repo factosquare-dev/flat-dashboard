@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { useClickOutsideRef } from '../../hooks/useClickOutside';
+import { useClickOutsideRef } from '@/hooks/useClickOutside';
 import type { Comment, CommentAuthor } from '../../types/comment';
 import CommentItem from './CommentItem';
 import CommentInput from './CommentInput';

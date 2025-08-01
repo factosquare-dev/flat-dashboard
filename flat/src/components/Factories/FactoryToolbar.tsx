@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import { FactoryType, FactoryTypeLabel } from '../../types/enums';
+import { FactoryType, FactoryTypeLabel } from '@/types/enums';
 
 interface FactoryToolbarProps {
   selectedType: FactoryType;

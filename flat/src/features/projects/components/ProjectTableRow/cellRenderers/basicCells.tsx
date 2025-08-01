@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
-import EditableCell from '../../EditableCell';
+import EditableCell from '@/features/projects/components/EditableCell';
 import type { UseEditableCellReturn } from '@/hooks/useEditableCell';
 import { EditableCellType, ProjectType } from '@/types/enums';
 import { isProjectType } from '@/utils/projectTypeUtils';
-import ProgressBar from '../../ProgressBar';
+import ProgressBar from '@/features/projects/components/ProgressBar';
 
 interface CellRenderProps {
   project: Project;

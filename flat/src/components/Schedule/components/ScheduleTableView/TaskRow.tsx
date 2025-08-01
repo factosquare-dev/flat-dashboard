@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import type { Task } from '../../../../types/schedule';
 import type { Project } from '../../../../types/project';
-import { APP_CONSTANTS } from '../../../../config/constants';
-import { gridColors } from '../../../../design-system/colors/grid';
-import { getStatusDisplayName, getStatusStyles } from '../../../../utils/statusUtils';
-import { mockDataService } from '../../../../services/mockDataService';
-import { isDateInRange } from '../../../../utils/unifiedDateUtils';
+import { APP_CONSTANTS } from '@/config/constants';
+import { gridColors } from '@/design-system/colors/grid';
+import { getStatusDisplayName, getStatusStyles } from '@/utils/statusUtils';
+import { mockDataService } from '@/services/mockDataService';
+import { isDateInRange } from '@/utils/unifiedDateUtils';
 import TaskStatusIcons from './TaskStatusIcons';
 import TaskSchedule from './TaskSchedule';
 import TaskFactory from './TaskFactory';

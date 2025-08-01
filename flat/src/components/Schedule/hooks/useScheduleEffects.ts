@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { isToday } from '../../../utils/coreUtils';
+import { isToday } from '@/utils/coreUtils';
 
 export const useScheduleEffects = (
   days: Date[],

@@ -1,14 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import UserModal, { type UserFormData } from '../../components/Users/UserModal';
 import UserCard, { type UserData } from '../../components/Users/UserCard';
-import UserToolbar from '../../components/Users/UserToolbar';
-import FloatingActionButton from '../../components/common/FloatingActionButton';
-import { useUserFilter } from '../../hooks/useUserFilter';
-import { useUserManagement } from '../../hooks/useUserManagement';
-import { useModalState } from '../../hooks/useModalState';
+import UserToolbar from '@/components/Users/UserToolbar';
+import FloatingActionButton from '@/components/common/FloatingActionButton';
+import { useUserFilter } from '@/hooks/useUserFilter';
+import { useUserManagement } from '@/hooks/useUserManagement';
+import { useModalState } from '@/hooks/useModalState';
 import { UserPlus, Users } from 'lucide-react';
-import { LoadingState } from '../../components/loading/LoadingState';
-import { EmptyState } from '../../components/common';
+import { LoadingState } from '@/components/loading/LoadingState';
+import { EmptyState } from '@/components/common';
+import { ButtonVariant } from '@/types/enums';
 
 const UsersPage: React.FC = () => {
   const modalState = useModalState<UserData | null>(false, null);
@@ -140,7 +141,7 @@ const UsersPage: React.FC = () => {
         onClick={handleAddUser}
         icon={<UserPlus />}
         label="새 사용자 추가"
-        variant="primary"
+        variant={ButtonVariant.PRIMARY}
         position="first"
       />
 

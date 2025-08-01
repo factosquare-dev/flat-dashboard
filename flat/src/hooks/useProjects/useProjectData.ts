@@ -4,15 +4,15 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { Project } from '../../types/project';
-import { ServiceType, ProjectStatus, Priority, ProductType, ProjectType, ProjectField, FACTORY_ID_FIELDS, DATE_FIELDS } from '../../types/enums';
+import { ServiceType, ProjectStatus, Priority, ProductType, ProjectType, ProjectField, FACTORY_ID_FIELDS, DATE_FIELDS } from '@/types/enums';
 import type { ProjectId } from '../../types/branded';
 import type { Schedule } from '../../types/schedule';
-import { factories } from '../../data/factories';
-import { scheduleApi } from '../../api/scheduleApi';
-import { extractProjectFromSchedule } from '../../data/mockSchedules';
-import { formatDateISO } from '../../utils/coreUtils';
-import { MockDatabaseImpl } from '../../mocks/database/MockDatabase';
-import { isProjectType } from '../../utils/projectTypeUtils';
+import { factories } from '@/data/factories';
+import { scheduleApi } from '@/api/scheduleApi';
+import { extractProjectFromSchedule } from '@/data/mockSchedules';
+import { formatDateISO } from '@/utils/coreUtils';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { isProjectType } from '@/utils/projectTypeUtils';
 
 // Helper functions
 const getRelativeDate = (daysOffset: number): string => {

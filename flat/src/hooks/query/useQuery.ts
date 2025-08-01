@@ -4,7 +4,7 @@ import type { QueryOptions, QueryResult } from './types';
 import { queryCache } from './queryCache';
 import { executeWithRetry } from './retryLogic';
 import { getQueryKey } from './cacheUtils';
-import { DURATION } from '../../constants/time';
+import { DURATION } from '@/constants/time';
 
 export const useQuery = <T = any>(
   queryKey: string | string[],

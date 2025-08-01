@@ -6,11 +6,11 @@
 import { useEffect, useState } from 'react';
 import type { Project } from '../../types/project';
 import type { ProjectId } from '../../types/branded';
-import { getHierarchicalProjectsData, flattenProjects, toggleProject } from '../../data/hierarchicalProjects';
+import { getHierarchicalProjectsData, flattenProjects, toggleProject } from '@/data/hierarchicalProjects';
 import { useProjectData } from './useProjectData';
 import { useProjectSelection } from './useProjectSelection';
 import { useProjectPagination } from './useProjectPagination';
-import { MockDatabaseImpl } from '../../mocks/database/MockDatabase';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 export const useProjects = () => {
   // Hierarchical data state (temporary until API is ready)

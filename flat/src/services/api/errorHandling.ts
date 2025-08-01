@@ -2,13 +2,13 @@
  * API error handling utilities
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@/utils/logger';
 import { 
   AppError, 
   ERROR_CODES, 
   httpStatusToErrorCode,
   ERROR_MESSAGES 
-} from '../../utils/error/errorHandler';
+} from '@/utils/error/errorHandler';
 
 export interface ApiError {
   message: string;

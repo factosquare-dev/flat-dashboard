@@ -5,7 +5,7 @@
 
 import { BaseService } from '../BaseService';
 import { Project, ProjectType } from '@/types/project';
-import { DbResponse, ProjectAssignment } from '../../database/types';
+import { DbResponse, ProjectAssignment } from '@/mocks/database/types';
 import { User } from '@/types/user';
 import { Factory } from '@/types/factory';
 import { Schedule, Task, TaskType } from '@/types/schedule';

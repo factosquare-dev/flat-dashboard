@@ -1,4 +1,4 @@
-import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '../../utils/dragCalculations';
+import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '@/utils/schedule/dragCalculations';
 import type { ModalState } from '../../../../types/schedule';
 import type { DragState } from './types';
 

@@ -9,6 +9,7 @@ import { formatDate } from '@/utils/dateUtils';
 import { useToast } from '@/hooks/useToast';
 import { customerService } from '@/mocks/services';
 import { LoadingState } from '@/components/loading/LoadingState';
+import { ModalSize } from '@/types/enums';
 
 const CustomersPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -133,7 +134,7 @@ const CustomersPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="sm"
+            size={ModalSize.SM}
             onClick={loadCustomers}
             disabled={isLoading}
           >
@@ -141,7 +142,7 @@ const CustomersPage: React.FC = () => {
             새로고침
           </Button>
           <Button
-            size="sm"
+            size={ModalSize.SM}
             onClick={handleCreateCustomer}
           >
             <Plus className="w-4 h-4" />

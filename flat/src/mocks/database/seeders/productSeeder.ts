@@ -1,6 +1,6 @@
-import { ProductStatus, type Product, type ProductId } from '../../../types/product';
+import { ProductStatus, type Product, type ProductId } from '@/types/product';
 import type { ProductCategoryId } from '../../../types/productCategory';
-import { getCurrentISOString } from '../../../utils/unifiedDateUtils';
+import { getCurrentISOString } from '@/utils/unifiedDateUtils';
 
 export function createProducts(): Product[] {
   const now = getCurrentISOString();

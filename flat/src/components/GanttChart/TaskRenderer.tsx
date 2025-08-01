@@ -3,7 +3,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { logger } from '../../utils/logger';
+import { logger } from '@/utils/logger';
 import type { Project, Task, DragState } from './types';
 import { GANTT_CONSTANTS, getTotalDays } from './constants';
 import { getDateIndex } from './utils/ganttCalculations';

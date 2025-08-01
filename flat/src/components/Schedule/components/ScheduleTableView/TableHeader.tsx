@@ -1,6 +1,6 @@
 import React from 'react';
-import { APP_CONSTANTS } from '../../../../config/constants';
-import { formatDate } from '../../../../utils/unifiedDateUtils';
+import { APP_CONSTANTS } from '@/config/constants';
+import { formatDate } from '@/utils/unifiedDateUtils';
 
 const TableHeader: React.FC = () => {
   const today = new Date();

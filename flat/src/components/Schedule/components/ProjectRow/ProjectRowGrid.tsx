@@ -1,7 +1,7 @@
 import React from 'react';
 import GridCell from '../GridCell';
 import { formatDateISO } from '@/utils/coreUtils';
-import { getInteractionState } from '../../utils/globalState';
+import { getInteractionState } from '@/utils/schedule/globalState';
 import './ProjectRowGrid.css';
 
 interface ProjectRowGridProps {

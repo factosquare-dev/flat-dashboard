@@ -8,7 +8,7 @@ export const databaseApi = {
   async getStats() {
     await simulateDelay();
     
-    const { getDatabaseStats } = await import('../../services');
+    const { getDatabaseStats } = await import('@/mocks/services');
     const stats = getDatabaseStats();
     
     return formatResponse(true, stats);
@@ -17,7 +17,7 @@ export const databaseApi = {
   async export() {
     await simulateDelay();
     
-    const { exportDatabase } = await import('../../services');
+    const { exportDatabase } = await import('@/mocks/services');
     const data = exportDatabase();
     
     return formatResponse(true, { data });
@@ -26,7 +26,7 @@ export const databaseApi = {
   async import(data: string) {
     await simulateDelay();
     
-    const { importDatabase } = await import('../../services');
+    const { importDatabase } = await import('@/mocks/services');
     const success = importDatabase(data);
     
     if (!success) {
@@ -39,7 +39,7 @@ export const databaseApi = {
   async reset() {
     await simulateDelay();
     
-    const { resetServices } = await import('../../services');
+    const { resetServices } = await import('@/mocks/services');
     resetServices();
     
     return formatResponse(true, null);

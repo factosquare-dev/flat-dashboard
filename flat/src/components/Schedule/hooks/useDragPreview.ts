@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { factories } from '../../../data/factories';
-import { formatDateISO } from '../../../utils/coreUtils';
+import { factories } from '@/data/factories';
+import { formatDateISO } from '@/utils/coreUtils';
 
 import type { Participant, Task } from '../../../types/schedule';
 

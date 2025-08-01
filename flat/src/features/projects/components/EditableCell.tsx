@@ -1,11 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import type { Project } from '../../../types/project';
 import type { ProjectId } from '../../../types/branded';
-import { formatKoreanNumber, parseKoreanNumber } from '../../../utils/coreUtils';
-import { formatDate } from '../../../utils/unifiedDateUtils';
-import { factoriesByType } from '../../../data/mockData';
-import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
-import { EditableCellType } from '../../../types/enums';
+import { formatKoreanNumber, parseKoreanNumber } from '@/utils/coreUtils';
+import { formatDate } from '@/utils/unifiedDateUtils';
+import { factoriesByType } from '@/data/mockData';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { EditableCellType } from '@/types/enums';
 
 interface EditableCellProps {
   project: Project;

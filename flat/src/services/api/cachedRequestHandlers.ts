@@ -2,10 +2,10 @@
  * Cached HTTP request handlers - Extends RequestHandlers with caching
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '@/utils/logger';
 import { RequestHandlers, RequestOptions, ApiResponse } from './requestHandlers';
-import { apiCache, shouldCache, getCacheTTL } from '../../utils/api/cache';
-import { HttpMethod } from '../../types/enums';
+import { apiCache, shouldCache, getCacheTTL } from '@/utils/api/cache';
+import { HttpMethod } from '@/types/enums';
 
 export class CachedRequestHandlers extends RequestHandlers {
   constructor(

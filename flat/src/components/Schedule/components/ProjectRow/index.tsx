@@ -1,12 +1,12 @@
 import React from 'react';
 import type { Participant, Task } from '../../../../types/schedule';
-import { getProjectRowCount } from '../../../../utils/taskUtils';
-import { getTasksForFactory } from '../../../../utils/scheduleUtils';
+import { getProjectRowCount } from '@/utils/taskUtils';
+import { getTasksForFactory } from '@/utils/scheduleUtils';
 import { ProjectRowGrid } from './ProjectRowGrid';
 import { ProjectRowTasks } from './ProjectRowTasks';
 import { ProjectRowDragPreview } from './ProjectRowDragPreview';
 import { ProjectRowResizePreview } from './ProjectRowResizePreview';
-import { cn } from '../../../../utils/cn';
+import { cn } from '@/utils/cn';
 import './ProjectRow.css';
 
 interface ProjectRowProps {

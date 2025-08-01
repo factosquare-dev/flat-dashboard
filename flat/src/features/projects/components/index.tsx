@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import type { Project } from '../../types/project';
 import type { Schedule as ScheduleType } from '../../types/schedule';
-import { scheduleApi } from '../../api/scheduleApi';
+import { scheduleApi } from '@/features/api/scheduleApi';
 import Schedule from '../Schedule';
 import ProjectListView from './ProjectList';
-import { ErrorBoundary, ProjectListErrorFallback } from '../../../components/ErrorBoundary';
+import { ErrorBoundary, ProjectListErrorFallback } from '@/components/ErrorBoundary';
 
 interface ProjectListContainerProps {
   className?: string;

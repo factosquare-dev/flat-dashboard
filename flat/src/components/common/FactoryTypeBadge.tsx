@@ -1,5 +1,5 @@
 import React from 'react';
-import { FactoryType, FactoryTypeLabel } from '../../types/enums';
+import { FactoryType, FactoryTypeLabel } from '@/types/enums';
 import './FactoryTypeBadge.css';
 
 interface FactoryTypeBadgeProps {

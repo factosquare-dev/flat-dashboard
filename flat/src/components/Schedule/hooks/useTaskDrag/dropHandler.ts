@@ -1,10 +1,10 @@
 import React from 'react';
 import type { ModalState, Participant } from '../../../../types/schedule';
 import type { DragState } from './types';
-import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '../../utils/dragCalculations';
-import { findAvailableDateRange } from '../../../../utils/taskUtils';
-import { formatDateISO } from '../../../../utils/dateUtils';
-import { factories } from '../../../../data/factories';
+import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '@/utils/schedule/dragCalculations';
+import { findAvailableDateRange } from '@/utils/taskUtils';
+import { formatDateISO } from '@/utils/dateUtils';
+import { factories } from '@/data/factories';
 
 export const createDropHandler = (
   projects: Participant[],

@@ -1,5 +1,5 @@
 import type { Project } from '../../types/project';
-import { projectColors } from '../../data/mockData';
+import { projectColors } from '@/data/mockData';
 
 export const mockProjects: Project[] = [
   {

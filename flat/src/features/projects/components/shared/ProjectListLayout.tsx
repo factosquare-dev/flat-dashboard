@@ -1,9 +1,10 @@
 import React from 'react';
 import { Plus, Mail } from 'lucide-react';
-import { PageLayout, FloatingActionButton } from '../../../../components/common';
+import { PageLayout, FloatingActionButton } from '@/components/common';
 import ProjectActions from '../ProjectActions';
 import type { Priority, ServiceType, ProjectStatus } from '../../../../types/project';
 import type { Column } from '../../../../hooks/useColumnOrder';
+import { ButtonVariant } from '@/types/enums';
 
 interface ProjectListLayoutProps {
   containerStyle: { top: string; left: string };
@@ -81,14 +82,14 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
         onClick={onSendEmail}
         icon={<Mail />}
         label="메일 보내기"
-        variant="secondary"
+        variant={ButtonVariant.SECONDARY}
         position="second"
       />
       <FloatingActionButton
         onClick={onCreateProject}
         icon={<Plus />}
         label="새 프로젝트"
-        variant="primary"
+        variant={ButtonVariant.PRIMARY}
         position="first"
       />
     </>

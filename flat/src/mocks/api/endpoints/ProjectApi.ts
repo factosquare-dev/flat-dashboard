@@ -2,8 +2,8 @@
  * Project API endpoints
  */
 
-import { getServices } from '../../services';
-import { QueryOptions } from '../../database/types';
+import { getServices } from '@/mocks/services';
+import { QueryOptions } from '@/mocks/database/types';
 import { Project } from '@/types/project';
 import { simulateDelay, shouldSimulateError, formatResponse } from '../common';
 

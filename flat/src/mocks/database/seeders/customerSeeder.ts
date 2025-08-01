@@ -1,5 +1,5 @@
 import { Customer } from '@/types/customer';
-import { TIME_CONSTANTS } from '../../../constants/time';
+import { TIME_CONSTANTS } from '@/constants/time';
 
 export const createCustomers = (): Customer[] => {
   return [

@@ -1,0 +1,690 @@
+[
+  {
+    "path": "App.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/CommentSection/CommentInput.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/CommentSection/CommentItem.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/CustomerModal/components/AdditionalInfoSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/CustomerModal/components/BasicInfoSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/CustomerModal/components/ContactInfoSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/EmailModal/FactorySelector.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/EmailModal/FileAttachment.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ErrorBoundary/ComponentErrorBoundary.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ErrorBoundary/ErrorFallback.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ErrorBoundary/ErrorFallbacks.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ErrorBoundary/ErrorViews.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ErrorBoundary/PageErrorBoundary.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ErrorBoundary/SectionErrorBoundary.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ErrorBoundary/SpecializedBoundaries.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ErrorBoundary.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Factories/FactoryCard.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Factories/FactoryModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Factories/FactoryToolbar.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Factories/components/CertificationSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Factories/components/ManagerSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/FactorySelectionModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Gantt/GanttGrid.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Gantt/GanttHeader.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/GanttChart/GanttGrid.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/GanttChart/GanttHeader.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/GanttChart/LazyGanttChart.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/GanttChart/ProjectSidebar.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/GanttChart/TaskRenderer.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/GanttChart.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/LazyComponents.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Modal/ConfirmationModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Modal/LazyModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProductRequestModal/ContentInfoForm.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProductRequestModal/IngredientInfoForm.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProductRequestModal/OrderInfoForm.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProductTypes/CategoryEditModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProductTypes/CategoryTree.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProductTypes/ProductTypeCategoryManager.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProjectList.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProjectModal/AmountInfoSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProjectModal/BasicInfoSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProjectModal/FactoryInfoSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProjectModal/ProductInfoSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProjectModal/ProjectStatusSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ProjectModal/ScheduleSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/FactorySelectionModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/LazySchedule.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ProjectRow.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ScheduleComponent/ScheduleDataValidator.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ScheduleComponent/ScheduleViewSwitcher.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ScheduleErrorBoundary.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ScheduleGrid.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ScheduleGridContainer.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ScheduleHeader.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ScheduleModals.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/ScrollControls.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/TaskItem.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/TimelineHeader.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/AddFactoryRow.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/DragPreview.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/DragTooltip.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/GridCell.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/IntegratedGanttChart.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ProjectHeader.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ProjectRow/ProjectRowDragPreview.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ProjectRow/ProjectRowGrid.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ProjectRow/ProjectRowResizePreview.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ProjectRow/ProjectRowTasks.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ResizeIndicator.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ResizePreview.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleLayout.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleProjectColumn.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTableView/EmptyState.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTableView/TableHeader.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTableView/TaskActions.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTableView/TaskAssignee.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTableView/TaskFactory.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTableView/TaskRow.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTableView/TaskSchedule.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTableView/TaskStatusIcons.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/ScheduleTimelineGrid.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Schedule/components/TaskItem.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/TaskCreateModal/TaskFormFields.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/TaskEditModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Users/UserCard.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Users/UserModal/FormFields.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Users/UserModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/Users/UserToolbar.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/WorkflowModal/DateSelection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/WorkflowModal/FactorySelection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/WorkflowModal/TaskSelection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/WorkflowModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/BaseModal.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/CompoundComponents.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/EmptyState.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/FactoryTypeBadge.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/FloatingActionButton.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/LazyBoundary.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/LoadingRenderer.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/LoadingState.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/ModalField.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/ModalRenderer.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/ModalSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/PageLayout.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/Skeleton.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/common/StatusBadge.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/Form.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/FormField.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/FormGroup.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/FormInput.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/FormRow.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/FormSection.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/FormSelect.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/FormTextarea.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/forms/ValidationMessage.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/loading/LoadingSpinner.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/loading/LoadingState.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/loading/Skeleton.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/providers/ModalProvider.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/providers/ThemeInitializer.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ui/Button.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ui/Card.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ui/LoadingScreen.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ui/Toast.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/ui/VirtualList.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "context/ProviderUtils.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "contexts/AppContext.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "contexts/AuthContext.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "contexts/LoadingContext.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "contexts/ModalContext.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "contexts/ThemeContext.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ColumnVisibilityDropdown.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/DateRangeFilter.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/DraggableProjectTable.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/EditableCell.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/GroupActionsMenu.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/HierarchicalProjectTable.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/OptionsMenu.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/PriorityDropdown.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProductTypeDropdown.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProgressBar.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectActions.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectFilters.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectHeader.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectList.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectModals.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectTable.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectTableRow/SelectionCell.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectTableRow/cellRenderers/CurrentStageCell.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectTableRow/cellRenderers/DepositPaidCell.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectTableRow/cellRenderers/FactoryCell.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ProjectTableSection/ProjectTableUI.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/SearchBox.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/SearchableCell.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/ServiceTypeDropdown.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/StatusDropdown.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/TaskList.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/shared/InfiniteScrollTrigger.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/shared/LoadingIndicator.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "features/projects/components/shared/ProjectListLayout.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "layouts/MainLayout/Header.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "layouts/MainLayout/Sidebar.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "pages/Factories/FactoryRegistration/BasicInfoForm.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "pages/Factories/FactoryRegistration/CertificationForm.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "pages/Factories/FactoryRegistration/ManagerForm.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "pages/Factories/FactoryRegistration.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "pages/Users/UserRegistration.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "providers/query/QueryProvider.tsx",
+    "type": "single-file"
+  },
+  {
+    "path": "components/GlobalErrorHandler",
+    "type": "no-index"
+  },
+  {
+    "path": "components/ErrorBoundary",
+    "type": "mixed"
+  },
+  {
+    "path": "components/Schedule",
+    "type": "mixed"
+  }
+]

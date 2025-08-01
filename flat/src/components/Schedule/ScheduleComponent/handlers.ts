@@ -1,9 +1,9 @@
 import type { Task, ScheduleFactory } from '../../../types/schedule';
 import type { TaskData } from './types';
-import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
-import { DB_COLLECTIONS } from '../../../mocks/database/types';
-import { storageKeys } from '../../../config';
-import { FactoryType } from '../../../types/enums';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { DB_COLLECTIONS } from '@/mocks/database/types';
+import { storageKeys } from '@/config';
+import { FactoryType } from '@/types/enums';
 
 interface TaskControls {
   tasks: Task[];
@@ -28,11 +28,11 @@ interface ModalState {
 type SetModalState = React.Dispatch<React.SetStateAction<ModalState>>;
 
 type ToastError = (title: string, message: string) => void;
-import { factories, taskTypesByFactoryType } from '../../../data/factories';
-import { findAvailableDateRange } from '../../../utils/taskUtils';
-import { projectColors } from '../../../data/mockData';
-import { getFactoryByIdOrName } from '../../../utils/factoryUtils';
-import { getParticipantColor } from '../../../utils/scheduleColorManager';
+import { factories, taskTypesByFactoryType } from '@/data/factories';
+import { findAvailableDateRange } from '@/utils/taskUtils';
+import { projectColors } from '@/data/mockData';
+import { getFactoryByIdOrName } from '@/utils/factoryUtils';
+import { getParticipantColor } from '@/utils/scheduleColorManager';
 
 export const createProjectHandlers = (
   projects: ScheduleFactory[],

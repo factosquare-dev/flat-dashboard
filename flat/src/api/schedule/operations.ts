@@ -1,11 +1,11 @@
 import type { Schedule, Task, Participant } from '../../types/schedule';
 import type { Project, ProjectFactory } from '../../types/project';
-import { formatDate } from '../../utils/coreUtils';
-import { USE_MOCK_DATA } from '../../config/mock';
-import { getDatabaseWithRetry } from '../../mocks/database/utils';
+import { formatDate } from '@/utils/coreUtils';
+import { USE_MOCK_DATA } from '@/config/mock';
+import { getDatabaseWithRetry } from '@/mocks/database/utils';
 // Removed deprecated scheduleAdapter import
-import { createMockSchedules } from '../../data/mockSchedules';
-import { mockDataService } from '../../services/mockDataService';
+import { createMockSchedules } from '@/data/mockSchedules';
+import { mockDataService } from '@/services/mockDataService';
 
 /**
  * Validate task dates - throw error if tasks overlap

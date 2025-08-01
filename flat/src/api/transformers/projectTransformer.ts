@@ -9,8 +9,8 @@ import {
   toCustomerIdSafe,
   toFactoryIdSafe,
   toUserIdSafe
-} from '../../types/branded';
-import { ProjectType, ProjectStatus, Priority, DepositStatus } from '../../types/enums';
+} from '@/types/branded';
+import { ProjectType, ProjectStatus, Priority, DepositStatus } from '@/types/enums';
 
 // API Response interfaces (what we receive from the backend)
 interface ApiProject {

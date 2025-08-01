@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { factories } from '../../data/factories';
+import { factories } from '@/data/factories';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
-import { useDragSelection } from '../../hooks/useDragSelection';
-import { MODAL_SIZES } from '../../utils/modalUtils';
-import { FactoryType, FactoryTypeLabel } from '../../types/enums';
+import { useDragSelection } from '@/hooks/useDragSelection';
+import { MODAL_SIZES } from '@/utils/modalUtils';
+import { FactoryType, FactoryTypeLabel } from '@/types/enums';
 import FactoryTypeBadge from '../common/FactoryTypeBadge';
+import { ModalSize } from '@/types/enums';
 
 interface Factory {
   id: string;
@@ -202,7 +203,7 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-gray-900">{factory.name}</h3>
-                          <FactoryTypeBadge type={factory.type} size="sm" showLabel={false} />
+                          <FactoryTypeBadge type={factory.type} size={ModalSize.SM} showLabel={false} />
                         </div>
                         {factory.location && (
                           <p className="text-sm text-gray-600 mb-1">📍 {factory.location}</p>

@@ -1,17 +1,17 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import type { ScheduleProps } from './types';
-import { ViewMode } from '../../../types/enums';
+import { ViewMode } from '@/types/enums';
 import { useScheduleState } from '../hooks/useScheduleState';
 import { useScheduleEffects } from '../hooks/useScheduleEffects';
 import { useDynamicLayout } from '../hooks/useDynamicLayout';
-import { useTaskStore } from '../../../stores/taskStore';
+import { useTaskStore } from '@/stores/taskStore';
 import ScheduleLayout from '../components/ScheduleLayout';
 import ScheduleModals from '../ScheduleModals';
 import ScheduleViewSwitcher from './ScheduleViewSwitcher';
 import ScheduleDataValidator from './ScheduleDataValidator';
-import { useToast } from '../../../hooks/useToast';
+import { useToast } from '@/hooks/useToast';
 import { createProjectHandlers, createTaskHandlers, createModalHandlers } from './handlers';
-import { comprehensiveScheduleDebug } from '../../../utils/scheduleComprehensiveDebug';
+import { comprehensiveScheduleDebug } from '@/utils/scheduleComprehensiveDebug';
 
 const Schedule: React.FC<ScheduleProps> = ({
   participants,

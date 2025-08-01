@@ -609,3 +609,20 @@ export enum EditableCellType {
   DATE = 'DATE',
   CURRENCY = 'CURRENCY',
 }
+
+// Validation Message Types
+export enum ValidationMessageType {
+  ERROR = 'ERROR',
+  WARNING = 'WARNING',
+  INFO = 'INFO',
+  SUCCESS = 'SUCCESS',
+}
+
+// Component States
+export enum ComponentState {
+  IDLE = 'IDLE',
+  LOADING = 'LOADING',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR',
+  DISABLED = 'DISABLED',
+}

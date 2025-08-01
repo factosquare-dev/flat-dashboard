@@ -1,17 +1,17 @@
 import { useState, useMemo, useEffect } from 'react';
 import type { ScheduleFactory, Task } from '../../../types/schedule';
 import type { Factory } from '../../../types/factory';
-import { getDaysArray } from '../../../utils/scheduleUtils';
-import { formatDate } from '../../../utils/coreUtils';
-import { useScheduleDrag } from '../../../hooks/useScheduleDrag';
-import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
-import { useScheduleTasksWithStore } from '../../../hooks/useScheduleTasksWithStore';
-import { factories } from '../../../data/factories';
-import { storageKeys } from '../../../config';
-import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
-import { parseScheduleDate } from '../../../utils/scheduleDateParsing';
+import { getDaysArray } from '@/utils/scheduleUtils';
+import { formatDate } from '@/utils/coreUtils';
+import { useScheduleDrag } from '@/hooks/useScheduleDrag';
+import { useScheduleTasks } from '@/hooks/useScheduleTasks';
+import { useScheduleTasksWithStore } from '@/hooks/useScheduleTasksWithStore';
+import { factories } from '@/data/factories';
+import { storageKeys } from '@/config';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { parseScheduleDate } from '@/utils/scheduleDateParsing';
 import { addDays, startOfDay } from 'date-fns';
-import { getParticipantColor } from '../../../utils/scheduleColorManager';
+import { getParticipantColor } from '@/utils/scheduleColorManager';
 
 interface ModalState {
   showEmailModal: boolean;

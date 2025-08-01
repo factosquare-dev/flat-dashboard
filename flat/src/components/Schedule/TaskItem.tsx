@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Task } from '../../types/schedule';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 import './TaskItem.css';
 
 interface TaskItemProps {

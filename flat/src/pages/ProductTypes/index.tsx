@@ -1,5 +1,5 @@
 import React from 'react';
-import ProductTypeCategoryManager from '../../components/ProductTypes/ProductTypeCategoryManager';
+import ProductTypeCategoryManager from '@/components/ProductTypes/ProductTypeCategoryManager';
 
 const ProductTypes: React.FC = () => {
   return (

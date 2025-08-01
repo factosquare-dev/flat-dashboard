@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Task } from '../../../types/schedule';
-import { GridCoordinateCalculator } from '../utils/dragCalculations';
+import { GridCoordinateCalculator } from '@/utils/schedule/dragCalculations';
 
 interface DragPreviewProps {
   startDate: string;

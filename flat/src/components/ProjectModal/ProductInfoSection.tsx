@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 import { Package } from 'lucide-react';
 import type { ProjectData } from './types';
-import { productTypes } from '../../data/mockData';
-import { SERVICE_TYPE_OPTIONS } from '../../constants';
-import { mockDataService } from '../../services/mockDataService';
+import { productTypes } from '@/data/mockData';
+import { SERVICE_TYPE_OPTIONS } from '@/constants';
+import { mockDataService } from '@/services/mockDataService';
 
 interface ProductInfoSectionProps {
   formData: ProjectData;

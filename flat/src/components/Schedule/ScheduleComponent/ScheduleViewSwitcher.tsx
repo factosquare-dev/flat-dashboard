@@ -4,7 +4,7 @@ import ScheduleTableView from '../components/ScheduleTableView';
 import type { ViewMode } from './types';
 import type { Participant, Task } from '../../../types/schedule';
 import type { Factory } from '../../../types/factory';
-import { ViewMode as ViewModeEnum } from '../../../types/enums';
+import { ViewMode as ViewModeEnum } from '@/types/enums';
 
 interface ScheduleViewSwitcherProps {
   viewMode: ViewMode;

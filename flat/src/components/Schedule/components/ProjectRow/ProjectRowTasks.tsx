@@ -2,7 +2,7 @@ import React from 'react';
 import type { Task, Participant } from '@/types/schedule';
 import TaskItem from '../TaskItem';
 import { assignTaskRows } from '@/utils/taskUtils';
-import { GridCoordinateCalculator } from '../../utils/dragCalculations';
+import { GridCoordinateCalculator } from '@/utils/schedule/dragCalculations';
 
 interface ProjectRowTasksProps {
   projectTasks: Task[];

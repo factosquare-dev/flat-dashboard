@@ -2,15 +2,15 @@ import React, { useState, useCallback } from 'react';
 import { FileText, Mail, AlertCircle } from 'lucide-react';
 import EmailModal from '../EmailModal/index';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
-import FormInput from '../common/FormInput';
-import FormTextarea from '../common/FormTextarea';
+import FormInput from '@/components/forms';
+import FormTextarea from '@/components/forms';
 import OrderInfoForm from './OrderInfoForm';
 import ContentInfoForm from './ContentInfoForm';
 import IngredientInfoForm from './IngredientInfoForm';
-import { useModalFormValidation } from '../../hooks/useModalFormValidation';
-import { ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
+import { useModalFormValidation } from '@/hooks/useModalFormValidation';
+import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
 import { Button } from '../ui/Button';
-import { getModalSizeString } from '../../utils/modalUtils';
+import { getModalSizeString } from '@/utils/modalUtils';
 import './ProductRequestModal.css';
 
 interface ProductRequestModalProps {

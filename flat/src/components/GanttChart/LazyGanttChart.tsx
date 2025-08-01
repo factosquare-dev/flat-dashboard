@@ -4,7 +4,7 @@
  */
 
 import React, { lazy, Suspense } from 'react';
-import { logger } from '../../utils/logger';
+import { logger } from '@/utils/logger';
 
 // Lazy load the GanttChart component
 const GanttChart = lazy(() => import('./index'));

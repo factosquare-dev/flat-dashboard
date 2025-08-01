@@ -1,6 +1,6 @@
 import type { User, UserRole } from '../../types/user';
 import type { ApiResponse } from '../../types/api';
-import { toUserId, toUserIdSafe } from '../../types/branded';
+import { toUserId, toUserIdSafe } from '@/types/branded';
 
 // API Response interfaces
 interface ApiUser {

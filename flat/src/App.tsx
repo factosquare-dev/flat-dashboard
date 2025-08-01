@@ -4,9 +4,10 @@ import { ModalProvider } from './components/providers/ModalProvider'
 import { ThemeInitializer } from './components/providers/ThemeInitializer'
 import { RootProviders } from './contexts'
 import ErrorBoundary from './components/ErrorBoundary'
-import { Toast as ToastContainer } from './lib/ui-components'
+import Toast from './components/ui/Toast'
 import { queryCache } from './hooks/query/queryCache'
-import { ModalRenderer, LoadingRenderer } from './lib/ui-components'
+import ModalRenderer from './components/common/ModalRenderer'
+import LoadingRenderer from './components/common/LoadingRenderer'
 // Load reset utility only in development
 if (import.meta.env.DEV) {
   import('./utils/resetMockData');

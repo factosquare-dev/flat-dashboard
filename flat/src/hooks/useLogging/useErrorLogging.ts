@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { logger } from '../../utils/logger';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook for error logging and handling

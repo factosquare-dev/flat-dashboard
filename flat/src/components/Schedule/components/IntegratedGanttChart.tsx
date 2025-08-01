@@ -1,14 +1,14 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react';
 import type { Participant, Task } from '../../../types/schedule';
-import { TaskStatus } from '../../../types/enums';
-import GanttHeader from '../../GanttChart/GanttHeader';
-import ProjectSidebar from '../../GanttChart/ProjectSidebar';
-import GanttGrid from '../../GanttChart/GanttGrid';
-import TaskRenderer from '../../GanttChart/TaskRenderer';
-import { useGanttDrag } from '../../GanttChart/hooks/useGanttDrag';
+import { TaskStatus } from '@/types/enums';
+import GanttHeader from '@/components/GanttChart/GanttHeader';
+import ProjectSidebar from '@/components/GanttChart/ProjectSidebar';
+import GanttGrid from '@/components/GanttChart/GanttGrid';
+import TaskRenderer from '@/components/GanttChart/TaskRenderer';
+import { useGanttDrag } from '@/components/GanttChart/hooks/useGanttDrag';
 import type { Project } from '../../GanttChart/types';
-import { getTotalRows } from '../../GanttChart/utils/ganttHelpers';
-import { GANTT_CONSTANTS, getTotalDays, getGanttDateRange } from '../../GanttChart/constants';
+import { getTotalRows } from '@/components/GanttChart/utils/ganttHelpers';
+import { GANTT_CONSTANTS, getTotalDays, getGanttDateRange } from '@/components/GanttChart/constants';
 
 interface IntegratedGanttChartProps {
   participants: Participant[];

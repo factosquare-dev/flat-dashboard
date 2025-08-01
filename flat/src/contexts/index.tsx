@@ -5,7 +5,7 @@ export { AuthProvider, useAuth, useUser, useAuthActions } from './AuthContext';
 // Combined providers for app root
 import React from 'react';
 import { QueryClient } from '@tanstack/react-query';
-import { QueryProvider } from '../lib/react-query/QueryProvider';
+import { QueryProvider } from '../providers/query/QueryProvider';
 import { AuthProvider } from './AuthContext';
 import { AppProvider } from './AppContext';
 

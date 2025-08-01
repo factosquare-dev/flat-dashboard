@@ -3,18 +3,18 @@ import BaseModal, { ModalFooter } from '../../common/BaseModal';
 import { FormFields } from './FormFields';
 import type { UserModalProps, UserFormData, FormErrors } from './types';
 import type { UserRole } from '../../../store/slices/userSlice';
-import { UserRole as UserRoleEnum } from '../../../types/enums';
+import { UserRole as UserRoleEnum } from '@/types/enums';
 import { 
   formatPhoneNumber, 
   validateForm, 
   getDefaultDepartment, 
   getDefaultPosition 
 } from './utils';
-import { useModalFormValidation } from '../../../hooks/useModalFormValidation';
+import { useModalFormValidation } from '@/hooks/useModalFormValidation';
 import { AlertCircle } from 'lucide-react';
-import { MODAL_SIZES } from '../../../utils/modalUtils';
-import { ButtonVariant } from '../../../types/enums';
-import { Button } from '../../ui/Button';
+import { MODAL_SIZES } from '@/utils/modalUtils';
+import { ButtonVariant } from '@/types/enums';
+import { Button } from '@/components/ui/Button';
 import './UserModal.css';
 
 const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, editData }) => {

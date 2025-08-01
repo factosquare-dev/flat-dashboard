@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import type { Project } from '../../../types/project';
-import { useDynamicLayout } from '../../../components/Schedule/hooks/useDynamicLayout';
+import { useDynamicLayout } from '@/components/Schedule/hooks/useDynamicLayout';
 import { useProjectListState } from './hooks/useProjectListState';
-import { useColumnVisibility } from '../../../hooks/useColumnVisibility';
-import { useColumnOrder } from '../../../hooks/useColumnOrder';
+import { useColumnVisibility } from '@/hooks/useColumnVisibility';
+import { useColumnOrder } from '@/hooks/useColumnOrder';
 import ProjectListLayout from './shared/ProjectListLayout';
 import ProjectTableSection from './ProjectTableSection';
 import ProjectModals from './ProjectModals';
-import { factories } from '../../../data/factories';
+import { factories } from '@/data/factories';
 
 interface ProjectListProps {
   onSelectProject: (project: Project) => void;

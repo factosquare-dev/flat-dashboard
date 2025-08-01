@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
-import { GANTT_CONSTANTS, TOTAL_DAYS } from '../../constants/gantt';
-import { getTodayIndex, isTodayInRange } from '../../utils/ganttUtils';
-import { cn } from '../../utils/cn';
+import { GANTT_CONSTANTS, TOTAL_DAYS } from '@/constants/gantt';
+import { getTodayIndex, isTodayInRange } from '@/utils/ganttUtils';
+import { cn } from '@/utils/cn';
 import './GanttHeader.css';
 
 interface GanttHeaderProps {

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { isToday, isWeekend } from '../../utils/coreUtils';
+import { isToday, isWeekend } from '@/utils/coreUtils';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 import './TimelineHeader.css';
 
 interface TimelineHeaderProps {

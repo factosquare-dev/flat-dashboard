@@ -6,7 +6,7 @@ import {
   toProjectId, 
   toUserId, 
   toUserIdSafe 
-} from '../../types/branded';
+} from '@/types/branded';
 
 // API Response interfaces
 interface ApiTask {

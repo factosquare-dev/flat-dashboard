@@ -7,7 +7,7 @@
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import { cn } from '../../../utils/cn';
+import { cn } from '@/utils/cn';
 import './Table.css';
 
 // Table Context for sharing state

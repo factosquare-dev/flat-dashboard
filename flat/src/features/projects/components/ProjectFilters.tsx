@@ -1,8 +1,8 @@
 import React from 'react';
 import { Calendar, Mail } from 'lucide-react';
-import { Priority, PriorityLabel, ServiceType, ServiceTypeLabel, ProjectStatus } from '../../../types/enums';
+import { Priority, PriorityLabel, ServiceType, ServiceTypeLabel, ProjectStatus } from '@/types/enums';
 import DateRangeFilter from './DateRangeFilter';
-import { getStatusStyles, getAllStatuses } from '../../../utils/statusUtils';
+import { getStatusStyles, getAllStatuses } from '@/utils/statusUtils';
 import '../../../design-system/styles/button.css';
 
 interface ProjectFiltersProps {

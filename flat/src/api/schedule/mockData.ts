@@ -1,5 +1,5 @@
 import type { Schedule } from '../../types/schedule';
-import { createMockSchedules } from '../../data/mockSchedules';
+import { createMockSchedules } from '@/data/mockSchedules';
 
 // Mock 데이터 저장소
 export const mockSchedules = new Map<string, Schedule>();

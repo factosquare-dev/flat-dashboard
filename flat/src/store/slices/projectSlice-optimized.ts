@@ -1,8 +1,8 @@
 import { produce } from 'immer';
 import type { Project } from '../../types/project';
-import { createImmerUpdater, createAsyncAction } from '../utils/storeUtils';
-import { projectsApi } from '../../api/projects';
-import { ProjectStatus, getProjectStatusFromLabel } from '../../types/enums';
+import { createImmerUpdater, createAsyncAction } from '@/utils/store/storeUtils';
+import { projectsApi } from '@/api/projects';
+import { ProjectStatus, getProjectStatusFromLabel } from '@/types/enums';
 import type { StateCreator } from 'zustand';
 
 export interface ProjectFilters {

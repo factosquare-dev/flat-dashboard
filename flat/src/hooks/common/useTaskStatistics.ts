@@ -3,7 +3,7 @@
  */
 
 import { useMemo } from 'react';
-import { useTaskStore, selectTaskStats, selectTasksByStatus, selectUpcomingTasks } from '../../stores/taskStore';
+import { useTaskStore, selectTaskStats, selectTasksByStatus, selectUpcomingTasks } from '@/stores/taskStore';
 
 interface TaskStatistics {
   total: number;

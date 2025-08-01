@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Trash2 } from 'lucide-react';
 import type { Participant, Task } from '../../types/schedule';
-import { isWeekend } from '../../utils/dateUtils';
+import { isWeekend } from '@/utils/dateUtils';
 import TaskItem from './TaskItem';
 
 interface ProjectRowProps {

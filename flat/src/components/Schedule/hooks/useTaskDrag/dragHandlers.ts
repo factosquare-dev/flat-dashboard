@@ -4,7 +4,7 @@
 
 import type { ModalState, Participant, TaskControls } from '@/types/schedule';
 import type { DragState } from './types';
-import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '../../utils/dragCalculations';
+import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '@/utils/schedule/dragCalculations';
 import { formatDateISO } from '@/utils/coreUtils';
 import { UI_DELAYS } from '@/constants/time';
 import { validateTaskDrop } from './dragValidation';

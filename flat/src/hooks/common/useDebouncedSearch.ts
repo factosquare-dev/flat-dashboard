@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { debounce } from '../../utils/common';
+import { debounce } from '@/utils/common';
 
 interface UseDebouncedSearchOptions {
   delay?: number;

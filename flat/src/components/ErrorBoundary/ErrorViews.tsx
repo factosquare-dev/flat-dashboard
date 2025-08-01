@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import type { ErrorBoundaryState } from './types';
+import { ButtonVariant, ModalSize } from '@/types/enums';
 
 interface ErrorViewProps {
   state: ErrorBoundaryState;
@@ -68,7 +69,7 @@ export const PageErrorView: React.FC<ErrorViewProps> = ({ state, onRetry, showEr
           <div className="flex gap-2">
             <Button 
               onClick={onRetry} 
-              variant="primary"
+              variant={ButtonVariant.PRIMARY}
               leftIcon={<RefreshCw className="h-4 w-4" />}
               className="flex-1"
             >
@@ -108,7 +109,7 @@ export const SectionErrorView: React.FC<ErrorViewProps> = ({ state, onRetry }) =
             <Button
               onClick={onRetry}
               variant="outline"
-              size="sm"
+              size={ModalSize.SM}
               className="bg-red-100 hover:bg-red-200 text-red-800 border-red-300"
             >
               Try Again

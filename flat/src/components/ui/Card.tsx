@@ -1,6 +1,6 @@
 import React from 'react';
-import { CardVariant, CardPadding } from '../../types/enums';
-import { cn } from '../../utils/cn';
+import { CardVariant, CardPadding } from '@/types/enums';
+import { cn } from '@/utils/cn';
 import './Card.css';
 
 const variantClassMap = {

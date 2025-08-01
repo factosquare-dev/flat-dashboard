@@ -1,6 +1,6 @@
 import React from 'react';
 import { TestTube } from 'lucide-react';
-import FormInput from '../common/FormInput';
+import FormInput from '@/components/forms';
 import ModalSection from '../common/ModalSection';
 
 interface ContentInfo {

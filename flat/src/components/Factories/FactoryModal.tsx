@@ -4,10 +4,10 @@ import { useFactoryForm, type FactoryFormData } from './hooks/useFactoryForm';
 import ManagerSection from './components/ManagerSection';
 import CertificationSection from './components/CertificationSection';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
-import { useModalFormValidation } from '../../hooks/useModalFormValidation';
+import { useModalFormValidation } from '@/hooks/useModalFormValidation';
 import { AlertCircle } from 'lucide-react';
-import { FactoryType, FactoryTypeLabel, ModalSize, ButtonVariant } from '../../types/enums';
-import { MODAL_SIZES } from '../../utils/modalUtils';
+import { FactoryType, FactoryTypeLabel, ModalSize, ButtonVariant } from '@/types/enums';
+import { MODAL_SIZES } from '@/utils/modalUtils';
 import { Button } from '../ui/Button';
 import './FactoryModal.css';
 

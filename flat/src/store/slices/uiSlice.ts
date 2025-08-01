@@ -1,4 +1,4 @@
-import { Theme, Language, ToastVariant } from '../../types/enums';
+import { Theme, Language, ToastVariant } from '@/types/enums';
 
 export interface Notification {
   id: string;

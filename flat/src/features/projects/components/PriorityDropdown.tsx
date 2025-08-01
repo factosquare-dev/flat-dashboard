@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Priority } from '../../../types/enums';
-import { getPriorityDisplayName, getPriorityStyles, getPriorityIcon } from '../../../utils/priorityUtils';
+import { Priority } from '@/types/enums';
+import { getPriorityDisplayName, getPriorityStyles, getPriorityIcon } from '@/utils/priorityUtils';
 import '../../../design-system/styles/dropdown.css';
 
 interface PriorityDropdownProps {

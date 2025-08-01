@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { projectService } from '../services';
 import type { Project, ProjectFilter } from '../types';
 import type { PaginationParams, SortParams } from '../../common/types';
-import { useDebounce } from '../../common/hooks/useDebounce';
-import { logger } from '../../../utils/logger';
+import { useDebounce } from '@/features/common/hooks/useDebounce';
+import { logger } from '@/utils/logger';
 
 interface UseProjectsOptions {
   filters?: ProjectFilter;

@@ -7,10 +7,11 @@
 
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
-import { ARIA_LABELS, focusManagement, KEYBOARD_KEYS } from '../../../utils/accessibility';
-import { ModalSize } from '../../../types/enums';
-import { cn } from '../../../utils/cn';
+import { ARIA_LABELS, focusManagement, KEYBOARD_KEYS } from '@/utils/accessibility';
+import { ModalSize } from '@/types/enums';
+import { cn } from '@/utils/cn';
 import './Modal.css';
+import { ButtonVariant } from '@/types/enums';
 
 // Modal Context for sharing state between compound components
 interface ModalContextValue {
@@ -259,7 +260,7 @@ export const Modal = {
 //     {/* Your content here */}
 //   </Modal.Body>
 //   <Modal.Footer>
-//     <Button variant="secondary" onClick={onClose}>Cancel</Button>
-//     <Button variant="primary" onClick={onSave}>Save</Button>
+//     <Button variant={ButtonVariant.SECONDARY} onClick={onClose}>Cancel</Button>
+//     <Button variant={ButtonVariant.PRIMARY} onClick={onSave}>Save</Button>
 //   </Modal.Footer>
 // </Modal.Root>

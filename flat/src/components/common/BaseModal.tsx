@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
-import { ARIA_LABELS, focusManagement, KEYBOARD_KEYS } from '../../utils/accessibility';
-import { ModalSize } from '../../types/enums';
+import { ARIA_LABELS, focusManagement, KEYBOARD_KEYS } from '@/utils/accessibility';
+import { ModalSize } from '@/types/enums';
 import './BaseModal.css';
 
 interface BaseModalProps {

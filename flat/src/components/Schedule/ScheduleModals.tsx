@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import type { ScheduleFactory, Task } from '../../types/schedule';
-import { factories } from '../../data/factories';
-import { getFactoryTypeColor } from '../../utils/factoryUtils';
+import { factories } from '@/data/factories';
+import { getFactoryTypeColor } from '@/utils/factoryUtils';
 
 // Lazy load all modal components
 const EmailModal = lazy(() => import('../EmailModal/index'));

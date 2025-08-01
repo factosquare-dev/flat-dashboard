@@ -1,4 +1,4 @@
-import { logger } from '../../../utils/logger';
+import { logger } from '@/utils/logger';
 import type { ApiResponse } from '../requestHandlers';
 import { ApiErrorHandler } from '../errorHandling';
 import type { UploadOptions, UploadResponse } from './types';

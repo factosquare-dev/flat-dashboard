@@ -1,8 +1,8 @@
 import React from 'react';
 import type { ScheduleFactory, Task, TaskControls, DragControls, ModalState } from '../../types/schedule';
-import { findAvailableDateRange } from '../../utils/taskUtils';
+import { findAvailableDateRange } from '@/utils/taskUtils';
 import ScheduleGrid from './ScheduleGrid';
-import { factories, taskTypesByFactoryType } from '../../data/factories';
+import { factories, taskTypesByFactoryType } from '@/data/factories';
 import { useTaskDrag } from './hooks/useTaskDrag';
 import { useTaskResize } from './hooks/useTaskResize';
 
@@ -25,7 +25,7 @@ interface ScheduleGridContainerProps {
   onTaskCreate?: (task: { projectId: string; factoryId: string; factory: string; startDate: string; endDate: string }) => void;
 }
 
-import { getInteractionState, setInteractionMode, setPreventClickUntil } from './utils/globalState';
+import { getInteractionState, setInteractionMode, setPreventClickUntil } from '@/utils/schedule/globalState';
 import { SCHEDULE_CONSTANTS } from './constants';
 
 const ScheduleGridContainer: React.FC<ScheduleGridContainerProps> = ({

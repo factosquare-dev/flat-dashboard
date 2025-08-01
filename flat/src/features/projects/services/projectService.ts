@@ -1,4 +1,4 @@
-import { apiClient } from '../../common/services';
+import { apiClient } from '@/features/common/services';
 import type { Project, ProjectFilter, ProjectFormData, ProjectMetrics } from '../types';
 import type { ApiResponse, PaginationParams, SortParams } from '../../common/types';
 import type { Project as ProjectModel, ProjectType } from '../../../types/project';
@@ -9,12 +9,12 @@ import type {
   UpdateProjectResponse,
   DeleteProjectResponse 
 } from '../../../types/api';
-import { API_ENDPOINTS } from '../../../types/api';
+import { API_ENDPOINTS } from '@/types/api';
 import { 
   transformApiProject, 
   transformApiProjectList, 
   transformProjectToApi 
-} from '../../../api/transformers';
+} from '@/api/transformers';
 
 class ProjectService {
   private readonly basePath = API_ENDPOINTS.PROJECTS;

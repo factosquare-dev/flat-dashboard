@@ -3,7 +3,7 @@ import type { Project } from '../../types/project';
 import type { ProjectId } from '../../types/branded';
 import { MoreVertical, GripVertical } from 'lucide-react';
 import ProjectTableRow from './ProjectTableRow/index';
-import { useColumnOrder } from '../../hooks/useColumnOrder';
+import { useColumnOrder } from '@/features/hooks/useColumnOrder';
 import type { Column } from '../../hooks/useColumnOrder';
 
 interface ProjectTableProps {

@@ -3,7 +3,7 @@
  */
 
 import type { GanttConstants } from './types';
-import { TIME_CONSTANTS } from '../../constants/time';
+import { TIME_CONSTANTS } from '@/constants/time';
 
 export const GANTT_CONSTANTS: GanttConstants = {
   CELL_WIDTH: 40,
@@ -12,7 +12,7 @@ export const GANTT_CONSTANTS: GanttConstants = {
   SIDEBAR_WIDTH: 192, // w-48 = 12rem = 192px
 };
 
-import { MockDatabaseImpl } from '../../mocks/database/MockDatabase';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 // Dynamic dates based on actual project data from MockDB
 export const getDateRange = () => {

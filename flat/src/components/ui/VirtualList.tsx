@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 import './VirtualList.css';
 
 interface VirtualListProps<T> {

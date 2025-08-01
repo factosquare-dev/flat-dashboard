@@ -3,14 +3,14 @@
  */
 
 import { MockDatabase, UserFactory, ProjectAssignment, FactoryProject, UserCustomer } from './types';
-import { MockDatabaseImpl } from './MockDatabase';
+// Remove circular dependency - MockDatabaseImpl is not used in this file
 import { User, UserRole } from '@/types/user';
 import { Customer } from '@/types/customer';
 import { Factory } from '@/types/factory';
 import { Project, ProjectType, ProjectStatus } from '@/types/project';
 import { Schedule, Task, TaskStatus, TaskType, Participant, ParticipantRole } from '@/types/schedule';
-import { taskTypesByFactoryType } from '../../data/factories';
-import { TIME_CONSTANTS } from '../../constants/time';
+import { taskTypesByFactoryType } from '@/data/factories';
+import { TIME_CONSTANTS } from '@/constants/time';
 import type { Comment } from '@/types/comment';
 import { FactoryType, Priority } from '@/types/enums';
 import { getTaskTemplatesByFactoryType, calculateTaskDates, TaskTemplate } from './seeders/tasks/taskTemplates';

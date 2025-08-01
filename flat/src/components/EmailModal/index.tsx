@@ -3,10 +3,10 @@ import { ArrowLeft, Mail, AlertCircle } from 'lucide-react';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
 import FactorySelector from './FactorySelector';
 import FileAttachment from './FileAttachment';
-import { useModalFormValidation } from '../../hooks/useModalFormValidation';
-import { ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
+import { useModalFormValidation } from '@/hooks/useModalFormValidation';
+import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
 import { Button } from '../ui/Button';
-import { getModalSizeString } from '../../utils/modalUtils';
+import { getModalSizeString } from '@/utils/modalUtils';
 import './EmailModal.css';
 
 interface EmailModalProps {

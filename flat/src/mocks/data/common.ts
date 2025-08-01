@@ -5,7 +5,7 @@ import {
   PROJECT_PRIORITY,
   SERVICE_TYPES,
   TASK_TEMPLATES
-} from '../../constants';
+} from '@/constants';
 
 /**
  * Common mock data used across multiple modules

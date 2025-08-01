@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 export interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;

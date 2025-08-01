@@ -6,7 +6,7 @@ import type { FactoryFormData } from './types';
 import { BasicInfoForm } from './BasicInfoForm';
 import { CertificationForm } from './CertificationForm';
 import { ManagerForm } from './ManagerForm';
-import { FactoryType } from '../../../types/enums';
+import { FactoryType } from '@/types/enums';
 
 const FactoryRegistration: React.FC = () => {
   const navigate = useNavigate();

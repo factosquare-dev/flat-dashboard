@@ -2,7 +2,7 @@
  * HTTP request handlers for API client
  */
 
-import { logger, PerformanceLogger } from '../../utils/logger';
+import { logger, PerformanceLogger } from '@/utils/logger';
 import { ApiErrorHandler } from './errorHandling';
 
 export interface RequestOptions {

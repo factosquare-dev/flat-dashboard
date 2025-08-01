@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import type { Project } from '../../../types/project';
 import { ChevronDown, ChevronRight, Folder, FolderOpen, FileSpreadsheet } from 'lucide-react';
 import DraggableProjectTable from './DraggableProjectTable';
-import { flattenProjects, toggleProject } from '../../../data/hierarchicalProjects';
-import { ProjectType } from '../../../types/enums';
-import { isProjectType } from '../../../utils/projectTypeUtils';
+import { flattenProjects, toggleProject } from '@/data/hierarchicalProjects';
+import { ProjectType } from '@/types/enums';
+import { isProjectType } from '@/utils/projectTypeUtils';
 
 interface HierarchicalProjectTableProps {
   projects: Project[];
@@ -12,17 +12,22 @@ interface HierarchicalProjectTableProps {
   sortField: keyof Project | null;
   sortDirection: 'asc' | 'desc';
   hiddenColumns?: Set<string>;
+  showOptionsMenu?: string | null;
+  dropdownPosition?: { top: number; left: number } | null;
+  isDragging?: boolean;
   onSort: (field: keyof Project) => void;
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (projectId: string, checked: boolean, index?: number) => void;
   onSelectProject: (project: Project) => void;
-  onUpdateProject: (projectId: string, field: keyof Project, value: any) => void;
+  onUpdateProject?: <K extends keyof Project>(projectId: string, field: K, value: Project[K]) => void;
   onShowOptionsMenu: (projectId: string, position: { top: number; left: number }, event?: React.MouseEvent) => void;
   onEdit: (project: Project) => void;
   onDelete: (projectId: string) => void;
   onDuplicate: (project: Project) => void;
+  onMouseEnterRow?: (index: number) => void;
+  onStartDrag?: (index: number) => void;
+  onEndDrag?: () => void;
   onDragStart?: (projectId: string) => void;
-  onDragEnd?: () => void;
 }
 
 const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props) => {
@@ -31,6 +36,9 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
   // Merge props.projects with local expanded state
   const projectData = React.useMemo(() => {
     const mergeExpandedState = (projects: Project[]): Project[] => {
+      if (!projects || !Array.isArray(projects)) {
+        return [];
+      }
       return projects.map(project => ({
         ...project,
         isExpanded: expandedState[project.id] !== undefined 
@@ -44,7 +52,6 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
   }, [props.projects, expandedState]);
   
   const handleToggleProject = (projectId: string) => {
-    console.log('[HierarchicalProjectTable] handleToggleProject called for:', projectId);
     // Find current expanded state from projectData
     const findProject = (projects: Project[]): boolean | undefined => {
       for (const project of projects) {
@@ -74,7 +81,7 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
     const flatten = (items: any[], level: number = 0) => {
       items.forEach(item => {
         if (seenIds.has(item.id)) {
-          console.warn(`[HierarchicalProjectTable] Duplicate project ID found: ${item.id}`, item);
+          return; // Skip duplicate IDs
         }
         seenIds.add(item.id);
         flattened.push({ ...item, level });
@@ -98,6 +105,7 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
     },
     onToggleMaster: handleToggleProject,
     onMouseEnterRow: props.onMouseEnterRow,
+    isDragging: props.isDragging,
     onStartDrag: (index: number) => {
       // Master 프로젝트에서는 드래그 시작 방지
       const project = flatProjects[index];
@@ -107,10 +115,12 @@ const HierarchicalProjectTable: React.FC<HierarchicalProjectTableProps> = (props
       if (props.onStartDrag) {
         props.onStartDrag(index);
       }
-    }
+    },
+    onDragEnd: props.onEndDrag,
+    onDragStart: props.onDragStart
   };
 
-  return <DraggableProjectTable {...modifiedProps} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd} />;
+  return <DraggableProjectTable {...modifiedProps} />;
 };
 
 export default HierarchicalProjectTable;

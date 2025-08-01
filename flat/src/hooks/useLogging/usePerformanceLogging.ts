@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { logger, PerformanceLogger } from '../../utils/logger';
+import { logger, PerformanceLogger } from '@/utils/logger';
 import { PERFORMANCE_CONSTANTS } from './constants';
 
 /**

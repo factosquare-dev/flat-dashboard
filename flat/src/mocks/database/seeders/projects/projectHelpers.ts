@@ -1,6 +1,6 @@
 import { Project } from '@/types/project';
 import { FactoryId } from '@/types/branded';
-import { factories } from '../../../../data/factories';
+import { factories } from '@/data/factories';
 
 // Helper function to get factory names
 export function getFactoryName(factoryId: string | FactoryId | null): string | null {

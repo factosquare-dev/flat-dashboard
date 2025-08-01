@@ -5,7 +5,7 @@
 
 import type { Schedule, Task, Participant } from '../../types/schedule';
 import type { Project } from '../../types/project';
-import { USE_MOCK_DATA } from '../../config/mock';
+import { USE_MOCK_DATA } from '@/config/mock';
 import { apiClient } from '../client/interceptors';
 import {
   getOrCreateScheduleForProject,
@@ -14,7 +14,7 @@ import {
   deleteTaskFromSchedule
 } from './operations';
 import { mockSchedules } from './mockStore';
-import { mockDataService } from '../../services/mockDataService';
+import { mockDataService } from '@/services/mockDataService';
 
 /**
  * Task 날짜 겹침 검증 - 같은 공장 내에서 겹치는 Task가 있으면 에러 발생
@@ -88,7 +88,7 @@ export const scheduleApi = {
   getScheduleByProjectId: async (projectId: string): Promise<Schedule | null> => {
     if (USE_MOCK_DATA) {
       // MockDatabase에서 직접 가져오기
-      const { MockDatabaseImpl } = await import('../../mocks/database/MockDatabase');
+      const { MockDatabaseImpl } = await import('@/mocks/database/MockDatabase');
       const mockDb = MockDatabaseImpl.getInstance();
       const database = mockDb.getDatabase();
       
@@ -163,7 +163,7 @@ export const scheduleApi = {
   addTask: async (scheduleId: string, task: Omit<Task, 'id'>): Promise<Task> => {
     if (USE_MOCK_DATA) {
       // MockDatabase에서 직접 추가
-      const { MockDatabaseImpl } = await import('../../mocks/database/MockDatabase');
+      const { MockDatabaseImpl } = await import('@/mocks/database/MockDatabase');
       const mockDb = MockDatabaseImpl.getInstance();
       const database = mockDb.getDatabase();
       
@@ -194,7 +194,7 @@ export const scheduleApi = {
   updateTask: async (projectId: string, taskId: number | string, updates: Partial<Task>): Promise<Task> => {
     if (USE_MOCK_DATA) {
       // MockDatabase에서 직접 업데이트
-      const { MockDatabaseImpl } = await import('../../mocks/database/MockDatabase');
+      const { MockDatabaseImpl } = await import('@/mocks/database/MockDatabase');
       const mockDb = MockDatabaseImpl.getInstance();
       const database = mockDb.getDatabase();
       

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { APP_CONSTANTS } from '../../config/constants';
-import { clearAllStorage, getAuthToken, clearAuthTokens } from '../../utils/storageConversions';
+import { APP_CONSTANTS } from '@/config/constants';
+import { clearAllStorage, getAuthToken, clearAuthTokens } from '@/utils/storageConversions';
 
 interface RetryConfig {
   retries?: number;

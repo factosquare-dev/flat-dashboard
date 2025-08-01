@@ -1,6 +1,6 @@
 import type { UserRole } from '../../../store/slices/userSlice';
 import type { UserFormData, FormErrors } from './types';
-import { UserRole as UserRoleEnum } from '../../../types/enums';
+import { UserRole as UserRoleEnum } from '@/types/enums';
 
 export const formatPhoneNumber = (value: string): string => {
   const numbers = value.replace(/[^0-9]/g, '');

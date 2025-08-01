@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode, useMemo } from 'react';
-import { useProjects } from '../lib/react-query/hooks/useProjects';
+import { useProjects } from '../providers/query/hooks/useProjects';
 import { useModalState } from '../hooks/common/useModalState';
 import type { Project, Customer, Task, Participant } from '../types';
 

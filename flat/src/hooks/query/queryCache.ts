@@ -1,5 +1,5 @@
 import type { CacheEntry } from './types';
-import { DURATION } from '../../constants/time';
+import { DURATION } from '@/constants/time';
 
 class QueryCache {
   private cache = new Map<string, CacheEntry>();

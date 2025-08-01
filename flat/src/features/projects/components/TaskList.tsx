@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check, AlertCircle } from 'lucide-react';
-import { cn } from '../../../utils/cn';
-import { TaskStatus } from '../../../types/enums';
+import { cn } from '@/utils/cn';
+import { TaskStatus } from '@/types/enums';
 import type { Task as ScheduleTask } from '../../../types/schedule';
 import './TaskList.css';
 

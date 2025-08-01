@@ -4,8 +4,8 @@
  */
 
 import { MockDatabase } from '../types';
-import { storageKeys } from '../../../config';
-import { DATABASE_CONFIG } from '../../../config/database';
+import { storageKeys } from '@/config';
+import { DATABASE_CONFIG } from '@/config/database';
 
 export class StorageManager {
   private readonly STORAGE_KEY = storageKeys.mockDbKey;

@@ -1,5 +1,5 @@
 import { User, UserRole } from '@/types/user';
-import { TIME_CONSTANTS } from '../../../constants/time';
+import { TIME_CONSTANTS } from '@/constants/time';
 
 export const createUsers = (): User[] => {
   return [

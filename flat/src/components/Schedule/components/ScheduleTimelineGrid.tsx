@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Participant, Task, ResizePreview } from '../../../types/schedule';
-import { getProjectRowCount } from '../../../utils/taskUtils';
+import { getProjectRowCount } from '@/utils/taskUtils';
 import TimelineHeader from '../TimelineHeader';
 import ProjectRow from './ProjectRow';
 import DragPreview from './DragPreview';

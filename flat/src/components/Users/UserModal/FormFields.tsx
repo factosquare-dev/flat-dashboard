@@ -1,7 +1,7 @@
 import React from 'react';
 import type { UserFormData, FormErrors } from './types';
 import { getRoleLabel, getDepartmentLabel, getPositionLabel } from './utils';
-import { UserRole } from '../../../types/enums';
+import { UserRole } from '@/types/enums';
 
 interface FormFieldsProps {
   formData: UserFormData;

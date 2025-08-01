@@ -6,10 +6,10 @@ import { DateSelection } from './DateSelection';
 import { workflowReducer } from './reducer';
 import { initialWorkflowState } from './constants';
 import { AlertCircle } from 'lucide-react';
-import { useModalFormValidation } from '../../hooks/useModalFormValidation';
-import { ModalSize, ButtonVariant, ButtonSize } from '../../types/enums';
+import { useModalFormValidation } from '@/hooks/useModalFormValidation';
+import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
 import { Button } from '../ui/Button';
-import { getModalSizeString } from '../../utils/modalUtils';
+import { getModalSizeString } from '@/utils/modalUtils';
 import type { WorkflowModalProps } from './types';
 import './WorkflowModal.css';
 

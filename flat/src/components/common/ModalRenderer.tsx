@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { useModalRenderer } from '../../hooks/common/useModalStore';
+import { useModalRenderer } from '@/hooks/common/useModalStore';
 
 export const ModalRenderer: React.FC = () => {
   const { modals, closeModal } = useModalRenderer();

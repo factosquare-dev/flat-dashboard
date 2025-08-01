@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { logger } from '../../utils/logger';
-import { handleError as utilHandleError } from '../../utils/error/errorHandler';
-import { handleError, FlatError } from '../../errors';
+import { logger } from '@/utils/logger';
+import { handleError as utilHandleError } from '@/utils/error/errorHandler';
+import { handleError, FlatError } from '@/errors';
 import { ErrorFallback } from './ErrorFallback';
 
 interface Props {

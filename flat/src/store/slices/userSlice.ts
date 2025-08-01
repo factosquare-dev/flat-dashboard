@@ -1,5 +1,5 @@
-import { UserRole } from '../../types/enums';
-import { UserId } from '../../types/branded';
+import { UserRole } from '@/types/enums';
+import { UserId } from '@/types/branded';
 import type { StateCreator } from 'zustand';
 
 export interface User {

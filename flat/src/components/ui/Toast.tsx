@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
-import { useStore } from '../../store';
-import { ToastVariant } from '../../types/enums';
-import { cn } from '../../utils/cn';
+import { useStore } from '@/store';
+import { ToastVariant } from '@/types/enums';
+import { cn } from '@/utils/cn';
 import './Toast.css';
 
 const variantClassMap = {

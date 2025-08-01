@@ -1,8 +1,8 @@
 import { Schedule, Task, TaskStatus, Participant } from '@/types/schedule';
 import { Project, ProjectStatus } from '@/types/project';
 import { User, UserRole } from '@/types/user';
-import { taskTypesByFactoryType } from '../../../data/factories';
-import { parseDate, toLocalDateString, getTaskStatusByDate } from '../../../utils/unifiedDateUtils';
+import { taskTypesByFactoryType } from '@/data/factories';
+import { parseDate, toLocalDateString, getTaskStatusByDate } from '@/utils/unifiedDateUtils';
 
 export function createSchedulesAndTasks(projects: Project[], users: User[]): { schedules: Schedule[], tasks: Task[] } {
   const schedules: Schedule[] = [];

@@ -1,3 +1,5 @@
+import { ButtonVariant, ModalSize } from '@/types/enums';
+
 /**
  * Compound Components Export
  * 
@@ -43,7 +45,7 @@ export const CompoundComponentExamples = {
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={onClose}>Cancel</Button>
-        <Button variant="primary" onClick={onSave}>Save</Button>
+        <Button variant={ButtonVariant.PRIMARY} onClick={onSave}>Save</Button>
       </Modal.Footer>
     </Modal.Root>
   `,
@@ -93,8 +95,8 @@ export const CompoundComponentExamples = {
       </Form.Section>
       
       <Form.Actions>
-        <Button variant="secondary">Cancel</Button>
-        <Button variant="primary" type="submit">Save</Button>
+        <Button variant={ButtonVariant.SECONDARY}>Cancel</Button>
+        <Button variant={ButtonVariant.PRIMARY} type="submit">Save</Button>
       </Form.Actions>
     </Form.Root>
   `,
@@ -109,7 +111,7 @@ export const CompoundComponentExamples = {
         {/* Content */}
       </CardContent>
       <CardFooter>
-        <Button size="sm">View All</Button>
+        <Button size={ModalSize.SM}>View All</Button>
       </CardFooter>
     </Card>
   `
