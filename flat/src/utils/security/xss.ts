@@ -1,9 +1,10 @@
 import DOMPurify from 'dompurify';
+import type { Config } from 'dompurify';
 
 /**
  * Sanitize HTML content to prevent XSS attacks
  */
-export function sanitizeHtml(dirty: string, options?: DOMPurify.Config): string {
+export function sanitizeHtml(dirty: string, options?: Config): string {
   return DOMPurify.sanitize(dirty, {
     ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'p', 'br', 'span', 'div', 'a'],
     ALLOWED_ATTR: ['href', 'class', 'id', 'target', 'rel'],
@@ -103,31 +104,3 @@ export function setInnerHTML(element: HTMLElement, html: string): void {
   element.innerHTML = sanitizeHtml(html);
 }
 
-/**
- * React component for rendering sanitized HTML
- */
-export interface SafeHTMLProps {
-  html: string;
-  className?: string;
-  allowedTags?: string[];
-  allowedAttributes?: string[];
-}
-
-export const SafeHTML: React.FC<SafeHTMLProps> = ({ 
-  html, 
-  className,
-  allowedTags,
-  allowedAttributes 
-}) => {
-  const sanitized = sanitizeHtml(html, {
-    ALLOWED_TAGS: allowedTags,
-    ALLOWED_ATTR: allowedAttributes
-  });
-  
-  return (
-    <div 
-      className={className}
-      dangerouslySetInnerHTML={{ __html: sanitized }}
-    />
-  );
-};

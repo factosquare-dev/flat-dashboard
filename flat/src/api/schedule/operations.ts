@@ -4,7 +4,7 @@ import { formatDate } from '@/utils/coreUtils';
 import { USE_MOCK_DATA } from '@/config/mock';
 import { getDatabaseWithRetry } from '@/mocks/database/utils';
 // Removed deprecated scheduleAdapter import
-import { createMockSchedules } from '@/data/mockSchedules';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 import { mockDataService } from '@/services/mockDataService';
 
 /**
@@ -202,7 +202,9 @@ export const getOrCreateScheduleForProject = async (
   // Get mock schedules and find tasks for this specific project
   let mockSchedules: Schedule[] = [];
   try {
-    mockSchedules = createMockSchedules();
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    mockSchedules = Array.from(database.schedules.values());
   } catch {
     // Continue with empty array
   }

@@ -9,3 +9,4 @@ export { default as FactoryTypeBadge } from './FactoryTypeBadge';
 export { default as StatusBadge } from './StatusBadge';
 export { default as LoadingState } from './LoadingState';
 export { default as EmptyState } from './EmptyState';
+export { SafeHTML } from './SafeHTML';

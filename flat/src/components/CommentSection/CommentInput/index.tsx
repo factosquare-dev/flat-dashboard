@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { User } from '../../types/comment';
 import { Send } from 'lucide-react';
-import { managerNames } from '@/components/data/mockData';
+import { mockDataService } from '@/services/mockDataService';
 
 interface CommentInputProps {
   currentUser: User;
@@ -34,12 +34,22 @@ const CommentInput: React.FC<CommentInputProps> = ({
   const [cursorPosition, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  // Mock users for mention suggestions - Mock DB에서 가져오기
-  const mockUsers: MentionSuggestion[] = managerNames.map((name, index) => ({
-    id: (index + 1).toString(),
-    name,
-    avatar: ''
-  }));
+  // Mock users for mention suggestions - MockDB에서 가져오기
+  const mockUsers: MentionSuggestion[] = React.useMemo(() => {
+    try {
+      const users = mockDataService.getUsers();
+      return users
+        .filter(user => user.role === 'PRODUCT_MANAGER' || user.role === 'ADMIN')
+        .map(user => ({
+          id: user.id,
+          name: user.name,
+          avatar: user.profileImage || ''
+        }));
+    } catch (error) {
+      console.error('Failed to load users from MockDB:', error);
+      return [];
+    }
+  }, []);
   
   const filteredUsers = mockUsers.filter(user => 
     user.name.toLowerCase().includes(mentionSearch.toLowerCase()) &&

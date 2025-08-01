@@ -3,9 +3,9 @@ import type { Project } from '../../../types/project';
 import type { ProjectId } from '../../../types/branded';
 import { formatKoreanNumber, parseKoreanNumber } from '@/utils/coreUtils';
 import { formatDate } from '@/utils/unifiedDateUtils';
-import { factoriesByType } from '@/data/mockData';
+import { getFactoriesByType } from '@/data/factories';
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
-import { EditableCellType } from '@/types/enums';
+import { EditableCellType, FactoryType, ProjectField } from '@/types/enums';
 
 interface EditableCellProps {
   project: Project;
@@ -50,7 +50,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   if (type === EditableCellType.SEARCH && editing) {
     // 필드에 따라 다른 검색 리스트 사용
     let searchList: string[] = [];
-    if (field === 'client') {
+    if (field === ProjectField.CLIENT) {
       // Mock DB에서 고객사 리스트 가져오기
       try {
         const db = MockDatabaseImpl.getInstance();
@@ -60,12 +60,12 @@ const EditableCell: React.FC<EditableCellProps> = ({
       } catch (error) {
         searchList = ['뷰티코리아', '그린코스메틱', '코스메디칼', '퍼스트뷰티'];
       }
-    } else if (field === 'manufacturer') {
-      searchList = factoriesByType.manufacturing.map(f => f.name);
-    } else if (field === 'container') {
-      searchList = factoriesByType.container.map(f => f.name);
-    } else if (field === 'packaging') {
-      searchList = factoriesByType.packaging.map(f => f.name);
+    } else if (field === ProjectField.MANUFACTURER_ID) {
+      searchList = getFactoriesByType(FactoryType.MANUFACTURING).map(f => f.name);
+    } else if (field === ProjectField.CONTAINER_ID) {
+      searchList = getFactoriesByType(FactoryType.CONTAINER).map(f => f.name);
+    } else if (field === ProjectField.PACKAGING_ID) {
+      searchList = getFactoriesByType(FactoryType.PACKAGING).map(f => f.name);
     }
     
     return (

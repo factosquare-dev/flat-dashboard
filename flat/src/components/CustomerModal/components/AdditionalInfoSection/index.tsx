@@ -1,7 +1,6 @@
 import React from 'react';
 import { MapPin, Hash, FileText } from 'lucide-react';
-import FormInput from '@/components/forms';
-import FormTextarea from '@/components/forms';
+import { FormInput, FormTextarea } from '@/components/forms';
 import ModalSection from '@/components/CustomerModal/common/ModalSection';
 
 interface AdditionalInfoSectionProps {

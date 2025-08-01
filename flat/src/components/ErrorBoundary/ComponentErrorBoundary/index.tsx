@@ -30,17 +30,25 @@ const ComponentErrorFallback: React.FC<{ error: Error; resetError: () => void; c
   );
 };
 
+// Create a named component for the default fallback
+const createDefaultFallback = (componentName?: string): React.ComponentType<{ error: Error; resetError: () => void }> => {
+  const DefaultFallback: React.FC<{ error: Error; resetError: () => void }> = (props) => (
+    <ComponentErrorFallback {...props} componentName={componentName} />
+  );
+  DefaultFallback.displayName = `DefaultFallback(${componentName || 'Component'})`;
+  return DefaultFallback;
+};
+
 export const ComponentErrorBoundary: React.FC<ComponentErrorBoundaryProps> = ({ 
   children, 
   componentName,
   fallback 
 }) => {
-  const defaultFallback = fallback || ((props) => (
-    <ComponentErrorFallback {...props} componentName={componentName} />
-  ));
+  // Use provided fallback or create a proper component (not an inline function)
+  const FallbackComponent = fallback || createDefaultFallback(componentName);
 
   return (
-    <ErrorBoundary fallback={defaultFallback}>
+    <ErrorBoundary fallback={FallbackComponent}>
       {children}
     </ErrorBoundary>
   );

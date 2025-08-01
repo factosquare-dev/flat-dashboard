@@ -14,6 +14,9 @@ export type ServiceTypeString = 'OEM' | 'ODM' | 'OBM' | 'Private Label' | 'White
 export type ProjectStatusKorean = '시작전' | '진행중' | '완료' | '중단';
 export type PriorityString = '높음' | '보통' | '낮음' | 'high' | 'medium' | 'low';
 
+// Product type is currently a string - will be enum in future
+export type ProductType = string;
+
 export interface Customer {
   id: CustomerId;
   name: string;

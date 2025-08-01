@@ -2,6 +2,8 @@ import type { Project, HierarchicalProject } from '../types/project';
 import type { ProjectId } from '../types/branded';
 import { ProjectType } from '../types/enums';
 import { isProjectType } from '../utils/projectTypeUtils';
+import { toLocalDateString } from '../utils/unifiedDateUtils';
+import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 
 export class ProjectTableService {
   /**
@@ -110,5 +112,66 @@ export class ProjectTableService {
       const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       return direction === 'asc' ? comparison : -comparison;
     });
+  }
+
+  /**
+   * Duplicate a project with cascade support for Master-SUB relationships
+   */
+  static prepareDuplicateProject(project: Project): {
+    masterProject: Omit<Project, 'id'>;
+    subProjects: Omit<Project, 'id'>[];
+    newMasterId?: string;
+  } {
+    const db = MockDatabaseImpl.getInstance();
+    const freshProject = db.getProject(project.id) || project;
+    const currentDate = toLocalDateString(new Date());
+    
+    // Check if this is a Master project
+    if (isProjectType(freshProject.type, ProjectType.MASTER)) {
+      // Get all SUB projects associated with this Master
+      const allProjects = Array.from(db.getDatabase().projects.values());
+      const subProjects = allProjects.filter(p => 
+        isProjectType(p.type, ProjectType.SUB) && p.parentId === freshProject.id
+      );
+      
+      // Prepare new Master project
+      const { id: masterId, ...masterWithoutId } = freshProject;
+      const newMasterId = `project-${Date.now()}`;
+      const masterProject = {
+        ...masterWithoutId,
+        startDate: currentDate,
+        endDate: currentDate
+      };
+      
+      // Prepare SUB projects with new parent ID
+      const duplicatedSubProjects = subProjects.map((subProject, index) => {
+        const { id: subId, ...subWithoutId } = subProject;
+        return {
+          ...subWithoutId,
+          parentId: newMasterId as ProjectId,
+          startDate: currentDate,
+          endDate: currentDate
+        };
+      });
+      
+      return {
+        masterProject,
+        subProjects: duplicatedSubProjects,
+        newMasterId
+      };
+    } else {
+      // Not a Master project, prepare single project
+      const { id, ...projectWithoutId } = freshProject;
+      const duplicatedProject = {
+        ...projectWithoutId,
+        startDate: currentDate,
+        endDate: currentDate
+      };
+      
+      return {
+        masterProject: duplicatedProject,
+        subProjects: []
+      };
+    }
   }
 }

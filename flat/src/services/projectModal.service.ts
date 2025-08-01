@@ -2,9 +2,10 @@ import type { Comment } from '../types/comment';
 import type { User } from '../types/user';
 import { UserRole } from '../types/user';
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-
+import type { Project } from '../types/project';
 import { ProjectStatus, Priority, ServiceType } from '../types/enums';
 import type { ProjectData } from '../components/ProjectModal/types';
+import { toLocalDateString } from '../utils/unifiedDateUtils';
 
 export class ProjectModalService {
   /**
@@ -23,8 +24,6 @@ export class ProjectModalService {
       manufacturer: '',
       container: '',
       packaging: '',
-      sales: '',
-      purchase: '',
       description: ''
     };
   }
@@ -155,6 +154,29 @@ export class ProjectModalService {
       ...comment,
       content: newContent,
       updatedAt: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Convert Project to ProjectData for modal form
+   */
+  static convertProjectToFormData(project: Project): ProjectData {
+    // Use productType directly as it comes from DB
+    // The project object should already have the correct productType from MockDB
+    return {
+      id: project.id,
+      client: project.client || project.customer?.name || '',
+      manager: project.manager || '',
+      productType: project.productType || '',
+      serviceType: project.serviceType || ServiceType.OEM,
+      status: project.status || ProjectStatus.PLANNING,
+      priority: project.priority || Priority.MEDIUM,
+      startDate: project.startDate instanceof Date ? toLocalDateString(project.startDate) : project.startDate || '',
+      endDate: project.endDate instanceof Date ? toLocalDateString(project.endDate) : project.endDate || '',
+      manufacturer: Array.isArray(project.manufacturer) ? project.manufacturer.join(', ') : project.manufacturer || '',
+      container: Array.isArray(project.container) ? project.container.join(', ') : project.container || '',
+      packaging: Array.isArray(project.packaging) ? project.packaging.join(', ') : project.packaging || '',
+      description: ''
     };
   }
 }

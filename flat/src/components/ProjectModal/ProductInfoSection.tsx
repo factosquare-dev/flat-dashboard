@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { Package } from 'lucide-react';
 import type { ProjectData } from './types';
-import { productTypes } from '@/data/mockData';
 import { SERVICE_TYPE_OPTIONS } from '@/constants';
 import { mockDataService } from '@/services/mockDataService';
 
@@ -11,18 +10,13 @@ interface ProductInfoSectionProps {
 }
 
 const ProductInfoSectionComponent: React.FC<ProductInfoSectionProps> = ({ formData, onChange }) => {
-  // Get products from MockDB with category information
+  // Get products only from MockDB
   const availableProducts = useMemo(() => {
     try {
       return mockDataService.getProductsWithCategory();
     } catch (error) {
-      console.warn('Failed to load products from MockDB, using fallback data:', error);
-      return productTypes.map(type => ({
-        id: type,
-        name: type,
-        categoryName: type,
-        categoryPath: type
-      }));
+      console.error('Failed to load products from MockDB:', error);
+      return [];
     }
   }, []);
 

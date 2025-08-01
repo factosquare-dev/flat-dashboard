@@ -15,8 +15,8 @@ export const useProjectListState = () => {
     projectModal.openCreateModal();
   }, [projectModal]);
 
-  const handleEditProject = useCallback((project: Project) => {
-    projectModal.openEditModal(project);
+  const handleEditProject = useCallback(async (project: Project) => {
+    await projectModal.openEditModal(project);
   }, [projectModal]);
 
   const handleDeleteProject = useCallback((projectId: string) => {

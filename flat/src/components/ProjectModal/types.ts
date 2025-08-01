@@ -1,3 +1,5 @@
+import type { Project } from '../../types/project';
+
 export interface ProjectData {
   id?: string;
   client: string;
@@ -11,8 +13,6 @@ export interface ProjectData {
   manufacturer: string;
   container: string;
   packaging: string;
-  sales: string;
-  purchase: string;
   description?: string;
 }
 
@@ -20,6 +20,6 @@ export interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: ProjectData) => void;
-  editData?: ProjectData | null;
+  editData?: Project | null;
   mode: 'create' | 'edit';
 }

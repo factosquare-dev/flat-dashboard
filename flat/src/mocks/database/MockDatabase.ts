@@ -117,6 +117,13 @@ export class MockDatabaseImpl {
     return this.crudOperations.get(this.db, collection, id);
   }
 
+  /**
+   * Alias for get method for better readability
+   */
+  async getById<T>(collection: keyof MockDatabase, id: string): Promise<DbResponse<T>> {
+    return this.get<T>(collection, id);
+  }
+
   async getAll<T>(collection: keyof MockDatabase): Promise<DbResponse<T[]>> {
     return this.crudOperations.getAll(this.db, collection);
   }

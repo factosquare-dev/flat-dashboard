@@ -308,10 +308,30 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
                   e.stopPropagation();
                   const buttonRect = (e.target as HTMLElement).getBoundingClientRect();
                   const dropdownWidth = 160;
-                  onShowOptionsMenu(project.id, {
-                    top: buttonRect.bottom + 2,
-                    left: buttonRect.right - dropdownWidth
-                  }, e);
+                  const dropdownHeight = 120; // Approximate height of the dropdown menu
+                  
+                  // Calculate position with viewport awareness
+                  const viewportHeight = window.innerHeight;
+                  const spaceBelow = viewportHeight - buttonRect.bottom;
+                  const spaceAbove = buttonRect.top;
+                  
+                  // Determine vertical position
+                  let top: number;
+                  if (spaceBelow >= dropdownHeight + 10) {
+                    // Enough space below, show dropdown below button
+                    top = buttonRect.bottom + 2;
+                  } else if (spaceAbove >= dropdownHeight + 10) {
+                    // Not enough space below but enough above, show dropdown above button
+                    top = buttonRect.top - dropdownHeight - 2;
+                  } else {
+                    // Not enough space either way, align with viewport bottom
+                    top = viewportHeight - dropdownHeight - 10;
+                  }
+                  
+                  // Ensure horizontal position stays within viewport
+                  const left = Math.max(10, buttonRect.right - dropdownWidth);
+                  
+                  onShowOptionsMenu(project.id, { top, left }, e);
                 }}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors options-menu-button"
                 aria-label={`프로젝트 ${project.client} 옵션 메뉴`}

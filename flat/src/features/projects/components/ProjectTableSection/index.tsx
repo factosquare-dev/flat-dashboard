@@ -132,16 +132,25 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const isOptionsMenu = target.closest('.options-menu-dropdown');
+      const isOptionsButton = target.closest('.options-menu-button');
       
-      if (!isOptionsMenu) {
+      // Don't close if clicking inside menu or on the button
+      if (!isOptionsMenu && !isOptionsButton) {
         setShowOptionsMenu(null);
         setDropdownPosition(null);
       }
     };
     
     if (showOptionsMenu) {
-      document.addEventListener('click', handleClickOutside, true);
-      return () => document.removeEventListener('click', handleClickOutside, true);
+      // Use setTimeout to ensure this runs after the current event loop
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+      }, 0);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('click', handleClickOutside);
+      };
     }
   }, [showOptionsMenu, setShowOptionsMenu, setDropdownPosition]);
 

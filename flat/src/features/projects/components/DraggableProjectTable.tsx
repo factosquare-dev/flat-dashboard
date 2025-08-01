@@ -128,10 +128,15 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
       moveToMaster(draggedProjectId, targetProject.id);
       setDraggedProjectId(null);
     } else if (isProjectType(targetProject.type, ProjectType.SUB)) {
-      // Dropping on SUB project - always stop propagation to prevent making it independent
-      e.stopPropagation();
-      setDraggedProjectId(null);
-      return;
+      // Dropping on SUB project
+      if (draggedProject.parentId && targetProject.parentId === draggedProject.parentId) {
+        // Same parent group - do nothing
+        e.stopPropagation();
+        setDraggedProjectId(null);
+        return;
+      }
+      // Different parent or independent SUB - let it bubble to container to make independent
+      // Don't stop propagation here
     }
     // If not handled above, let event bubble to container for independent project handling
   };

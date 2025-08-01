@@ -8,10 +8,10 @@ import { useScheduleTasks } from '@/hooks/useScheduleTasks';
 import { useScheduleTasksWithStore } from '@/hooks/useScheduleTasksWithStore';
 import { factories } from '@/data/factories';
 import { storageKeys } from '@/config';
-import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 import { parseScheduleDate } from '@/utils/scheduleDateParsing';
 import { addDays, startOfDay } from 'date-fns';
 import { getParticipantColor } from '@/utils/scheduleColorManager';
+import { useProjectFactories } from '@/hooks/useProjectFactories';
 
 interface ModalState {
   showEmailModal: boolean;
@@ -159,96 +159,14 @@ export const useScheduleState = (
     "#06b6d4"  // cyan-500
   ], []);
 
+  // Get project factories using custom hook
+  const projectFactoriesFromDB = useProjectFactories(projectId);
+
   // Project의 factory ID들을 기반으로 공장 목록 생성
   const getProjectFactories = () => {
-    // projectId가 있으면 MockDB에서 Project의 공장 정보 가져오기 (우선순위)
-    if (projectId) {
-      try {
-        // MockDB 인스턴스 직접 사용
-        const db = MockDatabaseImpl.getInstance();
-        const database = db.getDatabase();
-        
-        if (!database || database.projects.size === 0) {
-          console.log('[Schedule] MockDB is not initialized yet');
-          return [];
-        }
-        
-        // Project에서 공장 정보 가져오기
-        const project = database.projects.get(projectId);
-        const factoriesData = Object.fromEntries(database.factories);
-        if (project) {
-          const factoryList: ScheduleFactory[] = [];
-          
-          // manufacturerId 처리
-          if (project.manufacturerId) {
-            const manufacturerIds = Array.isArray(project.manufacturerId) ? project.manufacturerId : [project.manufacturerId];
-            manufacturerIds.forEach((id: string) => {
-              const factory = factoriesData[id];
-              if (factory) {
-                factoryList.push({
-                  id: factory.id,
-                  name: factory.name,
-                  type: factory.type || 'MANUFACTURER',
-                  period: '',
-                  color: getParticipantColor(factory.id)
-                });
-              }
-            });
-          }
-          
-          // containerId 처리
-          if (project.containerId) {
-            const containerIds = Array.isArray(project.containerId) ? project.containerId : [project.containerId];
-            containerIds.forEach((id: string) => {
-              const factory = factoriesData[id];
-              if (factory) {
-                factoryList.push({
-                  id: factory.id,
-                  name: factory.name,
-                  type: factory.type || 'CONTAINER',
-                  period: '',
-                  color: getParticipantColor(factory.id)
-                });
-              }
-            });
-          }
-          
-          // packagingId 처리
-          if (project.packagingId) {
-            const packagingIds = Array.isArray(project.packagingId) ? project.packagingId : [project.packagingId];
-            packagingIds.forEach((id: string) => {
-              const factory = factoriesData[id];
-              if (factory) {
-                factoryList.push({
-                  id: factory.id,
-                  name: factory.name,
-                  type: factory.type || 'PACKAGING',
-                  period: '',
-                  color: getParticipantColor(factory.id)
-                });
-              }
-            });
-          }
-          
-          // 중복 제거 (ID 기준)
-          const uniqueFactoryList = factoryList.filter((factory, index, self) => 
-            index === self.findIndex(f => f.id === factory.id)
-          );
-          
-          console.log('[Schedule] ✅ Factories loaded from MockDB:', {
-            projectId,
-            originalCount: factoryList.length,
-            uniqueCount: uniqueFactoryList.length,
-            factories: uniqueFactoryList.map(f => f.name)
-          });
-          
-          return uniqueFactoryList;
-        } else {
-          console.log('[Schedule] ❌ Project not found in MockDB:', projectId);
-        }
-      } catch (error) {
-        // Error loading factories
-      }
+    // Use factories from custom hook if available
+    if (projectFactoriesFromDB.length > 0) {
+      return projectFactoriesFromDB;
     }
 
     // projectId가 없으면 participants 사용 (하위 호환성)
@@ -260,7 +178,7 @@ export const useScheduleState = (
     return [];
   };
 
-  const participantsList = useMemo(() => getProjectFactories(), [participants, projectId]);
+  const participantsList = useMemo(() => getProjectFactories(), [participants, projectId, projectFactoriesFromDB]);
   
   // "공장 추가" 행을 마지막에 추가 (항상 표시)
   const initialProjects = useMemo(() => {

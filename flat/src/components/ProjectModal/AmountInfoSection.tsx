@@ -10,8 +10,9 @@ interface AmountInfoSectionProps {
 }
 
 const AmountInfoSection: React.FC<AmountInfoSectionProps> = ({ formData, onChange }) => {
-  const formatCurrencyValue = (value: string) => {
-    const num = value.replace(/[^0-9]/g, '');
+  const formatCurrencyValue = (value: string | number) => {
+    const stringValue = String(value || '');
+    const num = stringValue.replace(/[^0-9]/g, '');
     if (!num) return '';
     return formatCurrency(parseInt(num));
   };

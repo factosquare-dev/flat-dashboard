@@ -135,17 +135,19 @@ export const useProjects = () => {
     }
   };
 
-  const enhancedDeleteProjects = (projectIds: string[]) => {
+  const enhancedDeleteProjects = (projectIds: string | string[]) => {
+    // Convert single ID to array for consistent handling
+    const idsToDelete = Array.isArray(projectIds) ? projectIds : [projectIds];
     if (useHierarchicalMode) {
       setHierarchicalData(prev => 
         prev.reduce<Project[]>((acc, project) => {
           // Remove if it's a top-level project being deleted
-          if (projectIds.includes(project.id)) {
+          if (idsToDelete.includes(project.id)) {
             return acc;
           }
           // Filter children if any are being deleted
           if (project.children) {
-            const filteredChildren = project.children.filter(child => !projectIds.includes(child.id));
+            const filteredChildren = project.children.filter(child => !idsToDelete.includes(child.id));
             if (filteredChildren.length > 0 || !project.children.length) {
               acc.push({ ...project, children: filteredChildren });
             }
@@ -156,7 +158,7 @@ export const useProjects = () => {
         }, [])
       );
     } else {
-      projectIds.forEach(id => deleteProject(id));
+      idsToDelete.forEach(id => deleteProject(id));
     }
     clearSelection();
   };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { TestTube } from 'lucide-react';
-import FormInput from '@/components/forms';
+import { FormInput } from '@/components/forms';
 import ModalSection from '../common/ModalSection';
 
 interface ContentInfo {
@@ -21,7 +21,7 @@ const IngredientInfoForm: React.FC<IngredientInfoFormProps> = ({
   onChange
 }) => {
   return (
-    <ModalSection title="성분" icon={<TestTube />} iconColor="text-pink-600">
+    <ModalSection title="성분" icon={TestTube} iconColor="text-pink-600">
       <FormInput
         label="컨셉성분"
         value={contentInfo.containerSpecifications}

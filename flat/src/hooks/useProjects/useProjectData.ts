@@ -9,10 +9,10 @@ import type { ProjectId } from '../../types/branded';
 import type { Schedule } from '../../types/schedule';
 import { factories } from '@/data/factories';
 import { scheduleApi } from '@/api/scheduleApi';
-import { extractProjectFromSchedule } from '@/data/mockSchedules';
 import { formatDateISO } from '@/utils/coreUtils';
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 import { isProjectType } from '@/utils/projectTypeUtils';
+import { formatCompanyNameForDisplay } from '@/utils/companyUtils';
 
 // Helper functions
 const getRelativeDate = (daysOffset: number): string => {
@@ -140,12 +140,12 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
             if (Array.isArray(factoryIds)) {
               const names = factoryIds.map(id => {
                 const factory = mockDb.getDatabase().factories.get(id);
-                return factory ? simplifyCompanyName(factory.name) : id;
+                return factory ? formatCompanyNameForDisplay(factory.name) : id;
               });
               updatedProject[factoryType] = names;
             } else if (factoryIds) {
               const factory = mockDb.getDatabase().factories.get(factoryIds);
-              updatedProject[factoryType] = factory ? simplifyCompanyName(factory.name) : factoryIds;
+              updatedProject[factoryType] = factory ? formatCompanyNameForDisplay(factory.name) : factoryIds;
             } else {
               updatedProject[factoryType] = null;
             }
@@ -180,11 +180,11 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
                     if (Array.isArray(factoryIds)) {
                       updatedMaster[field] = factoryIds.map(id => {
                         const factory = mockDb.getDatabase().factories.get(id);
-                        return factory ? simplifyCompanyName(factory.name) : id;
+                        return factory ? formatCompanyNameForDisplay(factory.name) : id;
                       });
                     } else {
                       const factory = mockDb.getDatabase().factories.get(factoryIds);
-                      updatedMaster[field] = factory ? simplifyCompanyName(factory.name) : factoryIds;
+                      updatedMaster[field] = factory ? formatCompanyNameForDisplay(factory.name) : factoryIds;
                     }
                   }
                 });
@@ -258,11 +258,11 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
                     if (Array.isArray(factoryIds)) {
                       updatedMaster[field] = factoryIds.map(id => {
                         const factory = mockDb.getDatabase().factories.get(id);
-                        return factory ? simplifyCompanyName(factory.name) : id;
+                        return factory ? formatCompanyNameForDisplay(factory.name) : id;
                       });
                     } else {
                       const factory = mockDb.getDatabase().factories.get(factoryIds);
-                      updatedMaster[field] = factory ? simplifyCompanyName(factory.name) : factoryIds;
+                      updatedMaster[field] = factory ? formatCompanyNameForDisplay(factory.name) : factoryIds;
                     }
                   }
                 });

@@ -78,9 +78,7 @@ export const ProjectTableUI: React.FC<ProjectTableUIProps> = ({
     <>
       <div 
         ref={containerRef}
-        className={`h-full overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 ${
-          isDraggingOver ? 'bg-blue-50' : ''
-        }`}
+        className="h-full overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
         onDrop={handleContainerDrop}
         onDragOver={handleContainerDragOver}
         onDragLeave={handleContainerDragLeave}
@@ -119,25 +117,17 @@ export const ProjectTableUI: React.FC<ProjectTableUIProps> = ({
           isLoading={isLoading}
           loadMoreRef={loadMoreRef}
         />
-        
-        {/* Drag over indicator */}
-        {isDraggingOver && (
-          <div className="text-center py-4 text-blue-600 bg-blue-50 border-2 border-dashed border-blue-300 mx-4 my-2 rounded-lg">
-            <p className="font-medium">
-              여기에 놓아 독립 프로젝트로 만들기
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Options menu dropdown for project actions */}
       {showOptionsMenu && dropdownPosition && (
         <OptionsMenu
           projectId={showOptionsMenu as ProjectId}
-          dropdownPosition={dropdownPosition}
+          position={dropdownPosition}
           onEdit={handleEditProject}
           onDelete={handleDeleteProject}
           onDuplicate={handleDuplicateProject}
+          onClose={() => handleShowOptionsMenu('', { top: 0, left: 0 })}
         />
       )}
     </>

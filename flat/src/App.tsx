@@ -3,7 +3,7 @@ import { AppRouter } from './router'
 import { ModalProvider } from './components/providers/ModalProvider'
 import { ThemeInitializer } from './components/providers/ThemeInitializer'
 import { RootProviders } from './contexts'
-import ErrorBoundary from './components/ErrorBoundary'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import Toast from './components/ui/Toast'
 import { queryCache } from './hooks/query/queryCache'
 import ModalRenderer from './components/common/ModalRenderer'
@@ -25,12 +25,12 @@ function App() {
   return (
     <ErrorBoundary>
       <RootProviders>
-        <ThemeInitializer />
+        {/* <ThemeInitializer /> */}
         <ModalProvider>
           <AppRouter />
           {/* <ToastContainer /> */}
-          <ModalRenderer />
-          <LoadingRenderer />
+          {/* <ModalRenderer /> */}
+          {/* <LoadingRenderer /> */}
         </ModalProvider>
       </RootProviders>
     </ErrorBoundary>

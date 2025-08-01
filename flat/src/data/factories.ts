@@ -248,7 +248,7 @@ export const factories: Factory[] = [
 ];
 
 // 타입별 공장 필터링 헬퍼 함수
-export const getFactoriesByType = (type: '제조' | '용기' | '포장'): Factory[] => {
+export const getFactoriesByType = (type: FactoryType): Factory[] => {
   return factories.filter(factory => factory.type === type);
 };
 

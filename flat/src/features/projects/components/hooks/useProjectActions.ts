@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import { useProjects } from '@/hooks/useProjects';
-import { toLocalDateString } from '@/utils/unifiedDateUtils';
+import { ProjectTableService } from '@/services/projectTable.service';
 
 export const useProjectActions = () => {
   const projectsHook = useProjects();
@@ -18,14 +18,29 @@ export const useProjectActions = () => {
   }, [projectsHook]);
 
   const duplicateProject = useCallback((project: Project) => {
-    const { id, ...projectWithoutId } = project;
-    const newProject = {
-      ...projectWithoutId,
-      client: `${project.client} (복사본)`,
-      startDate: toLocalDateString(new Date()),
-      endDate: toLocalDateString(new Date())
-    };
-    projectsHook.addProject(newProject);
+    try {
+      const { masterProject, subProjects, newMasterId } = ProjectTableService.prepareDuplicateProject(project);
+      
+      // Add the master project with the specified ID if it's a Master type
+      if (newMasterId) {
+        projectsHook.addProject({ ...masterProject, id: newMasterId });
+        
+        // Add all SUB projects with staggered timing to avoid ID conflicts
+        subProjects.forEach((subProject, index) => {
+          setTimeout(() => {
+            projectsHook.addProject(subProject);
+          }, 100 * (index + 1));
+        });
+      } else {
+        // Regular project duplication
+        projectsHook.addProject(masterProject);
+      }
+    } catch (error) {
+      console.error('[useProjectActions] Error duplicating project:', error);
+      // Fallback: basic duplication without cascade
+      const { id, ...projectWithoutId } = project;
+      projectsHook.addProject(projectWithoutId);
+    }
   }, [projectsHook]);
 
   const saveProject = useCallback((

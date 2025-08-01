@@ -54,6 +54,28 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError && this.state.error) {
       const FallbackComponent = this.props.fallback || ErrorFallback;
       
+      // Check if FallbackComponent is a React element (JSX) instead of a component
+      if (React.isValidElement(FallbackComponent)) {
+        console.warn('[ErrorBoundary] FallbackComponent is a React element, not a component. Using default fallback.');
+        return (
+          <ErrorFallback
+            error={this.state.error}
+            resetError={this.resetError}
+          />
+        );
+      }
+      
+      // Type guard to ensure FallbackComponent is a valid component function
+      if (typeof FallbackComponent !== 'function') {
+        console.error('[ErrorBoundary] Invalid FallbackComponent type:', typeof FallbackComponent, FallbackComponent);
+        return (
+          <ErrorFallback
+            error={this.state.error}
+            resetError={this.resetError}
+          />
+        );
+      }
+      
       return (
         <FallbackComponent
           error={this.state.error}

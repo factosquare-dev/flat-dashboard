@@ -17,11 +17,11 @@ export const LazyComponent: React.FC<LazyComponentProps> = ({
   const LazyLoadedComponent = lazy(component);
 
   return (
-    <ErrorBoundary ErrorFallback={ErrorFallback}>
+    <LazyErrorBoundary ErrorFallback={ErrorFallback}>
       <Suspense fallback={<Fallback />}>
         <LazyLoadedComponent />
       </Suspense>
-    </ErrorBoundary>
+    </LazyErrorBoundary>
   );
 };
 
@@ -46,21 +46,21 @@ const DefaultErrorFallback: React.FC<{ error: Error; retry: () => void }> = ({ e
 );
 
 // Error boundary for lazy components
-interface ErrorBoundaryState {
+interface LazyErrorBoundaryState {
   hasError: boolean;
   error?: Error;
 }
 
-class ErrorBoundary extends React.Component<
+class LazyErrorBoundary extends React.Component<
   { children: React.ReactNode; ErrorFallback: React.ComponentType<{ error: Error; retry: () => void }> },
-  ErrorBoundaryState
+  LazyErrorBoundaryState
 > {
   constructor(props: any) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): LazyErrorBoundaryState {
     return { hasError: true, error };
   }
 

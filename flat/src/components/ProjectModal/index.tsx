@@ -4,7 +4,6 @@ import ProductInfoSection from './ProductInfoSection';
 import ProjectStatusSection from './ProjectStatusSection';
 import ScheduleSection from './ScheduleSection';
 import FactoryInfoSection from './FactoryInfoSection';
-import AmountInfoSection from './AmountInfoSection';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
 import CommentSection from '../CommentSection';
 import type { ProjectModalProps, ProjectData } from './types';
@@ -24,6 +23,12 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
     ProjectModalService.getInitialFormData()
   );
 
+  // Define currentUser first
+  const currentUser = useMemo((): User => ({
+    id: 'current-user',
+    name: '현재 사용자',
+    avatar: ''
+  }), []);
 
   // Use custom hook for comment management
   const {
@@ -35,7 +40,9 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
 
   useEffect(() => {
     if (editData && mode === 'edit') {
-      setFormData(editData);
+      // Convert Project to ProjectData with proper field mapping
+      const formattedData = ProjectModalService.convertProjectToFormData(editData);
+      setFormData(formattedData);
     } else {
       // Reset form for create mode
       setFormData(ProjectModalService.getInitialFormData());
@@ -85,12 +92,6 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
     [mode]
   );
 
-  const currentUser = useMemo((): User => ({
-    id: 'current-user',
-    name: '현재 사용자',
-    avatar: ''
-  }), []);
-
   return (
     <BaseModal
       isOpen={isOpen}
@@ -134,7 +135,6 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
             <ProjectStatusSection formData={formData} onChange={updateFormData} />
             <ScheduleSection formData={formData} onChange={updateFormData} />
             <FactoryInfoSection formData={formData} onChange={updateFormData} />
-            <AmountInfoSection formData={formData} onChange={updateFormData} />
 
             {/* 댓글 섹션 */}
             <CommentSection
