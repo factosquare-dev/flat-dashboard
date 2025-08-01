@@ -8,7 +8,8 @@ import {
   DbResponse, 
   DbEvent, 
   DbEventType,
-  DbStats
+  DbStats,
+  DB_COLLECTIONS
 } from './types';
 import { seedData } from './seedData';
 import { StorageManager } from './managers/StorageManager';
@@ -16,6 +17,7 @@ import { EventManager } from './managers/EventManager';
 import { TransactionManager } from './managers/TransactionManager';
 import { CrudOperations } from './managers/CrudOperations';
 import { ProjectType } from '@/types/enums';
+import type { Project } from '@/types/project';
 
 export class MockDatabaseImpl {
   private static instance: MockDatabaseImpl;
@@ -125,6 +127,67 @@ export class MockDatabaseImpl {
       this.storageManager.saveToStorage(this.db);
     }
     return result;
+  }
+
+  /**
+   * Update project with Master-SUB synchronization
+   */
+  async updateProject(projectId: string, updates: Partial<Project>): Promise<DbResponse<Project>> {
+    const projectResult = await this.get<Project>(DB_COLLECTIONS.PROJECTS, projectId);
+    if (!projectResult.success || !projectResult.data) {
+      return projectResult;
+    }
+
+    const project = projectResult.data;
+
+    // If updating a SUB project's factory IDs, update Master aggregates
+    if (project.type === ProjectType.SUB && project.parentId) {
+      const factoryFieldsChanged = ['manufacturerId', 'containerId', 'packagingId'].some(
+        field => updates[field as keyof Project] !== undefined
+      );
+      
+      if (factoryFieldsChanged) {
+        // Update the SUB project first
+        const updateResult = await this.update<Project>(DB_COLLECTIONS.PROJECTS, projectId, updates);
+        
+        if (updateResult.success) {
+          // Then update Master aggregates
+          this.updateMasterProjectAggregates(project.parentId);
+        }
+        
+        return updateResult;
+      }
+    }
+
+    // If updating a Master project, sync changes to SUB projects
+    if (project.type === ProjectType.MASTER) {
+      const syncFields = ['customerId', 'customer', 'priority', 'serviceType'];
+      const syncUpdates: Partial<Project> = {};
+      
+      syncFields.forEach(field => {
+        if (updates[field as keyof Project] !== undefined) {
+          syncUpdates[field as keyof Project] = updates[field as keyof Project];
+        }
+      });
+
+      // Update Master first
+      const updateResult = await this.update<Project>(DB_COLLECTIONS.PROJECTS, projectId, updates);
+      
+      if (updateResult.success && Object.keys(syncUpdates).length > 0) {
+        // Update all SUB projects
+        const subProjects = Array.from(this.db.projects.values())
+          .filter(p => p.type === ProjectType.SUB && p.parentId === projectId);
+          
+        for (const sub of subProjects) {
+          await this.update<Project>(DB_COLLECTIONS.PROJECTS, sub.id, syncUpdates);
+        }
+      }
+      
+      return updateResult;
+    }
+
+    // Regular update for other cases
+    return await this.update<Project>(DB_COLLECTIONS.PROJECTS, projectId, updates);
   }
 
   async delete(collection: keyof MockDatabase, id: string): Promise<DbResponse<void>> {
@@ -292,6 +355,95 @@ export class MockDatabaseImpl {
   }
 
   /**
+   * Get project with automatic aggregation for Master projects
+   */
+  async getProject(projectId: string): Promise<DbResponse<Project>> {
+    const projectResult = await this.get<Project>(DB_COLLECTIONS.PROJECTS, projectId);
+    
+    if (!projectResult.success || !projectResult.data) {
+      return projectResult;
+    }
+    
+    const project = projectResult.data;
+    
+    // If it's a Master project, update aggregates before returning
+    if (project.type === ProjectType.MASTER) {
+      const aggregateResult = this.updateMasterProjectAggregates(projectId);
+      if (aggregateResult.success) {
+        // Get the updated project
+        const updatedResult = await this.get<Project>(DB_COLLECTIONS.PROJECTS, projectId);
+        return updatedResult;
+      }
+    }
+    
+    return projectResult;
+  }
+
+  /**
+   * Get all projects with automatic aggregation for Master projects
+   */
+  async getAllProjects(): Promise<DbResponse<Project[]>> {
+    const allProjectsResult = await this.getAll<Project>(DB_COLLECTIONS.PROJECTS);
+    
+    if (!allProjectsResult.success || !allProjectsResult.data) {
+      return allProjectsResult;
+    }
+    
+    // Update all Master projects
+    const masterProjects = allProjectsResult.data.filter(p => p.type === ProjectType.MASTER);
+    for (const master of masterProjects) {
+      this.updateMasterProjectAggregates(master.id);
+    }
+    
+    // Return all projects (including updated Masters)
+    return await this.getAll<Project>(DB_COLLECTIONS.PROJECTS);
+  }
+
+  /**
+   * Create SUB project with inheritance from Master
+   */
+  async createSubProject(subProjectData: Partial<Project>): Promise<DbResponse<Project>> {
+    if (!subProjectData.parentId) {
+      return { success: false, error: 'SUB project must have parentId' };
+    }
+
+    // Get Master project
+    const masterResult = await this.getProject(subProjectData.parentId);
+    if (!masterResult.success || !masterResult.data) {
+      return { success: false, error: 'Master project not found' };
+    }
+
+    const master = masterResult.data;
+
+    // Inherit fields from Master (excluding factory IDs which are aggregated from SUBs)
+    const inheritedData = {
+      ...subProjectData,
+      type: ProjectType.SUB,
+      customerId: master.customerId,
+      customer: master.customer,
+      priority: master.priority,
+      serviceType: master.serviceType,
+      // Ensure dates are within Master bounds
+      startDate: subProjectData.startDate && new Date(subProjectData.startDate) < new Date(master.startDate) 
+        ? master.startDate 
+        : subProjectData.startDate,
+      endDate: subProjectData.endDate && new Date(subProjectData.endDate) > new Date(master.endDate) 
+        ? master.endDate 
+        : subProjectData.endDate,
+    };
+
+    // Create the SUB project
+    const createResult = await this.create<Project>(DB_COLLECTIONS.PROJECTS, inheritedData as Project);
+    
+    if (createResult.success) {
+      // Update Master project aggregates
+      this.updateMasterProjectAggregates(subProjectData.parentId);
+    }
+
+    return createResult;
+  }
+
+  /**
    * Update Master project with aggregated data from SUB projects
    */
   updateMasterProjectAggregates(masterId: string): DbResponse<void> {
@@ -375,15 +527,15 @@ export class MockDatabaseImpl {
       });
 
       // Update master project with aggregated data
+      // Note: Factory IDs are NOT stored in Master - they are fetched from SUBs on demand
       const updatedMaster = {
         ...masterProject,
         sales: aggregatedSales,
         purchase: aggregatedPurchase,
         startDate: earliestStartDate,
         endDate: latestEndDate,
-        manufacturerId: Array.from(allManufacturerIds),
-        containerId: Array.from(allContainerIds),
-        packagingId: Array.from(allPackagingIds),
+        // Factory IDs are intentionally NOT aggregated here
+        // They should be fetched from SUB projects when needed
         updatedAt: new Date()
       };
 

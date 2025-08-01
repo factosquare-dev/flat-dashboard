@@ -42,9 +42,9 @@ export function createMasterProjects(
     depositStatus: DepositStatus.PENDING,
     startDate: master1Start,
     endDate: master1End,
-    manufacturerId: '', // SUB에서 집계
-    containerId: '', // SUB에서 집계
-    packagingId: '', // SUB에서 집계
+    manufacturerId: undefined, // Master는 factory ID를 저장하지 않음 - SUB에서 실시간으로 가져옴
+    containerId: undefined, // Master는 factory ID를 저장하지 않음 - SUB에서 실시간으로 가져옴
+    packagingId: undefined, // Master는 factory ID를 저장하지 않음 - SUB에서 실시간으로 가져옴
     priority: Priority.MEDIUM, // Master는 중간 우선순위
     progress: 0, // SUB에서 집계
     scheduleId: 'schedule-1',
@@ -88,9 +88,9 @@ export function createMasterProjects(
     depositStatus: DepositStatus.PENDING,
     startDate: master2Start,
     endDate: master2End,
-    manufacturerId: '', // SUB에서 집계
-    containerId: '', // SUB에서 집계
-    packagingId: '', // SUB에서 집계
+    manufacturerId: undefined, // Master는 factory ID를 저장하지 않음 - SUB에서 실시간으로 가져옴
+    containerId: undefined, // Master는 factory ID를 저장하지 않음 - SUB에서 실시간으로 가져옴
+    packagingId: undefined, // Master는 factory ID를 저장하지 않음 - SUB에서 실시간으로 가져옴
     priority: Priority.MEDIUM, // Master는 중간 우선순위
     progress: 0, // SUB에서 집계
     scheduleId: 'schedule-2',

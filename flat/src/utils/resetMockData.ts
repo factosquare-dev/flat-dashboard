@@ -23,6 +23,11 @@ export const resetMockData = () => {
       localStorage.removeItem(key);
     });
     
+    // Clear MockDB singleton instance before reload
+    if ((window as any).MockDatabaseImpl) {
+      (window as any).MockDatabaseImpl.instance = null;
+    }
+    
     // Force page reload to reinitialize mock database
     window.location.reload();
   } catch (error) {

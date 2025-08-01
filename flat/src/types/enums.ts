@@ -17,6 +17,27 @@ export const FactoryTypeLabel: Record<FactoryType, string> = {
   [FactoryType.PACKAGING]: '포장',
 };
 
+// Project Factory Fields
+export enum ProjectFactoryField {
+  MANUFACTURER = 'manufacturer',
+  CONTAINER = 'container',
+  PACKAGING = 'packaging',
+}
+
+// Project Factory ID Fields
+export enum ProjectFactoryIdField {
+  MANUFACTURER_ID = 'manufacturerId',
+  CONTAINER_ID = 'containerId',
+  PACKAGING_ID = 'packagingId',
+}
+
+// Factory Field to Type Mapping
+export const FactoryFieldToType: Record<ProjectFactoryField, FactoryType> = {
+  [ProjectFactoryField.MANUFACTURER]: FactoryType.MANUFACTURING,
+  [ProjectFactoryField.CONTAINER]: FactoryType.CONTAINER,
+  [ProjectFactoryField.PACKAGING]: FactoryType.PACKAGING,
+};
+
 // Project Status
 export enum ProjectStatus {
   PLANNING = 'PLANNING',
@@ -451,12 +472,32 @@ export enum ParticipantRole {
 
 // Task Type
 export enum TaskType {
-  MATERIAL = 'MATERIAL',
+  // Common
+  DESIGN = 'DESIGN',
+  PROTOTYPING = 'PROTOTYPING',
   PRODUCTION = 'PRODUCTION',
-  QUALITY = 'QUALITY',
-  PACKAGING = 'PACKAGING',
+  QUALITY_CHECK = 'QUALITY_CHECK',
   INSPECTION = 'INSPECTION',
   SHIPPING = 'SHIPPING',
+  
+  // Manufacturing specific
+  SOURCING = 'SOURCING',
+  PREPARATION = 'PREPARATION',
+  
+  // Container specific
+  MOLD_MAKING = 'MOLD_MAKING',
+  
+  // Packaging specific
+  PRINTING_PLATE = 'PRINTING_PLATE',
+  PRINTING = 'PRINTING',
+  COLOR_CORRECTION = 'COLOR_CORRECTION',
+  POST_PROCESSING = 'POST_PROCESSING',
+  PACKING = 'PACKING',
+  
+  // Legacy (for backward compatibility)
+  MATERIAL = 'MATERIAL',
+  QUALITY = 'QUALITY',
+  PACKAGING = 'PACKAGING',
   OTHER = 'OTHER',
 }
 

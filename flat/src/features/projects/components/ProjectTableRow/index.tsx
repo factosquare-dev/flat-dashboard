@@ -8,7 +8,7 @@ import type { Column } from '@/hooks/useColumnOrder';
 import { useTaskManagement } from './useTaskManagement';
 import SelectionCell from './SelectionCell';
 import * as cellRenderers from './cellRenderers';
-import { ProjectType } from '@/types/enums';
+import { ProjectType, ProjectFactoryField } from '@/types/enums';
 import { isProjectType } from '@/utils/projectTypeUtils';
 
 interface ProjectTableRowProps {
@@ -103,7 +103,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
       case 'manufacturer':
         return (
           <cellRenderers.FactoryCell 
-            field="manufacturer"
+            field={ProjectFactoryField.MANUFACTURER}
             project={project}
             editableCell={editableCell}
             onUpdateField={onUpdateField}
@@ -113,7 +113,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
       case 'container':
         return (
           <cellRenderers.FactoryCell 
-            field="container"
+            field={ProjectFactoryField.CONTAINER}
             project={project}
             editableCell={editableCell}
             onUpdateField={onUpdateField}
@@ -123,7 +123,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
       case 'packaging':
         return (
           <cellRenderers.FactoryCell 
-            field="packaging"
+            field={ProjectFactoryField.PACKAGING}
             project={project}
             editableCell={editableCell}
             onUpdateField={onUpdateField}
@@ -242,7 +242,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
               return (
                 <cellRenderers.FactoryCell 
                   key={column.id}
-                  field="manufacturer"
+                  field={ProjectFactoryField.MANUFACTURER}
                   project={project}
                   editableCell={editableCell}
                   onUpdateField={onUpdateField}
@@ -252,7 +252,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
               return (
                 <cellRenderers.FactoryCell 
                   key={column.id}
-                  field="container"
+                  field={ProjectFactoryField.CONTAINER}
                   project={project}
                   editableCell={editableCell}
                   onUpdateField={onUpdateField}
@@ -262,7 +262,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
               return (
                 <cellRenderers.FactoryCell 
                   key={column.id}
-                  field="packaging"
+                  field={ProjectFactoryField.PACKAGING}
                   project={project}
                   editableCell={editableCell}
                   onUpdateField={onUpdateField}

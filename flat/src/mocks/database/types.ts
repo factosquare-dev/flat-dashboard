@@ -38,6 +38,9 @@ export interface MockDatabase {
   priorityMappings: Map<string, PriorityMapping>;
   serviceTypeMappings: Map<string, ServiceTypeMapping>;
   projectTypeMappings: Map<string, ProjectTypeMapping>;
+  
+  // UI Settings
+  uiSettings: Map<string, UISettings>;
 }
 
 /**
@@ -119,6 +122,26 @@ export interface ProjectTypeMapping {
 }
 
 /**
+ * UI Settings Models
+ */
+export interface UISettings {
+  id: string;
+  userId: UserId;
+  component: string; // e.g., 'ProjectList', 'Schedule'
+  settings: {
+    columnOrder?: string[];
+    columnWidths?: Record<string, number>;
+    hiddenColumns?: string[];
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    filters?: Record<string, any>;
+    viewMode?: string;
+    other?: Record<string, any>;
+  };
+  updatedAt: Date;
+}
+
+/**
  * Query Options
  */
 export interface QueryOptions {
@@ -178,7 +201,8 @@ export const DB_COLLECTIONS = {
   STATUS_MAPPINGS: 'statusMappings',
   PRIORITY_MAPPINGS: 'priorityMappings',
   SERVICE_TYPE_MAPPINGS: 'serviceTypeMappings',
-  PROJECT_TYPE_MAPPINGS: 'projectTypeMappings'
+  PROJECT_TYPE_MAPPINGS: 'projectTypeMappings',
+  UI_SETTINGS: 'uiSettings'
 } as const;
 
 export type DbCollectionName = keyof MockDatabase;

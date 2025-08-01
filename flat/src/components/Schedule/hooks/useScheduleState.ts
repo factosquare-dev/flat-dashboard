@@ -8,6 +8,7 @@ import { useScheduleTasks } from '../../../hooks/useScheduleTasks';
 import { useScheduleTasksWithStore } from '../../../hooks/useScheduleTasksWithStore';
 import { factories } from '../../../data/factories';
 import { storageKeys } from '../../../config';
+import { MockDatabaseImpl } from '../../../mocks/database/MockDatabase';
 import { parseScheduleDate } from '../../../utils/scheduleDateParsing';
 import { addDays, startOfDay } from 'date-fns';
 import { getParticipantColor } from '../../../utils/scheduleColorManager';
@@ -163,39 +164,18 @@ export const useScheduleState = (
     // projectId가 있으면 MockDB에서 Project의 공장 정보 가져오기 (우선순위)
     if (projectId) {
       try {
-        const mockDbKey = storageKeys.mockDbKey || 'mockDb';
-        const rawData = localStorage.getItem(mockDbKey);
+        // MockDB 인스턴스 직접 사용
+        const db = MockDatabaseImpl.getInstance();
+        const database = db.getDatabase();
         
-        if (!rawData) {
-          console.log('[Schedule] No MockDB data found in localStorage');
+        if (!database || database.projects.size === 0) {
+          console.log('[Schedule] MockDB is not initialized yet');
           return [];
         }
         
-        const storedData = JSON.parse(rawData);
-        
-        // MockDB stores data in a nested structure
-        const dbData = storedData.data || storedData;
-        
-        // Convert array entries back to object
-        const projects = {};
-        const factoriesData = {};
-        
-        if (dbData.projects) {
-          dbData.projects.forEach(([id, project]: [string, any]) => {
-            projects[id] = project;
-          });
-        }
-        
-        if (dbData.factories) {
-          dbData.factories.forEach(([id, factory]: [string, any]) => {
-            factoriesData[id] = factory;
-          });
-        }
-        
-        // Check project and factories
-        
         // Project에서 공장 정보 가져오기
-        const project = projects[projectId];
+        const project = database.projects.get(projectId);
+        const factoriesData = Object.fromEntries(database.factories);
         if (project) {
           const factoryList: ScheduleFactory[] = [];
           
@@ -250,13 +230,19 @@ export const useScheduleState = (
             });
           }
           
+          // 중복 제거 (ID 기준)
+          const uniqueFactoryList = factoryList.filter((factory, index, self) => 
+            index === self.findIndex(f => f.id === factory.id)
+          );
+          
           console.log('[Schedule] ✅ Factories loaded from MockDB:', {
             projectId,
-            count: factoryList.length,
-            factories: factoryList.map(f => f.name)
+            originalCount: factoryList.length,
+            uniqueCount: uniqueFactoryList.length,
+            factories: uniqueFactoryList.map(f => f.name)
           });
           
-          return factoryList;
+          return uniqueFactoryList;
         } else {
           console.log('[Schedule] ❌ Project not found in MockDB:', projectId);
         }
@@ -277,16 +263,23 @@ export const useScheduleState = (
   const participantsList = useMemo(() => getProjectFactories(), [participants, projectId]);
   
   // "공장 추가" 행을 마지막에 추가 (항상 표시)
-  const initialProjects = useMemo(() => [
-    ...participantsList,
-    {
-      id: 'ADD_FACTORY_ROW',
-      name: '공장 추가',
-      type: 'ADD_FACTORY',
-      period: '',
-      color: ''
-    }
-  ], [participantsList]);
+  const initialProjects = useMemo(() => {
+    // 중복 제거 (ID 기준)
+    const uniqueParticipants = participantsList.filter((participant, index, self) => 
+      index === self.findIndex(p => p.id === participant.id)
+    );
+    
+    return [
+      ...uniqueParticipants,
+      {
+        id: 'ADD_FACTORY_ROW',
+        name: '공장 추가',
+        type: 'ADD_FACTORY',
+        period: '',
+        color: ''
+      }
+    ];
+  }, [participantsList]);
 
   const [projects, setProjects] = useState<ScheduleFactory[]>(initialProjects);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
@@ -294,8 +287,13 @@ export const useScheduleState = (
   
   // participantsList가 변경되면 projects도 업데이트
   useEffect(() => {
+    // 중복 제거 (ID 기준)
+    const uniqueParticipants = participantsList.filter((participant, index, self) => 
+      index === self.findIndex(p => p.id === participant.id)
+    );
+    
     setProjects([
-      ...participantsList,
+      ...uniqueParticipants,
       {
         id: 'ADD_FACTORY_ROW',
         name: '공장 추가',

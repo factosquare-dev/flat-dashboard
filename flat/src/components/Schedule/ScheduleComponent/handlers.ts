@@ -65,15 +65,21 @@ export const createProjectHandlers = (
             
             if (projectToDelete.type === FactoryType.MANUFACTURING && project.manufacturerId) {
               const ids = Array.isArray(project.manufacturerId) ? project.manufacturerId : [project.manufacturerId];
-              const filtered = ids.filter(id => id !== projectId);
+              // Set을 사용하여 중복 제거 후 필터링
+              const uniqueIds = [...new Set(ids)];
+              const filtered = uniqueIds.filter(id => id !== projectId);
               updates.manufacturerId = filtered.length > 0 ? filtered : undefined;
             } else if (projectToDelete.type === FactoryType.CONTAINER && project.containerId) {
               const ids = Array.isArray(project.containerId) ? project.containerId : [project.containerId];
-              const filtered = ids.filter(id => id !== projectId);
+              // Set을 사용하여 중복 제거 후 필터링
+              const uniqueIds = [...new Set(ids)];
+              const filtered = uniqueIds.filter(id => id !== projectId);
               updates.containerId = filtered.length > 0 ? filtered : undefined;
             } else if (projectToDelete.type === FactoryType.PACKAGING && project.packagingId) {
               const ids = Array.isArray(project.packagingId) ? project.packagingId : [project.packagingId];
-              const filtered = ids.filter(id => id !== projectId);
+              // Set을 사용하여 중복 제거 후 필터링
+              const uniqueIds = [...new Set(ids)];
+              const filtered = uniqueIds.filter(id => id !== projectId);
               updates.packagingId = filtered.length > 0 ? filtered : undefined;
             }
             
@@ -140,8 +146,17 @@ export const createProjectHandlers = (
   };
 
   const handleAddFactory = (factory: { id: string; name: string; type: string }) => {
-    // 이미 존재하지 않는 경우에만 추가
-    if (!projects.find(p => p.id === factory.id)) {
+    setProjects(prev => {
+      console.log('[Schedule] Current projects before add:', prev.map(p => ({ id: p.id, name: p.name })));
+      console.log('[Schedule] Trying to add factory:', factory);
+      
+      // 이미 존재하는지 prev 상태에서 체크
+      const existingFactory = prev.find(p => p.id === factory.id);
+      if (existingFactory) {
+        console.log('[Schedule] Factory already exists, skipping:', factory.id);
+        return prev; // 변경 없이 반환
+      }
+      
       const newProject: ScheduleFactory = {
         id: factory.id,
         name: factory.name,
@@ -150,30 +165,32 @@ export const createProjectHandlers = (
         color: getParticipantColor(factory.id) // Use color manager
       };
       
-      // "공장 추가" 행 바로 위에 추가하기 위해 splice 사용
-      setProjects(prev => {
-        const newProjects = [...prev];
-        const addFactoryIndex = newProjects.findIndex(p => p.id === 'ADD_FACTORY_ROW');
-        if (addFactoryIndex !== -1) {
-          // "공장 추가" 행 바로 위에 삽입
-          newProjects.splice(addFactoryIndex, 0, newProject);
-        } else {
-          // "공장 추가" 행이 없으면 마지막에 추가
-          newProjects.push(newProject);
-        }
-        return newProjects;
-      });
-    }
+      // ADD_FACTORY_ROW를 제외한 프로젝트들만 필터링
+      const existingProjects = prev.filter(p => p.id !== 'ADD_FACTORY_ROW');
+      const addFactoryRow = prev.find(p => p.id === 'ADD_FACTORY_ROW');
+      
+      // 중복 체크를 한 번 더 수행 (ID 기준)
+      const uniqueProjects = [...existingProjects, newProject].filter((project, index, self) => 
+        index === self.findIndex(p => p.id === project.id)
+      );
+      
+      // ADD_FACTORY_ROW가 있으면 마지막에 추가
+      const finalProjects = addFactoryRow ? [...uniqueProjects, addFactoryRow] : uniqueProjects;
+      
+      console.log('[Schedule] Projects after add:', finalProjects.map(p => ({ id: p.id, name: p.name })));
+      return finalProjects;
+    });
   };
 
   const handleAddFactories = (factories: Array<{ id: string; name: string; type: string }>) => {
     setProjects(prev => {
-      const newProjects = [...prev];
-      const addFactoryIndex = newProjects.findIndex(p => p.id === 'ADD_FACTORY_ROW');
+      // ADD_FACTORY_ROW를 제외한 프로젝트들만 필터링
+      const existingProjects = prev.filter(p => p.id !== 'ADD_FACTORY_ROW');
+      const addFactoryRow = prev.find(p => p.id === 'ADD_FACTORY_ROW');
       
       // 이미 존재하지 않는 공장들만 필터링
       const factoriesToAdd = factories.filter(factory => 
-        !newProjects.find(p => p.id === factory.id)
+        !existingProjects.find(p => p.id === factory.id)
       );
       
       // 새로운 프로젝트 객체들 생성
@@ -185,13 +202,16 @@ export const createProjectHandlers = (
         color: getParticipantColor(factory.id)
       }));
       
-      if (addFactoryIndex !== -1) {
-        // "공장 추가" 행 바로 위에 모든 새 공장들을 삽입
-        newProjects.splice(addFactoryIndex, 0, ...newParticipants);
-      } else {
-        // "공장 추가" 행이 없으면 마지막에 추가
-        newProjects.push(...newParticipants);
-      }
+      // 기존 프로젝트와 새 프로젝트 합치기
+      const allProjects = [...existingProjects, ...newParticipants];
+      
+      // 중복 제거 (ID 기준)
+      const uniqueProjects = allProjects.filter((project, index, self) => 
+        index === self.findIndex(p => p.id === project.id)
+      );
+      
+      // ADD_FACTORY_ROW가 있으면 마지막에 추가
+      const finalProjects = addFactoryRow ? [...uniqueProjects, addFactoryRow] : uniqueProjects;
       
       // Project의 factory ID들을 업데이트
       if (currentProjectId) {
@@ -219,21 +239,24 @@ export const createProjectHandlers = (
               }
             });
             
-            // 기존 배열에 새 ID들 추가
+            // 기존 배열에 새 ID들 추가 (중복 제거)
             if (newManufacturerIds.length > 0) {
               const existing = project.manufacturerId ? 
                 (Array.isArray(project.manufacturerId) ? project.manufacturerId : [project.manufacturerId]) : [];
-              updates.manufacturerId = [...existing, ...newManufacturerIds];
+              // Set을 사용하여 중복 제거
+              updates.manufacturerId = [...new Set([...existing, ...newManufacturerIds])];
             }
             if (newContainerIds.length > 0) {
               const existing = project.containerId ? 
                 (Array.isArray(project.containerId) ? project.containerId : [project.containerId]) : [];
-              updates.containerId = [...existing, ...newContainerIds];
+              // Set을 사용하여 중복 제거
+              updates.containerId = [...new Set([...existing, ...newContainerIds])];
             }
             if (newPackagingIds.length > 0) {
               const existing = project.packagingId ? 
                 (Array.isArray(project.packagingId) ? project.packagingId : [project.packagingId]) : [];
-              updates.packagingId = [...existing, ...newPackagingIds];
+              // Set을 사용하여 중복 제거
+              updates.packagingId = [...new Set([...existing, ...newPackagingIds])];
             }
             
             // update 메서드 사용 - 부분 업데이트만 전달
@@ -249,7 +272,7 @@ export const createProjectHandlers = (
         }
       }
       
-      return newProjects;
+      return finalProjects;
     });
   };
 

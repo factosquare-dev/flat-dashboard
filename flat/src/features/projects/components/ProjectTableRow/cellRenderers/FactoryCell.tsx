@@ -2,14 +2,15 @@ import React from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import type { UseEditableCellReturn } from '@/hooks/useEditableCell';
-import { FactoryType, ProjectType } from '@/types/enums';
+import { FactoryType, ProjectType, ProjectFactoryField, ProjectFactoryIdField, FactoryFieldToType, FactoryTypeLabel } from '@/types/enums';
 import { mockDataService } from '@/services/mockDataService';
 import { formatManufacturerDisplay } from '@/utils/companyUtils';
 import { isProjectType } from '@/utils/projectTypeUtils';
 import SearchBox from '../../SearchBox';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 interface FactoryCellProps {
-  field: 'manufacturer' | 'container' | 'packaging';
+  field: ProjectFactoryField;
   project: Project;
   editableCell: UseEditableCellReturn;
   onUpdateField: (projectId: ProjectId, field: keyof Project, value: Project[keyof Project]) => void;
@@ -21,17 +22,44 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const value = project[field];
   const idField = `${field}Id` as keyof Project;
-  const factoryIds = project[idField];
   
-  // Get factory type from field
+  // Get factory type from field using enum mapping
   const getFactoryType = (): FactoryType => {
-    switch (field) {
-      case 'manufacturer': return FactoryType.MANUFACTURING;
-      case 'container': return FactoryType.CONTAINER;
-      case 'packaging': return FactoryType.PACKAGING;
-      default: return FactoryType.MANUFACTURING;
-    }
+    return FactoryFieldToType[field];
   };
+  
+  // For Master projects, get factory IDs from SUB projects
+  const factoryIds = React.useMemo(() => {
+    if (isProjectType(project.type, ProjectType.MASTER)) {
+      // Get SUB projects from MockDB
+      const db = MockDatabaseImpl.getInstance();
+      if (!db) return [];
+      
+      const allProjects = Array.from(db.getDatabase().projects.values());
+      const subProjects = allProjects.filter(p => 
+        p.type === ProjectType.SUB && p.parentId === project.id
+      );
+      
+      // Collect factory IDs from SUB projects
+      const collectedIds = new Set<string>();
+      
+      subProjects.forEach(sub => {
+        const subIds = sub[idField];
+        if (subIds) {
+          if (Array.isArray(subIds)) {
+            subIds.forEach(id => collectedIds.add(id));
+          } else {
+            collectedIds.add(subIds);
+          }
+        }
+      });
+      
+      return Array.from(collectedIds);
+    }
+    
+    // For non-Master projects, use the stored IDs
+    return project[idField];
+  }, [project, idField, field]);
   
   // Get original factory names for tooltip
   const originalFactoryNames = React.useMemo(() => {
@@ -71,6 +99,21 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
   
   // Get factory names - use value if it has names, otherwise convert IDs
   const factories = React.useMemo(() => {
+    // Debug log for Master projects
+    if (isProjectType(project.type, ProjectType.MASTER)) {
+      console.log('[FactoryCell] Master project factory data:', {
+        projectId: project.id,
+        field,
+        value,
+        valueType: typeof value,
+        isArray: Array.isArray(value),
+        valueStringified: JSON.stringify(value),
+        factoryIds,
+        factoryIdsType: typeof factoryIds,
+        factoryIdsIsArray: Array.isArray(factoryIds)
+      });
+    }
+    
     // First try to use the value (which should contain names)
     if (value) {
       if (Array.isArray(value)) {
@@ -100,6 +143,7 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
     const factoriesData = mockDataService.getFactoriesByType(factoryType);
     
     if (Array.isArray(factoryIds)) {
+      // Convert factory IDs to names
       return factoryIds.map(id => {
         const factory = factoriesData.find(f => f.id === id);
         return factory ? formatManufacturerDisplay(factory.name) : id;
@@ -110,8 +154,8 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
     }
   }, [value, factoryIds, field]);
   
-  // Get factory type label
-  const typeLabel = field === 'manufacturer' ? '제조' : field === 'container' ? '용기' : '포장';
+  // Get factory type label using enum
+  const typeLabel = FactoryTypeLabel[getFactoryType()];
   
   // Get factory data for SearchBox from MockDB
   const factoryData = React.useMemo(() => {
@@ -231,7 +275,13 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
             
             // Check if already exists (double check for safety)
             const existingIds = project[idField];
-            const currentIds = Array.isArray(existingIds) ? existingIds : existingIds ? [existingIds] : [];
+            let currentIds = Array.isArray(existingIds) ? existingIds : existingIds ? [existingIds] : [];
+            
+            // 중첩 배열 감지 및 평탄화
+            if (currentIds.length === 1 && Array.isArray(currentIds[0])) {
+              console.warn('[FactoryCell] Detected nested array in currentIds, flattening');
+              currentIds = currentIds[0];
+            }
             
             if (currentIds.includes(item.id)) {
               console.warn(`Factory ${item.id} already added`);
@@ -241,7 +291,8 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
             
             // Update the factory ID field only
             // The name will be automatically updated in useProjectData
-            const newIds = [...currentIds, item.id];
+            // Set을 사용하여 중복 제거
+            const newIds = [...new Set([...currentIds, item.id])];
             onUpdateField(project.id, idField, newIds);
             setShowAddFactory(false);
           }}

@@ -12,6 +12,7 @@ import {
   ProjectValidationService
 } from './project';
 import type { ProjectWithRelations, CreateProjectData } from './project/types';
+import { MockDatabaseImpl } from '../database/MockDatabase';
 
 export type { ProjectWithRelations, CreateProjectData };
 
@@ -30,11 +31,21 @@ export class ProjectService {
 
   // CRUD Operations
   async create(data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<DbResponse<Project>> {
+    const db = MockDatabaseImpl.getInstance();
+    
+    // Use createSubProject for SUB projects to inherit from Master
+    if (data.type === ProjectType.SUB && data.parentId) {
+      return db.createSubProject(data as Partial<Project>);
+    }
+    
+    // Regular create for other project types
     return this.crud.create(data);
   }
 
   async update(id: string, data: Partial<Project>): Promise<DbResponse<Project>> {
-    return this.crud.update(id, data);
+    // Use updateProject for Master-SUB synchronization
+    const db = MockDatabaseImpl.getInstance();
+    return db.updateProject(id, data);
   }
 
   async delete(projectId: string): Promise<DbResponse<void>> {
@@ -42,11 +53,15 @@ export class ProjectService {
   }
 
   async getById(id: string): Promise<DbResponse<Project>> {
-    return this.crud.getById(id);
+    // Use getProject for automatic Master aggregation
+    const db = MockDatabaseImpl.getInstance();
+    return db.getProject(id);
   }
 
   async getAll(): Promise<DbResponse<Project[]>> {
-    return this.crud.getAll();
+    // Use getAllProjects for automatic Master aggregation
+    const db = MockDatabaseImpl.getInstance();
+    return db.getAllProjects();
   }
 
   async updateStatus(projectId: string, status: ProjectStatus): Promise<DbResponse<Project>> {

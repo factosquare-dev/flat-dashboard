@@ -140,7 +140,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
             if (Array.isArray(factoryIds)) {
               const names = factoryIds.map(id => {
                 const factory = mockDb.getDatabase().factories.get(id);
-                return factory ? factory.name : id;
+                return factory ? simplifyCompanyName(factory.name) : id;
               });
               updatedProject[factoryType] = names;
             } else if (factoryIds) {
@@ -180,7 +180,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
                     if (Array.isArray(factoryIds)) {
                       updatedMaster[field] = factoryIds.map(id => {
                         const factory = mockDb.getDatabase().factories.get(id);
-                        return factory ? factory.name : id;
+                        return factory ? simplifyCompanyName(factory.name) : id;
                       });
                     } else {
                       const factory = mockDb.getDatabase().factories.get(factoryIds);
@@ -258,7 +258,7 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
                     if (Array.isArray(factoryIds)) {
                       updatedMaster[field] = factoryIds.map(id => {
                         const factory = mockDb.getDatabase().factories.get(id);
-                        return factory ? factory.name : id;
+                        return factory ? simplifyCompanyName(factory.name) : id;
                       });
                     } else {
                       const factory = mockDb.getDatabase().factories.get(factoryIds);

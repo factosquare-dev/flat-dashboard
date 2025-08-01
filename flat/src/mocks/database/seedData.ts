@@ -8,10 +8,12 @@ import { User, UserRole } from '@/types/user';
 import { Customer } from '@/types/customer';
 import { Factory } from '@/types/factory';
 import { Project, ProjectType, ProjectStatus } from '@/types/project';
-import { Schedule, Task, TaskStatus, Participant } from '@/types/schedule';
+import { Schedule, Task, TaskStatus, TaskType, Participant, ParticipantRole } from '@/types/schedule';
 import { taskTypesByFactoryType } from '../../data/factories';
 import { TIME_CONSTANTS } from '../../constants/time';
 import type { Comment } from '@/types/comment';
+import { FactoryType, Priority } from '@/types/enums';
+import { getTaskTemplatesByFactoryType, calculateTaskDates, TaskTemplate } from './seeders/tasks/taskTemplates';
 
 // Import seeders
 import { createUsers } from './seeders/userSeeder';
@@ -42,6 +44,7 @@ export const seedData = {
       priorityMappings: new Map(),
       serviceTypeMappings: new Map(),
       projectTypeMappings: new Map(),
+      uiSettings: new Map(),
     };
 
     // 1. Create Users
@@ -160,132 +163,100 @@ export const seedData = {
     const database = MockDatabaseImpl.getInstance().getDatabase();
 
     // Collect all factory types and their tasks dynamically
-    const projectFactoryTypes: { type: string; factoryId: string; factoryName: string }[] = [];
+    const projectFactoryTypes: { type: FactoryType; factoryId: string; factory: Factory }[] = [];
     
     // Add manufacturing factory type if exists
-    if (project.manufacturerId) {
+    if (project.manufacturerId && typeof project.manufacturerId === 'string') {
       const factory = database.factories.get(project.manufacturerId);
       if (factory) {
         projectFactoryTypes.push({
-          type: '제조',
+          type: FactoryType.MANUFACTURING,
           factoryId: project.manufacturerId,
-          factoryName: factory.name
+          factory
         });
       }
     }
     
     // Add container factory type if exists  
-    if (project.containerId) {
+    if (project.containerId && typeof project.containerId === 'string') {
       const factory = database.factories.get(project.containerId);
       if (factory) {
         projectFactoryTypes.push({
-          type: '용기',
+          type: FactoryType.CONTAINER,
           factoryId: project.containerId,
-          factoryName: factory.name
+          factory
         });
       }
     }
     
     // Add packaging factory type if exists
-    if (project.packagingId) {
+    if (project.packagingId && typeof project.packagingId === 'string') {
       const factory = database.factories.get(project.packagingId);
       if (factory) {
         projectFactoryTypes.push({
-          type: '포장',
+          type: FactoryType.PACKAGING,
           factoryId: project.packagingId,
-          factoryName: factory.name
+          factory
         });
       }
     }
 
-    // Create tasks dynamically based on factory types
-    const taskTemplates: Array<{
-      title: string;
-      type: string;
-      duration: number;
-      participants: string[];
-      dependsOn?: string[];
-      factoryType: string;
-      factoryId: string;
-      factoryName: string;
-    }> = [];
-    
-    let previousTasks: string[] = [];
-    
-    projectFactoryTypes.forEach((factoryInfo, factoryIndex) => {
-      const factoryTasks = taskTypesByFactoryType[factoryInfo.type as keyof typeof taskTypesByFactoryType] || [];
-      
-      
-      factoryTasks.forEach((taskTitle, taskIndex) => {
-        const template = {
-          title: taskTitle,
-          type: this.mapTaskTitleToType(taskTitle),
-          duration: this.getTaskDuration(taskTitle),
-          participants: this.getTaskParticipants(taskTitle, pmUser.id, factoryManager.id, qaUser.id),
-          dependsOn: taskIndex === 0 ? previousTasks : [factoryTasks[taskIndex - 1]],
-          factoryType: factoryInfo.type,
-          factoryId: factoryInfo.factoryId,
-          factoryName: factoryInfo.factoryName
-        };
-        
-        taskTemplates.push(template);
-      });
-      
-      // Set up dependency chain between factory types
-      if (factoryTasks.length > 0) {
-        previousTasks = [factoryTasks[factoryTasks.length - 1]];
-      }
-    });
-
-    // ✅ Calculate total task duration and scale to fit project timeline
-    const totalTaskDuration = taskTemplates.reduce((sum, template) => sum + template.duration, 0);
-    const scaleFactor = Math.max(0.8, Math.min(1.2, projectDurationDays / totalTaskDuration)); // 80%-120% scaling
-    
-    // Distribute tasks across project timeline with proper synchronization
+    // Create tasks using template system
+    let taskIndex = 0;
     let currentStartDate = new Date(projectStartDate);
     
-    taskTemplates.forEach((template, index) => {
-      // Scale task duration to fit within project timeline
-      const scaledDuration = Math.max(1, Math.round(template.duration * scaleFactor));
-      const taskEndDate = new Date(currentStartDate.getTime() + scaledDuration * 24 * 60 * 60 * 1000);
+    projectFactoryTypes.forEach((factoryInfo) => {
+      // Get task templates for this factory type
+      const templates = getTaskTemplatesByFactoryType(factoryInfo.type);
+      const taskDates = calculateTaskDates(templates, currentStartDate);
       
-      // ✅ Ensure task doesn't exceed project end date
-      if (taskEndDate > projectEndDate) {
-        taskEndDate.setTime(projectEndDate.getTime());
-      }
-
-      const task: Task = {
-        id: `task-${project.id}-${index + 1}`,
-        scheduleId,
-        title: template.title,
-        type: template.type,
-        status: this.getTaskStatus(project.progress, index, taskTemplates.length),
-        startDate: new Date(currentStartDate),
-        endDate: taskEndDate,
-        progress: this.getTaskProgress(project.progress, index, taskTemplates.length),
-        participants: template.participants.map(userId => ({
-          userId,
-          role: userId === pmUser.id ? 'manager' : 'member',
-        } as Participant)),
-        factoryId: template.factoryId,
-        factory: template.factoryName,
-        priority: project.priority,
-        dependsOn: template.dependsOn?.map(depTitle => 
-          `task-${project.id}-${taskTemplates.findIndex(t => t.title === depTitle) + 1}`
-        ).filter(id => id !== `task-${project.id}-0`) || [],
-        blockedBy: [],
-        createdAt: project.createdAt,
-        updatedAt: new Date(),
-      };
-
-      tasks.push(task);
+      templates.forEach((template, templateIndex) => {
+        const { startDate, endDate } = taskDates[templateIndex];
+        
+        // Map participant roles to user IDs
+        const participants: Participant[] = [];
+        if (template.participantRoles.includes('PM')) {
+          participants.push({ userId: pmUser.id, role: ParticipantRole.MANAGER });
+        }
+        if (template.participantRoles.includes('FACTORY_MANAGER')) {
+          participants.push({ userId: factoryManager.id, role: ParticipantRole.MEMBER });
+        }
+        if (template.participantRoles.includes('QA')) {
+          participants.push({ userId: qaUser.id, role: ParticipantRole.REVIEWER });
+        }
+        
+        const task: Task = {
+          id: `task-${project.id}-${taskIndex + 1}`,
+          scheduleId,
+          title: template.title,
+          name: template.title, // alias for compatibility
+          type: template.type,
+          status: this.getTaskStatus(project.progress, taskIndex, templates.length),
+          startDate,
+          endDate,
+          progress: this.getTaskProgress(project.progress, taskIndex, templates.length),
+          participants,
+          factoryId: factoryInfo.factoryId,
+          factory: factoryInfo.factory.name,
+          priority: template.priority,
+          dependsOn: template.dependsOnPrevious && taskIndex > 0 ? [`task-${project.id}-${taskIndex}`] : [],
+          blockedBy: [],
+          createdAt: project.createdAt,
+          updatedAt: new Date(),
+        };
+        
+        tasks.push(task);
+        taskIndex++;
+      });
       
-      // ✅ Move to next task start date with 1-day buffer (unless we're at project end)
-      currentStartDate = new Date(taskEndDate.getTime() + 24 * 60 * 60 * 1000);
-      if (currentStartDate > projectEndDate) {
-        currentStartDate = new Date(projectEndDate);
+      // Update start date for next factory type
+      if (templates.length > 0) {
+        const lastTaskDate = taskDates[taskDates.length - 1].endDate;
+        currentStartDate = new Date(lastTaskDate);
+        currentStartDate.setDate(currentStartDate.getDate() + 1);
       }
     });
+
 
     return tasks;
   },
