@@ -65,19 +65,12 @@ export const renderProgress = (project: Project) => (
 );
 
 export const renderClient = ({ project }: CellRenderProps) => {
-  const handleClientClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Navigate to schedule page with table view
-    // Using the same navigation as when clicking a project
-    const scheduleUrl = `/schedule/${project.id}?view=table`;
-    window.location.href = scheduleUrl;
-  };
-
+  // Clicking the customer cell will trigger the row click handler
+  // which expands/collapses the row to show tasks (table view)
   return (
     <td 
       className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px] cursor-pointer hover:bg-blue-50 transition-colors" 
       title={project.client}
-      onClick={handleClientClick}
     >
       <div className="overflow-hidden text-ellipsis whitespace-nowrap">
         {project.client}
