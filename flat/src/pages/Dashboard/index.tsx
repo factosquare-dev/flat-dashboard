@@ -1,16 +1,30 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ArrowUp, ArrowDown, Users, FolderOpen, Package, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store';
 import { ProjectStatus } from '@/types/enums';
-import { logError } from '@/utils/errorHandling';
-import { LoadingState } from '@/components/loading/LoadingState';
+import { logError } from '@/utils/error';
+import { LoadingState } from '@/components/loading';
 import { EmptyState } from '@/components/common';
+import { PageErrorBoundary } from '@/components/ErrorBoundary';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
-const Dashboard: React.FC = () => {
+const DashboardContent: React.FC = () => {
   const { projects } = useStore();
+  const navigate = useNavigate();
   const MAX_DASHBOARD_PROJECTS = 5; // Display limit for recent projects
+  const [counts, setCounts] = useState({ users: 0, products: 0 });
+  
+  useEffect(() => {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    setCounts({
+      users: database.users.size,
+      products: database.products.size
+    });
+  }, []);
   
   // Error handling for projects
   const safeProjects = useMemo(() => {
@@ -34,7 +48,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Active Users',
-      value: '2,345', // TODO: Replace with actual user count from MockDB
+      value: counts.users.toLocaleString(),
       description: '+5% from last month',
       icon: Users,
       trend: 'up',
@@ -43,7 +57,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Products',
-      value: '1,234',
+      value: counts.products.toLocaleString(),
       description: '-2% from last month',
       icon: Package,
       trend: 'down',
@@ -152,7 +166,7 @@ const Dashboard: React.FC = () => {
                 leftIcon={<FolderOpen className="h-4 w-4" />}
                 onClick={() => {
                   try {
-                    // TODO: Navigate to new project
+                    navigate('/projects');
                   } catch (error) {
                     logError('Dashboard', error, { action: 'New Project' });
                   }
@@ -165,7 +179,7 @@ const Dashboard: React.FC = () => {
                 leftIcon={<Package className="h-4 w-4" />}
                 onClick={() => {
                   try {
-                    // TODO: Navigate to add product
+                    navigate('/products');
                   } catch (error) {
                     logError('Dashboard', error, { action: 'Add Product' });
                   }
@@ -178,7 +192,7 @@ const Dashboard: React.FC = () => {
                 leftIcon={<Users className="h-4 w-4" />}
                 onClick={() => {
                   try {
-                    // TODO: Navigate to invite user
+                    navigate('/users');
                   } catch (error) {
                     logError('Dashboard', error, { action: 'Invite User' });
                   }
@@ -191,7 +205,7 @@ const Dashboard: React.FC = () => {
                 leftIcon={<TrendingUp className="h-4 w-4" />}
                 onClick={() => {
                   try {
-                    // TODO: Navigate to reports
+                    navigate('/reports');
                   } catch (error) {
                     logError('Dashboard', error, { action: 'View Reports' });
                   }
@@ -205,6 +219,14 @@ const Dashboard: React.FC = () => {
       </div>
       </div>
     </div>
+  );
+};
+
+const Dashboard: React.FC = () => {
+  return (
+    <PageErrorBoundary>
+      <DashboardContent />
+    </PageErrorBoundary>
   );
 };
 

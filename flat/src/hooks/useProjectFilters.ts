@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { Project, ProjectStatus, ServiceType, Priority } from '../types/project';
+import { ProjectStatusLabel } from '../types/enums';
 
 export const useProjectFilters = () => {
-  const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>(['시작전', '진행중', '완료', '중단']);
+  const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>(['PLANNING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED']);
   const [selectedPriority, setSelectedPriority] = useState<Priority | 'all'>('all');
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceType | 'all'>('all');
   const [sortField, setSortField] = useState<keyof Project | null>(null);
@@ -20,16 +21,18 @@ export const useProjectFilters = () => {
   }, [sortField, sortDirection]);
 
   const filterProjects = useCallback((projects: Project[]) => {
-    return projects.filter(project => {
+    const filtered = projects.filter(project => {
       const matchesStatus = statusFilters.includes(project.status);
       const matchesPriority = selectedPriority === 'all' || project.priority === selectedPriority;
       const matchesServiceType = selectedServiceType === 'all' || project.serviceType === selectedServiceType;
       const matchesSearch = searchValue === '' || 
-        project.client.toLowerCase().includes(searchValue.toLowerCase()) ||
-        project.manager.toLowerCase().includes(searchValue.toLowerCase()) ||
-        project.manufacturer.toLowerCase().includes(searchValue.toLowerCase()) ||
-        project.container.toLowerCase().includes(searchValue.toLowerCase()) ||
-        project.packaging.toLowerCase().includes(searchValue.toLowerCase());
+        project.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+        (project.client && project.client.toLowerCase().includes(searchValue.toLowerCase())) ||
+        (project.customer && project.customer.name.toLowerCase().includes(searchValue.toLowerCase())) ||
+        (project.manager && project.manager.toLowerCase().includes(searchValue.toLowerCase())) ||
+        (typeof project.manufacturer === 'string' && project.manufacturer.toLowerCase().includes(searchValue.toLowerCase())) ||
+        (typeof project.container === 'string' && project.container.toLowerCase().includes(searchValue.toLowerCase())) ||
+        (typeof project.packaging === 'string' && project.packaging.toLowerCase().includes(searchValue.toLowerCase()));
       
       // 날짜 필터링 로직
       let matchesDateRange = true;
@@ -59,6 +62,8 @@ export const useProjectFilters = () => {
       
       return matchesStatus && matchesPriority && matchesServiceType && matchesSearch && matchesDateRange;
     });
+    
+    return filtered;
   }, [statusFilters, selectedPriority, selectedServiceType, searchValue, dateRange]);
 
   const sortProjects = useCallback((projects: Project[]) => {
@@ -85,7 +90,7 @@ export const useProjectFilters = () => {
       const filtered = filterProjects(projects);
       return sortProjects(filtered);
     };
-  }, [statusFilters, selectedPriority, selectedServiceType, searchValue, dateRange, sortField, sortDirection]);
+  }, [filterProjects, sortProjects]);
 
   const handleStatusFilterToggle = useCallback((status: ProjectStatus) => {
     setStatusFilters(prev => 

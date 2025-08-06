@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { formatErrorForDisplay } from '@/utils/error/errorHandler';
+import { formatErrorForDisplay } from '@/utils/error/formatters';
 
 interface ErrorFallbackProps {
   error: Error;

@@ -1,6 +1,8 @@
 import React from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, X, User } from 'lucide-react';
 import type { FactoryManager } from '../../../data/factories';
+import { Button } from '@/components/ui/Button';
+import { ButtonVariant, ButtonSize } from '@/types/enums';
 
 interface ManagerSectionProps {
   managers: FactoryManager[];
@@ -22,25 +24,49 @@ const ManagerSection: React.FC<ManagerSectionProps> = ({
   onRemoveManager
 }) => {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        담당자 이름
-      </label>
-      <div className="space-y-2">
-        {managers.map((manager, index) => (
-          <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-            <span className="flex-1">{manager.name} ({manager.position})</span>
-            <button
-              type="button"
-              onClick={() => onRemoveManager(index)}
-              className="p-1 text-red-500 hover:bg-red-50 rounded"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        ))}
+    <div className="modal-field-spacing">
+      <div className="flex items-center justify-between mb-3">
+        <label className="modal-field-label flex items-center gap-2">
+          <User className="w-4 h-4" />
+          담당자 정보
+        </label>
+        {!showManagerForm && (
+          <Button
+            variant={ButtonVariant.GHOST}
+            size={ButtonSize.SM}
+            onClick={() => onShowManagerForm(true)}
+            className="gap-1"
+          >
+            <Plus className="w-4 h-4" />
+            담당자 추가
+          </Button>
+        )}
+      </div>
+      
+      {/* 담당자 목록 */}
+      {managers.length > 0 && (
+        <div className="space-y-2 mb-3">
+          {managers.map((manager, index) => (
+            <div key={index} className="manager-item">
+              <div className="flex-1">
+                <div className="font-medium text-sm">{manager.name}</div>
+                <div className="text-xs text-gray-600">
+                  {manager.position} | {manager.phone} | {manager.email}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => onRemoveManager(index)}
+                className="text-gray-400 hover:text-red-500"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
         
-        {showManagerForm ? (
+      {showManagerForm ? (
           <div className="space-y-2 p-3 bg-gray-50 rounded">
             <input
               type="text"
@@ -101,7 +127,6 @@ const ManagerSection: React.FC<ManagerSectionProps> = ({
             담당자 추가
           </button>
         )}
-      </div>
     </div>
   );
 };

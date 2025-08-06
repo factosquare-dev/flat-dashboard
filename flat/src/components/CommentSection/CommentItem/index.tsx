@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import type { Comment, CommentAuthor } from '../../types/comment';
+import type { Comment, CommentAuthor } from '@/types/comment';
 import { MessageSquare, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import CommentInput from '../CommentInput';
 import { formatRelativeTime } from '@/utils/coreUtils';

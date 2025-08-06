@@ -1,15 +1,14 @@
 import React from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
-import { MoreVertical } from 'lucide-react';
 import { useEditableCell } from '@/hooks/useEditableCell';
-import TaskList from '../TaskList';
 import type { Column } from '@/hooks/useColumnOrder';
 import { useTaskManagement } from './useTaskManagement';
-import SelectionCell from './SelectionCell';
-import * as cellRenderers from './cellRenderers';
-import { ProjectType, ProjectFactoryField } from '@/types/enums';
-import { isProjectType } from '@/utils/projectTypeUtils';
+import { renderTableCell } from './renderers/cellRenderer';
+import { RowLayout } from './components/RowLayout';
+import { ExpandableRow } from './components/ExpandableRow';
+import { MasterProjectRow } from './components/MasterProjectRow';
+import { ProjectType } from '@/types/enums';
 
 interface ProjectTableRowProps {
   project: Project;
@@ -77,295 +76,79 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
       onStartDrag 
     };
 
-    switch (columnId) {
-      case 'name':
-        return cellRenderers.renderName(cellRenderProps);
-      
-      case 'productType':
-        return cellRenderers.renderProductType(cellRenderProps);
-      
-      case 'serviceType':
-        return cellRenderers.renderServiceType(cellRenderProps);
-      
-      case 'currentStage':
-        return cellRenderers.renderCurrentStage(project);
-      
-      case 'status':
-        return cellRenderers.renderStatus(cellRenderProps);
-      
-      case 'progress':
-        return cellRenderers.renderProgress(project);
-      
-      case 'client':
-        return cellRenderers.renderClient(cellRenderProps);
-      
-      case 'startDate':
-        return cellRenderers.renderDate('startDate', cellRenderProps);
-      
-      case 'endDate':
-        return cellRenderers.renderDate('endDate', cellRenderProps);
-      
-      case 'manufacturer':
-        return (
-          <cellRenderers.FactoryCell 
-            field={ProjectFactoryField.MANUFACTURER}
-            project={project}
-            editableCell={editableCell}
-            onUpdateField={onUpdateField}
-          />
-        );
-      
-      case 'container':
-        return (
-          <cellRenderers.FactoryCell 
-            field={ProjectFactoryField.CONTAINER}
-            project={project}
-            editableCell={editableCell}
-            onUpdateField={onUpdateField}
-          />
-        );
-      
-      case 'packaging':
-        return (
-          <cellRenderers.FactoryCell 
-            field={ProjectFactoryField.PACKAGING}
-            project={project}
-            editableCell={editableCell}
-            onUpdateField={onUpdateField}
-          />
-        );
-      
-      case 'sales':
-        return cellRenderers.renderCurrency('sales', cellRenderProps);
-      
-      case 'purchase':
-        return cellRenderers.renderCurrency('purchase', cellRenderProps);
-      
-      case 'depositPaid':
-        return cellRenderers.renderDepositPaid(cellRenderProps);
-      
-      case 'priority':
-        return cellRenderers.renderPriority(cellRenderProps);
-      
-      default:
-        return cellRenderers.renderDefault();
-    }
+    return renderTableCell(columnId, cellRenderProps);
   };
 
+  const handleDragOverRow = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDropRow = (e: React.DragEvent, targetProject: Project) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    onDrop?.(e, targetProject);
+  };
+
+  // Render Master Project Row
+  if (project.type === ProjectType.MASTER) {
+    return (
+      <>
+        <MasterProjectRow
+          project={project}
+          columns={columns}
+          isSelected={isSelected}
+          isExpanded={!!isExpanded}
+          onSelect={onSelect}
+          onToggleMaster={handleMasterToggle}
+          onShowOptionsMenu={onShowOptionsMenu}
+          renderCell={renderCell}
+        />
+        {isExpanded && project.children && project.children.map((child) => (
+          <ProjectTableRow
+            key={child.id}
+            project={child}
+            columns={columns}
+            isSelected={false}
+            onSelect={() => {}}
+            onRowClick={onRowClick}
+            onUpdateField={onUpdateField}
+            onShowOptionsMenu={onShowOptionsMenu}
+            onToggleMaster={onToggleMaster}
+          />
+        ))}
+      </>
+    );
+  }
+
+  // Render regular row
   return (
     <>
-      <tr 
-        data-id={project.id}
-        data-project-type={project.type}
-        className={`group hover:bg-gray-50/30 transition-all duration-200 border-b border-gray-50 ${
-          isProjectType(project.type, ProjectType.MASTER) && isDragOver ? 'bg-blue-100' : ''
-        } ${
-          isProjectType(project.type, ProjectType.SUB) ? 'cursor-move' : 'cursor-pointer'
-        }`}
-        onClick={handleRowClick}
-        onMouseEnter={(e) => {
-          // Master 프로젝트에서는 모든 마우스 이벤트 차단
-          if (isProjectType(project.type, ProjectType.MASTER)) {
-            e.stopPropagation();
-            return;
-          }
-          if (onMouseEnter) onMouseEnter();
-        }}
-        onMouseDown={(e) => {
-          // Master 프로젝트에서는 드래그 시작 방지
-          if (isProjectType(project.type, ProjectType.MASTER)) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        }}
-        onMouseUp={(e) => {
-          if (isProjectType(project.type, ProjectType.MASTER)) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        }}
-        onMouseMove={(e) => {
-          if (isProjectType(project.type, ProjectType.MASTER)) {
-            e.stopPropagation();
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (isProjectType(project.type, ProjectType.MASTER)) {
-            e.stopPropagation();
-          }
-        }}
-        role="row"
-        tabIndex={0}
-        draggable={isProjectType(project.type, ProjectType.SUB)}
-        onDragStart={onDragStart && isProjectType(project.type, ProjectType.SUB) ? (e) => {
-          e.dataTransfer.effectAllowed = 'move';
-          onDragStart(e, project.id);
-        } : undefined}
+      <RowLayout
+        project={project}
+        columns={columns}
+        isSelected={isSelected}
+        onSelect={onSelect}
+        onShowOptionsMenu={onShowOptionsMenu}
+        onRowClick={handleRowClick}
+        renderCell={renderCell}
+        isDragOver={isDragOver}
+        onDragStart={onDragStart}
         onDragEnd={onDragEnd}
-        onDragOver={isProjectType(project.type, ProjectType.MASTER) ? (e) => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'move';
-          setIsDragOver(true);
-          if (onDragOver) onDragOver(e);
-        } : undefined}
-        onDragLeave={isProjectType(project.type, ProjectType.MASTER) ? () => setIsDragOver(false) : undefined}
-        onDrop={onDrop ? (e) => {
-          e.preventDefault();
-          setIsDragOver(false);
-          onDrop(e, project);
-        } : undefined}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleRowClick(e);
-          }
-        }}
-      >
-        {columns.length > 0 && (
-          <SelectionCell
-            project={project}
-            isExpanded={isExpanded}
-            isSelected={isSelected}
-            isDragging={isDragging}
-            index={index}
-            onSelect={onSelect}
-            onStartDrag={onStartDrag}
-            handleToggleTasks={handleToggleTasks}
-            handleMasterToggle={handleMasterToggle}
-          />
-        )}
-        
-        {columns.map((column) => {
-          const cellRenderProps = { project, editableCell, onUpdateField, index, isDragging };
-          
-          switch (column.id) {
-            case 'name':
-              return <React.Fragment key={column.id}>{cellRenderers.renderName(cellRenderProps)}</React.Fragment>;
-            case 'productType':
-              return <React.Fragment key={column.id}>{cellRenderers.renderProductType(cellRenderProps)}</React.Fragment>;
-            case 'serviceType':
-              return <React.Fragment key={column.id}>{cellRenderers.renderServiceType(cellRenderProps)}</React.Fragment>;
-            case 'currentStage':
-              return <React.Fragment key={column.id}>{cellRenderers.renderCurrentStage(project)}</React.Fragment>;
-            case 'status':
-              return <React.Fragment key={column.id}>{cellRenderers.renderStatus(cellRenderProps)}</React.Fragment>;
-            case 'progress':
-              return <React.Fragment key={column.id}>{cellRenderers.renderProgress(project)}</React.Fragment>;
-            case 'client':
-              return <React.Fragment key={column.id}>{cellRenderers.renderClient(cellRenderProps)}</React.Fragment>;
-            case 'startDate':
-              return <React.Fragment key={column.id}>{cellRenderers.renderDate('startDate', cellRenderProps)}</React.Fragment>;
-            case 'endDate':
-              return <React.Fragment key={column.id}>{cellRenderers.renderDate('endDate', cellRenderProps)}</React.Fragment>;
-            case 'manufacturer':
-              return (
-                <cellRenderers.FactoryCell 
-                  key={column.id}
-                  field={ProjectFactoryField.MANUFACTURER}
-                  project={project}
-                  editableCell={editableCell}
-                  onUpdateField={onUpdateField}
-                />
-              );
-            case 'container':
-              return (
-                <cellRenderers.FactoryCell 
-                  key={column.id}
-                  field={ProjectFactoryField.CONTAINER}
-                  project={project}
-                  editableCell={editableCell}
-                  onUpdateField={onUpdateField}
-                />
-              );
-            case 'packaging':
-              return (
-                <cellRenderers.FactoryCell 
-                  key={column.id}
-                  field={ProjectFactoryField.PACKAGING}
-                  project={project}
-                  editableCell={editableCell}
-                  onUpdateField={onUpdateField}
-                />
-              );
-            case 'sales':
-              return <React.Fragment key={column.id}>{cellRenderers.renderCurrency('sales', cellRenderProps)}</React.Fragment>;
-            case 'purchase':
-              return <React.Fragment key={column.id}>{cellRenderers.renderCurrency('purchase', cellRenderProps)}</React.Fragment>;
-            case 'depositPaid':
-              return <React.Fragment key={column.id}>{cellRenderers.renderDepositPaid(cellRenderProps)}</React.Fragment>;
-            case 'priority':
-              return <React.Fragment key={column.id}>{cellRenderers.renderPriority(cellRenderProps)}</React.Fragment>;
-            default:
-              return <React.Fragment key={column.id}>{cellRenderers.renderDefault()}</React.Fragment>;
-          }
-        })}
-        
-        {columns.length > 0 && (
-          <td className="px-1.5 py-1.5 text-center">
-            <div className="relative inline-block">
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const buttonRect = (e.target as HTMLElement).getBoundingClientRect();
-                  const dropdownWidth = 160;
-                  const dropdownHeight = 120; // Approximate height of the dropdown menu
-                  
-                  // Calculate position with viewport awareness
-                  const viewportHeight = window.innerHeight;
-                  const spaceBelow = viewportHeight - buttonRect.bottom;
-                  const spaceAbove = buttonRect.top;
-                  
-                  // Determine vertical position
-                  let top: number;
-                  if (spaceBelow >= dropdownHeight + 10) {
-                    // Enough space below, show dropdown below button
-                    top = buttonRect.bottom + 2;
-                  } else if (spaceAbove >= dropdownHeight + 10) {
-                    // Not enough space below but enough above, show dropdown above button
-                    top = buttonRect.top - dropdownHeight - 2;
-                  } else {
-                    // Not enough space either way, align with viewport bottom
-                    top = viewportHeight - dropdownHeight - 10;
-                  }
-                  
-                  // Ensure horizontal position stays within viewport
-                  const left = Math.max(10, buttonRect.right - dropdownWidth);
-                  
-                  onShowOptionsMenu(project.id, { top, left }, e);
-                }}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors options-menu-button"
-                aria-label={`프로젝트 ${project.client} 옵션 메뉴`}
-                aria-haspopup="true"
-              >
-                <MoreVertical className="icon-sm text-gray-600" aria-hidden="true" />
-              </button>
-            </div>
-          </td>
-        )}
-      </tr>
-      {isExpanded && (
-        <tr className="bg-white border-b border-gray-200">
-          <td colSpan={columns.length + (columns.length > 0 ? 2 : 0)} className="p-0">
-            <TaskList 
-              projectId={project.id}
-              tasks={tasks}
-              onTaskToggle={handleTaskToggle}
-            />
-          </td>
-        </tr>
-      )}
+        onDragOver={handleDragOverRow}
+        onDrop={handleDropRow}
+      />
+      <ExpandableRow
+        isExpanded={isExpanded}
+        tasks={tasks}
+        columns={columns}
+        onTaskToggle={handleTaskToggle}
+      />
     </>
-  );
-}, (prevProps, nextProps) => {
-  // props 비교 함수로 불필요한 리렌더링 방지
-  return (
-    prevProps.project.id === nextProps.project.id &&
-    prevProps.project === nextProps.project &&
-    prevProps.isSelected === nextProps.isSelected &&
-    prevProps.isDragging === nextProps.isDragging &&
-    prevProps.index === nextProps.index &&
-    prevProps.columns.length === nextProps.columns.length &&
-    prevProps.columns.every((col, idx) => col.id === nextProps.columns[idx]?.id)
   );
 });
 

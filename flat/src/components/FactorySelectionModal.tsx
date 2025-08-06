@@ -1,28 +1,35 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { factories, type Factory } from '../data/factories';
-import BaseModal from './common/BaseModal';
+import BaseModal, { ModalFooter } from './common/BaseModal';
 import { Search } from 'lucide-react';
 import { FactoryType, FactoryTypeLabel, ModalSize } from '../types/enums';
 import { MODAL_SIZES } from '../utils/modalUtils';
 import FactoryTypeBadge from './common/FactoryTypeBadge';
 import { useDebouncedSearch } from '../hooks/common';
+import { useDragSelection } from '@/hooks/useDragSelection';
 import { cn } from '../utils/cn';
 import './FactorySelectionModal.css';
 
 interface FactorySelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onFactorySelect: (factory: Factory) => void;
+  onFactorySelect?: (factory: Factory) => void; // For single selection
+  onSelectFactories?: (factories: Factory[]) => void; // For multiple selection
+  multiSelect?: boolean; // Enable multi-selection mode
+  selectedFactoryIds?: string[]; // Pre-selected factories for multi-select
 }
-
-// Using FactoryType enum from types/enums.ts
 
 const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
   isOpen,
   onClose,
   onFactorySelect,
+  onSelectFactories,
+  multiSelect = false,
+  selectedFactoryIds = []
 }) => {
-  const [selectedType, setSelectedType] = useState<FactoryType>(FactoryType.MANUFACTURING);
+  const [selectedType, setSelectedType] = useState<'all' | FactoryType>(multiSelect ? 'all' : FactoryType.MANUFACTURING);
+  const [selectedFactories, setSelectedFactories] = useState<string[]>(selectedFactoryIds);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Use debounced search hook
   const { searchValue, debouncedValue, setSearchValue } = useDebouncedSearch({
@@ -30,133 +37,168 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
     minLength: 1
   });
 
-  // 필터링된 공장 리스트
+  // For multi-select drag functionality
+  const {
+    isDragging,
+    handleStartDrag,
+    handleMouseEnterItem,
+    handleEndDrag,
+    handleSelectItem,
+  } = useDragSelection({
+    items: factories,
+    selectedItems: selectedFactories,
+    onSelectionChange: setSelectedFactories,
+    getItemId: (factory) => factory.id,
+    enabled: multiSelect
+  });
+
+  useEffect(() => {
+    setSelectedFactories(selectedFactoryIds);
+  }, [selectedFactoryIds]);
+
   const filteredFactories = useMemo(() => {
-    let filtered = factories;
-    
-    // 타입 필터링
-    filtered = filtered.filter(factory => factory.type === selectedType);
-    
-    // 검색어 필터링 - use debounced value
-    if (debouncedValue.trim()) {
-      filtered = filtered.filter(factory => 
+    return factories.filter(factory => {
+      const matchesType = selectedType === 'all' || factory.type === selectedType;
+      const matchesSearch = !debouncedValue || 
         factory.name.toLowerCase().includes(debouncedValue.toLowerCase()) ||
-        factory.address.toLowerCase().includes(debouncedValue.toLowerCase())
-      );
-    }
-    
-    return filtered;
+        factory.location?.toLowerCase().includes(debouncedValue.toLowerCase());
+      return matchesType && matchesSearch;
+    });
   }, [selectedType, debouncedValue]);
 
   const handleFactoryClick = (factory: Factory) => {
-    onFactorySelect(factory);
+    if (multiSelect) {
+      handleSelectItem(factory.id);
+    } else {
+      onFactorySelect?.(factory);
+      onClose();
+    }
+  };
+
+  const handleConfirmSelection = () => {
+    const selected = factories.filter(f => selectedFactories.includes(f.id));
+    onSelectFactories?.(selected);
     onClose();
+  };
+
+  const handleClose = () => {
     setSearchValue('');
-    setSelectedType(FactoryType.MANUFACTURING);
+    setSelectedFactories([]);
+    onClose();
   };
 
   return (
     <BaseModal
       isOpen={isOpen}
-      onClose={onClose}
-      title="공장 선택"
-      size={MODAL_SIZES.LARGE}
+      onClose={handleClose}
+      title={multiSelect ? "공장 선택 (다중 선택)" : "공장 선택"}
+      description={multiSelect ? "드래그하거나 클릭하여 여러 공장을 선택하세요" : "프로젝트에 할당할 공장을 선택하세요"}
+      size={MODAL_SIZES[ModalSize.MD]}
+      footer={
+        multiSelect && (
+          <ModalFooter>
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleConfirmSelection}
+              disabled={selectedFactories.length === 0}
+              className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              선택 완료 ({selectedFactories.length})
+            </button>
+          </ModalFooter>
+        )
+      }
     >
-      <div className="modal-section-spacing">
-
-        {/* 필터 및 검색 */}
-        <div className="modal-field-spacing">
-          {/* 타입 필터 */}
-          <div className="factory-modal__type-filter">
-            {Object.entries(FactoryTypeLabel).map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => setSelectedType(key as FactoryType)}
-                className={cn(
-                  'factory-modal__type-button',
-                  selectedType === key && 'factory-modal__type-button--selected'
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* 검색바 */}
-          <div className="factory-modal__search-container">
-            <input
-              type="text"
-              placeholder="공장명 또는 주소로 검색..."
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="factory-modal__search-input"
-            />
-            <Search className="factory-modal__search-icon" />
-          </div>
+      <div className="factory-selection-modal">
+        {/* Search Bar */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="text"
+            placeholder="공장명 또는 위치로 검색..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
 
-        {/* 공장 리스트 */}
-        <div className="factory-modal__list">
+        {/* Type Filter Tabs */}
+        <div className="flex space-x-2 mb-4 border-b">
+          {multiSelect && (
+            <button
+              onClick={() => setSelectedType('all')}
+              className={cn(
+                "px-4 py-2 font-medium text-sm border-b-2 transition-colors",
+                selectedType === 'all'
+                  ? "text-blue-600 border-blue-600"
+                  : "text-gray-500 border-transparent hover:text-gray-700"
+              )}
+            >
+              전체
+            </button>
+          )}
+          {Object.values(FactoryType).map((type) => (
+            <button
+              key={type}
+              onClick={() => setSelectedType(type)}
+              className={cn(
+                "px-4 py-2 font-medium text-sm border-b-2 transition-colors",
+                selectedType === type
+                  ? "text-blue-600 border-blue-600"
+                  : "text-gray-500 border-transparent hover:text-gray-700"
+              )}
+            >
+              {FactoryTypeLabel[type]}
+            </button>
+          ))}
+        </div>
+
+        {/* Factory List */}
+        <div 
+          ref={containerRef}
+          className="space-y-2 max-h-96 overflow-y-auto"
+          onMouseUp={handleEndDrag}
+          onMouseLeave={handleEndDrag}
+        >
           {filteredFactories.length === 0 ? (
-            <div className="flex items-center justify-center h-32 text-gray-500">
-              검색 결과가 없습니다.
+            <div className="text-center py-8 text-gray-500">
+              {debouncedValue ? '검색 결과가 없습니다' : '등록된 공장이 없습니다'}
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
-              {filteredFactories.map((factory) => (
-                <div
-                  key={factory.id}
-                  onClick={() => handleFactoryClick(factory)}
-                  className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <h3 className="text-lg font-medium text-gray-900">
-                          {factory.name}
-                        </h3>
-                        <FactoryTypeBadge type={factory.type} showLabel={false} />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {factory.address}
-                      </p>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                        <span>{factory.contact}</span>
-                        <span>{factory.capacity}</span>
-                      </div>
-                      {factory.certifications.length > 0 && (
-                        <div className="flex gap-1 mt-2">
-                          {factory.certifications.slice(0, 3).map((cert) => (
-                            <span
-                              key={cert}
-                              className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
-                            >
-                              {cert}
-                            </span>
-                          ))}
-                          {factory.certifications.length > 3 && (
-                            <span className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">
-                              +{factory.certifications.length - 3}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <button className="text-blue-500 hover:text-blue-700 font-medium text-sm">
-                        선택
-                      </button>
-                    </div>
+            filteredFactories.map((factory, index) => (
+              <div
+                key={factory.id}
+                className={cn(
+                  "factory-item p-4 rounded-lg border cursor-pointer transition-all",
+                  multiSelect && selectedFactories.includes(factory.id)
+                    ? "bg-blue-50 border-blue-300"
+                    : "bg-white border-gray-200 hover:bg-gray-50",
+                  isDragging && "select-none"
+                )}
+                onClick={() => handleFactoryClick(factory)}
+                onMouseDown={() => multiSelect && handleStartDrag(index)}
+                onMouseEnter={() => multiSelect && handleMouseEnterItem(index)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-900">{factory.name}</h3>
+                    {factory.location && (
+                      <p className="text-sm text-gray-500 mt-1">{factory.location}</p>
+                    )}
                   </div>
+                  <FactoryTypeBadge type={factory.type} />
                 </div>
-              ))}
-            </div>
+                {factory.contact && (
+                  <p className="text-sm text-gray-600 mt-2">담당자: {factory.contact}</p>
+                )}
+              </div>
+            ))
           )}
-        </div>
-
-        {/* 푸터 */}
-        <div className="mt-4 pt-4 border-t text-sm text-gray-600">
-          총 {filteredFactories.length}개의 공장이 검색되었습니다.
         </div>
       </div>
     </BaseModal>

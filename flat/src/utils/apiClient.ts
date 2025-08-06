@@ -1,18 +1,19 @@
 /**
  * API Client utility
  * 
- * Re-exports the refactored modular API client
+ * Re-exports API error handling utilities
  */
 
+// Export from services/api/errorHandling
 export {
-  ApiClient,
-  ApiError,
-  apiClient,
-  handleApiError,
+  ApiErrorHandler,
   isApiError,
   isNetworkError,
   isTimeoutError,
-  getErrorMessage
-} from './apiClient/index';
+  handleApiError
+} from '../services/api/errorHandling';
 
-export type { ApiClientOptions, RequestOptions } from './apiClient/types';
+// Export ApiError interface from services/api/errorHandling 
+export type { ApiError } from '../services/api/errorHandling';
+
+export { apiClient as default } from '../services/api';

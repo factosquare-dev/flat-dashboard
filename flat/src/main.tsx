@@ -10,12 +10,20 @@ import './mocks/initialize'
 import './utils/resetMockData'
 import { checkAndUpdateDatabaseVersion } from './utils/resetMockData'
 import { cleanupDuplicateFactories } from './utils/cleanupDuplicateFactories'
+import { cleanupInvalidEntries } from './utils/cleanupDatabase'
 
 // Check database version on app start
 checkAndUpdateDatabaseVersion()
 
-// Clean up duplicate factory IDs on app start
+// Clean up database on app start
 setTimeout(() => {
+  // First clean up invalid entries
+  const invalidCount = cleanupInvalidEntries();
+  if (invalidCount > 0) {
+    console.log(`[App] Cleaned ${invalidCount} invalid database entries`);
+  }
+  
+  // Then clean up duplicate factory IDs
   cleanupDuplicateFactories().then(count => {
     if (count > 0) {
       console.log(`[App] Cleaned ${count} projects with duplicate factory IDs`);

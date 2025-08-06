@@ -48,23 +48,36 @@ const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> = ({
 
       {isOpen && (
         <div className="absolute right-0 z-50 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg">
-          <div className="p-2 border-b border-gray-200">
-            <div className="flex gap-2">
-              <button
-                onClick={onShowAll}
-                className="flex-1 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded"
-              >
-                모두 표시
-              </button>
-              <button
-                onClick={onHideAll}
-                className="flex-1 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded"
-              >
-                모두 숨기기
-              </button>
+          {visibleCount > 0 && (
+            <div className="p-2 border-b border-gray-200">
+              <div className="flex gap-2">
+                <button
+                  onClick={onShowAll}
+                  className="flex-1 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded"
+                >
+                  모두 표시
+                </button>
+                <button
+                  onClick={onHideAll}
+                  className="flex-1 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded"
+                >
+                  모두 숨기기
+                </button>
+              </div>
             </div>
-          </div>
+          )}
           <div className="max-h-96 overflow-y-auto">
+            {visibleCount === 0 && (
+              <div className="p-4 text-center">
+                <div className="text-sm text-gray-500 mb-3">모든 열이 숨겨져 있습니다</div>
+                <button
+                  onClick={onShowAll}
+                  className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded border border-blue-200"
+                >
+                  모두 표시
+                </button>
+              </div>
+            )}
             {columns.map((column) => {
               const isVisible = !hiddenColumns.has(column.id);
               return (

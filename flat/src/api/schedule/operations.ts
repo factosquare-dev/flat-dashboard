@@ -1,450 +1,51 @@
-import type { Schedule, Task, Participant } from '../../types/schedule';
-import type { Project, ProjectFactory } from '../../types/project';
-import { formatDate } from '@/utils/coreUtils';
-import { USE_MOCK_DATA } from '@/config/mock';
-import { getDatabaseWithRetry } from '@/mocks/database/utils';
-// Removed deprecated scheduleAdapter import
-import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
-import { mockDataService } from '@/services/mockDataService';
-
 /**
- * Validate task dates - throw error if tasks overlap
+ * Schedule operations - Main entry point
+ * Re-exports all schedule-related operations
  */
-function validateTaskDates(tasks: Task[], projectStartDate?: string, projectEndDate?: string): void {
-  if (tasks.length === 0) return;
-  
-  const projectStart = projectStartDate ? new Date(projectStartDate) : null;
-  const projectEnd = projectEndDate ? new Date(projectEndDate) : null;
-  
-  // Sort tasks by start date
-  const sortedTasks = [...tasks].sort((a, b) => 
-    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-  );
-  
-  // Check for overlaps and project bounds violations
-  for (let i = 0; i < sortedTasks.length; i++) {
-    const currentTask = sortedTasks[i];
-    const taskStart = new Date(currentTask.startDate);
-    const taskEnd = new Date(currentTask.endDate);
-    
-    // Check project bounds
-    if (projectStart && taskStart < projectStart) {
-      throw new Error(`Task "${currentTask.title}" 시작일이 프로젝트 시작일보다 이릅니다.`);
-    }
-    
-    if (projectEnd && taskEnd > projectEnd) {
-      throw new Error(`Task "${currentTask.title}" 종료일이 프로젝트 종료일보다 늦습니다.`);
-    }
-    
-    // Check for overlap with previous task
-    if (i > 0) {
-      const prevTask = sortedTasks[i - 1];
-      const prevEnd = new Date(prevTask.endDate);
-      
-      if (taskStart <= prevEnd) {
-        throw new Error(
-          `Task 날짜 겹침: "${prevTask.title}" (${prevTask.startDate} ~ ${prevTask.endDate})와 ` +
-          `"${currentTask.title}" (${currentTask.startDate} ~ ${currentTask.endDate})가 겹칩니다.`
-        );
-      }
-    }
-  }
-}
 
-/**
- * 프로젝트로부터 스케줄 생성 또는 조회
- */
-export const getOrCreateScheduleForProject = async (
-  project: Project,
-  existingSchedules: Map<string, Schedule>
-): Promise<Schedule> => {
-  
-  // Use mock database if enabled
-  if (USE_MOCK_DATA) {
-    try {
-      const database = await getDatabaseWithRetry();
-      
-      if (database && database.schedules) {
-        const schedules = Array.from(database.schedules.values());
-        const existingSchedule = schedules.find(s => s.projectId === project.id);
-        
-        if (existingSchedule) {
-          
-          // Get project data first
-          const projectData = database.projects.get(existingSchedule.projectId);
-          
-          // Get assigned factory IDs for this project
-          const assignedFactoryIds = new Set<string>();
-          if (projectData) {
-            if (projectData.manufacturerId) assignedFactoryIds.add(projectData.manufacturerId);
-            if (projectData.containerId) assignedFactoryIds.add(projectData.containerId);
-            if (projectData.packagingId) assignedFactoryIds.add(projectData.packagingId);
-          }
-          
-          // Get tasks for this schedule - filter by assigned factories
-          const allTasks = Array.from(database.tasks.values());
-          
-          const tasksForSchedule = allTasks.filter(task => task.scheduleId === existingSchedule.id);
-          
-          const scheduleTasks = tasksForSchedule
-            .filter(task => assignedFactoryIds.has(task.factoryId))
-            .map(task => {
-              // Get factory name from factoryId
-              const factory = database.factories.get(task.factoryId);
-              const factoryColor = factory?.type === 'MANUFACTURING' ? 'blue' : 
-                                   factory?.type === 'CONTAINER' ? 'red' : 
-                                   factory?.type === 'PACKAGING' ? 'yellow' : 'gray';
-              
-              return {
-                id: task.id,
-                projectId: existingSchedule.projectId, // Use schedule's projectId instead of task's
-                factory: factory?.name || '',
-                factoryId: task.factoryId,
-                taskType: task.title,
-                startDate: typeof task.startDate === 'string' ? task.startDate : formatDate(new Date(task.startDate), 'iso'),
-                endDate: typeof task.endDate === 'string' ? task.endDate : formatDate(new Date(task.endDate), 'iso'),
-                status: task.status.toLowerCase().replace('_', '-'),
-                assignee: task.assignee || '',
-                color: factoryColor
-              };
-            });
-          
-          
-          // Validate task dates - throw error if overlapping
-          validateTaskDates(scheduleTasks, existingSchedule.startDate, existingSchedule.endDate);
-          
-          
-          // Get participants from project factories
-          const participants = [];
-          
-          if (projectData) {
-            if (projectData.manufacturerId && projectData.manufacturerId !== null) {
-              const factory = database.factories.get(projectData.manufacturerId);
-              if (factory) {
-                const startDateStr = typeof existingSchedule.startDate === 'string' ? 
-                  formatDate(new Date(existingSchedule.startDate)) : 
-                  formatDate(existingSchedule.startDate);
-                const endDateStr = typeof existingSchedule.endDate === 'string' ? 
-                  formatDate(new Date(existingSchedule.endDate)) : 
-                  formatDate(existingSchedule.endDate);
-                
-                participants.push({
-                  id: factory.id,
-                  name: factory.name,
-                  period: `${startDateStr} ~ ${endDateStr}`,
-                  color: 'blue'
-                });
-              }
-            }
-            
-            if (projectData.containerId && projectData.containerId !== null) {
-              const factory = database.factories.get(projectData.containerId);
-              if (factory) {
-                const startDateStr = typeof existingSchedule.startDate === 'string' ? 
-                  formatDate(new Date(existingSchedule.startDate)) : 
-                  formatDate(existingSchedule.startDate);
-                const endDateStr = typeof existingSchedule.endDate === 'string' ? 
-                  formatDate(new Date(existingSchedule.endDate)) : 
-                  formatDate(existingSchedule.endDate);
-                
-                participants.push({
-                  id: factory.id,
-                  name: factory.name,
-                  period: `${startDateStr} ~ ${endDateStr}`,
-                  color: 'red'
-                });
-              }
-            }
-            
-            if (projectData.packagingId && projectData.packagingId !== null) {
-              const factory = database.factories.get(projectData.packagingId);
-              if (factory) {
-                const startDateStr = typeof existingSchedule.startDate === 'string' ? 
-                  formatDate(new Date(existingSchedule.startDate)) : 
-                  formatDate(existingSchedule.startDate);
-                const endDateStr = typeof existingSchedule.endDate === 'string' ? 
-                  formatDate(new Date(existingSchedule.endDate)) : 
-                  formatDate(existingSchedule.endDate);
-                
-                participants.push({
-                  id: factory.id,
-                  name: factory.name,
-                  period: `${startDateStr} ~ ${endDateStr}`,
-                  color: 'yellow'
-                });
-              }
-            }
-          }
-          
-          
-          const result = {
-            id: existingSchedule.id,
-            projectId: existingSchedule.projectId,
-            participants: participants,
-            tasks: scheduleTasks,
-            startDate: typeof existingSchedule.startDate === 'string' ? existingSchedule.startDate : formatDate(new Date(existingSchedule.startDate)),
-            endDate: typeof existingSchedule.endDate === 'string' ? existingSchedule.endDate : formatDate(new Date(existingSchedule.endDate)),
-            createdAt: typeof existingSchedule.createdAt === 'string' ? existingSchedule.createdAt : existingSchedule.createdAt.toISOString(),
-            updatedAt: typeof existingSchedule.updatedAt === 'string' ? existingSchedule.updatedAt : existingSchedule.updatedAt.toISOString()
-          };
-          
-          return result;
-        }
-      }
-    } catch {
-      // Fall through to old logic
-    }
-  }
-  
-  
-  // Fallback: Create schedule with mock tasks for development
-  
-  // Get mock schedules and find tasks for this specific project
-  let mockSchedules: Schedule[] = [];
-  try {
-    const db = MockDatabaseImpl.getInstance();
-    const database = db.getDatabase();
-    mockSchedules = Array.from(database.schedules.values());
-  } catch {
-    // Continue with empty array
-  }
-  
-  const mockSchedule = mockSchedules.find(s => s.projectId === project.id);
-  
-  if (!mockSchedule) {
-    // No mock schedule found for this project
-  }
-  
-  // Filter tasks to fit within project dates
-  const projectStart = new Date(project.startDate);
-  const projectEnd = new Date(project.endDate);
-  
-  // Create non-overlapping tasks within each factory
-  let globalTaskId = 1;
-  const filteredTasks: Task[] = [];
-  
-  
-  if (mockSchedule) {
-    
-    // Filter tasks that belong to this project only
-    const projectTasks = mockSchedule.tasks.filter(task => 
-      task.projectId === project.id
-    );
-    
-    
-    // Get assigned factories for this project
-    const assignedFactoryIds = new Set<string>();
-    if (project.manufacturerId) {
-      assignedFactoryIds.add(project.manufacturerId);
-    }
-    if (project.containerId) {
-      assignedFactoryIds.add(project.containerId);
-    }
-    if (project.packagingId) {
-      assignedFactoryIds.add(project.packagingId);
-    }
-    
-    
-    // Filter tasks to only include those from assigned factories
-    const validProjectTasks = projectTasks.filter(task => {
-      if (!task.factoryId) {
-        return false;
-      }
-      const isValid = assignedFactoryIds.has(task.factoryId);
-      if (!isValid) {
-        // Task is not from an assigned factory
-      }
-      return isValid;
-    });
-    
-    
-    // Group tasks by factory
-    const tasksByFactory = new Map<string, Task[]>();
-    validProjectTasks.forEach(task => {
-      const factory = task.factory || 'Unknown';
-      if (!tasksByFactory.has(factory)) {
-        tasksByFactory.set(factory, []);
-      }
-      tasksByFactory.get(factory)!.push(task);
-    });
-    
-    // Process each factory's tasks separately to avoid overlaps within the same factory
-    tasksByFactory.forEach((factoryTasks, factoryName) => {
-      const factory = mockSchedule.participants.find(p => p.name === factoryName);
-      let lastEndDateForFactory = new Date(projectStart);
-      
-      
-      // Sort tasks by original start date
-      const sortedFactoryTasks = [...factoryTasks].sort((a, b) => 
-        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-      );
-      
-      sortedFactoryTasks.forEach((task, index) => {
-        const taskDuration = Math.ceil(
-          (new Date(task.endDate).getTime() - new Date(task.startDate).getTime()) / (1000 * 60 * 60 * 24)
-        );
-        
-        // For each factory, ensure no overlap within that factory
-        let newStartDate: Date;
-        if (index === 0) {
-          // First task starts at project start
-          newStartDate = new Date(projectStart);
-        } else {
-          // Subsequent tasks start after previous task ends
-          newStartDate = new Date(lastEndDateForFactory);
-          newStartDate.setDate(newStartDate.getDate() + 2); // Add 2 day gap between tasks
-        }
-        
-        const newEndDate = new Date(newStartDate);
-        newEndDate.setDate(newEndDate.getDate() + Math.max(3, taskDuration)); // Minimum 3 days per task
-        
-        // Only add task if it fits within project timeline
-        if (newEndDate <= projectEnd) {
-          const newTask = {
-            ...task,
-            id: globalTaskId++,
-            projectId: project.id,
-            factoryId: factory?.id || `factory-unknown`,
-            startDate: formatDate(newStartDate, 'iso'),
-            endDate: formatDate(newEndDate)
-          };
-          
-          filteredTasks.push(newTask);
-          lastEndDateForFactory = newEndDate;
-        } else {
-        // Task doesn't fit in project timeline
-      }
-      });
-    });
-  }
-  
-  // Get participants based on project's factories
-  const participants: Participant[] = [];
-  let allFactories: ProjectFactory[] = [];
-  
-  try {
-    allFactories = mockDataService.getAllFactories();
-  } catch {
-    // Continue with empty array
-  }
-  
-  const startDateStr = formatDate(new Date(project.startDate), 'iso');
-  const endDateStr = formatDate(new Date(project.endDate), 'iso');
-  const period = `${startDateStr} ~ ${endDateStr}`;
+// Export validation utilities
+export {
+  validateTaskDates,
+  validateTaskDependencies,
+  validateTaskParticipants,
+  validateTaskProgress,
+} from './validation';
 
-  if (project.manufacturerId) {
-    const factory = allFactories.find(f => f.id === project.manufacturerId);
-    if (factory) {
-      participants.push({
-        id: factory.id,
-        name: factory.name,
-        period,
-        color: 'blue'
-      });
-    }
-  }
-  
-  if (project.containerId) {
-    const factory = allFactories.find(f => f.id === project.containerId);
-    if (factory) {
-      participants.push({
-        id: factory.id,
-        name: factory.name,
-        period,
-        color: 'red'
-      });
-    }
-  }
-  
-  if (project.packagingId) {
-    const factory = allFactories.find(f => f.id === project.packagingId);
-    if (factory) {
-      participants.push({
-        id: factory.id,
-        name: factory.name,
-        period,
-        color: 'yellow'
-      });
-    }
-  }
-  
-  const newSchedule: Schedule = {
-    id: `schedule-${project.id}-${Date.now()}`,
-    projectId: project.id,
-    participants: participants,
-    tasks: filteredTasks,
-    startDate: project.startDate,
-    endDate: project.endDate,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  
-  
-  
-  if (USE_MOCK_DATA) {
-    existingSchedules.set(newSchedule.id, newSchedule);
-  }
-  
-  return newSchedule;
-};
+// Export task transformation utilities
+export {
+  getFactoryColor,
+  transformDatabaseTask,
+  calculateTaskDuration,
+  calculateTaskProgressByDate,
+  sortTasksByStartDate,
+  groupTasksByFactory,
+  filterTasksByDateRange,
+  getTaskStatistics,
+} from './taskTransformers';
 
-/**
- * 스케줄에 태스크 추가
- */
-export const addTaskToSchedule = (
-  schedule: Schedule,
-  task: Omit<Task, 'id'>
-): Schedule => {
-  const newTaskId = Math.max(...schedule.tasks.map(t => 
-    typeof t.id === 'number' ? t.id : parseInt(String(t.id)) || 0
-  )) + 1;
-  
-  const newTask: Task = {
-    ...task,
-    id: newTaskId
-  };
-  
-  return {
-    ...schedule,
-    tasks: [...schedule.tasks, newTask],
-    updatedAt: new Date().toISOString()
-  };
-};
+// Export schedule CRUD operations
+export {
+  getOrCreateScheduleForProject,
+  getSchedulesForProjects,
+  updateSchedule,
+  deleteSchedule,
+  addTaskToSchedule,
+  updateTaskInSchedule,
+  deleteTaskFromSchedule,
+} from './scheduleOperations';
 
-/**
- * 스케줄에서 태스크 업데이트
- */
-export const updateTaskInSchedule = (
-  schedule: Schedule,
-  taskId: number | string,
-  updates: Partial<Task>
-): Schedule | null => {
-  const taskIndex = schedule.tasks.findIndex(t => t.id === taskId);
-  if (taskIndex === -1) return null;
-  
-  const updatedTasks = [...schedule.tasks];
-  updatedTasks[taskIndex] = {
-    ...updatedTasks[taskIndex],
-    ...updates
-  };
-  
-  return {
-    ...schedule,
-    tasks: updatedTasks,
-    updatedAt: new Date().toISOString()
-  };
-};
+// Export gantt-specific operations
+export {
+  transformToGanttTasks,
+  createGanttTask,
+  updateGanttTask,
+  deleteGanttTask,
+  calculateGanttDependencies,
+} from './ganttOperations';
 
-/**
- * 스케줄에서 태스크 삭제
- */
-export const deleteTaskFromSchedule = (
-  schedule: Schedule,
-  taskId: number | string
-): Schedule => {
-  return {
-    ...schedule,
-    tasks: schedule.tasks.filter(t => t.id !== taskId),
-    updatedAt: new Date().toISOString()
-  };
-};
+// Export schedule sync operations
+export {
+  syncScheduleWithProject,
+  syncAllSchedules,
+  validateScheduleConsistency,
+} from './scheduleSync';

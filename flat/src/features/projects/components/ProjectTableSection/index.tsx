@@ -115,6 +115,9 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
   };
 
   const handleMouseEnterRow = (index: number) => {
+    if (!projects || index < 0 || index >= projects.length) {
+      return;
+    }
     const project = projects[index];
     if (project && !ProjectTableService.canStartDragSelection(project)) {
       return;

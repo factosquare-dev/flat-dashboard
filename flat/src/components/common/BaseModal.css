@@ -17,24 +17,43 @@
   background-color: white;
   border-radius: 0.5rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  width: 100%;
+  width: auto;
+  min-width: 20rem; /* 320px minimum width */
+  max-width: 90vw; /* Maximum 90% of viewport width */
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Maximum 90% of viewport height */
 }
 
-/* Modal Size Variants */
+/* Modal Size Variants - Now act as constraints, not fixed sizes */
 .modal-container--sm {
-  max-width: 24rem; /* 384px */
+  max-width: min(24rem, 90vw); /* 384px or 90vw, whichever is smaller */
 }
 
 .modal-container--md {
-  max-width: 42rem; /* 672px */
+  max-width: min(42rem, 90vw); /* 672px or 90vw */
 }
 
 .modal-container--lg {
-  max-width: 56rem; /* 896px */
+  max-width: min(56rem, 90vw); /* 896px or 90vw */
 }
 
 .modal-container--xl {
-  max-width: 72rem; /* 1152px */
+  max-width: min(72rem, 90vw); /* 1152px or 90vw */
+}
+
+/* Auto size variant - content defines the width */
+.modal-container--auto {
+  width: fit-content;
+  max-width: min(64rem, 90vw); /* Default reasonable max */
+}
+
+/* Full size variant - takes most of the viewport */
+.modal-container--full {
+  width: 95vw;
+  height: 95vh;
+  max-width: 95vw;
+  max-height: 95vh;
 }
 
 /* Modal Header */
@@ -89,8 +108,10 @@
 /* Modal Content */
 .modal-content {
   padding: 1.5rem;
-  max-height: calc(90vh - 200px);
+  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; /* Important for flex overflow */
 }
 
 /* Modal Footer */

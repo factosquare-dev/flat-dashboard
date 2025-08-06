@@ -45,10 +45,10 @@ export const useColumnVisibility = () => {
   };
 
   const hideAllColumns = () => {
-    // Don't hide checkbox and options columns
-    const allColumns = ['name', 'productType', 'client', 'serviceType', 'currentStage', 
+    // Hide ALL columns including checkbox and options
+    const allColumns = ['checkbox', 'name', 'productType', 'client', 'serviceType', 'currentStage', 
       'status', 'progress', 'startDate', 'endDate', 'manufacturer', 'container', 
-      'packaging', 'sales', 'purchase', 'depositPaid', 'priority'];
+      'packaging', 'sales', 'purchase', 'depositPaid', 'priority', 'options'];
     setHiddenColumns(new Set(allColumns));
   };
 

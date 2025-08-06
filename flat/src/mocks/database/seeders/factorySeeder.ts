@@ -1,11 +1,37 @@
 import { Factory } from '@/types/factory';
 import { TIME_CONSTANTS } from '@/constants/time';
 import { FactoryType } from '@/types/enums';
-import { factories as originalFactories } from '@/data/factories';
+import { toFactoryId } from '@/types/branded';
+import type { CertificationType } from '@/data/factories';
+
+// Initial factory data to avoid circular dependency
+const INITIAL_FACTORIES = [
+  {
+    id: toFactoryId('mfg-1'),
+    name: '누벨르 코스메틱',
+    type: FactoryType.MANUFACTURING,
+    address: '경기도 화성시 향남읍 제약공단1길 15',
+    contact: '031-366-7890',
+    email: 'contact@nouvelle.co.kr',
+    capacity: '10,000개/월',
+    certifications: ['ISO 22716', 'CGMP'] as CertificationType[],
+  },
+  {
+    id: toFactoryId('mfg-2'),
+    name: '퓨어 뷰티랩',
+    type: FactoryType.MANUFACTURING,
+    address: '충북 청주시 흥덕구 오송읍 오송생명로 123',
+    contact: '043-249-8800',
+    email: 'info@purebeautylab.co.kr',
+    capacity: '20,000개/월',
+    certifications: ['ISO 22716', 'CGMP', 'ISO 14001'] as CertificationType[],
+  },
+  // Add more factories as needed...
+];
 
 export const createFactories = (): Factory[] => {
-  // Convert all 15 factories from the original data
-  return originalFactories.map((factory, index) => {
+  // Use initial factory data instead of importing from factories.ts
+  return INITIAL_FACTORIES.map((factory, index) => {
     // Determine capacity as number based on original string capacity
     const capacityNumber = parseInt(factory.capacity.match(/\d+/)?.[0] || '100');
     

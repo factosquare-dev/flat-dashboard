@@ -72,9 +72,8 @@ export {
 export {
   unique as removeDuplicates,
   groupBy,
-  sortBy,
-  chunk
-} from './arrayUtils';
+  sortBy
+} from './common/arrays';
 
 // ============================================================================
 // RE-EXPORTS FROM FILE UTILITIES

@@ -90,6 +90,14 @@ export const getStatusIcon = (status: string, type: 'project' | 'task' = 'projec
     );
   }
   
+  if (upperCode === ProjectStatus.ON_HOLD) {
+    return (
+      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+      </svg>
+    );
+  }
+  
   if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return (
       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -169,10 +177,13 @@ function getStatusColorByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
   if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
-    return '#6B7280'; // gray-500
+    return '#64748B'; // slate-500
   }
   if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return '#3B82F6'; // blue-500
+  }
+  if (upperCode === ProjectStatus.ON_HOLD) {
+    return '#F59E0B'; // amber-500
   }
   if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return '#10B981'; // green-500
@@ -192,10 +203,13 @@ function getStatusBgClassByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
   if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
-    return 'bg-gray-100';
+    return 'bg-slate-100';
   }
   if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return 'bg-blue-100';
+  }
+  if (upperCode === ProjectStatus.ON_HOLD) {
+    return 'bg-amber-100';
   }
   if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return 'bg-green-100';
@@ -204,17 +218,20 @@ function getStatusBgClassByCode(code: string): string {
     return 'bg-red-100';
   }
   
-  return 'bg-gray-100'; // default
+  return 'bg-slate-100'; // default
 }
 
 function getStatusTextClassByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
   if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
-    return 'text-gray-700';
+    return 'text-slate-700';
   }
   if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return 'text-blue-700';
+  }
+  if (upperCode === ProjectStatus.ON_HOLD) {
+    return 'text-amber-700';
   }
   if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return 'text-green-700';
@@ -223,17 +240,20 @@ function getStatusTextClassByCode(code: string): string {
     return 'text-red-700';
   }
   
-  return 'text-gray-700'; // default
+  return 'text-slate-700'; // default
 }
 
 function getStatusBorderClassByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
   if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
-    return 'border-gray-300';
+    return 'border-slate-300';
   }
   if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return 'border-blue-300';
+  }
+  if (upperCode === ProjectStatus.ON_HOLD) {
+    return 'border-amber-300';
   }
   if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return 'border-green-300';
@@ -242,17 +262,20 @@ function getStatusBorderClassByCode(code: string): string {
     return 'border-red-300';
   }
   
-  return 'border-gray-300'; // default
+  return 'border-slate-300'; // default
 }
 
 function getSelectedStatusStylesByCode(code: string): string {
   const upperCode = code.toUpperCase();
   
   if (upperCode === ProjectStatus.PLANNING || upperCode === TaskStatus.PENDING) {
-    return 'bg-gray-600 text-white border-gray-700';
+    return 'bg-slate-600 text-white border-slate-700';
   }
   if (upperCode === ProjectStatus.IN_PROGRESS || upperCode === TaskStatus.IN_PROGRESS) {
     return 'bg-blue-600 text-white border-blue-700';
+  }
+  if (upperCode === ProjectStatus.ON_HOLD) {
+    return 'bg-amber-600 text-white border-amber-700';
   }
   if (upperCode === ProjectStatus.COMPLETED || upperCode === TaskStatus.COMPLETED) {
     return 'bg-green-600 text-white border-green-700';
@@ -261,8 +284,46 @@ function getSelectedStatusStylesByCode(code: string): string {
     return 'bg-red-600 text-white border-red-700';
   }
   
-  return 'bg-gray-600 text-white border-gray-700'; // default
+  return 'bg-slate-600 text-white border-slate-700'; // default
 }
+
+// Get all priorities
+export const getAllPriorities = () => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    return Array.from(database.priorityMappings.values())
+      .sort((a, b) => a.order - b.order)
+      .map(pm => ({
+        code: pm.code,
+        displayName: pm.displayName,
+        color: pm.color
+      }));
+  } catch (error) {
+    console.error('[getAllPriorities] Error:', error);
+    return [];
+  }
+};
+
+// Get all service types
+export const getAllServiceTypes = () => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    
+    return Array.from(database.serviceTypeMappings.values())
+      .sort((a, b) => a.order - b.order)
+      .map(stm => ({
+        code: stm.code,
+        displayName: stm.displayName,
+        description: stm.description
+      }));
+  } catch (error) {
+    console.error('[getAllServiceTypes] Error:', error);
+    return [];
+  }
+};
 
 // Clear cache when needed
 export const clearStatusCache = () => {

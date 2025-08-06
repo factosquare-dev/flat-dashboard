@@ -134,3 +134,56 @@ export const renderDefault = () => (
     -
   </td>
 );
+
+// Component exports for use in cellRenderer
+export const NameCell = (props: CellRenderProps) => {
+  const content = renderName(props);
+  // If EditableCell is returned, it already includes td wrapper
+  if (React.isValidElement(content) && content.type === EditableCell) {
+    return content;
+  }
+  // Otherwise, we need to extract the content from td
+  return React.isValidElement(content) ? content.props.children : content;
+};
+
+export const ClientCell = (props: CellRenderProps) => {
+  const td = renderClient(props);
+  return React.isValidElement(td) ? td.props.children : null;
+};
+
+export const ProgressCell = (props: CellRenderProps) => {
+  const td = renderProgress(props.project);
+  return React.isValidElement(td) ? td.props.children : null;
+};
+
+export const StartDateCell = (props: CellRenderProps) => {
+  const content = renderDate('startDate', props);
+  if (React.isValidElement(content) && content.type === EditableCell) {
+    return content;
+  }
+  return React.isValidElement(content) ? content.props.children : content;
+};
+
+export const EndDateCell = (props: CellRenderProps) => {
+  const content = renderDate('endDate', props);
+  if (React.isValidElement(content) && content.type === EditableCell) {
+    return content;
+  }
+  return React.isValidElement(content) ? content.props.children : content;
+};
+
+export const SalesCell = (props: CellRenderProps) => {
+  const content = renderCurrency('sales', props);
+  if (React.isValidElement(content) && content.type === EditableCell) {
+    return content;
+  }
+  return React.isValidElement(content) ? content.props.children : content;
+};
+
+export const PurchaseCell = (props: CellRenderProps) => {
+  const content = renderCurrency('purchase', props);
+  if (React.isValidElement(content) && content.type === EditableCell) {
+    return content;
+  }
+  return React.isValidElement(content) ? content.props.children : content;
+};

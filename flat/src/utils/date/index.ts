@@ -1,51 +1,55 @@
-// Re-export all date utilities from a single location
-export * from '../dateUtils';
-export * from '../ganttUtils';
+/**
+ * Unified date utilities - central export point
+ */
 
-// Import date-fns functions for standardized usage
+// Parsing utilities
 export {
-  format,
-  formatDistance,
-  formatDistanceToNow,
-  formatRelative,
-  isAfter,
-  isBefore,
-  isEqual,
-  isValid,
-  parseISO,
+  parseUtcDate,
+  parseDate
+} from './parsing';
+
+// Formatting utilities
+export {
+  formatDate,
+  formatDateLocale,
+  toUtcDateString,
+  toLocalDateString,
+  getCurrentISOString,
+  getCurrentTimestamp,
+  toISOString,
+  formatRelativeTime
+} from './formatting';
+
+// Operation utilities
+export {
   startOfDay,
   endOfDay,
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  addDays,
-  addWeeks,
-  addMonths,
-  subDays,
-  subWeeks,
-  subMonths,
-  differenceInDays,
-  differenceInWeeks,
-  differenceInMonths,
-  getDay,
-  getWeek,
-  getMonth,
-  getYear,
-  setHours,
-  setMinutes,
-  setSeconds,
-  isWeekend as isWeekendDateFns,
+  getToday,
+  isToday,
   isSameDay,
-  isSameWeek,
-  isSameMonth,
-  isWithinInterval,
-  compareAsc,
-  compareDesc,
-} from 'date-fns';
+  addDays,
+  subDays,
+  getDaysBetween,
+  getDaysArray,
+  isPast,
+  isFuture,
+  isDateInRange,
+  isWeekend,
+  getWeekNumber,
+  getUserTimezone,
+  getTimezoneOffset
+} from './operations';
 
-// Korean locale for date-fns
-export { ko } from 'date-fns/locale';
+// Validation utilities
+export {
+  isValidDateString,
+  isValidDateRange
+} from './validation';
 
-// Re-export time constants
-export * from '../../constants/time';
+// Gantt-specific utilities
+export {
+  getTaskStatusByDate,
+  calculateResizeDateFromX,
+  calculateHoveredDateIndex,
+  calculateSnapIndicatorX
+} from './gantt';

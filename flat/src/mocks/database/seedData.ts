@@ -2,27 +2,29 @@
  * Updated seed data for consistent customer and manager relationships
  */
 
-import { MockDatabase, UserFactory, ProjectAssignment, FactoryProject, UserCustomer } from './types';
-// Remove circular dependency - MockDatabaseImpl is not used in this file
-import { User, UserRole } from '@/types/user';
-import { Customer } from '@/types/customer';
-import { Factory } from '@/types/factory';
-import { Project, ProjectType, ProjectStatus } from '@/types/project';
-import { Schedule, Task, TaskStatus, TaskType, Participant, ParticipantRole } from '@/types/schedule';
-import { taskTypesByFactoryType } from '@/data/factories';
-import { TIME_CONSTANTS } from '@/constants/time';
-import type { Comment } from '@/types/comment';
-import { FactoryType, Priority } from '@/types/enums';
-import { getTaskTemplatesByFactoryType, calculateTaskDates, TaskTemplate } from './seeders/tasks/taskTemplates';
+import { MockDatabase } from './types';
 
 // Import seeders
 import { createUsers } from './seeders/userSeeder';
 import { createCustomers } from './seeders/customerSeeder';
 import { createFactories } from './seeders/factorySeeder';
 import { createProjects } from './seeders/projectSeeder';
-import { createSchedulesAndTasks } from './seeders/scheduleTaskSeeder';
 import { createProductCategories } from './seeders/productCategorySeeder';
 import { createProducts } from './seeders/productSeeder';
+import { createSchedulesAndTasks } from './seedTasks';
+import { 
+  createUserFactoryRelations, 
+  createProjectAssignments, 
+  createFactoryProjects, 
+  createUserCustomerRelations,
+  createComments
+} from './seedRelations';
+import { 
+  createStatusMappings, 
+  createPriorityMappings, 
+  createServiceTypeMappings, 
+  createProjectTypeMappings 
+} from './seedMappings';
 
 export const seedData = {
   createInitialData(): MockDatabase {
@@ -72,38 +74,38 @@ export const seedData = {
     products.forEach(product => db.products.set(product.id, product));
 
     // 7. Create Schedules and Tasks with consistent manager data
-    const { schedules, tasks } = createSchedulesAndTasks(projects, users);
+    const { schedules, tasks } = createSchedulesAndTasks(projects, users, factories);
     schedules.forEach(schedule => db.schedules.set(schedule.id, schedule));
     tasks.forEach(task => db.tasks.set(task.id, task));
 
     // 8. Create Comments
-    const comments = this.createComments(projects, users);
+    const comments = createComments(projects, users);
     comments.forEach(comment => db.comments.set(comment.id, comment));
 
     // 9. Create Relationships
-    const userFactories = this.createUserFactoryRelations(users, factories);
+    const userFactories = createUserFactoryRelations(users, factories);
     userFactories.forEach(uf => db.userFactories.set(uf.id, uf));
 
-    const projectAssignments = this.createProjectAssignments(projects, users);
+    const projectAssignments = createProjectAssignments(projects, users);
     projectAssignments.forEach(pa => db.projectAssignments.set(pa.id, pa));
 
-    const factoryProjects = this.createFactoryProjects(projects, factories);
+    const factoryProjects = createFactoryProjects(projects, factories);
     factoryProjects.forEach(fp => db.factoryProjects.set(fp.id, fp));
 
-    const userCustomers = this.createUserCustomerRelations(users, customers);
+    const userCustomers = createUserCustomerRelations(users, customers);
     userCustomers.forEach(uc => db.userCustomers.set(uc.id, uc));
 
     // 10. Create Status and Priority Mappings
-    const statusMappings = this.createStatusMappings();
+    const statusMappings = createStatusMappings();
     statusMappings.forEach(sm => db.statusMappings.set(sm.id, sm));
 
-    const priorityMappings = this.createPriorityMappings();
+    const priorityMappings = createPriorityMappings();
     priorityMappings.forEach(pm => db.priorityMappings.set(pm.id, pm));
 
-    const serviceTypeMappings = this.createServiceTypeMappings();
+    const serviceTypeMappings = createServiceTypeMappings();
     serviceTypeMappings.forEach(stm => db.serviceTypeMappings.set(stm.id, stm));
 
-    const projectTypeMappings = this.createProjectTypeMappings();
+    const projectTypeMappings = createProjectTypeMappings();
     projectTypeMappings.forEach(ptm => db.projectTypeMappings.set(ptm.id, ptm));
 
     // Note: Master project aggregates will be updated after database initialization
@@ -112,194 +114,9 @@ export const seedData = {
     return db;
   },
 
-  createSchedulesAndTasks(projects: Project[], users: User[]): { schedules: Schedule[], tasks: Task[] } {
-    const schedules: Schedule[] = [];
-    const tasks: Task[] = [];
-    const currentDate = new Date();
-    
-    // Find specific users for consistent task assignment
-    const pmUser = users.find(u => u.role === UserRole.PRODUCT_MANAGER)!;
-    const factoryManager = users.find(u => u.role === UserRole.FACTORY_MANAGER)!;
-    const qaUser = users.find(u => u.role === UserRole.QA)!;
-
-    projects.forEach((project, index) => {
-      const schedule: Schedule = {
-        id: `schedule-${index + 1}`,
-        projectId: project.id,
-        startDate: project.startDate,
-        endDate: project.endDate,
-        status: project.status === ProjectStatus.IN_PROGRESS ? 'active' : 'draft',
-        createdAt: project.createdAt,
-        updatedAt: currentDate,
-      };
-      schedules.push(schedule);
-
-      // Only create tasks for SUB projects
-      // Master projects will aggregate tasks from their SUB projects
-      if (project.type === ProjectType.SUB) {
-        const projectTasks = this.createTasksForProject(project, schedule.id, pmUser, factoryManager, qaUser);
-        tasks.push(...projectTasks);
-      }
-    });
-
-    return { schedules, tasks };
-  },
-
-  createTasksForProject(
-    project: Project, 
-    scheduleId: string, 
-    pmUser: User, 
-    factoryManager: User, 
-    qaUser: User
-  ): Task[] {
-    const tasks: Task[] = [];
-    
-    // ✅ Use project's synchronized dates (no hardcoding!)
-    const projectStartDate = new Date(project.startDate);
-    const projectEndDate = new Date(project.endDate);
-    const projectDurationDays = Math.ceil((projectEndDate.getTime() - projectStartDate.getTime()) / (1000 * 60 * 60 * 24));
-
-    // Get database to look up factory names
-    const database = MockDatabaseImpl.getInstance().getDatabase();
-
-    // Collect all factory types and their tasks dynamically
-    const projectFactoryTypes: { type: FactoryType; factoryId: string; factory: Factory }[] = [];
-    
-    // Add manufacturing factory type if exists
-    if (project.manufacturerId && typeof project.manufacturerId === 'string') {
-      const factory = database.factories.get(project.manufacturerId);
-      if (factory) {
-        projectFactoryTypes.push({
-          type: FactoryType.MANUFACTURING,
-          factoryId: project.manufacturerId,
-          factory
-        });
-      }
-    }
-    
-    // Add container factory type if exists  
-    if (project.containerId && typeof project.containerId === 'string') {
-      const factory = database.factories.get(project.containerId);
-      if (factory) {
-        projectFactoryTypes.push({
-          type: FactoryType.CONTAINER,
-          factoryId: project.containerId,
-          factory
-        });
-      }
-    }
-    
-    // Add packaging factory type if exists
-    if (project.packagingId && typeof project.packagingId === 'string') {
-      const factory = database.factories.get(project.packagingId);
-      if (factory) {
-        projectFactoryTypes.push({
-          type: FactoryType.PACKAGING,
-          factoryId: project.packagingId,
-          factory
-        });
-      }
-    }
-
-    // Create tasks using template system
-    let taskIndex = 0;
-    let currentStartDate = new Date(projectStartDate);
-    
-    projectFactoryTypes.forEach((factoryInfo) => {
-      // Get task templates for this factory type
-      const templates = getTaskTemplatesByFactoryType(factoryInfo.type);
-      const taskDates = calculateTaskDates(templates, currentStartDate);
-      
-      templates.forEach((template, templateIndex) => {
-        const { startDate, endDate } = taskDates[templateIndex];
-        
-        // Map participant roles to user IDs
-        const participants: Participant[] = [];
-        if (template.participantRoles.includes('PM')) {
-          participants.push({ userId: pmUser.id, role: ParticipantRole.MANAGER });
-        }
-        if (template.participantRoles.includes('FACTORY_MANAGER')) {
-          participants.push({ userId: factoryManager.id, role: ParticipantRole.MEMBER });
-        }
-        if (template.participantRoles.includes('QA')) {
-          participants.push({ userId: qaUser.id, role: ParticipantRole.REVIEWER });
-        }
-        
-        const task: Task = {
-          id: `task-${project.id}-${taskIndex + 1}`,
-          scheduleId,
-          title: template.title,
-          name: template.title, // alias for compatibility
-          type: template.type,
-          status: this.getTaskStatus(project.progress, taskIndex, templates.length),
-          startDate,
-          endDate,
-          progress: this.getTaskProgress(project.progress, taskIndex, templates.length),
-          participants,
-          factoryId: factoryInfo.factoryId,
-          factory: factoryInfo.factory.name,
-          priority: template.priority,
-          dependsOn: template.dependsOnPrevious && taskIndex > 0 ? [`task-${project.id}-${taskIndex}`] : [],
-          blockedBy: [],
-          createdAt: project.createdAt,
-          updatedAt: new Date(),
-        };
-        
-        tasks.push(task);
-        taskIndex++;
-      });
-      
-      // Update start date for next factory type
-      if (templates.length > 0) {
-        const lastTaskDate = taskDates[taskDates.length - 1].endDate;
-        currentStartDate = new Date(lastTaskDate);
-        currentStartDate.setDate(currentStartDate.getDate() + 1);
-      }
-    });
 
 
-    return tasks;
-  },
 
-  getTaskStatus(projectProgress: number, taskIndex: number, totalTasks: number): TaskStatus {
-    const taskProgressThreshold = (100 / totalTasks) * (taskIndex + 1);
-    
-    if (projectProgress >= taskProgressThreshold) {
-      return TaskStatus.COMPLETED;
-    } else if (projectProgress >= taskProgressThreshold - (100 / totalTasks)) {
-      return TaskStatus.IN_PROGRESS;
-    } else {
-      return TaskStatus.TODO;
-    }
-  },
-
-  getTaskProgress(projectProgress: number, taskIndex: number, totalTasks: number): number {
-    const taskProgressThreshold = (100 / totalTasks) * (taskIndex + 1);
-    const previousThreshold = (100 / totalTasks) * taskIndex;
-    
-    if (projectProgress >= taskProgressThreshold) {
-      return 100;
-    } else if (projectProgress > previousThreshold) {
-      const taskProgress = ((projectProgress - previousThreshold) / (100 / totalTasks)) * 100;
-      return Math.min(Math.round(taskProgress), 100);
-    } else {
-      return 0;
-    }
-  },
-
-  getFactoryForTask(factoryType: string, project: Project): string {
-    // Map factory types to project factory IDs
-    switch (factoryType) {
-      case '제조':
-        return project.manufacturerId;
-      case '용기':
-        return project.containerId;
-      case '포장':
-        return project.packagingId;
-      default:
-        return project.manufacturerId; // Fallback to manufacturing
-    }
-  },
 
   createComments(projects: Project[], users: User[]): Comment[] {
     const comments: Comment[] = [];
@@ -590,116 +407,14 @@ export const seedData = {
     return relations;
   },
 
-  // Helper functions for dynamic task creation (no more hardcoding!)
-  mapTaskTitleToType(title: string): string {
-    // Map task titles to types dynamically based on keywords
-    const typeMap: Record<string, string> = {
-      '원료': 'material',
-      '수령': 'material', 
-      '검사': 'quality',
-      '품질': 'quality',
-      '테스트': 'quality',
-      '제조': 'production',
-      '생산': 'production',
-      '혼합': 'production',
-      '배합': 'production',
-      '충전': 'production',
-      '성형': 'production',
-      '포장': 'packaging',
-      '라벨': 'packaging',
-      '박스': 'packaging',
-      '배송': 'shipping',
-      '출하': 'shipping',
-      '검수': 'inspection',
-      '승인': 'inspection',
-    };
-
-    // Find matching type based on keywords in title
-    for (const [keyword, type] of Object.entries(typeMap)) {
-      if (title.includes(keyword)) {
-        return type;
-      }
-    }
-    
-    return 'other'; // Default fallback
-  },
-
-  getTaskDuration(title: string): number {
-    // Dynamic duration based on task complexity (no hardcoded magic numbers!)
-    const durationMap: Record<string, number> = {
-      // Quick tasks (1-2 days)
-      '검수': 1,
-      '승인': 1,
-      '출하': 1,
-      '라벨': 2,
-      '준비': 2,
-      
-      // Medium tasks (3-5 days)
-      '검사': 3,
-      '품질': 3,
-      '포장': 4,
-      '작업': 4,
-      '처리': 3,
-      
-      // Complex tasks (5-10 days)
-      '제조': 7,
-      '생산': 7,
-      '혼합': 5,
-      '배합': 5,
-      '충전': 6,
-      '성형': 8,
-      '디자인': 5,
-      
-      // Very complex tasks (10+ days)
-      '금형': 12,
-      '개발': 14,
-      '테스트': 10,
-    };
-
-    // Find duration based on keywords in title
-    for (const [keyword, duration] of Object.entries(durationMap)) {
-      if (title.includes(keyword)) {
-        return duration;
-      }
-    }
-    
-    return 3; // Default duration
-  },
-
-  getTaskParticipants(title: string, pmUserId: string, factoryManagerId: string, qaUserId: string): string[] {
-    // Assign participants based on task type (no hardcoding!)
-    const participants: string[] = [];
-
-    // Quality-related tasks always include QA
-    if (title.includes('검사') || title.includes('품질') || title.includes('테스트')) {
-      participants.push(qaUserId);
-    }
-
-    // Management tasks include PM
-    if (title.includes('승인') || title.includes('검수') || title.includes('준비')) {
-      participants.push(pmUserId);
-    }
-
-    // Production tasks include factory manager
-    if (title.includes('제조') || title.includes('생산') || title.includes('작업') || 
-        title.includes('포장') || title.includes('충전') || title.includes('성형')) {
-      participants.push(factoryManagerId);
-    }
-
-    // If no specific participant assigned, default to factory manager + PM
-    if (participants.length === 0) {
-      participants.push(factoryManagerId, pmUserId);
-    }
-
-    return participants;
-  },
 
   createStatusMappings() {
     const projectStatuses = [
-      { id: 'status-proj-1', type: 'project' as const, code: 'PLANNING', displayName: '시작전', displayNameEn: 'Planning', color: '#6B7280', order: 1 },
+      { id: 'status-proj-1', type: 'project' as const, code: 'PLANNING', displayName: '시작전', displayNameEn: 'Planning', color: '#64748B', order: 1 },
       { id: 'status-proj-2', type: 'project' as const, code: 'IN_PROGRESS', displayName: '진행중', displayNameEn: 'In Progress', color: '#3B82F6', order: 2 },
-      { id: 'status-proj-3', type: 'project' as const, code: 'COMPLETED', displayName: '완료', displayNameEn: 'Completed', color: '#10B981', order: 3 },
-      { id: 'status-proj-4', type: 'project' as const, code: 'CANCELLED', displayName: '중단', displayNameEn: 'Cancelled', color: '#EF4444', order: 4 },
+      { id: 'status-proj-3', type: 'project' as const, code: 'ON_HOLD', displayName: '보류', displayNameEn: 'On Hold', color: '#F59E0B', order: 3 },
+      { id: 'status-proj-4', type: 'project' as const, code: 'COMPLETED', displayName: '완료', displayNameEn: 'Completed', color: '#10B981', order: 4 },
+      { id: 'status-proj-5', type: 'project' as const, code: 'CANCELLED', displayName: '중단', displayNameEn: 'Cancelled', color: '#EF4444', order: 5 },
     ];
 
     const taskStatuses = [
@@ -725,6 +440,9 @@ export const seedData = {
       { id: 'service-1', code: 'OEM', displayName: 'OEM', displayNameEn: 'OEM', description: '주문자 상표 부착 생산', order: 1 },
       { id: 'service-2', code: 'ODM', displayName: 'ODM', displayNameEn: 'ODM', description: '제조업체 개발 생산', order: 2 },
       { id: 'service-3', code: 'OBM', displayName: 'OBM', displayNameEn: 'OBM', description: '자체 브랜드 생산', order: 3 },
+      { id: 'service-4', code: 'PRIVATE_LABEL', displayName: 'Private Label', displayNameEn: 'Private Label', description: '자체 상표 부착', order: 4 },
+      { id: 'service-5', code: 'WHITE_LABEL', displayName: 'White Label', displayNameEn: 'White Label', description: '상표 없는 제품', order: 5 },
+      { id: 'service-6', code: 'OTHER', displayName: '기타', displayNameEn: 'Other', description: '기타 서비스', order: 6 },
     ];
   },
 

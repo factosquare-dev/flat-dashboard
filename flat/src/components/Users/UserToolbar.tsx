@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import type { UserRole } from '../../store/slices/userSlice';
+import type { UserRole } from '@/store/slices/userSlice';
 
 interface UserToolbarProps {
   selectedRole: UserRole;

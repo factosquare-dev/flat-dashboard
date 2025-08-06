@@ -207,7 +207,7 @@ class ApiClient {
   setBaseURL(baseURL: string): void {
     this.config.baseURL = baseURL;
     // Update handlers with new base URL
-    this.requestHandlers = new RequestHandlers(
+    this.requestHandlers = new CachedRequestHandlers(
       this.config.baseURL,
       this.config.defaultHeaders,
       this.config.timeout
@@ -227,7 +227,7 @@ class ApiClient {
   setTimeout(timeout: number): void {
     this.config.timeout = timeout;
     // Update handlers with new timeout
-    this.requestHandlers = new RequestHandlers(
+    this.requestHandlers = new CachedRequestHandlers(
       this.config.baseURL,
       this.config.defaultHeaders,
       this.config.timeout

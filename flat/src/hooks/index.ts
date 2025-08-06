@@ -7,7 +7,7 @@ export { useModalState, useMultipleModals } from './useModalState';
 export type { UseModalStateReturn, ModalState } from './useModalState';
 
 // Performance optimization
-export { useDebounce } from '../features/common/hooks/useDebounce';
+export { useDebounce } from './common/useDebounce';
 export { useInfiniteScroll } from './useInfiniteScroll';
 
 // Data management

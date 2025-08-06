@@ -116,6 +116,7 @@ export const ProjectTableUI: React.FC<ProjectTableUIProps> = ({
           hasMore={hasMore}
           isLoading={isLoading}
           loadMoreRef={loadMoreRef}
+          totalItems={projects.length}
         />
       </div>
 

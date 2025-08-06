@@ -6,9 +6,9 @@ import { logger } from '@/utils/logger';
 import { 
   AppError, 
   ERROR_CODES, 
-  httpStatusToErrorCode,
-  ERROR_MESSAGES 
-} from '@/utils/error/errorHandler';
+  ERROR_MESSAGES, 
+  httpStatusToErrorCode 
+} from '@/utils/error/core';
 
 export interface ApiError {
   message: string;
@@ -16,6 +16,85 @@ export interface ApiError {
   statusText?: string;
   data?: any;
   requestId?: string;
+}
+
+/**
+ * Type guard for ApiError
+ */
+export function isApiError(error: unknown): error is ApiError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as any).message === 'string'
+  );
+}
+
+/**
+ * Type guard for network errors
+ */
+export function isNetworkError(error: unknown): boolean {
+  if (error instanceof AppError) {
+    return error.code === ERROR_CODES.NETWORK_ERROR;
+  }
+  return (
+    error instanceof Error &&
+    (error.message.toLowerCase().includes('network') ||
+     error.message.toLowerCase().includes('fetch'))
+  );
+}
+
+/**
+ * Type guard for timeout errors
+ */
+export function isTimeoutError(error: unknown): boolean {
+  if (error instanceof AppError) {
+    return error.code === ERROR_CODES.TIMEOUT_ERROR;
+  }
+  return (
+    error instanceof Error &&
+    (error.name === 'AbortError' ||
+     error.message.toLowerCase().includes('timeout'))
+  );
+}
+
+/**
+ * Handle API errors with consistent formatting
+ */
+export function handleApiError(error: unknown, operation: string): string {
+  if (isNetworkError(error)) {
+    return 'Network connection error. Please check your internet connection.';
+  }
+
+  if (isTimeoutError(error)) {
+    return 'Request timed out. Please try again.';
+  }
+
+  if (isApiError(error)) {
+    const apiError = error as ApiError;
+    switch (apiError.status) {
+      case 400:
+        return 'Invalid request. Please check your input.';
+      case 401:
+        return 'Authentication required. Please log in.';
+      case 403:
+        return 'You don\'t have permission to perform this action.';
+      case 404:
+        return 'The requested resource was not found.';
+      case 409:
+        return 'This action conflicts with existing data.';
+      case 429:
+        return 'Too many requests. Please slow down.';
+      case 500:
+      case 502:
+      case 503:
+        return 'Server error. Please try again later.';
+      default:
+        return apiError.message || 'An error occurred while processing your request.';
+    }
+  }
+
+  return 'An unexpected error occurred. Please try again.';
 }
 
 export class ApiErrorHandler {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Building2, ChevronRight } from 'lucide-react';
-import type { Factory } from '../../data/factories';
+import type { Factory } from '@/data/factories';
 
 interface FactorySelectionProps {
   factories: Factory[];

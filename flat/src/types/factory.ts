@@ -2,7 +2,8 @@
  * Factory type definitions
  */
 
-import { FactoryType, CertificateType } from './enums';
+import { FactoryType } from './enums/factory';
+import { CertificateType } from './enums/product';
 import { FactoryId } from './branded';
 
 export interface FactoryManager {
@@ -10,6 +11,9 @@ export interface FactoryManager {
   phone: string;
   email: string;
 }
+
+// Re-export FactoryType for convenience
+export { FactoryType } from './enums/factory';
 
 export interface Factory {
   id: FactoryId;

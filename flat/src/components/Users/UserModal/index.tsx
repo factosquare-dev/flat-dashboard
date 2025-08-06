@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import BaseModal, { ModalFooter } from '../../common/BaseModal';
+import BaseModal, { ModalFooter } from '@/components/common/BaseModal';
 import { FormFields } from './FormFields';
 import type { UserModalProps, UserFormData, FormErrors } from './types';
-import type { UserRole } from '../../../store/slices/userSlice';
+import type { UserRole } from '@/store/slices/userSlice';
 import { UserRole as UserRoleEnum } from '@/types/enums';
 import { 
   formatPhoneNumber, 

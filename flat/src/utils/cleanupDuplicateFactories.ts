@@ -12,10 +12,23 @@ export const cleanupDuplicateFactories = async () => {
     const db = MockDatabaseImpl.getInstance();
     const database = db.getDatabase();
     
+    // Check if projects exist
+    if (!database.projects || database.projects.size === 0) {
+      console.log('[Cleanup] No projects found in database');
+      return 0;
+    }
+    
     let cleanedCount = 0;
     
     // Iterate through all projects
-    Array.from(database.projects.entries()).forEach(([projectId, project]) => {
+    for (const [projectId, project] of database.projects.entries()) {
+      // Skip if project is null or undefined
+      if (!project) {
+        // More detailed logging to debug the issue
+        console.warn(`[Cleanup] Skipping null/undefined project with key:`, projectId, 'type:', typeof projectId);
+        continue;
+      }
+      
       const updates: any = {};
       let hasChanges = false;
       
@@ -63,7 +76,7 @@ export const cleanupDuplicateFactories = async () => {
         db.update(DB_COLLECTIONS.PROJECTS, projectId, updates);
         cleanedCount++;
       }
-    });
+    }
     
     console.log(`[Cleanup] Cleaned ${cleanedCount} projects`);
     return cleanedCount;

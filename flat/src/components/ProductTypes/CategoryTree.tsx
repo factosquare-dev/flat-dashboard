@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown, MoreVertical, Plus, Edit2, Trash2, GripVertical } from 'lucide-react';
-import type { ProductCategory, ProductCategoryId } from '../../types/productCategory';
+import type { ProductCategory, ProductCategoryId } from '@/types/productCategory';
 
 interface CategoryTreeProps {
   categories: ProductCategory[];

@@ -39,6 +39,8 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
           return 'status-badge-planning';
         case ProjectStatus.IN_PROGRESS:
           return 'status-badge-in-progress';
+        case ProjectStatus.ON_HOLD:
+          return 'status-badge-on-hold';
         case ProjectStatus.COMPLETED:
           return 'status-badge-completed';
         case ProjectStatus.CANCELLED:

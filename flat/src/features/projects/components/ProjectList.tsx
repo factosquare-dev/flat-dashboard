@@ -40,7 +40,7 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
   // Memoize filtered and sorted projects
   const filteredProjects = useMemo(() => 
     filtersHook.getFilteredAndSortedProjects(projectsHook.projects),
-    [filtersHook, projectsHook.projects]
+    [filtersHook.getFilteredAndSortedProjects, projectsHook.projects]
   );
 
   // Memoize layout props to prevent unnecessary re-renders

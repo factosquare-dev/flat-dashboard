@@ -4,33 +4,11 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { Project } from '../../types/project';
-import { ServiceType, ProjectStatus, Priority, ProductType, ProjectType, ProjectField, FACTORY_ID_FIELDS, DATE_FIELDS } from '@/types/enums';
 import type { ProjectId } from '../../types/branded';
 import type { Schedule } from '../../types/schedule';
-import { factories } from '@/data/factories';
-import { scheduleApi } from '@/api/scheduleApi';
-import { formatDateISO } from '@/utils/coreUtils';
-import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
-import { isProjectType } from '@/utils/projectTypeUtils';
-import { formatCompanyNameForDisplay } from '@/utils/companyUtils';
-
-// Helper functions
-const getRelativeDate = (daysOffset: number): string => {
-  const date = new Date();
-  date.setDate(date.getDate() + daysOffset);
-  return formatDateISO(date);
-};
-
-const getRandomFactory = (type: string) => {
-  const filteredFactories = factories.filter(f => f.type === type);
-  return filteredFactories[Math.floor(Math.random() * filteredFactories.length)];
-};
-
-// Constants for simulation
-const SIMULATION_CONSTANTS = {
-  API_DELAY: 300,
-  TOTAL_COUNT: 500,
-} as const;
+import { loadProjectsFromDb } from './operations/projectLoader';
+import { updateProjectField, addNewProject, deleteProjectById, bulkUpdate } from './operations/projectCrud';
+import { loadScheduleForProject } from './operations/scheduleLoader';
 
 export interface UseProjectDataProps {
   onProjectsUpdate?: (projects: Project[]) => void;
@@ -40,9 +18,6 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
   const [projects, setProjects] = useState<Project[]>([]);
   const [schedules, setSchedules] = useState<Map<string, Schedule>>(new Map());
   const [isLoading, setIsLoading] = useState(false);
-  
-  // MockDB instance
-  const mockDb = MockDatabaseImpl.getInstance();
   
   // Race condition prevention
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -59,52 +34,17 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
     setIsLoading(true);
     
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, SIMULATION_CONSTANTS.API_DELAY));
+      const loadedProjects = await loadProjectsFromDb(signal, page);
       
-      if (signal.aborted) return [];
+      if (!signal.aborted) {
+        setProjects(loadedProjects);
+        onProjectsUpdate?.(loadedProjects);
+      }
       
-      // Load projects from MockDB
-      const dbResponse = await mockDb.getAll('projects');
-      const dbProjects = dbResponse.success ? dbResponse.data : [];
-      
-      // Enrich projects with factory names
-      const enrichedProjects = dbProjects.map(project => {
-        const enrichedProject = { ...project };
-        
-        // Convert factory IDs to names
-        const factoryFields = ['manufacturer', 'container', 'packaging'] as const;
-        factoryFields.forEach(field => {
-          const idField = `${field}Id` as keyof typeof project;
-          const factoryIds = project[idField];
-          
-          if (factoryIds) {
-            if (Array.isArray(factoryIds)) {
-              enrichedProject[field] = factoryIds.map(id => {
-                const factory = mockDb.getDatabase().factories.get(id);
-                return factory ? factory.name : id;
-              });
-            } else {
-              const factory = mockDb.getDatabase().factories.get(factoryIds);
-              enrichedProject[field] = factory ? factory.name : factoryIds;
-            }
-          }
-        });
-        
-        return enrichedProject;
-      });
-      
-      // Convert to pagination format (simulate pagination)
-      const itemsPerPage = 50;
-      const startIndex = (page - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const paginatedProjects = enrichedProjects.slice(startIndex, endIndex);
-      
-      return paginatedProjects;
+      return loadedProjects;
     } catch (error) {
       if (!signal.aborted) {
-        // Error handled silently
-        throw error;
+        console.error('Failed to load projects:', error);
       }
       return [];
     } finally {
@@ -112,258 +52,69 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
         setIsLoading(false);
       }
     }
-  }, []);
-
-  const updateProject = useCallback(<K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
-    // 현재 프로젝트 찾기
-    const currentProject = projects.find(p => p.id === projectId);
-    if (!currentProject) {
-      return;
-    }
-    
-    // 값이 동일하면 업데이트하지 않음 (중복 호출 방지)
-    if (currentProject[field] === value) {
-      return;
-    }
-    
-    // Update local state immediately for responsive UI
-    setProjects(prev => {
-      const updated = prev.map(project => {
-        if (project.id === projectId) {
-          const updatedProject = { ...project, [field]: value };
-          
-          // If updating factory IDs, also update the display names
-          if (FACTORY_ID_FIELDS.includes(field as any)) {
-            const factoryType = field.replace('Id', '') as 'manufacturer' | 'container' | 'packaging';
-            const factoryIds = value as string | string[];
-            
-            if (Array.isArray(factoryIds)) {
-              const names = factoryIds.map(id => {
-                const factory = mockDb.getDatabase().factories.get(id);
-                return factory ? formatCompanyNameForDisplay(factory.name) : id;
-              });
-              updatedProject[factoryType] = names;
-            } else if (factoryIds) {
-              const factory = mockDb.getDatabase().factories.get(factoryIds);
-              updatedProject[factoryType] = factory ? formatCompanyNameForDisplay(factory.name) : factoryIds;
-            } else {
-              updatedProject[factoryType] = null;
-            }
-          }
-          
-          return updatedProject;
-        }
-        return project;
-      });
-      
-      // SUB 프로젝트가 변경되었을 때 Master 프로젝트의 집계 데이터 업데이트
-      if (isProjectType(currentProject.type, ProjectType.SUB) && currentProject.parentId) {
-        // Master 프로젝트의 모든 집계 데이터를 업데이트
-        const updateMasterAggregates = async () => {
-          try {
-            const result = await mockDb.updateMasterProjectAggregates(currentProject.parentId);
-            if (result.success) {
-              // Master project aggregates updated
-              
-              // UI 상태도 업데이트하기 위해 Master 프로젝트 다시 로드
-              const masterResult = await mockDb.getById('projects', currentProject.parentId);
-              if (masterResult.success && masterResult.data) {
-                const updatedMaster = masterResult.data;
-                
-                // Factory names 업데이트
-                const factoryFields = ['manufacturer', 'container', 'packaging'] as const;
-                factoryFields.forEach(field => {
-                  const idField = `${field}Id` as keyof typeof updatedMaster;
-                  const factoryIds = updatedMaster[idField];
-                  
-                  if (factoryIds) {
-                    if (Array.isArray(factoryIds)) {
-                      updatedMaster[field] = factoryIds.map(id => {
-                        const factory = mockDb.getDatabase().factories.get(id);
-                        return factory ? formatCompanyNameForDisplay(factory.name) : id;
-                      });
-                    } else {
-                      const factory = mockDb.getDatabase().factories.get(factoryIds);
-                      updatedMaster[field] = factory ? formatCompanyNameForDisplay(factory.name) : factoryIds;
-                    }
-                  }
-                });
-                
-                // UI 상태 업데이트
-                setProjects(prev => prev.map(p => 
-                  p.id === currentProject.parentId ? updatedMaster : p
-                ));
-              }
-            }
-          } catch (error) {
-            console.error('[useProjectData] Failed to update master aggregates:', error);
-          }
-        };
-        
-        // 비동기로 Master 프로젝트 업데이트
-        updateMasterAggregates();
-      }
-      
-      return updated;
-    });
-    
-    // Update MockDB asynchronously
-    const updateMockDb = async () => {
-      try {
-        const updateData = { [field]: value };
-        const result = await mockDb.update('projects', projectId, updateData);
-        if (result.success) {
-          console.log('[useProjectData] MockDB updated successfully');
-        } else {
-          console.error('[useProjectData] Failed to update MockDB:', result.error);
-        }
-      } catch (error) {
-        console.error('[useProjectData] Failed to update MockDB:', error);
-      }
-    };
-    updateMockDb();
-  }, [onProjectsUpdate, mockDb, projects]);
-
-  const addProject = useCallback((newProject: Omit<Project, 'id'>) => {
-    const project: Project = {
-      ...newProject,
-      id: `project-${Date.now()}`,
-    };
-    
-    // Add to MockDB asynchronously
-    const addToMockDb = async () => {
-      try {
-        const result = await mockDb.create('projects', project.id, project);
-        if (result.success) {
-          console.log('[useProjectData] Project added to MockDB:', project.id);
-          
-          // If adding a SUB project, update Master aggregates
-          if (isProjectType(project.type, ProjectType.SUB) && project.parentId) {
-            const aggregateResult = await mockDb.updateMasterProjectAggregates(project.parentId);
-            if (aggregateResult.success) {
-              // Master project aggregates updated after adding SUB project
-              
-              // Reload Master project to update UI
-              const masterResult = await mockDb.getById('projects', project.parentId);
-              if (masterResult.success && masterResult.data) {
-                const updatedMaster = masterResult.data;
-                
-                // Update factory names
-                const factoryFields = ['manufacturer', 'container', 'packaging'] as const;
-                factoryFields.forEach(field => {
-                  const idField = `${field}Id` as keyof typeof updatedMaster;
-                  const factoryIds = updatedMaster[idField];
-                  
-                  if (factoryIds) {
-                    if (Array.isArray(factoryIds)) {
-                      updatedMaster[field] = factoryIds.map(id => {
-                        const factory = mockDb.getDatabase().factories.get(id);
-                        return factory ? formatCompanyNameForDisplay(factory.name) : id;
-                      });
-                    } else {
-                      const factory = mockDb.getDatabase().factories.get(factoryIds);
-                      updatedMaster[field] = factory ? formatCompanyNameForDisplay(factory.name) : factoryIds;
-                    }
-                  }
-                });
-                
-                // Update UI state
-                setProjects(prev => prev.map(p => 
-                  p.id === project.parentId ? updatedMaster : p
-                ));
-              }
-            }
-          }
-        } else {
-          console.error('[useProjectData] Failed to add project to MockDB:', result.error);
-        }
-      } catch (error) {
-        console.error('[useProjectData] Failed to add project to MockDB:', error);
-      }
-    };
-    addToMockDb();
-    
-    setProjects(prev => {
-      const updated = [project, ...prev];
-      if (onProjectsUpdate) {
-        onProjectsUpdate(updated);
-      }
-      return updated;
-    });
-  }, [onProjectsUpdate, mockDb]);
-
-  const deleteProject = useCallback((projectId: ProjectId) => {
-    // Delete from MockDB first
-    try {
-      mockDb.deleteProject(projectId);
-      console.log('[useProjectData] Project deleted from MockDB:', projectId);
-    } catch (error) {
-      console.error('[useProjectData] Failed to delete project from MockDB:', error);
-    }
-    
-    setProjects(prev => {
-      const updated = prev.filter(project => project.id !== projectId);
-      if (onProjectsUpdate) {
-        onProjectsUpdate(updated);
-      }
-      return updated;
-    });
-  }, [onProjectsUpdate, mockDb]);
-
-  const bulkUpdateProjects = useCallback((projectIds: ProjectId[], updates: Partial<Project>) => {
-    setProjects(prev => {
-      const updated = prev.map(project => 
-        projectIds.includes(project.id)
-          ? { ...project, ...updates }
-          : project
-      );
-      if (onProjectsUpdate) {
-        onProjectsUpdate(updated);
-      }
-      return updated;
-    });
   }, [onProjectsUpdate]);
 
-  const refreshProjects = useCallback(async () => {
-    try {
-      const refreshedProjects = await loadProjects(1);
-      setProjects(refreshedProjects);
-      
-      if (onProjectsUpdate) {
-        onProjectsUpdate(refreshedProjects);
-      }
-    } catch (error) {
-      // Error handled silently
-    }
-  }, [loadProjects, onProjectsUpdate]);
+  const updateProject = useCallback(<K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
+    updateProjectField(projectId, field, value, projects, (updatedProjects) => {
+      setProjects(updatedProjects);
+      onProjectsUpdate?.(updatedProjects);
+    });
+  }, [projects, onProjectsUpdate]);
 
-  // Load schedule for project
+  const addProject = useCallback((newProject: Omit<Project, 'id'>) => {
+    const safeNewProject = {
+      ...newProject,
+      createdAt: newProject.createdAt instanceof Date ? newProject.createdAt : new Date(newProject.createdAt),
+      updatedAt: newProject.updatedAt instanceof Date ? newProject.updatedAt : new Date(newProject.updatedAt),
+      startDate: newProject.startDate instanceof Date ? newProject.startDate.toISOString() : newProject.startDate,
+      endDate: newProject.endDate instanceof Date ? newProject.endDate.toISOString() : newProject.endDate,
+    };
+
+    addNewProject(safeNewProject, projects, (updatedProjects) => {
+      setProjects(updatedProjects);
+      onProjectsUpdate?.(updatedProjects);
+    });
+  }, [projects, onProjectsUpdate]);
+
+  const deleteProject = useCallback((projectId: ProjectId) => {
+    deleteProjectById(projectId, projects, (updatedProjects) => {
+      setProjects(updatedProjects);
+      onProjectsUpdate?.(updatedProjects);
+    });
+  }, [projects, onProjectsUpdate]);
+
+  const bulkUpdateProjects = useCallback((projectIds: ProjectId[], updates: Partial<Project>) => {
+    bulkUpdate(projectIds, updates, projects, (updatedProjects) => {
+      setProjects(updatedProjects);
+      onProjectsUpdate?.(updatedProjects);
+    });
+  }, [projects, onProjectsUpdate]);
+
+  const refreshProjects = useCallback(async () => {
+    const refreshedProjects = await loadProjects();
+    return refreshedProjects;
+  }, [loadProjects]);
+
   const loadSchedule = useCallback(async (projectId: ProjectId) => {
-    if (schedules.has(projectId)) {
-      return schedules.get(projectId);
-    }
-    
-    try {
-      const schedule = await scheduleApi.getSchedule(projectId);
-      setSchedules(prev => new Map(prev).set(projectId, schedule));
-      return schedule;
-    } catch (error) {
-      // Error handled silently
-      return null;
-    }
+    const updatedSchedules = await loadScheduleForProject(projectId, schedules);
+    setSchedules(updatedSchedules);
+    return updatedSchedules.get(projectId);
   }, [schedules]);
 
   return {
+    // Data
     projects,
-    setProjects,
     schedules,
     isLoading,
+    
+    // Operations
+    setProjects,
     loadProjects,
     updateProject,
     addProject,
     deleteProject,
     bulkUpdateProjects,
     refreshProjects,
-    loadSchedule
+    loadSchedule,
   };
 };

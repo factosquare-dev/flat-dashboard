@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { Project } from '../../types/project';
-import type { Schedule as ScheduleType } from '../../types/schedule';
+import type { Project } from '@/types/project';
+import type { Schedule as ScheduleType } from '@/types/schedule';
 import { useTaskStore } from '@/stores/taskStore';
 import Schedule from '../Schedule';
 import ProjectListView from '@/features/projects/components/ProjectList';

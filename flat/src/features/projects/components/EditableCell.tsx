@@ -3,7 +3,7 @@ import type { Project } from '../../../types/project';
 import type { ProjectId } from '../../../types/branded';
 import { formatKoreanNumber, parseKoreanNumber } from '@/utils/coreUtils';
 import { formatDate } from '@/utils/unifiedDateUtils';
-import { getFactoriesByType } from '@/data/factories';
+import { getFactoriesByType } from '@/utils/factoryUtils';
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 import { EditableCellType, FactoryType, ProjectField } from '@/types/enums';
 

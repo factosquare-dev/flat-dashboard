@@ -124,11 +124,27 @@ export const scheduleApi = {
   // 프로젝트로부터 스케줄 생성 또는 조회 - MockDB 직접 사용
   getOrCreateScheduleForProject: async (project: Project): Promise<Schedule> => {
     if (USE_MOCK_DATA) {
-      const projectTasks = mockDataService.getTasksByProjectId(project.id);
-      const projectFactories = mockDataService.getFactoriesForProject(project.id);
+      const projectTasks = mockDataService.getTasksByProject(project.id);
+      // Get factories from project directly
+      const manufacturingFactories = project.manufacturerId ? 
+        (Array.isArray(project.manufacturerId) ? 
+          project.manufacturerId.map(id => mockDataService.getFactoryById(id)).filter(Boolean) :
+          [mockDataService.getFactoryById(project.manufacturerId)].filter(Boolean)
+        ) : [];
+      const containerFactories = project.containerId ?
+        (Array.isArray(project.containerId) ? 
+          project.containerId.map(id => mockDataService.getFactoryById(id)).filter(Boolean) :
+          [mockDataService.getFactoryById(project.containerId)].filter(Boolean)
+        ) : [];
+      const packagingFactories = project.packagingId ?
+        (Array.isArray(project.packagingId) ? 
+          project.packagingId.map(id => mockDataService.getFactoryById(id)).filter(Boolean) :
+          [mockDataService.getFactoryById(project.packagingId)].filter(Boolean)
+        ) : [];
+      const projectFactories = [...manufacturingFactories, ...containerFactories, ...packagingFactories];
       
-      // Task 날짜 겹침 검증
-      validateTaskDateOverlaps(projectTasks);
+      // Task 날짜 겹침 검증 - 임시로 비활성화 (공장이 여러 작업을 동시에 수행할 수 있음)
+      // validateTaskDateOverlaps(projectTasks);
       
       const schedule: Schedule = {
         id: `schedule-${project.id}`,

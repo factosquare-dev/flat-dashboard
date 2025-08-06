@@ -9,7 +9,7 @@ import { useFactoryFilter } from '@/hooks/useFactoryFilter';
 import { useModalState } from '@/hooks/useModalState';
 import { Building2, Tags } from 'lucide-react';
 import { LoadingState } from '@/components/loading/LoadingState';
-import { logError } from '@/utils/errorHandling';
+import { logError } from '@/utils/error';
 import { useToast } from '@/hooks/useToast';
 import { ButtonVariant } from '@/types/enums';
 

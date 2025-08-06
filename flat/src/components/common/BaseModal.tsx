@@ -20,7 +20,9 @@ const sizeClassMap = {
   [ModalSize.SM]: 'modal-container--sm',
   [ModalSize.MD]: 'modal-container--md',
   [ModalSize.LG]: 'modal-container--lg',
-  [ModalSize.XL]: 'modal-container--xl'
+  [ModalSize.XL]: 'modal-container--xl',
+  [ModalSize.FULL]: 'modal-container--full',
+  [ModalSize.AUTO]: 'modal-container--auto'
 };
 
 const BaseModal: React.FC<BaseModalProps> = ({

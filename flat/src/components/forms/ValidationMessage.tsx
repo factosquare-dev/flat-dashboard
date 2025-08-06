@@ -1,28 +1,34 @@
 import React from 'react';
 import { AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { ValidationMessageType } from '@/types/enums';
 
 interface ValidationMessageProps {
-  type: 'error' | 'success' | 'info';
+  type: ValidationMessageType;
   message: string;
   className?: string;
 }
 
 const ValidationMessage: React.FC<ValidationMessageProps> = ({ type, message, className = '' }) => {
   const config = {
-    error: {
+    [ValidationMessageType.ERROR]: {
       className: 'modal-validation-message--error',
       icon: AlertCircle,
       iconClass: 'text-red-600'
     },
-    success: {
+    [ValidationMessageType.SUCCESS]: {
       className: 'modal-validation-message--success',
       icon: CheckCircle,
       iconClass: 'text-green-600'
     },
-    info: {
+    [ValidationMessageType.INFO]: {
       className: 'modal-validation-message--info',
       icon: Info,
       iconClass: 'text-blue-600'
+    },
+    [ValidationMessageType.WARNING]: {
+      className: 'modal-validation-message--warning',
+      icon: AlertCircle,
+      iconClass: 'text-yellow-600'
     }
   };
 

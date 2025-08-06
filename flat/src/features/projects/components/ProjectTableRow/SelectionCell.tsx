@@ -27,8 +27,13 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
   handleToggleTasks,
   handleMasterToggle
 }) => {
+  // Early return if project is undefined
+  if (!project) {
+    return <div className="px-2 py-3 w-10"></div>;
+  }
+
   return (
-    <td 
+    <div 
       className="px-1 py-1.5" 
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => {
@@ -94,8 +99,17 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
       }}
     >
       <div className="flex items-center gap-1 select-none">
-        {/* 들여쓰기 */}
-        <div style={{ width: `${(project.level || 0) * 20}px` }} />
+        {/* 들여쓰기 - level이 있으면 사용, 없으면 ProjectType 기반으로 계산 */}
+        <div style={{ 
+          width: `${(
+            (project as any).level !== undefined 
+              ? (project as any).level 
+              : project.type === ProjectType.MASTER ? 0 
+              : project.type === ProjectType.SUB ? 1 
+              : project.type === ProjectType.TASK ? 2 
+              : 0
+          ) * 20}px` 
+        }} />
         
         {/* 확장/축소 버튼 영역 - 모든 타입에서 동일한 공간 차지 */}
         <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -197,7 +211,7 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
           aria-label={`${isProjectType(project.type, ProjectType.MASTER) ? '마스터 ' : ''}프로젝트 ${project.client} 선택`}
         />
       </div>
-    </td>
+    </div>
   );
 };
 

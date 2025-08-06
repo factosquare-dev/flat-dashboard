@@ -117,3 +117,24 @@ export const renderPriority = ({ project, onUpdateField }: CellRenderProps) => {
     </td>
   );
 };
+
+// Component exports for use in cellRenderer
+export const ProductTypeCell = (props: CellRenderProps) => {
+  const td = renderProductType(props);
+  return React.isValidElement(td) ? td.props.children : null;
+};
+
+export const ServiceTypeCell = (props: CellRenderProps) => {
+  const td = renderServiceType(props);
+  return React.isValidElement(td) ? td.props.children : null;
+};
+
+export const StatusCell = (props: CellRenderProps) => {
+  const td = renderStatus(props);
+  return React.isValidElement(td) ? td.props.children : null;
+};
+
+export const PriorityCell = (props: CellRenderProps) => {
+  const td = renderPriority(props);
+  return React.isValidElement(td) ? td.props.children : null;
+};

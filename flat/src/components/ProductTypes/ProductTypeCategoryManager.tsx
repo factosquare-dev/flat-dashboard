@@ -3,10 +3,11 @@ import { Plus, Search } from 'lucide-react';
 import CategoryTree from './CategoryTree';
 import CategoryEditModal from './CategoryEditModal';
 import FloatingActionButton from '../common/FloatingActionButton';
-import type { ProductCategory, ProductCategoryId } from '../../types/productCategory';
+import type { ProductCategory, ProductCategoryId } from '@/types/productCategory';
 import { generateProductCategoryId } from '@/types/branded';
-import { mockDataService } from '@/services/mockDataService';
+import { useProductCategories } from '@/hooks/useProducts';
 import { ButtonVariant } from '@/types/enums';
+import { mockDataService } from '@/services/mockDataService';
 
 const ProductTypeCategoryManager: React.FC = () => {
   const [categories, setCategories] = useState<ProductCategory[]>(() => {

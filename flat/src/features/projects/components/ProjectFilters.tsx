@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, Mail } from 'lucide-react';
 import { Priority, PriorityLabel, ServiceType, ServiceTypeLabel, ProjectStatus } from '@/types/enums';
 import DateRangeFilter from './DateRangeFilter';
-import { getStatusStyles, getAllStatuses } from '@/utils/statusUtils';
+import { getStatusStyles, getAllStatuses, getAllPriorities, getAllServiceTypes } from '@/utils/statusUtils';
 import '../../../design-system/styles/button.css';
 
 interface ProjectFiltersProps {
@@ -61,17 +61,17 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
         {/* Status Filters */}
         <div className="flex gap-1" role="group" aria-label="상태 필터">
           {getAllStatuses('project').map(statusInfo => {
-            const isSelected = statusFilters.includes(statusInfo.displayName as ProjectStatus);
+            const isSelected = statusFilters.includes(statusInfo.code as ProjectStatus);
             const isPlanningStatus = statusInfo.code.toUpperCase() === 'PLANNING';
             
             return (
               <button
                 key={statusInfo.code}
-                onClick={() => onStatusFilterToggle(statusInfo.displayName as ProjectStatus)}
+                onClick={() => onStatusFilterToggle(statusInfo.code as ProjectStatus)}
                 className={`px-3 py-1.5 h-8 rounded-full text-xs font-medium transition-all border ${
                   isSelected
                     ? isPlanningStatus
-                      ? 'bg-gray-600 text-white border-gray-700 shadow-sm'
+                      ? 'bg-slate-600 text-white border-slate-700 shadow-sm'
                       : `${getStatusStyles(statusInfo.code, 'project')} shadow-sm`
                     : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
                 }`}
@@ -96,9 +96,9 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
           aria-label="우선순위 필터 선택"
       >
         <option value="all">모든 우선순위</option>
-        <option value={PriorityLabel[Priority.HIGH]}>{PriorityLabel[Priority.HIGH]}</option>
-        <option value={PriorityLabel[Priority.MEDIUM]}>{PriorityLabel[Priority.MEDIUM]}</option>
-        <option value={PriorityLabel[Priority.LOW]}>{PriorityLabel[Priority.LOW]}</option>
+        {getAllPriorities().map(priority => (
+          <option key={priority.code} value={priority.code}>{priority.displayName}</option>
+        ))}
       </select>
 
         {/* Service Type Filter */}
@@ -111,12 +111,9 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
           aria-label="서비스 유형 필터 선택"
       >
         <option value="all">모든 서비스 유형</option>
-        <option value={ServiceTypeLabel[ServiceType.OEM]}>{ServiceTypeLabel[ServiceType.OEM]}</option>
-        <option value={ServiceTypeLabel[ServiceType.ODM]}>{ServiceTypeLabel[ServiceType.ODM]}</option>
-        <option value={ServiceTypeLabel[ServiceType.OBM]}>{ServiceTypeLabel[ServiceType.OBM]}</option>
-        <option value={ServiceTypeLabel[ServiceType.PRIVATE_LABEL]}>{ServiceTypeLabel[ServiceType.PRIVATE_LABEL]}</option>
-        <option value={ServiceTypeLabel[ServiceType.WHITE_LABEL]}>{ServiceTypeLabel[ServiceType.WHITE_LABEL]}</option>
-        <option value={ServiceTypeLabel[ServiceType.OTHER]}>{ServiceTypeLabel[ServiceType.OTHER]}</option>
+        {getAllServiceTypes().map(serviceType => (
+          <option key={serviceType.code} value={serviceType.code}>{serviceType.displayName}</option>
+        ))}
         </select>
         
         <div className="h-4 w-px bg-gray-300" />

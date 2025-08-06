@@ -16,6 +16,7 @@ import { StorageManager } from './managers/StorageManager';
 import { EventManager } from './managers/EventManager';
 import { TransactionManager } from './managers/TransactionManager';
 import { CrudOperations } from './managers/CrudOperations';
+import { ProjectAggregationManager } from './managers/ProjectAggregationManager';
 import { ProjectType } from '@/types/enums';
 import type { Project } from '@/types/project';
 
@@ -28,6 +29,7 @@ export class MockDatabaseImpl {
   private eventManager: EventManager;
   private transactionManager: TransactionManager;
   private crudOperations: CrudOperations;
+  private projectAggregationManager: ProjectAggregationManager;
 
   private constructor() {
     // Initialize managers
@@ -38,6 +40,9 @@ export class MockDatabaseImpl {
     
     // Initialize database
     this.db = this.initializeDatabase();
+    
+    // Initialize project aggregation manager after database is ready
+    this.projectAggregationManager = new ProjectAggregationManager(this.db, this.storageManager);
   }
 
   static getInstance(): MockDatabaseImpl {
@@ -79,11 +84,9 @@ export class MockDatabaseImpl {
     // Store db temporarily to allow updateMasterProjectAggregates to work
     this.db = db;
     
-    // Update Master project aggregates after database is created
-    const masterProjects = Array.from(db.projects.values()).filter(p => p.type === ProjectType.MASTER);
-    masterProjects.forEach(master => {
-      this.updateMasterProjectAggregates(master.id);
-    });
+    // Need to create temporary project aggregation manager for initialization
+    const tempAggregationManager = new ProjectAggregationManager(db, this.storageManager);
+    tempAggregationManager.updateAllMasterProjects();
     
     this.storageManager.saveToStorage(db);
     return db;
@@ -159,7 +162,7 @@ export class MockDatabaseImpl {
         
         if (updateResult.success) {
           // Then update Master aggregates
-          this.updateMasterProjectAggregates(project.parentId);
+          this.projectAggregationManager.updateMasterProjectAggregates(project.parentId);
         }
         
         return updateResult;
@@ -375,7 +378,7 @@ export class MockDatabaseImpl {
     
     // If it's a Master project, update aggregates before returning
     if (project.type === ProjectType.MASTER) {
-      const aggregateResult = this.updateMasterProjectAggregates(projectId);
+      const aggregateResult = this.projectAggregationManager.updateMasterProjectAggregates(projectId);
       if (aggregateResult.success) {
         // Get the updated project
         const updatedResult = await this.get<Project>(DB_COLLECTIONS.PROJECTS, projectId);
@@ -399,7 +402,7 @@ export class MockDatabaseImpl {
     // Update all Master projects
     const masterProjects = allProjectsResult.data.filter(p => p.type === ProjectType.MASTER);
     for (const master of masterProjects) {
-      this.updateMasterProjectAggregates(master.id);
+      this.projectAggregationManager.updateMasterProjectAggregates(master.id);
     }
     
     // Return all projects (including updated Masters)
@@ -444,119 +447,12 @@ export class MockDatabaseImpl {
     
     if (createResult.success) {
       // Update Master project aggregates
-      this.updateMasterProjectAggregates(subProjectData.parentId);
+      this.projectAggregationManager.updateMasterProjectAggregates(subProjectData.parentId);
     }
 
     return createResult;
   }
 
-  /**
-   * Update Master project with aggregated data from SUB projects
-   */
-  updateMasterProjectAggregates(masterId: string): DbResponse<void> {
-    try {
-      const masterProject = this.db.projects.get(masterId);
-      if (!masterProject || masterProject.type !== ProjectType.MASTER) {
-        return { success: false, error: 'Master project not found' };
-      }
-
-      // Get all SUB projects for this master
-      const subProjects = Array.from(this.db.projects.values())
-        .filter(p => p.type === ProjectType.SUB && p.parentId === masterId);
-
-      if (subProjects.length === 0) {
-        // No SUB projects, keep master as is
-        return { success: true };
-      }
-
-      // Calculate aggregated values
-      const aggregatedSales = subProjects.reduce((sum, sub) => {
-        const sales = typeof sub.sales === 'string' ? parseFloat(sub.sales) || 0 : sub.sales || 0;
-        return sum + sales;
-      }, 0);
-
-      const aggregatedPurchase = subProjects.reduce((sum, sub) => {
-        const purchase = typeof sub.purchase === 'string' ? parseFloat(sub.purchase) || 0 : sub.purchase || 0;
-        return sum + purchase;
-      }, 0);
-
-      // Calculate date range from SUB projects
-      const subStartDates = subProjects
-        .map(sub => sub.startDate)
-        .filter(date => date)
-        .map(date => new Date(date).getTime());
-      
-      const subEndDates = subProjects
-        .map(sub => sub.endDate)
-        .filter(date => date)
-        .map(date => new Date(date).getTime());
-
-      const earliestStartDate = subStartDates.length > 0 
-        ? new Date(Math.min(...subStartDates))
-        : masterProject.startDate;
-      
-      const latestEndDate = subEndDates.length > 0 
-        ? new Date(Math.max(...subEndDates))
-        : masterProject.endDate;
-
-      // Collect all unique factory IDs from SUB projects
-      const allManufacturerIds = new Set<string>();
-      const allContainerIds = new Set<string>();
-      const allPackagingIds = new Set<string>();
-
-      subProjects.forEach(sub => {
-        // Handle manufacturer IDs
-        if (sub.manufacturerId) {
-          if (Array.isArray(sub.manufacturerId)) {
-            sub.manufacturerId.forEach(id => allManufacturerIds.add(id));
-          } else {
-            allManufacturerIds.add(sub.manufacturerId);
-          }
-        }
-        
-        // Handle container IDs
-        if (sub.containerId) {
-          if (Array.isArray(sub.containerId)) {
-            sub.containerId.forEach(id => allContainerIds.add(id));
-          } else {
-            allContainerIds.add(sub.containerId);
-          }
-        }
-        
-        // Handle packaging IDs
-        if (sub.packagingId) {
-          if (Array.isArray(sub.packagingId)) {
-            sub.packagingId.forEach(id => allPackagingIds.add(id));
-          } else {
-            allPackagingIds.add(sub.packagingId);
-          }
-        }
-      });
-
-      // Update master project with aggregated data
-      // Note: Factory IDs are NOT stored in Master - they are fetched from SUBs on demand
-      const updatedMaster = {
-        ...masterProject,
-        sales: aggregatedSales,
-        purchase: aggregatedPurchase,
-        startDate: earliestStartDate,
-        endDate: latestEndDate,
-        // Factory IDs are intentionally NOT aggregated here
-        // They should be fetched from SUB projects when needed
-        updatedAt: new Date()
-      };
-
-      // Save updated master project
-      this.db.projects.set(masterId, updatedMaster);
-      this.storageManager.saveToStorage(this.db);
-
-      // Master project aggregates updated
-      return { success: true };
-    } catch (error) {
-      // Error updating master project aggregates
-      return { success: false, error: error.message };
-    }
-  }
 
   /**
    * Export database as JSON

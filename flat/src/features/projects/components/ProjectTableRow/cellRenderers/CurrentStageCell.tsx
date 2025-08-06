@@ -108,3 +108,8 @@ export const renderCurrentStage = (project: Project) => {
     </td>
   );
 };
+
+// Component export for use in cellRenderer
+export const CurrentStageCell = ({ project }: { project: Project }) => {
+  return <CurrentStageContent project={project} />;
+};

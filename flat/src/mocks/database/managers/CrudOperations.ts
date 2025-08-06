@@ -18,6 +18,14 @@ export class CrudOperations {
     id: string,
     data: T
   ): Promise<DbResponse<T>> {
+    // Validate ID is a string
+    if (typeof id !== 'string' || !id) {
+      return {
+        success: false,
+        error: `Invalid ID for ${collection}: ID must be a non-empty string, got ${typeof id}`,
+      };
+    }
+    
     const targetCollection = db[collection] as Map<string, T>;
     
     if (targetCollection.has(id)) {
@@ -88,6 +96,14 @@ export class CrudOperations {
     id: string,
     updates: Partial<T>
   ): Promise<DbResponse<T>> {
+    // Validate ID is a string
+    if (typeof id !== 'string' || !id) {
+      return {
+        success: false,
+        error: `Invalid ID for ${collection}: ID must be a non-empty string, got ${typeof id}`,
+      };
+    }
+    
     const targetCollection = db[collection] as Map<string, T>;
     const existing = targetCollection.get(id);
     

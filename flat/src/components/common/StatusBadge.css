@@ -45,6 +45,12 @@
   border-color: var(--color-primary);
 }
 
+.status-badge.status-badge-on-hold {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning-text);
+  border-color: var(--color-status-warning);
+}
+
 .status-badge.status-badge-completed {
   background-color: var(--color-status-success-bg);
   color: var(--color-status-success-text);

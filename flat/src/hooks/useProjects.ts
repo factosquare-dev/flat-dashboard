@@ -82,10 +82,12 @@ export const useProjects = () => {
     loadProjects,
     projects: useHierarchicalMode ? flattenedHierarchicalData : projects,
     setProjects: useHierarchicalMode ? 
-      (newProjects) => {
+      (newProjects: Project[]) => {
         // Convert flat projects back to hierarchical if needed
         setHierarchicalData(typeof newProjects === 'function' ? newProjects(hierarchicalData) : newProjects);
-      } : setProjects
+      } : (newProjects: Project[]) => {
+        setProjects(newProjects);
+      }
   });
 
   // Initialize data on mount
