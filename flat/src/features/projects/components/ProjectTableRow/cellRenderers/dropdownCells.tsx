@@ -44,7 +44,7 @@ export const renderProductType = ({ project, onUpdateField }: CellRenderProps) =
     return (
       <td className="px-3 py-1.5 text-xs text-gray-900 min-w-[120px]">
         <div className="text-left">
-          {subProjectCount > 0 ? `${subProjectCount}종` : '-'}
+          {subProjectCount > 0 ? `${subProjectCount}종` : ''}
         </div>
       </td>
     );
@@ -118,23 +118,19 @@ export const renderPriority = ({ project, onUpdateField }: CellRenderProps) => {
   );
 };
 
-// Component exports for use in cellRenderer
+// Component exports for use in cellRenderer - return td elements
 export const ProductTypeCell = (props: CellRenderProps) => {
-  const td = renderProductType(props);
-  return React.isValidElement(td) ? td.props.children : null;
+  return renderProductType(props);
 };
 
 export const ServiceTypeCell = (props: CellRenderProps) => {
-  const td = renderServiceType(props);
-  return React.isValidElement(td) ? td.props.children : null;
+  return renderServiceType(props);
 };
 
 export const StatusCell = (props: CellRenderProps) => {
-  const td = renderStatus(props);
-  return React.isValidElement(td) ? td.props.children : null;
+  return renderStatus(props);
 };
 
 export const PriorityCell = (props: CellRenderProps) => {
-  const td = renderPriority(props);
-  return React.isValidElement(td) ? td.props.children : null;
+  return renderPriority(props);
 };

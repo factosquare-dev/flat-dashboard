@@ -64,9 +64,9 @@ export interface Project {
   // UI computed/display fields - populated from relations
   client?: string; // customer.name
   manager?: string; // manager user name
-  manufacturer?: string | string[]; // manufacturer factory name(s)
-  container?: string | string[]; // container factory name(s)
-  packaging?: string | string[]; // packaging factory name(s)
+  manufacturerName?: string | string[]; // manufacturer factory name(s)
+  containerName?: string | string[]; // container factory name(s)
+  packagingName?: string | string[]; // packaging factory name(s)
   currentStage?: string[]; // computed from tasks
   
   // Hierarchy fields for UI

@@ -68,7 +68,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   } = useColumnResize();
   
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
-  const { moveToMaster, canBeMoved, canAcceptChildren } = useProjectHierarchy();
+  const { moveToMaster, makeIndependent, canBeMoved, canAcceptChildren } = useProjectHierarchy();
   const tableRef = useRef<HTMLTableElement>(null);
 
   // Filter out hidden columns
@@ -102,22 +102,20 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
 
   const handleProjectDrop = (e: React.DragEvent, targetProject: Project) => {
     e.preventDefault();
+    e.stopPropagation(); // Always stop propagation
     
-    // If dropping on itself, stop propagation and do nothing
+    // If dropping on itself, do nothing
     if (!draggedProjectId || draggedProjectId === targetProject.id) {
-      e.stopPropagation();
       setDraggedProjectId(null);
       return;
     }
     
-    // Find dragged project first
+    // Find dragged project
     const draggedProject = projects.find(p => p.id === draggedProjectId);
     if (!draggedProject) return;
     
-    // Check if dropping on MASTER project
+    // If dropping on MASTER project - move to that master
     if (isProjectType(targetProject.type, ProjectType.MASTER)) {
-      e.stopPropagation(); // Always stop propagation when dropping on MASTER
-      
       // Check if already in the same parent
       if (draggedProject.parentId === targetProject.id) {
         // Already in the same parent, do nothing
@@ -129,16 +127,21 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
       setDraggedProjectId(null);
     } else if (isProjectType(targetProject.type, ProjectType.SUB)) {
       // Dropping on SUB project
-      if (draggedProject.parentId && targetProject.parentId === draggedProject.parentId) {
-        // Same parent group - do nothing
-        e.stopPropagation();
-        setDraggedProjectId(null);
-        return;
+      if (targetProject.parentId) {
+        // Target SUB is in a master group
+        if (draggedProject.parentId !== targetProject.parentId) {
+          // Move dragged to target's master group
+          moveToMaster(draggedProjectId, targetProject.parentId);
+        }
+        // If same parent, just reorder (handled by state update)
+      } else {
+        // Target SUB is independent - make dragged independent too
+        if (draggedProject.parentId) {
+          makeIndependent(draggedProjectId);
+        }
       }
-      // Different parent or independent SUB - let it bubble to container to make independent
-      // Don't stop propagation here
+      setDraggedProjectId(null);
     }
-    // If not handled above, let event bubble to container for independent project handling
   };
 
   const renderHeaderCell = (column: Column) => {

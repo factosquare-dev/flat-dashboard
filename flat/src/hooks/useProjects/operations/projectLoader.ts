@@ -55,7 +55,7 @@ export const loadProjectsFromDb = async (signal: AbortSignal, page: number = 1):
       enrichedProject.type = enrichedProject.type as ProjectType;
     }
     
-    // Add factory names
+    // Add factory names to the new fields
     enrichedProject.manufacturerName = enrichedProject.manufacturerId 
       ? getFactoryNames(enrichedProject.manufacturerId) 
       : undefined;

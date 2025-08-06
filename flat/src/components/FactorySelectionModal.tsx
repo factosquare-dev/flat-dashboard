@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { factories, type Factory } from '../data/factories';
+import { getFactories, type Factory } from '../data/factories';
 import BaseModal, { ModalFooter } from './common/BaseModal';
 import { Search } from 'lucide-react';
 import { FactoryType, FactoryTypeLabel, ModalSize } from '../types/enums';
@@ -29,7 +29,14 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
 }) => {
   const [selectedType, setSelectedType] = useState<'all' | FactoryType>(multiSelect ? 'all' : FactoryType.MANUFACTURING);
   const [selectedFactories, setSelectedFactories] = useState<string[]>(selectedFactoryIds);
+  const [factories, setFactories] = useState<Factory[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Load factories on component mount
+  useEffect(() => {
+    const loadedFactories = getFactories();
+    setFactories(loadedFactories);
+  }, []);
   
   // Use debounced search hook
   const { searchValue, debouncedValue, setSearchValue } = useDebouncedSearch({

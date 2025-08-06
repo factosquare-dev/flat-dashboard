@@ -7,7 +7,7 @@ import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import { UseEditableCellReturn } from '@/hooks/useEditableCell';
 import * as cellRenderers from '../cellRenderers';
-import { ProjectType, ProjectFactoryField } from '@/types/enums';
+import { ProjectType, ProjectField, ProjectFactoryField } from '@/types/enums';
 
 interface CellRenderProps {
   project: Project;
@@ -30,74 +30,75 @@ export const renderTableCell = (columnId: string, props: CellRenderProps) => {
     onStartDrag 
   };
 
+  // Using ProjectField enum values for consistency
   switch (columnId) {
-    case 'name':
+    case ProjectField.NAME:
       return <cellRenderers.NameCell {...cellRenderProps} />;
       
-    case 'productType':
+    case 'productType': // Custom field - not in ProjectField enum
       return <cellRenderers.ProductTypeCell {...cellRenderProps} />;
       
-    case 'serviceType':
+    case ProjectField.SERVICE_TYPE:
       return <cellRenderers.ServiceTypeCell {...cellRenderProps} />;
       
-    case 'currentStage':
+    case 'currentStage': // Custom field - not in ProjectField enum  
       return <cellRenderers.CurrentStageCell {...cellRenderProps} />;
       
-    case 'status':
+    case ProjectField.STATUS:
       return <cellRenderers.StatusCell {...cellRenderProps} />;
       
-    case 'progress':
+    case ProjectField.PROGRESS:
       return <cellRenderers.ProgressCell {...cellRenderProps} />;
       
-    case 'client':
+    case 'client': // Custom field (maps to customer)
       return <cellRenderers.ClientCell {...cellRenderProps} />;
       
-    case 'startDate':
+    case ProjectField.START_DATE:
       return <cellRenderers.StartDateCell {...cellRenderProps} />;
       
-    case 'endDate':
+    case ProjectField.END_DATE:
       return <cellRenderers.EndDateCell {...cellRenderProps} />;
       
-    case 'manufacturer':
+    case ProjectField.MANUFACTURER:
       const manufacturerCellProps = {
         ...cellRenderProps,
-        factoryField: ProjectFactoryField.MANUFACTURER_ID,
+        field: ProjectFactoryField.MANUFACTURER,
         isVisible: project.type === ProjectType.SUB
       };
       return manufacturerCellProps.isVisible ? (
         <cellRenderers.FactoryCell {...manufacturerCellProps} />
       ) : null;
       
-    case 'container':
+    case ProjectField.CONTAINER:
       const containerCellProps = {
         ...cellRenderProps,
-        factoryField: ProjectFactoryField.CONTAINER_ID,
+        field: ProjectFactoryField.CONTAINER,
         isVisible: project.type === ProjectType.SUB
       };
       return containerCellProps.isVisible ? (
         <cellRenderers.FactoryCell {...containerCellProps} />
       ) : null;
       
-    case 'packaging':
+    case ProjectField.PACKAGING:
       const packagingCellProps = {
         ...cellRenderProps,
-        factoryField: ProjectFactoryField.PACKAGING_ID,
+        field: ProjectFactoryField.PACKAGING,
         isVisible: project.type === ProjectType.SUB
       };
       return packagingCellProps.isVisible ? (
         <cellRenderers.FactoryCell {...packagingCellProps} />
       ) : null;
       
-    case 'sales':
+    case ProjectField.SALES:
       return <cellRenderers.SalesCell {...cellRenderProps} />;
       
-    case 'purchase':
+    case ProjectField.PURCHASE:
       return <cellRenderers.PurchaseCell {...cellRenderProps} />;
       
-    case 'depositPaid':
+    case ProjectField.DEPOSIT_PAID:
       return <cellRenderers.DepositPaidCell {...cellRenderProps} />;
       
-    case 'priority':
+    case ProjectField.PRIORITY:
       return <cellRenderers.PriorityCell {...cellRenderProps} />;
       
     default:

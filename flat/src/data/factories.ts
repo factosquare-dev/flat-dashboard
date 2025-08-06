@@ -1,5 +1,5 @@
-import { FACTORY_TYPES, TASK_TYPES } from '../constants/factory';
 import { FactoryType } from '../types/enums';
+import { TaskType } from '../types/enums/task';
 import { FactoryId, toFactoryId } from '../types/branded';
 
 // 공장 인증 타입
@@ -35,11 +35,12 @@ export interface Factory {
   managers?: FactoryManager[]; // 공장 담당자들 (복수)
 }
 
-// Export factories as a getter function to avoid circular dependency
+// Import at the top to avoid circular dependency issues
+import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+
+// Export factories as a getter function
 export const getFactories = (): Factory[] => {
   try {
-    // Dynamic import to avoid circular dependency at module load time
-    const { MockDatabaseImpl } = require('../mocks/database/MockDatabase');
     const db = MockDatabaseImpl.getInstance();
     const database = db.getDatabase();
     
@@ -60,17 +61,17 @@ export const factories: Factory[] = [];
 // Task types by factory type mapping
 export const taskTypesByFactoryType: Record<FactoryType, string[]> = {
   [FactoryType.MANUFACTURING]: [
-    TASK_TYPES.SOURCING,
-    TASK_TYPES.PRODUCTION,
-    TASK_TYPES.QUALITY_CHECK,
+    TaskType.SOURCING,
+    TaskType.PRODUCTION,
+    TaskType.QUALITY_CHECK,
   ],
   [FactoryType.CONTAINER]: [
-    TASK_TYPES.CONTAINER_PRODUCTION,
-    TASK_TYPES.CONTAINER_QUALITY_CHECK,
+    TaskType.INJECTION_MOLDING,
+    TaskType.QUALITY_CHECK,
   ],
   [FactoryType.PACKAGING]: [
-    TASK_TYPES.PACKING_DESIGN,
-    TASK_TYPES.PACKAGING,
-    TASK_TYPES.DELIVERY,
+    TaskType.PACKAGING_DESIGN,
+    TaskType.PACKAGING,
+    TaskType.DELIVERY,
   ],
 };

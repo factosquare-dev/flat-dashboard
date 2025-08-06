@@ -3,6 +3,7 @@
  */
 
 import type { Task } from '../../types/schedule';
+import { TaskStatus } from '../../types/enums';
 
 /**
  * Validate task dates - throw error if tasks overlap
@@ -136,12 +137,12 @@ export function validateTaskProgress(task: Task): void {
   }
   
   // Completed tasks should have 100% progress
-  if (task.status === 'completed' && task.progress !== 100) {
+  if (task.status === TaskStatus.COMPLETED && task.progress !== 100) {
     throw new Error(`Completed task "${task.title}" should have 100% progress`);
   }
   
   // TODO or cancelled tasks should have 0% progress
-  if ((task.status === 'todo' || task.status === 'cancelled') && task.progress !== 0) {
+  if ((task.status === TaskStatus.TODO || task.status === TaskStatus.CANCELLED) && task.progress !== 0) {
     throw new Error(`${task.status} task "${task.title}" should have 0% progress`);
   }
 }

@@ -120,9 +120,12 @@ export const TaskTypeLabel: Record<TaskType, string> = {
   [TaskType.OTHER]: '기타',
 };
 
+// Import FactoryType for proper typing
+import { FactoryType } from './factory';
+
 // Task types by factory type
-export const TasksByFactoryType = {
-  MANUFACTURING: [
+export const TasksByFactoryType: Record<FactoryType, TaskType[]> = {
+  [FactoryType.MANUFACTURING]: [
     TaskType.DESIGN,
     TaskType.SOURCING,
     TaskType.MATERIAL,
@@ -138,7 +141,7 @@ export const TasksByFactoryType = {
     TaskType.INSPECTION,
     TaskType.APPROVAL,
   ],
-  CONTAINER: [
+  [FactoryType.CONTAINER]: [
     TaskType.DESIGN,
     TaskType.MOLD_DESIGN,
     TaskType.MOLD_MAKING,
@@ -150,7 +153,7 @@ export const TasksByFactoryType = {
     TaskType.INSPECTION,
     TaskType.APPROVAL,
   ],
-  PACKAGING: [
+  [FactoryType.PACKAGING]: [
     TaskType.PACKAGING_DESIGN,
     TaskType.PRINTING_PLATE,
     TaskType.COLOR_CORRECTION,

@@ -3,7 +3,7 @@
  */
 
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
-import { FACTORY_TYPES, TASK_TYPES } from '@/constants/factory';
+import { FactoryType, TaskType, TasksByFactoryType } from '@/types/enums';
 import type { Factory } from '@/types/factory';
 import type { FactoryId } from '@/types/branded';
 
@@ -33,46 +33,26 @@ export class FactoryDataService {
   }
 
   // 공장 ID로 태스크 타입 가져오기
-  getTaskTypesForFactory(factoryId: string | FactoryId): string[] {
+  getTaskTypesForFactory(factoryId: string | FactoryId): TaskType[] {
     const factory = this.getFactoryById(factoryId);
-    if (!factory) return [];
+    if (!factory || !factory.type) return [];
 
     // 공장 타입에 따른 태스크 타입 반환
-    switch (factory.type) {
-      case FACTORY_TYPES.MANUFACTURING:
-        return [
-          TASK_TYPES.SOURCING,
-          TASK_TYPES.PRODUCTION,
-          TASK_TYPES.QUALITY_CHECK,
-        ];
-      case FACTORY_TYPES.CONTAINER:
-        return [
-          TASK_TYPES.CONTAINER_PRODUCTION,
-          TASK_TYPES.CONTAINER_QUALITY_CHECK,
-        ];
-      case FACTORY_TYPES.PACKAGING:
-        return [
-          TASK_TYPES.PACKING_DESIGN,
-          TASK_TYPES.PACKAGING,
-          TASK_TYPES.DELIVERY,
-        ];
-      default:
-        return [];
-    }
+    return TasksByFactoryType[factory.type as FactoryType] || [];
   }
 
   // 제조 공장 가져오기
   getManufacturingFactories(): Factory[] {
-    return this.getFactoriesByType(FACTORY_TYPES.MANUFACTURING);
+    return this.getFactoriesByType(FactoryType.MANUFACTURING);
   }
 
   // 용기 공장 가져오기
   getContainerFactories(): Factory[] {
-    return this.getFactoriesByType(FACTORY_TYPES.CONTAINER);
+    return this.getFactoriesByType(FactoryType.CONTAINER);
   }
 
   // 포장 공장 가져오기
   getPackagingFactories(): Factory[] {
-    return this.getFactoriesByType(FACTORY_TYPES.PACKAGING);
+    return this.getFactoriesByType(FactoryType.PACKAGING);
   }
 }

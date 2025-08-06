@@ -109,7 +109,7 @@ export const renderCurrentStage = (project: Project) => {
   );
 };
 
-// Component export for use in cellRenderer
+// Component export for use in cellRenderer - return td element
 export const CurrentStageCell = ({ project }: { project: Project }) => {
-  return <CurrentStageContent project={project} />;
+  return renderCurrentStage(project);
 };

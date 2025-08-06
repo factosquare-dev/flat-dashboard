@@ -8,6 +8,7 @@ import { Customer } from '@/types/customer';
 import { Factory } from '@/types/factory';
 import { Project } from '@/types/project';
 import { Comment } from '@/types/comment';
+import { Priority } from '@/types/enums';
 
 export function createUserFactoryRelations(users: User[], factories: Factory[]): UserFactory[] {
   const relations: UserFactory[] = [];
@@ -96,7 +97,7 @@ export function createProjectAssignments(projects: Project[], users: User[]): Pr
     });
     
     // Add developer for high priority projects
-    if (project.priority === 'high') {
+    if (project.priority === Priority.HIGH) {
       assignments.push({
         id: `pa-${index}-3`,
         projectId: project.id,

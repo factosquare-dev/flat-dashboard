@@ -77,7 +77,7 @@ export const renderDate = (field: 'startDate' | 'endDate', { project, editableCe
   
   if (!isEditable) {
     const dateValue = project[field];
-    const displayDate = dateValue ? new Date(dateValue).toLocaleDateString('ko-KR') : '-';
+    const displayDate = dateValue ? new Date(dateValue).toLocaleDateString('ko-KR') : '';
     
     return (
       <td className="px-3 py-1.5 text-xs text-gray-900 min-w-[90px]" title={displayDate}>
@@ -131,59 +131,36 @@ export const renderCurrency = (field: 'sales' | 'purchase', { project, editableC
 
 export const renderDefault = () => (
   <td className="px-3 py-1.5 text-xs text-gray-400">
-    -
+    
   </td>
 );
 
 // Component exports for use in cellRenderer
 export const NameCell = (props: CellRenderProps) => {
-  const content = renderName(props);
-  // If EditableCell is returned, it already includes td wrapper
-  if (React.isValidElement(content) && content.type === EditableCell) {
-    return content;
-  }
-  // Otherwise, we need to extract the content from td
-  return React.isValidElement(content) ? content.props.children : content;
+  // renderName now always returns a td element
+  return renderName(props);
 };
 
 export const ClientCell = (props: CellRenderProps) => {
-  const td = renderClient(props);
-  return React.isValidElement(td) ? td.props.children : null;
+  return renderClient(props);
 };
 
 export const ProgressCell = (props: CellRenderProps) => {
-  const td = renderProgress(props.project);
-  return React.isValidElement(td) ? td.props.children : null;
+  return renderProgress(props.project);
 };
 
 export const StartDateCell = (props: CellRenderProps) => {
-  const content = renderDate('startDate', props);
-  if (React.isValidElement(content) && content.type === EditableCell) {
-    return content;
-  }
-  return React.isValidElement(content) ? content.props.children : content;
+  return renderDate('startDate', props);
 };
 
 export const EndDateCell = (props: CellRenderProps) => {
-  const content = renderDate('endDate', props);
-  if (React.isValidElement(content) && content.type === EditableCell) {
-    return content;
-  }
-  return React.isValidElement(content) ? content.props.children : content;
+  return renderDate('endDate', props);
 };
 
 export const SalesCell = (props: CellRenderProps) => {
-  const content = renderCurrency('sales', props);
-  if (React.isValidElement(content) && content.type === EditableCell) {
-    return content;
-  }
-  return React.isValidElement(content) ? content.props.children : content;
+  return renderCurrency('sales', props);
 };
 
 export const PurchaseCell = (props: CellRenderProps) => {
-  const content = renderCurrency('purchase', props);
-  if (React.isValidElement(content) && content.type === EditableCell) {
-    return content;
-  }
-  return React.isValidElement(content) ? content.props.children : content;
+  return renderCurrency('purchase', props);
 };

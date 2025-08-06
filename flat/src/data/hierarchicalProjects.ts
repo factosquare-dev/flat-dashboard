@@ -32,15 +32,15 @@ const getHierarchicalProjects = (): Project[] => {
   
   // Build hierarchical structure
   // MASTER projects should never have a parentId
-  const masterProjects = projects.filter(p => p.type === 'MASTER' && !p.parentId);
+  const masterProjects = projects.filter(p => p.type === ProjectType.MASTER && !p.parentId);
   
   // Independent SUB projects (no parentId)
-  const independentSubProjects = projects.filter(p => p.type === 'SUB' && !p.parentId);
+  const independentSubProjects = projects.filter(p => p.type === ProjectType.SUB && !p.parentId);
   
   // First, add all MASTER projects with their children
   const hierarchicalProjects = masterProjects.map(master => {
     // Only get SUB projects as children
-    const subProjects = projects.filter(p => p.type === 'SUB' && p.parentId === master.id);
+    const subProjects = projects.filter(p => p.type === ProjectType.SUB && p.parentId === master.id);
     
     // Get customer from database
     const masterCustomer = customers.find(c => c.id === master.customerId);

@@ -76,14 +76,7 @@ export const renderDepositPaid = ({ project, onUpdateField, index, isDragging, o
   );
 };
 
-// Component export for use in cellRenderer
+// Component export for use in cellRenderer - return td element
 export const DepositPaidCell = (props: CellRenderProps) => {
-  return (
-    <DepositPaidCheckbox
-      checked={props.project.depositPaid || false}
-      onChange={(checked) => props.onUpdateField(props.project.id, 'depositPaid', checked)}
-      onStartDrag={props.index !== undefined && props.onStartDrag ? () => props.onStartDrag(props.index!) : undefined}
-      isDragging={props.isDragging}
-    />
-  );
+  return renderDepositPaid(props);
 };

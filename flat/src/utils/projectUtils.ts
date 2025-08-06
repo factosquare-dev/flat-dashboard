@@ -1,5 +1,6 @@
 import type { Project } from '../types/project';
 import { getHierarchicalProjectsData } from '../data/hierarchicalProjects';
+import { ProjectType } from '../types/enums';
 
 /**
  * Get the count of sub-projects for a master project
@@ -14,7 +15,7 @@ export const getSubProjectCount = (masterProjectId: string): number => {
     }
     
     // Count only SUB type children
-    return masterProject.children.filter(child => child.type === 'SUB').length;
+    return masterProject.children.filter(child => child.type === ProjectType.SUB).length;
   } catch (error) {
     console.warn('Error getting sub-project count:', error);
     return 0;

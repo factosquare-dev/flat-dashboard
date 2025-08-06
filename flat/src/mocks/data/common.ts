@@ -1,11 +1,11 @@
 import { 
-  FACTORY_TYPES, 
   CERTIFICATE_TYPE_OPTIONS,
   PROJECT_STATUS,
   PROJECT_PRIORITY,
   SERVICE_TYPES,
   TASK_TEMPLATES
 } from '@/constants';
+import { FactoryType } from '@/types/enums';
 
 /**
  * Common mock data used across multiple modules
@@ -25,19 +25,19 @@ export const MOCK_CUSTOMER_NAMES = [
 
 // Factory names by type
 export const MOCK_FACTORY_NAMES = {
-  [FACTORY_TYPES.MANUFACTURING]: [
+  [FactoryType.MANUFACTURING]: [
     '큐셀시스템',
     '코스모로스',
     '바이오텍',
     '그린팜',
   ],
-  [FACTORY_TYPES.CONTAINER]: [
+  [FactoryType.CONTAINER]: [
     '(주)연우',
     '컨테이너텍',
     '패키지마스터',
     '용기나라',
   ],
-  [FACTORY_TYPES.PACKAGING]: [
+  [FactoryType.PACKAGING]: [
     '(주)네트모베이지',
     '패키징솔루션',
     '박스프로',
@@ -71,19 +71,19 @@ export const MOCK_PRODUCT_TYPES = [
 
 // Task templates by factory type
 export const MOCK_TASKS_BY_FACTORY_TYPE = {
-  [FACTORY_TYPES.MANUFACTURING]: [
+  [FactoryType.MANUFACTURING]: [
     TASK_TEMPLATES.RAW_MATERIAL_PREP,
     TASK_TEMPLATES.MIXING_MANUFACTURING,
     TASK_TEMPLATES.STABILITY_TEST,
     TASK_TEMPLATES.QUALITY_INSPECTION,
   ],
-  [FACTORY_TYPES.CONTAINER]: [
+  [FactoryType.CONTAINER]: [
     TASK_TEMPLATES.MOLD_MAKING,
     TASK_TEMPLATES.TRIAL_MOLDING,
     TASK_TEMPLATES.INJECTION_MOLDING,
     TASK_TEMPLATES.CONTAINER_DESIGN,
   ],
-  [FACTORY_TYPES.PACKAGING]: [
+  [FactoryType.PACKAGING]: [
     TASK_TEMPLATES.DESIGN_WORK,
     TASK_TEMPLATES.PACKAGING_WORK,
     TASK_TEMPLATES.PROTOTYPE_MAKING,

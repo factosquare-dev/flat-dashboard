@@ -9,7 +9,8 @@
 
 /* Dropdown chevron icon */
 .dropdown-chevron {
-  @apply absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none;
+  @apply absolute inset-y-0 right-0 flex items-center pr-2;
+  pointer-events: none;
 }
 
 .dropdown-chevron svg {

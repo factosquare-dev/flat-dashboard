@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { factories, type Factory as FactoryType } from '@/data/factories';
+import { getFactories, type Factory as FactoryType } from '@/data/factories';
 import FactoryModal, { type FactoryFormData } from '../../components/Factories/FactoryModal';
 import FactoryCard from '@/components/Factories/FactoryCard';
 import FactoryToolbar from '@/components/Factories/FactoryToolbar';
@@ -18,6 +18,13 @@ const FactoriesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
+  const [factories, setFactories] = useState<FactoryType[]>([]);
+  
+  // Load factories on component mount
+  useEffect(() => {
+    const loadedFactories = getFactories();
+    setFactories(loadedFactories);
+  }, []);
   
   // 필터링 로직을 커스텀 훅으로 분리
   const {

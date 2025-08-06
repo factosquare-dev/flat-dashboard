@@ -132,6 +132,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
         project={project}
         columns={columns}
         isSelected={isSelected}
+        isExpanded={isExpanded}
         onSelect={onSelect}
         onShowOptionsMenu={onShowOptionsMenu}
         onRowClick={handleRowClick}
@@ -141,6 +142,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
         onDragEnd={onDragEnd}
         onDragOver={handleDragOverRow}
         onDrop={handleDropRow}
+        handleToggleTasks={handleToggleTasks}
       />
       <ExpandableRow
         isExpanded={isExpanded}

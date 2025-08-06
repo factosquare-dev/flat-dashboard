@@ -12,11 +12,20 @@ import { formatCompanyNameForDisplay } from '@/utils/companyUtils';
 
 const mockDb = MockDatabaseImpl.getInstance();
 
-// Define factory ID fields for projects
-const FACTORY_ID_FIELDS = ['manufacturerId', 'containerId', 'packagingId'] as const;
+// Define factory ID fields for projects using enum
+const FACTORY_ID_FIELDS = [
+  ProjectField.MANUFACTURER_ID,
+  ProjectField.CONTAINER_ID,
+  ProjectField.PACKAGING_ID
+] as const;
 
-// Define date fields for projects
-const DATE_FIELDS = ['startDate', 'endDate', 'createdAt', 'updatedAt'] as const;
+// Define date fields for projects using enum
+const DATE_FIELDS = [
+  ProjectField.START_DATE,
+  ProjectField.END_DATE,
+  ProjectField.CREATED_AT,
+  ProjectField.UPDATED_AT
+] as const;
 
 /**
  * Update a single project field
@@ -188,11 +197,11 @@ export const bulkUpdate = async (
 const getFactoryNameField = (factoryIdField: typeof FACTORY_ID_FIELDS[number]): keyof Project | null => {
   switch (factoryIdField) {
     case ProjectField.MANUFACTURER_ID:
-      return ProjectField.MANUFACTURER_NAME;
+      return ProjectField.MANUFACTURER_NAME as keyof Project;
     case ProjectField.CONTAINER_ID:
-      return ProjectField.CONTAINER_NAME;
+      return ProjectField.CONTAINER_NAME as keyof Project;
     case ProjectField.PACKAGING_ID:
-      return ProjectField.PACKAGING_NAME;
+      return ProjectField.PACKAGING_NAME as keyof Project;
     default:
       return null;
   }

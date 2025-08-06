@@ -8,11 +8,13 @@ import type { ProjectId } from '@/types/branded';
 import { MoreVertical } from 'lucide-react';
 import type { Column } from '@/hooks/useColumnOrder';
 import SelectionCell from '../SelectionCell';
+import { ProjectType } from '@/types/enums';
 
 interface RowLayoutProps {
   project: Project;
   columns: Column[];
   isSelected: boolean;
+  isExpanded?: boolean;
   onSelect: (checked: boolean) => void;
   onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }, event?: React.MouseEvent) => void;
   onRowClick: (e: React.MouseEvent) => void;
@@ -22,12 +24,14 @@ interface RowLayoutProps {
   onDragEnd?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent, project: Project) => void;
+  handleToggleTasks?: (e: React.MouseEvent) => void;
 }
 
 export const RowLayout: React.FC<RowLayoutProps> = ({
   project,
   columns,
   isSelected,
+  isExpanded = false,
   onSelect,
   onShowOptionsMenu,
   onRowClick,
@@ -36,7 +40,8 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
   onDragStart,
   onDragEnd,
   onDragOver,
-  onDrop
+  onDrop,
+  handleToggleTasks
 }) => {
   const handleOptions = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -69,19 +74,19 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
     <tr 
       onClick={onRowClick}
       className={rowClasses}
-      draggable={project.type === 'SUB'}
+      draggable={project.type === ProjectType.SUB}
       onDragStart={(e) => onDragStart?.(e, project.id)}
       onDragEnd={onDragEnd}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <td className="px-4 py-2 sticky left-0 bg-white group-hover:bg-gray-50/50 z-10 w-12">
+      <td className="px-4 py-2 w-12">
         <SelectionCell
           project={project}
-          isExpanded={false}
+          isExpanded={isExpanded}
           isSelected={isSelected}
           onSelect={onSelect}
-          handleToggleTasks={() => {}}
+          handleToggleTasks={handleToggleTasks || (() => {})}
           handleMasterToggle={() => {}}
         />
       </td>
@@ -90,6 +95,13 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
         const content = renderCell(column.id);
         if (column.visible === false || content === null) return null;
         
+        // All our cell components return td elements now, so just add key
+        if (React.isValidElement(content)) {
+          // Clone element to add key prop
+          return React.cloneElement(content, { key: column.id });
+        }
+        
+        // Fallback for non-element content
         return (
           <td 
             key={column.id} 
@@ -101,7 +113,7 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
         );
       })}
       
-      <td className="px-4 py-2 text-sm sticky right-0 bg-white group-hover:bg-gray-50/50 z-10 w-12">
+      <td className="px-4 py-2 text-sm w-12">
         <button
           onClick={handleOptions}
           className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"

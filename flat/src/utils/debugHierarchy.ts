@@ -1,5 +1,6 @@
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 import type { Project } from '../types/project';
+import { ProjectType } from '../types/enums';
 
 export function debugHierarchyIssue() {
   try {
@@ -13,13 +14,13 @@ export function debugHierarchyIssue() {
     const projects = Array.from(database.projects.values());
     
     // 1. Check for MASTER projects with parentId
-    const masterWithParent = projects.filter(p => p.type === 'MASTER' && p.parentId);
+    const masterWithParent = projects.filter(p => p.type === ProjectType.MASTER && p.parentId);
     
     // 2. Check for SUB projects without parentId (This is allowed - independent SUB projects)
-    const subWithoutParent = projects.filter(p => p.type === 'SUB' && !p.parentId);
+    const subWithoutParent = projects.filter(p => p.type === ProjectType.SUB && !p.parentId);
     
     // 3. Check for SUB projects whose parent is not MASTER
-    const subProjects = projects.filter(p => p.type === 'SUB');
+    const subProjects = projects.filter(p => p.type === ProjectType.SUB);
     const invalidParents: any[] = [];
     
     subProjects.forEach(sub => {
@@ -29,7 +30,7 @@ export function debugHierarchyIssue() {
           sub: { id: sub.id, name: sub.name, parentId: sub.parentId },
           issue: 'Parent not found'
         });
-      } else if (parent.type !== 'MASTER') {
+      } else if (parent.type !== ProjectType.MASTER) {
         invalidParents.push({
           sub: { id: sub.id, name: sub.name, parentId: sub.parentId },
           parent: { id: parent.id, name: parent.name, type: parent.type },
@@ -56,7 +57,7 @@ export function debugHierarchyIssue() {
     });
     
     // 5. Display the actual hierarchy
-    const masterProjects = projects.filter(p => p.type === 'MASTER' && !p.parentId);
+    const masterProjects = projects.filter(p => p.type === ProjectType.MASTER && !p.parentId);
     
     masterProjects.forEach(master => {
       const children = projects.filter(p => p.parentId === master.id);
@@ -68,10 +69,10 @@ export function debugHierarchyIssue() {
     });
     
     // 6. Check the hierarchicalProjects.ts logic
-    const testMasterProjects = projects.filter(p => p.type === 'MASTER' && !p.parentId);
+    const testMasterProjects = projects.filter(p => p.type === ProjectType.MASTER && !p.parentId);
     
     testMasterProjects.forEach(master => {
-      const testSubProjects = projects.filter(p => p.type === 'SUB' && p.parentId === master.id);
+      const testSubProjects = projects.filter(p => p.type === ProjectType.SUB && p.parentId === master.id);
     });
     
   } catch (error) {
@@ -94,7 +95,7 @@ export function fixHierarchyIssues() {
     
     // Fix MASTER projects with parentId
     projects.forEach(project => {
-      if (project.type === 'MASTER' && project.parentId) {
+      if (project.type === ProjectType.MASTER && project.parentId) {
         delete project.parentId;
         database.projects.set(project.id, project);
         fixCount++;

@@ -5,7 +5,7 @@
 
 import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 import { DB_COLLECTIONS } from '../mocks/database/types';
-import { ProjectFactoryIdField, FactoryTypeLabel, FactoryType } from '../types/enums';
+import { ProjectFactoryIdField, FactoryTypeLabel, FactoryType, ProjectType } from '../types/enums';
 
 export const cleanupDuplicateFactories = async () => {
   try {
@@ -33,7 +33,7 @@ export const cleanupDuplicateFactories = async () => {
       let hasChanges = false;
       
       // Master projects should not store factory IDs
-      if (project.type === 'MASTER') {
+      if (project.type === ProjectType.MASTER) {
         if (project.manufacturerId !== undefined || project.containerId !== undefined || project.packagingId !== undefined) {
           updates.manufacturerId = undefined;
           updates.containerId = undefined;

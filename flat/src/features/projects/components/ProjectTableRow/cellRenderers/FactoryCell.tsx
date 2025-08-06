@@ -20,8 +20,11 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
   const [showAddFactory, setShowAddFactory] = React.useState(false);
   const [isExpanded, setIsExpanded] = React.useState(false);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
-  const value = project[field];
-  const idField = `${field}Id` as keyof Project;
+  
+  // Map field to the correct name field
+  const nameField = `${field}Name` as keyof Project; // e.g., manufacturerName
+  const idField = `${field}Id` as keyof Project; // e.g., manufacturerId
+  const value = project[nameField]; // Use the name field, not the base field
   
   // Get factory type from field using enum mapping
   const getFactoryType = (): FactoryType => {
@@ -99,22 +102,9 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
   
   // Get factory names - use value if it has names, otherwise convert IDs
   const factories = React.useMemo(() => {
-    
-    // First try to use the value (which should contain names)
+    // Use the name value directly if available
     if (value) {
       if (Array.isArray(value)) {
-        // Check if the values are IDs (e.g., 'mfg-1') or names
-        const firstValue = value[0];
-        if (firstValue && firstValue.match(/^(mfg|cont|pack)-\d+$/)) {
-          // These are IDs, convert them
-          const factoryType = getFactoryType();
-          const factoriesData = mockDataService.getFactoriesByType(factoryType);
-          return value.map(id => {
-            const factory = factoriesData.find(f => f.id === id);
-            return factory ? formatManufacturerDisplay(factory.name) : id;
-          });
-        }
-        // These are already names - apply formatting
         return value.map(name => formatManufacturerDisplay(name));
       }
       if (typeof value === 'string') {
@@ -122,21 +112,20 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
       }
     }
     
-    // Fallback: use factory IDs
+    // If no name value, convert IDs to names
     if (!factoryIds) return [];
     
     const factoryType = getFactoryType();
     const factoriesData = mockDataService.getFactoriesByType(factoryType);
     
     if (Array.isArray(factoryIds)) {
-      // Convert factory IDs to names
       return factoryIds.map(id => {
         const factory = factoriesData.find(f => f.id === id);
-        return factory ? formatManufacturerDisplay(factory.name) : id;
-      });
+        return factory ? formatManufacturerDisplay(factory.name) : '';
+      }).filter(Boolean);
     } else {
       const factory = factoriesData.find(f => f.id === factoryIds);
-      return factory ? [formatManufacturerDisplay(factory.name)] : [factoryIds];
+      return factory ? [formatManufacturerDisplay(factory.name)] : [];
     }
   }, [value, factoryIds, field]);
   
@@ -273,11 +262,15 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
               return;
             }
             
-            // Update the factory ID field only
-            // The name will be automatically updated in useProjectData
-            // Set을 사용하여 중복 제거
+            // Update both ID and name fields
             const newIds = [...new Set([...currentIds, item.id])];
             onUpdateField(project.id, idField, newIds);
+            
+            // Also update the name field
+            const currentNames = value ? (Array.isArray(value) ? value : [value]) : [];
+            const newNames = [...currentNames, item.name];
+            onUpdateField(project.id, nameField, newNames);
+            
             setShowAddFactory(false);
           }}
           onClose={() => setShowAddFactory(false)}

@@ -22,10 +22,13 @@ export const ExpandableRow: React.FC<ExpandableRowProps> = ({
 }) => {
   if (!isExpanded) return null;
 
+  // Calculate proper colspan: checkbox column + visible columns + options column
+  const visibleColumnCount = columns.filter(c => c.visible !== false).length;
+  const totalColspan = visibleColumnCount + 2; // +1 for checkbox, +1 for options column
+  
   return (
     <tr>
-      <td></td>
-      <td colSpan={columns.filter(c => c.visible).length + 1} className="px-4 py-2 bg-gray-50">
+      <td colSpan={totalColspan} className="px-4 py-2 bg-gray-50">
         <TaskList
           tasks={tasks}
           onToggle={onTaskToggle}

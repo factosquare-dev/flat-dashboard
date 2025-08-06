@@ -210,23 +210,25 @@ const EditableCell: React.FC<EditableCellProps> = ({
     );
   }
   
-  // Display mode
+  // Display mode - wrapped in td
   return (
-    <td 
-      className={`px-3 py-1.5 text-xs text-gray-700 cursor-pointer group js-inline-edit ${
-        type === EditableCellType.CURRENCY ? 'text-right min-w-[90px]' : type === EditableCellType.DATE ? 'text-center min-w-[90px]' : ''
-      }`}
-      onClick={(e) => {
-        e.stopPropagation();
-        startEditing(project.id, field);
-      }}
-    >
-      <div className={type === EditableCellType.CURRENCY ? 'overflow-hidden text-ellipsis whitespace-nowrap' : 'relative'}>
-        <div className={`${type === EditableCellType.CURRENCY ? 'text-blue-600 font-medium' : type === EditableCellType.DATE ? 'whitespace-nowrap' : 'truncate max-w-[140px]'} transition-colors`} title={value as string}>
-          {type === EditableCellType.CURRENCY ? 
-            (value !== null && value !== undefined && value !== '' ? `${formatKoreanNumber(value)}원` : '0원') : 
-           type === EditableCellType.DATE ? formatDate(value as string, 'yy-MM-dd') :
-           (value instanceof Date ? formatDate(value, 'yy-MM-dd') : value || '')}
+    <td className="px-3 py-1.5 text-xs text-gray-900">
+      <div 
+        className={`cursor-pointer ${
+          type === EditableCellType.CURRENCY ? 'text-right' : type === EditableCellType.DATE ? 'text-center' : ''
+        }`}
+        onClick={(e) => {
+          e.stopPropagation();
+          startEditing(project.id, field);
+        }}
+      >
+        <div className={type === EditableCellType.CURRENCY ? 'overflow-hidden text-ellipsis whitespace-nowrap' : 'relative'}>
+          <div className={`${type === EditableCellType.CURRENCY ? 'text-blue-600 font-medium' : type === EditableCellType.DATE ? 'whitespace-nowrap' : 'truncate max-w-[140px]'} transition-colors`} title={value as string}>
+            {type === EditableCellType.CURRENCY ? 
+              (value !== null && value !== undefined && value !== '' ? `${formatKoreanNumber(value)}원` : '0원') : 
+             type === EditableCellType.DATE ? formatDate(value as string, 'yy-MM-dd') :
+             (value instanceof Date ? formatDate(value, 'yy-MM-dd') : value || '')}
+          </div>
         </div>
       </div>
     </td>

@@ -99,58 +99,58 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
       }}
     >
       <div className="flex items-center gap-1 select-none">
-        {/* 들여쓰기 - level이 있으면 사용, 없으면 ProjectType 기반으로 계산 */}
+        {/* 들여쓰기 - Task만 들여쓰기, Master와 Sub는 같은 위치 */}
         <div style={{ 
           width: `${(
             (project as any).level !== undefined 
               ? (project as any).level 
-              : project.type === ProjectType.MASTER ? 0 
-              : project.type === ProjectType.SUB ? 1 
-              : project.type === ProjectType.TASK ? 2 
+              : project.type === ProjectType.TASK ? 1 
               : 0
           ) * 20}px` 
         }} />
         
-        {/* 확장/축소 버튼 영역 - 모든 타입에서 동일한 공간 차지 */}
+        {/* Master 프로젝트는 폴더 아이콘으로 확장/축소 */}
+        {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
+          <button
+            onClick={(e) => {
+              console.log('[SelectionCell] Master toggle button clicked');
+              e.stopPropagation();
+              e.preventDefault();
+              handleMasterToggle(e);
+            }}
+            onMouseDown={(e) => {
+              console.log('[SelectionCell] Master button mouseDown');
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onMouseLeave={(e) => {
+              console.log('[SelectionCell] Master button mouseLeave - folder button left');
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onMouseUp={(e) => {
+              console.log('[SelectionCell] Master button mouseUp');
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onDragStart={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            style={{ userSelect: 'none' }}
+            className="p-0.5 rounded transition-colors hover:bg-gray-200"
+            title={project.isExpanded ? "폴더 접기" : "폴더 펼치기"}
+          >
+            {project.isExpanded ? (
+              <FolderOpen className="w-4 h-4 text-blue-600" />
+            ) : (
+              <Folder className="w-4 h-4 text-blue-600" />
+            )}
+          </button>
+        )}
+        
+        {/* SUB 프로젝트는 chevron으로 태스크 확장/축소 */}
         <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-          {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
-            <button
-              onClick={(e) => {
-                console.log('[SelectionCell] Master toggle button clicked');
-                e.stopPropagation();
-                e.preventDefault();
-                handleMasterToggle(e);
-              }}
-              onMouseDown={(e) => {
-                console.log('[SelectionCell] Master button mouseDown');
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-              onMouseLeave={(e) => {
-                console.log('[SelectionCell] Master button mouseLeave - chevron button left');
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-              onMouseUp={(e) => {
-                console.log('[SelectionCell] Master button mouseUp');
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-              onDragStart={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              style={{ userSelect: 'none' }}
-              className="p-0.5 rounded transition-colors hover:bg-gray-200"
-              title={project.isExpanded ? "축소" : "확장"}
-            >
-              {project.isExpanded ? (
-                <ChevronDown className="w-4 h-4 text-gray-600" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-gray-600" />
-              )}
-            </button>
-          )}
           {isProjectType(project.type, ProjectType.SUB) && (
             <button
               onClick={handleToggleTasks}
@@ -173,15 +173,6 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
                 <ChevronRight className="w-3 h-3" />
               )}
             </button>
-          )}
-        </div>
-        
-        {/* 아이콘 영역 - Master만 폴더 아이콘, 나머지는 빈 공간 */}
-        <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-          {isProjectType(project.type, ProjectType.MASTER) && (
-            project.isExpanded ? 
-              <FolderOpen className="w-4 h-4 text-blue-600" /> : 
-              <Folder className="w-4 h-4 text-blue-600" />
           )}
         </div>
         
