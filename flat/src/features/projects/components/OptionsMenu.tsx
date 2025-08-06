@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface OptionsMenuProps {
   projectId: string;
@@ -17,8 +17,50 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   onDuplicate,
   onClose
 }) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [adjustedPosition, setAdjustedPosition] = useState(position);
+
+  useEffect(() => {
+    if (menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      let newLeft = position.left;
+      let newTop = position.top;
+      
+      // Check if menu goes beyond right edge
+      if (rect.right > viewportWidth) {
+        newLeft = Math.max(10, viewportWidth - rect.width - 10);
+      }
+      
+      // Check if menu goes beyond bottom edge
+      if (rect.bottom > viewportHeight) {
+        newTop = Math.max(10, viewportHeight - rect.height - 10);
+      }
+      
+      // Check if menu goes beyond left edge
+      if (rect.left < 0) {
+        newLeft = 10;
+      }
+      
+      // Check if menu goes beyond top edge
+      if (rect.top < 0) {
+        newTop = 10;
+      }
+      
+      if (newLeft !== position.left || newTop !== position.top) {
+        setAdjustedPosition({ left: newLeft, top: newTop });
+      }
+    }
+  }, [position]);
+
   return (
-    <div className="fixed z-50 options-menu-dropdown" style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+    <div 
+      ref={menuRef}
+      className="fixed z-50 options-menu-dropdown" 
+      style={{ top: `${adjustedPosition.top}px`, left: `${adjustedPosition.left}px` }}
+    >
       <div className="bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[160px]">
         <button
           onClick={(e) => {

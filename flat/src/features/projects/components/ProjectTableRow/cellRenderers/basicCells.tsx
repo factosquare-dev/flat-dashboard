@@ -64,13 +64,27 @@ export const renderProgress = (project: Project) => (
   </td>
 );
 
-export const renderClient = ({ project }: CellRenderProps) => (
-  <td className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px]" title={project.client}>
-    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-      {project.client}
-    </div>
-  </td>
-);
+export const renderClient = ({ project }: CellRenderProps) => {
+  const handleClientClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Navigate to schedule page with table view
+    // Using the same navigation as when clicking a project
+    const scheduleUrl = `/schedule/${project.id}?view=table`;
+    window.location.href = scheduleUrl;
+  };
+
+  return (
+    <td 
+      className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px] cursor-pointer hover:bg-blue-50 transition-colors" 
+      title={project.client}
+      onClick={handleClientClick}
+    >
+      <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+        {project.client}
+      </div>
+    </td>
+  );
+};
 
 export const renderDate = (field: 'startDate' | 'endDate', { project, editableCell, onUpdateField }: CellRenderProps) => {
   const isEditable = isMasterFieldEditable(project, field);

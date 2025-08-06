@@ -33,7 +33,25 @@ const ScheduleHeader: React.FC<ScheduleHeaderProps> = ({
         )}
       </div>
       <div className="flex items-center gap-2">
-        {/* Table/Gantt view toggle temporarily disabled - breaking changes coming */}
+        {onToggleTableView && (
+          <>
+            {!isTableView ? (
+              <button
+                onClick={onToggleTableView}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 rounded-md border border-gray-200 transition-all hover:shadow-sm flex items-center gap-2 text-sm"
+                title="테이블 뷰로 전환"
+              >
+                <Table2 className="w-4 h-4" />
+                <span className="font-medium">테이블 뷰</span>
+              </button>
+            ) : (
+              <div className="px-3 py-1.5 bg-gray-100 text-gray-500 rounded-md border border-gray-200 flex items-center gap-2 text-sm cursor-not-allowed opacity-50">
+                <Calendar className="w-4 h-4" />
+                <span className="font-medium">간트차트 뷰 (비활성화)</span>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
