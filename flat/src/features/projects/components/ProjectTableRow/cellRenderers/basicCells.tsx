@@ -14,6 +14,7 @@ interface CellRenderProps {
   index?: number;
   isDragging?: boolean;
   onStartDrag?: (index: number) => void;
+  onToggleTasks?: () => void;
 }
 
 // Master 프로젝트에서 편집 가능한 필드 정의
@@ -64,13 +65,20 @@ export const renderProgress = (project: Project) => (
   </td>
 );
 
-export const renderClient = ({ project }: CellRenderProps) => {
-  // Clicking the customer cell will trigger the row click handler
-  // which expands/collapses the row to show tasks (table view)
+export const renderClient = ({ project, onToggleTasks }: CellRenderProps) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // For SUB projects, toggle the task expansion
+    if (isProjectType(project.type, ProjectType.SUB) && onToggleTasks) {
+      onToggleTasks();
+    }
+  };
+
   return (
     <td 
       className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px] cursor-pointer hover:bg-blue-50 transition-colors" 
       title={project.client}
+      onClick={handleClick}
     >
       <div className="overflow-hidden text-ellipsis whitespace-nowrap">
         {project.client}

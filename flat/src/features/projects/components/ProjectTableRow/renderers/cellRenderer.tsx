@@ -16,10 +16,11 @@ interface CellRenderProps {
   index?: number;
   isDragging?: boolean;
   onStartDrag?: (index: number) => void;
+  onToggleTasks?: () => void;
 }
 
 export const renderTableCell = (columnId: string, props: CellRenderProps) => {
-  const { project, editableCell, onUpdateField, index, isDragging, onStartDrag } = props;
+  const { project, editableCell, onUpdateField, index, isDragging, onStartDrag, onToggleTasks } = props;
 
   const cellRenderProps = { 
     project, 
@@ -27,7 +28,8 @@ export const renderTableCell = (columnId: string, props: CellRenderProps) => {
     onUpdateField,
     index,
     isDragging,
-    onStartDrag 
+    onStartDrag,
+    onToggleTasks 
   };
 
   // Using ProjectField enum values for consistency

@@ -73,7 +73,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
       onUpdateField,
       index,
       isDragging,
-      onStartDrag 
+      onStartDrag,
+      onToggleTasks: handleToggleTasks 
     };
 
     return renderTableCell(columnId, cellRenderProps);
