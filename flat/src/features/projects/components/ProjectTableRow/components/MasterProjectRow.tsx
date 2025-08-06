@@ -19,6 +19,9 @@ interface MasterProjectRowProps {
   onToggleMaster: () => void;
   onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }, event?: React.MouseEvent) => void;
   renderCell: (columnId: string) => React.ReactNode;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDragLeave?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent, project: Project) => void;
 }
 
 export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
@@ -29,8 +32,12 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
   onSelect,
   onToggleMaster,
   onShowOptionsMenu,
-  renderCell
+  renderCell,
+  onDragOver,
+  onDragLeave,
+  onDrop
 }) => {
+  const [isDragOver, setIsDragOver] = React.useState(false);
   const handleOptions = (e: React.MouseEvent) => {
     e.stopPropagation();
     const target = e.currentTarget as HTMLElement;
@@ -42,8 +49,38 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
     onShowOptionsMenu(project.id, position, e);
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(`[DragDrop MasterRow] 📍 OVER: ${project.name} (MASTER)`);
+    setIsDragOver(true);
+    onDragOver?.(e);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.stopPropagation();
+    console.log(`[DragDrop MasterRow] 👋 LEAVE: ${project.name}`);
+    setIsDragOver(false);
+    onDragLeave?.(e);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(`[DragDrop MasterRow] 💧 DROP on: ${project.name} (MASTER)`);
+    setIsDragOver(false);
+    onDrop?.(e, project);
+  };
+
   return (
-    <tr className="group border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-150 cursor-pointer">
+    <tr 
+      className={`group border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-150 cursor-pointer ${
+        isDragOver ? 'bg-blue-50' : ''
+      }`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <td className="px-4 py-2 w-12">
         <SelectionCell
           project={project}
@@ -157,7 +194,7 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
       <td className="px-4 py-2 text-sm w-12">
         <button
           onClick={handleOptions}
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
         >
           <MoreVertical className="w-4 h-4 text-gray-500" />
         </button>

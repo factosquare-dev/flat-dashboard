@@ -31,7 +31,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
     setIsOpen(prev => !prev);
   }, []);
 
-  const handleSelect = useCallback((status: ProjectStatus) => (e: React.MouseEvent) => {
+  const handleSelect = useCallback((status: ProjectStatus, e: React.MouseEvent) => {
     e.stopPropagation();
     onChange(status);
     setIsOpen(false);
@@ -57,7 +57,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange }) => {
           {statuses.map((statusInfo) => (
             <button
               key={statusInfo.code}
-              onClick={handleSelect(statusInfo.code as ProjectStatus)}
+              onClick={(e) => handleSelect(statusInfo.code as ProjectStatus, e)}
               className={`dropdown-item ${getStatusStyles(statusInfo.code, 'project')}`}
             >
               {getStatusIcon(statusInfo.code, 'project')}

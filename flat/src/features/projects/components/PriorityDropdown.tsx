@@ -30,7 +30,7 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
     setIsOpen(prev => !prev);
   }, []);
 
-  const handleSelect = useCallback((priority: Priority) => (e: React.MouseEvent) => {
+  const handleSelect = useCallback((priority: Priority, e: React.MouseEvent) => {
     e.stopPropagation();
     onChange(priority);
     setIsOpen(false);
@@ -56,7 +56,7 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ value, onChange }) 
           {priorities.map((priority) => (
             <button
               key={priority}
-              onClick={handleSelect(priority)}
+              onClick={(e) => handleSelect(priority, e)}
               className={`dropdown-item ${getPriorityStyles(priority)}`}
             >
               {getPriorityIcon(priority)}

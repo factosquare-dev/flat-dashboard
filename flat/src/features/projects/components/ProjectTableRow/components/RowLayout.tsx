@@ -23,6 +23,7 @@ interface RowLayoutProps {
   onDragStart?: (e: React.DragEvent, projectId: ProjectId) => void;
   onDragEnd?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.DragEvent) => void;
+  onDragLeave?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent, project: Project) => void;
   handleToggleTasks?: (e: React.MouseEvent) => void;
 }
@@ -40,6 +41,7 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
   onDragStart,
   onDragEnd,
   onDragOver,
+  onDragLeave,
   onDrop,
   handleToggleTasks
 }) => {
@@ -57,12 +59,21 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log(`[DragDrop RowLayout] 📍 OVER: ${project.name} (${project.type})`);
     onDragOver?.(e);
+  };
+  
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.stopPropagation();
+    console.log(`[DragDrop RowLayout] 👋 LEAVE: ${project.name}`);
+    // Clear visual feedback when drag leaves
+    onDragLeave?.(e);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log(`[DragDrop RowLayout] 💧 DROP on: ${project.name} (${project.type})`);
     onDrop?.(e, project);
   };
 
@@ -78,6 +89,7 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
       onDragStart={(e) => onDragStart?.(e, project.id)}
       onDragEnd={onDragEnd}
       onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       <td className="px-4 py-2 w-12">
@@ -116,7 +128,7 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
       <td className="px-4 py-2 text-sm w-12">
         <button
           onClick={handleOptions}
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
         >
           <MoreVertical className="w-4 h-4 text-gray-500" />
         </button>

@@ -81,15 +81,18 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
 
   const handleDragOverRow = (e: React.DragEvent) => {
     e.preventDefault();
+    console.log(`[DragDrop Row] 📍 OVER: ${project.name} (${project.type})`);
     setIsDragOver(true);
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e: React.DragEvent) => {
+    console.log(`[DragDrop Row] 👋 LEAVE: ${project.name}`);
     setIsDragOver(false);
   };
 
   const handleDropRow = (e: React.DragEvent, targetProject: Project) => {
     e.preventDefault();
+    console.log(`[DragDrop Row] 💧 DROP on: ${targetProject.name} (${targetProject.type})`);
     setIsDragOver(false);
     onDrop?.(e, targetProject);
   };
@@ -107,6 +110,9 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
           onToggleMaster={handleMasterToggle}
           onShowOptionsMenu={onShowOptionsMenu}
           renderCell={renderCell}
+          onDragOver={onDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDropRow}
         />
         {isExpanded && project.children && project.children.map((child) => (
           <ProjectTableRow
@@ -141,6 +147,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         onDragOver={handleDragOverRow}
+        onDragLeave={handleDragLeave}
         onDrop={handleDropRow}
         handleToggleTasks={handleToggleTasks}
       />

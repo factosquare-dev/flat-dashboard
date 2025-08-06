@@ -8,27 +8,22 @@ export const useProjectHierarchy = () => {
   const updateProjectParent = useCallback(async (projectId: string, newParentId: string | null) => {
     try {
       const db = MockDatabaseImpl.getInstance();
-      const database = db.getDatabase();
-      const project = database.projects.get(projectId);
       
-      if (!project) {
+      // Use the update method which handles saving automatically
+      const result = await db.update('projects', projectId, {
+        parentId: newParentId || undefined
+      });
+      
+      if (!result.success) {
+        console.error('[ProjectHierarchy] Failed to update project parent:', result.error);
         return;
       }
-      
-      
-      // Update the project's parentId
-      project.parentId = newParentId || undefined;
-      database.projects.set(projectId, project);
-      
-      // Save to localStorage to persist changes
-      (db as any).saveToStorage(database);
-      
       
       // Force refresh by dispatching a custom event
       window.dispatchEvent(new Event('projectHierarchyChanged'));
       
     } catch (error) {
-      alert('프로젝트 이동 중 오류가 발생했습니다.');
+      console.error('[ProjectHierarchy] Error updating project parent:', error);
     }
   }, []);
 

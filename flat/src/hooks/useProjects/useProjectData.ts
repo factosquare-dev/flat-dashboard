@@ -54,8 +54,8 @@ export const useProjectData = ({ onProjectsUpdate }: UseProjectDataProps = {}) =
     }
   }, [onProjectsUpdate]);
 
-  const updateProject = useCallback(<K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
-    updateProjectField(projectId, field, value, projects, (updatedProjects) => {
+  const updateProject = useCallback(async <K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
+    await updateProjectField(projectId, field, value, projects, (updatedProjects) => {
       setProjects(updatedProjects);
       onProjectsUpdate?.(updatedProjects);
     });

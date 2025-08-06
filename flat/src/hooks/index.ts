@@ -19,7 +19,7 @@ export { useFactoryFilter } from './useFactoryFilter';
 export { useGanttData } from './useGanttData';
 export { useGanttDrag } from './useGanttDrag';
 export { useProjectFilters } from './useProjectFilters';
-export { useProjects } from './useProjects';
+export { useProjects } from './useProjects/index';
 export { useScheduleDrag } from './useScheduleDrag';
 export { useScheduleTasks } from './useScheduleTasks';
 export { useToast } from './useToast';

@@ -38,7 +38,9 @@ export const updateProjectField = async <K extends keyof Project>(
   onUpdate?: (projects: Project[]) => void
 ): Promise<Project[]> => {
   const projectIndex = projects.findIndex(p => p.id === projectId);
-  if (projectIndex === -1) return projects;
+  if (projectIndex === -1) {
+    return projects;
+  }
 
   const project = projects[projectIndex];
   let updatedProject = { ...project };

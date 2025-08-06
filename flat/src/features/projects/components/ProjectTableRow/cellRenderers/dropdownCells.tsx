@@ -73,6 +73,16 @@ export const renderProductType = ({ project, onUpdateField }: CellRenderProps) =
 };
 
 export const renderServiceType = ({ project, onUpdateField }: CellRenderProps) => {
+  // Show service type for:
+  // 1. MASTER projects
+  // 2. Independent SUB projects (without parentId)
+  const isVisible = isProjectType(project.type, ProjectType.MASTER) || 
+                   (isProjectType(project.type, ProjectType.SUB) && !project.parentId);
+  
+  if (!isVisible) {
+    return <td className="px-3 py-1.5"></td>;
+  }
+  
   return (
     <td className="px-3 py-1.5">
       <ServiceTypeDropdown
@@ -83,14 +93,26 @@ export const renderServiceType = ({ project, onUpdateField }: CellRenderProps) =
   );
 };
 
-export const renderStatus = ({ project, onUpdateField }: CellRenderProps) => (
-  <td className="px-3 py-1.5">
-    <StatusDropdown
-      value={project.status}
-      onChange={(value) => onUpdateField(project.id, 'status', value)}
-    />
-  </td>
-);
+export const renderStatus = ({ project, onUpdateField }: CellRenderProps) => {
+  // Show status for:
+  // 1. MASTER projects
+  // 2. Independent SUB projects (without parentId)
+  const isVisible = isProjectType(project.type, ProjectType.MASTER) || 
+                   (isProjectType(project.type, ProjectType.SUB) && !project.parentId);
+  
+  if (!isVisible) {
+    return <td className="px-3 py-1.5"></td>;
+  }
+  
+  return (
+    <td className="px-3 py-1.5">
+      <StatusDropdown
+        value={project.status}
+        onChange={(value) => onUpdateField(project.id, 'status', value)}
+      />
+    </td>
+  );
+};
 
 export const renderPriority = ({ project, onUpdateField }: CellRenderProps) => {
   const isEditable = isMasterFieldEditable(project, 'priority');

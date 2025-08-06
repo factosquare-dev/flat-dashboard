@@ -121,28 +121,30 @@ export const useProjects = () => {
   };
 
   // Enhanced update methods that work with both modes
-  const enhancedUpdateProject = (projectId: ProjectId, field: keyof Project, value: any) => {
+  const enhancedUpdateProject = async (projectId: ProjectId, field: keyof Project, value: any) => {
     // Update MockDatabase first
     const db = MockDatabaseImpl.getInstance();
-    const database = db.getDatabase();
-    const project = database.projects.get(projectId);
     
-    if (project) {
-      // Update the project in MockDatabase
-      const updatedProject = { ...project, [field]: value };
-      database.projects.set(projectId, updatedProject);
+    try {
+      // Use the official update method which handles events and storage
+      const result = await db.update('projects', projectId, { [field]: value });
       
-      // Refresh data from MockDatabase
-      if (useHierarchicalMode) {
-        // Get fresh data from MockDatabase
-        const freshData = getHierarchicalProjectsData();
-        setHierarchicalData(freshData);
-      } else {
-        updateProject(projectId, field, value);
+      if (result.success) {
+        // Refresh the projects from database
+        if (useHierarchicalMode) {
+          // Get fresh data from MockDatabase
+          const freshData = getHierarchicalProjectsData();
+          setHierarchicalData(freshData);
+        } else {
+          // Reload projects from database
+          await refreshProjects();
+        }
+        
+        // Dispatch event to notify other components
+        window.dispatchEvent(new Event('projectHierarchyChanged'));
       }
-      
-      // Dispatch event to notify other components
-      window.dispatchEvent(new Event('projectHierarchyChanged'));
+    } catch (error) {
+      console.error('[enhancedUpdateProject] Error updating project:', error);
     }
   };
 

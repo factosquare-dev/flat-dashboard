@@ -5,7 +5,7 @@
 import { useCallback } from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
-import { useProjects } from '@/hooks/useProjects';
+import { useProjects } from '@/hooks/useProjects/index';
 import { ProjectTableService } from '@/services/projectTable.service';
 
 export const useProjectActions = () => {

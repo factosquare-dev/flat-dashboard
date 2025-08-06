@@ -182,7 +182,7 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
   const isMaster = isProjectType(project.type, ProjectType.MASTER);
   
   return (
-    <td className="px-3 py-1.5 min-w-[120px] group">
+    <td className="px-3 py-1.5 min-w-[120px] group/factory-cell">
       <div className="flex items-center gap-1.5 flex-nowrap overflow-hidden">
         {/* Factory pills */}
         {visibleFactories.map((factory, index) => {
@@ -228,7 +228,7 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
               e.stopPropagation();
               setShowAddFactory(true);
             }}
-            className="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full transition-all duration-200"
+            className="opacity-0 group-hover/factory-cell:opacity-100 w-5 h-5 flex items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full transition-all duration-200"
             title={`${typeLabel} 공장 추가`}
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,8 +266,9 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
             const newIds = [...new Set([...currentIds, item.id])];
             onUpdateField(project.id, idField, newIds);
             
-            // Also update the name field
-            const currentNames = value ? (Array.isArray(value) ? value : [value]) : [];
+            // Also update the name field - get current names from original factory names
+            const currentNames = originalFactoryNames.length > 0 ? originalFactoryNames : 
+                                (value ? (Array.isArray(value) ? value : [value]) : []);
             const newNames = [...currentNames, item.name];
             onUpdateField(project.id, nameField, newNames);
             
