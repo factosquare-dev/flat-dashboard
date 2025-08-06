@@ -17,7 +17,7 @@ export const mockProjects: Project[] = [
     manager: '김철수',
     productType: '스킨케어',
     serviceType: 'ODM',
-    currentStage: '제조',
+    currentStage: ['제조'],
     color: projectColors[0],
   },
   {
@@ -35,7 +35,7 @@ export const mockProjects: Project[] = [
     manager: '이영희',
     productType: '헤어케어',
     serviceType: 'OEM',
-    currentStage: '설계',
+    currentStage: ['설계'],
     color: projectColors[1],
   },
   {
@@ -53,7 +53,7 @@ export const mockProjects: Project[] = [
     manager: '박민수',
     productType: '메이크업',
     serviceType: 'ODM',
-    currentStage: '승인',
+    currentStage: ['승인'],
     color: projectColors[2],
   },
   {
@@ -71,7 +71,7 @@ export const mockProjects: Project[] = [
     manager: '정수진',
     productType: '헤어케어',
     serviceType: 'OEM',
-    currentStage: '설계',
+    currentStage: ['설계'],
     color: projectColors[3],
   },
   {
@@ -89,7 +89,7 @@ export const mockProjects: Project[] = [
     manager: '최지훈',
     productType: '바디케어',
     serviceType: 'OEM',
-    currentStage: '용기',
+    currentStage: ['용기'],
     color: projectColors[4],
   }
 ];

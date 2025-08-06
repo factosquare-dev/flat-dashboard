@@ -55,17 +55,12 @@ const TaskList: React.FC<TaskListProps> = React.memo(({ projectId, tasks, onTask
                 type="checkbox"
                 id={`task-${projectId}-${task.id}`}
                 checked={isCompleted}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  onTaskToggle(String(task.id));
-                }}
-                onClick={(e) => e.stopPropagation()}
+                onChange={() => onTaskToggle(String(task.id))}
                 className="task-list__checkbox"
               />
               <label
                 htmlFor={`task-${projectId}-${task.id}`}
                 className="task-list__checkbox-label"
-                onClick={(e) => e.stopPropagation()}
               >
                 {isCompleted && (
                   <Check className="task-list__checkbox-icon" />

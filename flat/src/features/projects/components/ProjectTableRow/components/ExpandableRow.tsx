@@ -30,8 +30,9 @@ export const ExpandableRow: React.FC<ExpandableRowProps> = ({
     <tr>
       <td colSpan={totalColspan} className="px-4 py-2 bg-gray-50">
         <TaskList
+          projectId={`project-${Date.now()}`}
           tasks={tasks}
-          onToggle={onTaskToggle}
+          onTaskToggle={onTaskToggle}
         />
       </td>
     </tr>

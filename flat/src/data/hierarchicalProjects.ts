@@ -46,6 +46,12 @@ const getHierarchicalProjects = (): Project[] => {
     const masterCustomer = customers.find(c => c.id === master.customerId);
     const customerName = masterCustomer?.name || 'Unknown Customer';
     
+    // Aggregate product types from SUB projects
+    const productTypes = [...new Set(subProjects.map(sub => sub.productType).filter(Boolean))];
+    const aggregatedProductType = productTypes.length === 1 
+      ? productTypes[0] 
+      : (productTypes.length > 1 ? productTypes.join(', ') : master.productType);
+    
     // Aggregate factory information from SUB projects
     const manufacturerIds = [...new Set(subProjects.map(sub => sub.manufacturerId).filter(Boolean))];
     const containerIds = [...new Set(subProjects.map(sub => sub.containerId).filter(Boolean))];
@@ -93,6 +99,7 @@ const getHierarchicalProjects = (): Project[] => {
       manager: users.find(u => u.id === master.managerId)?.name || 'Unknown',
       currentStage: [], // MASTER projects don't show individual task stages
       progress: overallProgress, // Show aggregated progress from all SUB projects
+      productType: aggregatedProductType, // Aggregated product type from SUB projects
       allScheduleIds: allScheduleIds, // For Schedule/TableView aggregation
       manufacturer: manufacturerNames.length > 0 ? manufacturerNames : '',
       container: containerNames.length > 0 ? containerNames : '',

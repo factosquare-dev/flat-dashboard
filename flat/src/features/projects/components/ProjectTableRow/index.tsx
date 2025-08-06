@@ -62,7 +62,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
     const target = e.target as HTMLElement;
     const isInteractive = target.closest('button, input, select, a, .js-inline-edit');
     if (!isInteractive) {
-      onRowClick(project);
+      // Navigate to table view when row is clicked
+      window.location.href = `/projects?view=table&projectId=${project.id}`;
     }
   };
 

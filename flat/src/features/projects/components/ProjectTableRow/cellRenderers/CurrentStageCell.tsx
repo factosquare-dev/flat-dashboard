@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { isToday, isWithinInterval, parseISO } from 'date-fns';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { isWithinInterval, parseISO } from 'date-fns';
 import type { Project } from '@/types/project';
 import { mockDataService } from '@/services/mockDataService';
+import { isToday } from '@/utils/date/operations';
 
 const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -12,7 +12,6 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
     // Getting tasks for project
     try {
       const tasks = mockDataService.getTasksByProjectId(project.id);
-      // CurrentStageCell - Total tasks
       
       if (tasks.length === 0) {
         // No tasks found for project
@@ -29,13 +28,14 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
           
           const startDate = typeof task.startDate === 'string' ? parseISO(task.startDate) : task.startDate;
           const endDate = typeof task.endDate === 'string' ? parseISO(task.endDate) : task.endDate;
+          
+          // Check if today is the start date, end date, or within the range
+          const todayIsStart = isToday(startDate);
+          const todayIsEnd = isToday(endDate);
           const today = new Date();
-          
-          // 오늘이 작업 기간 내에 있는지 확인
           const isInRange = isWithinInterval(today, { start: startDate, end: endDate });
-          // Task date range check
           
-          return isInRange;
+          return todayIsStart || todayIsEnd || isInRange;
         })
         .map(task => task.name || task.title || '')
         .filter(name => name.length > 0);
@@ -50,53 +50,47 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
   
   // 오늘 작업이 있으면 표시, 없으면 기존 currentStage 표시
   const hasToday = todayTasks.length > 0;
-  const stagesToShow = hasToday ? todayTasks : (project.currentStage || []);
+  // Ensure currentStage is always an array
+  const currentStageArray = Array.isArray(project.currentStage) 
+    ? project.currentStage 
+    : (project.currentStage ? [project.currentStage] : []);
+  const stagesToShow = hasToday ? todayTasks : currentStageArray;
   const hasMultipleStages = stagesToShow.length > 1;
   
-  // Collapse 상태에서는 첫 번째 stage만 보여주고 나머지 개수 표시
-  const displayStages = isExpanded || !hasMultipleStages ? stagesToShow : [stagesToShow[0]];
+  // If no stages at all, return empty
+  if (stagesToShow.length === 0) {
+    return null;
+  }
+  
+  // Show all stages when expanded, otherwise just the first one
+  const displayStages = isExpanded ? stagesToShow : stagesToShow.slice(0, 1);
   
   return (
-    <div className="flex items-center gap-1">
-      {hasMultipleStages && (
+    <div className="flex gap-1 flex-wrap items-center">
+      {displayStages.map((stage, index) => (
+        <span
+          key={index}
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+            hasToday 
+              ? 'bg-blue-500 text-white' 
+              : 'bg-purple-500 text-white'
+          }`}
+          title={stage}
+        >
+          {stage.length > 8 && !isExpanded ? `${stage.slice(0, 8)}...` : stage}
+        </span>
+      ))}
+      {hasMultipleStages && !isExpanded && (
         <button
           onClick={(e) => {
             e.stopPropagation();
-            setIsExpanded(!isExpanded);
+            setIsExpanded(true);
           }}
-          className="p-0.5 rounded transition-colors hover:bg-gray-200 flex-shrink-0"
-          title={isExpanded ? "접기" : "펼치기"}
+          className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer px-1.5 py-0.5 rounded hover:bg-gray-100 transition-colors"
         >
-          {isExpanded ? (
-            <ChevronDown className="w-3 h-3 text-gray-600" />
-          ) : (
-            <ChevronRight className="w-3 h-3 text-gray-600" />
-          )}
+          +{stagesToShow.length - 1}
         </button>
       )}
-      <div className={`flex gap-1 ${isExpanded ? 'flex-wrap' : 'items-center'}`}>
-        {displayStages.map((stage, index) => {
-          const displayText = stage.length > 5 && !isExpanded ? `${stage.slice(0, 5)}...` : stage;
-          return (
-            <span
-              key={index}
-              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${
-                hasToday 
-                  ? 'bg-purple-100 text-purple-700 border-purple-200' 
-                  : 'bg-purple-100 text-purple-700 border-purple-200'
-              }`}
-              title={stage.length > 5 && !isExpanded ? stage : undefined}
-            >
-              {displayText}
-            </span>
-          );
-        })}
-        {!isExpanded && hasMultipleStages && (
-          <span className="text-xs text-gray-500 ml-1">
-            +{stagesToShow.length - 1}
-          </span>
-        )}
-      </div>
     </div>
   );
 };

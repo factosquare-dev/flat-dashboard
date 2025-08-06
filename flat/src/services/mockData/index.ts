@@ -80,6 +80,7 @@ class MockDataService {
   getAllTasks = () => this.taskService.getAllTasks();
   getTasksBySchedule = (scheduleId: string) => this.taskService.getTasksBySchedule(scheduleId);
   getTasksByProject = (projectId: string) => this.taskService.getTasksByProject(projectId);
+  getTasksByProjectId = (projectId: string) => this.taskService.getTasksByProject(projectId); // Alias for compatibility
   getTaskById = (id: string) => this.taskService.getTaskById(id);
   createTask = (task: any) => this.taskService.createTask(task);
   updateTask = (id: string, updates: any) => this.taskService.updateTask(id, updates);
