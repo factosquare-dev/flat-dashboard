@@ -68,7 +68,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
       '.modal-input, .SearchBox, ' +
       '[contenteditable="true"], ' +
       '[role="combobox"], [role="listbox"], ' +
-      '.factory-cell, .date-picker'
+      '.factory-cell, .date-picker, ' +
+      '.memo-cell, [data-memo-cell="true"]'
     );
     
     // Also check if it's a td element with onclick handler
@@ -76,8 +77,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
     
     if (!isInteractive && !isEditableCell) {
       // Only navigate if clicking on non-interactive areas
-      // Navigate to table view when row is clicked
-      window.location.href = `/projects?view=table&projectId=${project.id}`;
+      // Navigate to task view when row is clicked
+      window.location.href = `/projects?view=task&projectId=${project.id}`;
     }
   };
 

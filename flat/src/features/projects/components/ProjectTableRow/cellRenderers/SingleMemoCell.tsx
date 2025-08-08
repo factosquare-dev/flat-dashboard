@@ -57,7 +57,7 @@ export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId 
 
   if (isEditing) {
     return (
-      <td className="px-2 py-1.5 text-xs">
+      <td className="px-2 py-1.5 text-xs memo-cell" data-memo-cell="true">
         <div className="flex items-center gap-1">
           <input
             ref={inputRef}
@@ -95,7 +95,7 @@ export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId 
   }
 
   return (
-    <td className="px-2 py-1.5 text-xs">
+    <td className="px-2 py-1.5 text-xs memo-cell" data-memo-cell="true">
       <div 
         className="group flex items-center justify-between hover:bg-gray-50 cursor-pointer rounded px-1"
         onClick={(e) => {
