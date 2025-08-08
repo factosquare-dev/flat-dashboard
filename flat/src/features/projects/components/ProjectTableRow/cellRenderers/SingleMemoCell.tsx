@@ -12,7 +12,9 @@ export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId 
   const { getMemoValue, setMemoValue } = useMemoColumns();
   
   const [memo, setMemo] = useState<string>(() => {
-    return getMemoValue(project.id, memoId);
+    const value = getMemoValue(project.id, memoId);
+    console.log('[SingleMemoCell] Initial memo value:', { projectId: project.id, memoId, value });
+    return value;
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(memo);
@@ -98,6 +100,7 @@ export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId 
         className="group flex items-center justify-between hover:bg-gray-50 cursor-pointer rounded px-1"
         onClick={(e) => {
           e.stopPropagation();
+          console.log('[SingleMemoCell] Cell clicked, starting edit mode');
           setIsEditing(true);
         }}
       >
@@ -107,6 +110,7 @@ export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId 
         <button
           onClick={(e) => {
             e.stopPropagation();
+            console.log('[SingleMemoCell] Edit button clicked');
             setIsEditing(true);
           }}
           className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-blue-600 transition-opacity"

@@ -7,7 +7,7 @@ import type { Column } from '../../../hooks/useColumnOrder';
 import { useColumnResize } from '@/hooks/useColumnResize';
 import { useMemoColumns } from '@/hooks/useMemoColumns';
 import { Plus, X, Edit2, Check } from 'lucide-react';
-import { ProjectType } from '@/types/enums';
+import { ProjectType, TableColumnId } from '@/types/enums';
 import { isProjectType } from '@/utils/projectTypeUtils';
 import { useProjectHierarchy } from '@/hooks/useProjectHierarchy';
 import '../../../styles/tableResize.css';
@@ -362,17 +362,22 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 />
               </div>
             </th>
-            {visibleColumns.map((column) => {
-              // Check if we should add the "Add Memo" button after this column
+            {visibleColumns.map((column, idx) => {
+              // Check if we should add the "Add Memo" button after LAB_NUMBER column
+              const isLabNumberColumn = column.id === TableColumnId.LAB_NUMBER;
+              // Check if there are any memo columns
+              const hasMemoColumns = visibleColumns.some(col => col.id.startsWith('memo-'));
+              // Check if this is the last memo column
               const isLastMemoColumn = column.id.startsWith('memo-') && 
-                !visibleColumns.some((col, idx) => 
-                  idx > visibleColumns.indexOf(column) && col.id.startsWith('memo-')
+                !visibleColumns.some((col, colIdx) => 
+                  colIdx > idx && col.id.startsWith('memo-')
                 );
               
               return (
                 <React.Fragment key={column.id}>
                   {renderHeaderCell(column)}
-                  {isLastMemoColumn && (
+                  {/* Add button after LAB_NUMBER if no memo columns, or after last memo column */}
+                  {((isLabNumberColumn && !hasMemoColumns) || isLastMemoColumn) && (
                     <th className="table-header-cell text-center w-12 bg-white" scope="col">
                       <button
                         onClick={handleAddMemoColumn}
@@ -455,7 +460,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               handleProjectDrop(e);
             }}
           >
-            <td colSpan={visibleColumns.length + 2 + (visibleColumns.some(col => col.id.startsWith('memo-')) ? 1 : 0)} className="text-center text-gray-400 text-xs">
+            <td colSpan={visibleColumns.length + 2 + (visibleColumns.some(col => col.id === TableColumnId.LAB_NUMBER || col.id.startsWith('memo-')) ? 1 : 0)} className="text-center text-gray-400 text-xs">
               {draggedProjectId && (
                 <div className="py-4 border-2 border-dashed border-gray-300 rounded">
                   Drop here to make independent

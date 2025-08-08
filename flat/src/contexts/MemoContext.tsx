@@ -36,9 +36,10 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
   const [memoColumns, setMemoColumns] = useState<MemoColumn[]>(() => {
     // Load memo fields from MockDB
     const memoFields = customFieldManager.getMemoFields();
+    console.log('[MemoContext] Loading memo fields from DB:', memoFields.length);
     
     if (memoFields.length > 0) {
-      return memoFields.map(field => ({
+      const columns = memoFields.map(field => ({
         id: field.id,
         label: field.name,
         sortable: false,
@@ -46,9 +47,12 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
         isMemo: true as const,
         fieldId: field.id
       }));
+      console.log('[MemoContext] Initialized with existing columns:', columns);
+      return columns;
     }
     
     // Create default memo fields if none exist
+    console.log('[MemoContext] No existing memo fields, creating defaults');
     const defaultMemos: MemoColumn[] = [];
     for (let i = 1; i <= 3; i++) {
       const field = customFieldManager.createMemoField(`메모 ${i}`);
@@ -62,6 +66,7 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
       });
     }
     
+    console.log('[MemoContext] Created default memo columns:', defaultMemos);
     return defaultMemos;
   });
 
