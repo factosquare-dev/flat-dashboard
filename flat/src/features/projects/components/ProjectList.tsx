@@ -9,6 +9,7 @@ import ProjectListLayout from './shared/ProjectListLayout';
 import ProjectTableSection from './ProjectTableSection';
 import ProjectModals from './ProjectModals';
 import { factories } from '@/data/factories';
+import { ViewMode } from '@/types/enums';
 
 interface ProjectListProps {
   onSelectProject: (project: Project) => void;
@@ -18,7 +19,7 @@ interface ProjectListProps {
 const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, className = '' }) => {
   const [searchParams] = useSearchParams();
   const viewMode = searchParams.get('view');
-  const isTableView = viewMode === 'table';
+  const isTaskView = viewMode === ViewMode.TASK;
   
   const { containerStyle } = useDynamicLayout();
   const { hiddenColumns, toggleColumn, isColumnVisible, showAllColumns, hideAllColumns } = useColumnVisibility();
@@ -57,7 +58,7 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     onSendEmail: handleSendEmail,
     onSearch: handleSearch,
     onCreateProject: handleCreateProject,
-    isTableView,
+    isTaskView,
     selectedPriority: filtersHook.selectedPriority,
     selectedServiceType: filtersHook.selectedServiceType,
     statusFilters: filtersHook.statusFilters,
@@ -79,7 +80,7 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     handleSendEmail,
     handleSearch,
     handleCreateProject,
-    isTableView,
+    isTaskView,
     filtersHook.selectedPriority,
     filtersHook.selectedServiceType,
     filtersHook.statusFilters,

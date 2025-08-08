@@ -7,13 +7,13 @@ import type { Project } from '@/types/project';
 import type { Factory } from '@/data/factories';
 import type { FactoryAssignment } from '@/types/schedule';
 import { mockDataService } from '@/services/mockDataService';
-import { FactoryType, TaskStatus } from '@/types/enums';
+import { FactoryType, TaskStatus, ViewMode } from '@/types/enums';
 
 const Projects: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const [viewMode, setViewMode] = useState<'list' | 'table'>('list');
+  const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.LIST);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [showFactoryModal, setShowFactoryModal] = useState(false);
   
@@ -21,19 +21,19 @@ const Projects: React.FC = () => {
     const view = searchParams.get('view');
     const projectId = searchParams.get('projectId');
     
-    if (view === 'table') {
-      setViewMode('table');
+    if (view === ViewMode.TASK) {
+      setViewMode(ViewMode.TASK);
       if (projectId) {
         setSelectedProjectId(projectId);
       }
     } else {
-      setViewMode('list');
+      setViewMode(ViewMode.LIST);
     }
   }, [searchParams]);
   
   const handleSelectProject = useCallback((project: Project) => {
-    // Navigate to table view with project ID
-    navigate(`/projects?view=table&projectId=${project.id}`);
+    // Navigate to task view with project ID
+    navigate(`/projects?view=${ViewMode.TASK}&projectId=${project.id}`);
   }, [navigate]);
 
   const handleBackToList = () => {
@@ -88,8 +88,8 @@ const Projects: React.FC = () => {
     window.location.reload();
   }, [selectedProjectId]);
 
-  // Show TableView or ProjectList based on view mode
-  if (viewMode === 'table') {
+  // Show TaskView or ProjectList based on view mode
+  if (viewMode === ViewMode.TASK) {
     return (
       <div className="h-full">
         <div className="p-4 border-b border-gray-200 bg-white">

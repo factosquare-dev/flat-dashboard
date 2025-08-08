@@ -13,7 +13,7 @@ interface ProjectListLayoutProps {
   onSearch: (query: string) => void;
   onCreateProject: () => void;
   children: React.ReactNode;
-  isTableView?: boolean;
+  isTaskView?: boolean;
   selectedPriority?: Priority | 'all';
   selectedServiceType?: ServiceType | 'all';
   statusFilters?: ProjectStatus[];
@@ -38,7 +38,7 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
   onSearch,
   onCreateProject,
   children,
-  isTableView = false,
+  isTaskView = false,
   selectedPriority,
   selectedServiceType,
   statusFilters,
@@ -78,8 +78,8 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
     />
   );
 
-  const floatingActions = isTableView ? (
-    // Table View: 새 공장과 제품개발의뢰서 편집
+  const floatingActions = isTaskView ? (
+    // Task View: 새 공장과 제품개발의뢰서 편집
     <>
       <FloatingActionButton
         onClick={onCreateProject}
