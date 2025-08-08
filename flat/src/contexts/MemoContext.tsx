@@ -75,6 +75,8 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
   }, [memoColumns, db]);
 
   const addMemoColumn = () => {
+    console.log('[MemoContext] addMemoColumn called, current columns:', memoColumns.length);
+    
     if (memoColumns.length >= MAX_MEMO_COLUMNS) {
       alert(`최대 ${MAX_MEMO_COLUMNS}개의 메모 컬럼만 추가할 수 있습니다.`);
       return;
@@ -82,6 +84,7 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
 
     // Create new field in database
     const field = customFieldManager.createMemoField(`메모 ${memoColumns.length + 1}`);
+    console.log('[MemoContext] Created new field:', field.id, field.name);
     
     const newColumn: MemoColumn = {
       id: field.id,
@@ -92,10 +95,15 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
       fieldId: field.id
     };
 
-    setMemoColumns(prev => [...prev, newColumn]);
+    setMemoColumns(prev => {
+      console.log('[MemoContext] Adding column to state, new total:', prev.length + 1);
+      return [...prev, newColumn];
+    });
   };
 
   const removeMemoColumn = (columnId: string) => {
+    console.log('[MemoContext] removeMemoColumn called for:', columnId);
+    
     if (memoColumns.length <= 1) {
       alert('최소 1개의 메모 컬럼은 유지해야 합니다.');
       return;
@@ -103,31 +111,43 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
 
     // Find the field to delete
     const column = memoColumns.find(col => col.id === columnId);
-    if (!column?.fieldId) return;
+    if (!column?.fieldId) {
+      console.error('[MemoContext] Column not found or no fieldId:', columnId);
+      return;
+    }
 
     // Delete from database
     const deleted = customFieldManager.deleteFieldDefinition(column.fieldId);
     if (!deleted) {
+      console.error('[MemoContext] Failed to delete field from DB:', column.fieldId);
       alert('메모 컬럼을 삭제할 수 없습니다.');
       return;
     }
 
+    console.log('[MemoContext] Field deleted from DB, removing from state');
     // Remove from state
     setMemoColumns(prev => prev.filter(col => col.id !== columnId));
   };
 
   const updateMemoColumnName = (columnId: string, newName: string) => {
+    console.log('[MemoContext] updateMemoColumnName called:', columnId, newName);
+    
     // Find the field to update
     const column = memoColumns.find(col => col.id === columnId);
-    if (!column?.fieldId) return;
+    if (!column?.fieldId) {
+      console.error('[MemoContext] Column not found for rename:', columnId);
+      return;
+    }
 
     // Update in database
     const updated = customFieldManager.updateFieldDefinition(column.fieldId, { name: newName });
     if (!updated) {
+      console.error('[MemoContext] Failed to update field name in DB');
       alert('메모 이름을 변경할 수 없습니다.');
       return;
     }
 
+    console.log('[MemoContext] Field name updated in DB, updating state');
     // Update state
     setMemoColumns(prev => prev.map(col =>
       col.id === columnId ? { ...col, label: newName } : col
@@ -161,7 +181,10 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
   // Function to get memo value for a project
   const getMemoValue = (projectId: string, memoId: string): string => {
     const column = memoColumns.find(col => col.id === memoId);
-    if (!column?.fieldId) return '';
+    if (!column?.fieldId) {
+      console.log('[MemoContext] getMemoValue: Column not found for memoId:', memoId);
+      return '';
+    }
 
     const value = customFieldManager.getFieldValue(projectId, column.fieldId);
     return value?.value || '';
@@ -169,8 +192,13 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
 
   // Function to set memo value for a project
   const setMemoValue = (projectId: string, memoId: string, value: string) => {
+    console.log('[MemoContext] setMemoValue:', { projectId, memoId, value });
+    
     const column = memoColumns.find(col => col.id === memoId);
-    if (!column?.fieldId) return;
+    if (!column?.fieldId) {
+      console.error('[MemoContext] Column not found for memoId:', memoId);
+      return;
+    }
 
     customFieldManager.setFieldValue(
       projectId,
@@ -179,6 +207,7 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
       value
     );
 
+    console.log('[MemoContext] Memo value saved to DB');
     // Save to storage
     const storageManager = (db as any).storageManager;
     if (storageManager) {

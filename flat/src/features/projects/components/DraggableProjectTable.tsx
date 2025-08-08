@@ -184,11 +184,13 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   };
 
   const handleStartEditMemo = (columnId: string, columnLabel: string) => {
+    console.log('[DraggableProjectTable] Starting memo edit:', columnId, columnLabel);
     setEditingMemoId(columnId);
     setEditingMemoName(columnLabel);
   };
 
   const handleSaveMemoName = (columnId: string) => {
+    console.log('[DraggableProjectTable] Saving memo name:', columnId, editingMemoName);
     if (editingMemoName.trim()) {
       updateMemoColumnName(columnId, editingMemoName.trim());
     }
@@ -197,15 +199,18 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   };
 
   const handleCancelEditMemo = () => {
+    console.log('[DraggableProjectTable] Canceling memo edit');
     setEditingMemoId(null);
     setEditingMemoName('');
   };
   
   const handleAddMemoColumn = () => {
+    console.log('[DraggableProjectTable] Add memo column button clicked');
     addMemoColumn();
   };
   
   const handleRemoveMemoColumn = (columnId: string) => {
+    console.log('[DraggableProjectTable] Remove memo column button clicked:', columnId);
     removeMemoColumn(columnId);
   };
 

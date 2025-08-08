@@ -33,12 +33,14 @@ export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId 
   }, [project.id, memoId, getMemoValue]);
 
   const handleSave = () => {
+    console.log('[SingleMemoCell] Saving memo:', { projectId: project.id, memoId, value: editValue });
     setMemo(editValue);
     setMemoValue(project.id, memoId, editValue);
     setIsEditing(false);
   };
 
   const handleCancel = () => {
+    console.log('[SingleMemoCell] Canceling memo edit');
     setEditValue(memo);
     setIsEditing(false);
   };
