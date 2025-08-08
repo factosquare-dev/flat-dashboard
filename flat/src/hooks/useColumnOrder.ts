@@ -63,12 +63,13 @@ export const useColumnOrder = () => {
         
         // Runtime type validation using type guard
         if (isValidColumnArray(parsed)) {
-          // Filter out old memo columns (they're managed separately now)
-          const nonMemoColumns = parsed.filter(col => !col.isMemo && col.id !== TableColumnId.MEMO);
+          // Filter out old memo columns (they're managed separately now) and any undefined/null values
+          const nonMemoColumns = parsed.filter(col => col && !col.isMemo && col.id !== TableColumnId.MEMO);
           // 새로운 컬럼이 추가된 경우를 대비하여 머지
           const savedIds = nonMemoColumns.map(col => col.id);
           const newColumns = DEFAULT_COLUMNS.filter(col => !savedIds.includes(col.id));
-          return [...nonMemoColumns, ...newColumns];
+          // Filter out any undefined values before returning
+          return [...nonMemoColumns, ...newColumns].filter(col => col != null);
         } else {
           return DEFAULT_COLUMNS;
         }
@@ -99,7 +100,7 @@ export const useColumnOrder = () => {
 
   useEffect(() => {
     // Only save non-memo columns to avoid duplication
-    const nonMemoColumns = baseColumns.filter(col => !col.isMemo);
+    const nonMemoColumns = baseColumns.filter(col => col && !col.isMemo);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nonMemoColumns));
   }, [baseColumns]);
 
@@ -120,16 +121,20 @@ export const useColumnOrder = () => {
     
     if (!draggedColumn || draggedColumn === targetColumnId) return;
 
-    const draggedIndex = columns.findIndex(col => col.id === draggedColumn);
-    const targetIndex = columns.findIndex(col => col.id === targetColumnId);
+    // Don't allow dragging memo columns (they have fixed positions)
+    if (draggedColumn.startsWith('memo-') || targetColumnId.startsWith('memo-')) return;
+
+    const draggedIndex = baseColumns.findIndex(col => col && col.id === draggedColumn);
+    const targetIndex = baseColumns.findIndex(col => col && col.id === targetColumnId);
 
     if (draggedIndex === -1 || targetIndex === -1) return;
 
     const newColumns = [...baseColumns];
     const [removed] = newColumns.splice(draggedIndex, 1);
-    newColumns.splice(targetIndex, 0, removed);
-
-    setBaseColumns(newColumns);
+    if (removed) {  // Only insert if we actually removed something
+      newColumns.splice(targetIndex, 0, removed);
+      setBaseColumns(newColumns);
+    }
   };
 
   const resetColumnOrder = () => {
