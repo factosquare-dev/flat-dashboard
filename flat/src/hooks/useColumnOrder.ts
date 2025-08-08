@@ -82,14 +82,17 @@ export const useColumnOrder = () => {
   // Combine base columns with memo columns
   // Insert memo columns after LAB_NUMBER
   const columns = React.useMemo(() => {
+    // Filter out any undefined memo columns
+    const validMemoColumns = (memoColumns || []).filter(col => col != null);
+    
     const labNumberIndex = baseColumns.findIndex(col => col.id === TableColumnId.LAB_NUMBER);
     if (labNumberIndex === -1) {
-      return [...baseColumns, ...memoColumns];
+      return [...baseColumns, ...validMemoColumns];
     }
     
     const before = baseColumns.slice(0, labNumberIndex + 1);
     const after = baseColumns.slice(labNumberIndex + 1);
-    return [...before, ...memoColumns, ...after];
+    return [...before, ...validMemoColumns, ...after];
   }, [baseColumns, memoColumns]);
 
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);

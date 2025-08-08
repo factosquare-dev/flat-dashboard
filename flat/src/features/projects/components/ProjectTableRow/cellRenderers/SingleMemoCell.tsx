@@ -30,7 +30,7 @@ export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId 
     const value = getMemoValue(project.id, memoId);
     setMemo(value);
     setEditValue(value);
-  }, [project.id, memoId]);
+  }, [project.id, memoId, getMemoValue]);
 
   const handleSave = () => {
     setMemo(editValue);

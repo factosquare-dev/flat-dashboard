@@ -336,7 +336,6 @@ export const getHierarchicalProjectsData = (filteredProjects?: Project[]): Proje
   }
   
   // Otherwise get all projects from DB (when filteredProjects is undefined)
-  console.log('[getHierarchicalProjectsData] No filter provided, getting all from DB');
   _hierarchicalProjects = getHierarchicalProjects();
   return _hierarchicalProjects;
 };

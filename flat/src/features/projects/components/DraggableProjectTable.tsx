@@ -77,8 +77,8 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   const { moveToMaster, makeIndependent, canBeMoved, canAcceptChildren } = useProjectHierarchy();
   const tableRef = useRef<HTMLTableElement>(null);
 
-  // Filter out hidden columns
-  const visibleColumns = columns.filter(col => !hiddenColumns.has(col.id));
+  // Filter out hidden columns and any undefined values
+  const visibleColumns = columns.filter(col => col && !hiddenColumns.has(col.id));
 
   const handleProjectDragStart = (e: React.DragEvent, projectId: string) => {
     const project = projects.find(p => p.id === projectId);
@@ -229,11 +229,13 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   };
 
   const handleStartEditMemo = (columnId: string, columnLabel: string) => {
+    console.log('Starting edit memo:', columnId, columnLabel);
     setEditingMemoId(columnId);
     setEditingMemoName(columnLabel);
   };
 
   const handleSaveMemoName = (columnId: string) => {
+    console.log('Saving memo name:', columnId, editingMemoName);
     if (editingMemoName.trim()) {
       updateMemoColumnName(columnId, editingMemoName.trim());
     }
@@ -242,8 +244,19 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   };
 
   const handleCancelEditMemo = () => {
+    console.log('Canceling edit memo');
     setEditingMemoId(null);
     setEditingMemoName('');
+  };
+  
+  const handleAddMemoColumn = () => {
+    console.log('Adding memo column');
+    addMemoColumn();
+  };
+  
+  const handleRemoveMemoColumn = (columnId: string) => {
+    console.log('Removing memo column:', columnId);
+    removeMemoColumn(columnId);
   };
 
   const renderHeaderCell = (column: Column) => {
@@ -329,7 +342,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      removeMemoColumn(column.id);
+                      handleRemoveMemoColumn(column.id);
                     }}
                     className="p-0.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
                     title="메모 삭제"
@@ -407,7 +420,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                   {isLastMemoColumn && (
                     <th className="table-header-cell text-center w-12 bg-white" scope="col">
                       <button
-                        onClick={addMemoColumn}
+                        onClick={handleAddMemoColumn}
                         className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded"
                         title="메모 추가"
                       >
