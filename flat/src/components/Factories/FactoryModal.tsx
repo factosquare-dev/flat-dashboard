@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { CertificationType } from '../../data/factories';
 import { useFactoryForm, type FactoryFormData } from './hooks/useFactoryForm';
 import ManagerSection from './components/ManagerSection';
 import CertificationSection from './components/CertificationSection';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
 import { useModalFormValidation } from '@/hooks/useModalFormValidation';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { FactoryType, FactoryTypeLabel, ModalSize, ButtonVariant } from '@/types/enums';
 import { MODAL_SIZES } from '@/utils/modalUtils';
 import { Button } from '../ui/Button';
@@ -32,6 +32,10 @@ const FactoryModal: React.FC<FactoryModalProps> = ({ isOpen, onClose, onSave, ed
     handleAddManager,
     handleRemoveManager
   } = useFactoryForm(editData, isOpen);
+
+  // Image upload state
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const availableCertifications: CertificationType[] = [
     'ISO 22716', 'CGMP', 'ISO 9001', 'ISO 14001', 'ISO 45001',
@@ -81,7 +85,59 @@ const FactoryModal: React.FC<FactoryModalProps> = ({ isOpen, onClose, onSave, ed
   });
 
   const handleSubmit = (e: React.FormEvent) => {
+    const dataWithImages = {
+      ...formData,
+      images: uploadedImages
+    };
     handleFormSubmit(e);
+  };
+
+  // Image upload handlers
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      Array.from(files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setUploadedImages(prev => [...prev, reader.result as string]);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const files = e.dataTransfer.files;
+    if (files) {
+      Array.from(files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setUploadedImages(prev => [...prev, reader.result as string]);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -286,6 +342,75 @@ const FactoryModal: React.FC<FactoryModalProps> = ({ isOpen, onClose, onSave, ed
                   className="modal-input"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* 댓글 및 이미지 섹션 - 전체 너비 */}
+          <div className="modal-section-spacing mt-6 border-t pt-6">
+            <div className="modal-field-spacing">
+              <label className="modal-field-label">댓글 / 메모</label>
+              <textarea
+                name="comments"
+                className="modal-input h-24 resize-none"
+                value={formData.comments || ''}
+                onChange={handleInputChange}
+                placeholder="공장에 대한 추가 정보나 특이사항을 입력하세요..."
+              />
+            </div>
+
+            {/* 이미지 업로드 섹션 */}
+            <div className="modal-field-spacing">
+              <label className="modal-field-label">첨부 이미지</label>
+              
+              {/* 드래그 앤 드롭 영역 */}
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                  isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <input
+                  type="file"
+                  id="image-upload"
+                  className="hidden"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
+                <label htmlFor="image-upload" className="cursor-pointer">
+                  <Upload className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-600">
+                    클릭하거나 이미지를 드래그하여 업로드
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    JPG, PNG, GIF (최대 10MB)
+                  </p>
+                </label>
+              </div>
+
+              {/* 업로드된 이미지 미리보기 */}
+              {uploadedImages.length > 0 && (
+                <div className="grid grid-cols-4 gap-4 mt-4">
+                  {uploadedImages.map((image, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={image}
+                        alt={`Upload ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </form>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import EditableCell from '@/features/projects/components/EditableCell';
@@ -65,18 +66,18 @@ export const renderProgress = (project: Project) => (
   </td>
 );
 
-export const renderClient = ({ project, onToggleTasks }: CellRenderProps) => {
+export const renderClient = ({ project }: CellRenderProps) => {
+  const navigate = useNavigate();
+  
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // For SUB projects, toggle the task expansion
-    if (isProjectType(project.type, ProjectType.SUB) && onToggleTasks) {
-      onToggleTasks();
-    }
+    // Navigate to TableView with project ID
+    navigate(`/projects?view=table&projectId=${project.id}`);
   };
 
   return (
     <td 
-      className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px] cursor-pointer hover:bg-blue-50 transition-colors" 
+      className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px] cursor-pointer" 
       title={project.client}
       onClick={handleClick}
     >

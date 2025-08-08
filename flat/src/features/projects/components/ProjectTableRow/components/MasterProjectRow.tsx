@@ -7,6 +7,7 @@ import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import { MoreVertical } from 'lucide-react';
 import type { Column } from '@/hooks/useColumnOrder';
+import { ProjectField, ProjectFactoryField } from '@/types/enums';
 import * as cellRenderers from '../cellRenderers';
 import SelectionCell from '../SelectionCell';
 
@@ -81,7 +82,7 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <td className="px-4 py-2 w-12">
+      <td className="pl-6 pr-2 py-2 w-14">
         <SelectionCell
           project={project}
           isExpanded={isExpanded}
@@ -89,25 +90,36 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
           onSelect={onSelect}
           handleToggleTasks={() => {}}
           handleMasterToggle={onToggleMaster}
+          level={(project as any).level || 0}
         />
       </td>
       
-      {columns.map((column) => {
+      {columns.map((column, index) => {
         if (column.visible === false) return null;
+        
+        // Check if we should add an empty cell for the "Add Memo" button column
+        const isLastMemoColumn = column.id.startsWith('memo-') && 
+          !columns.some((col, idx) => 
+            idx > index && col.id.startsWith('memo-')
+          );
+        
+        let cellContent: React.ReactNode = null;
         
         // Special handling for master project cells
         switch (column.id) {
           case ProjectField.NAME: {
             // For master project name, just display the name (chevron is in SelectionCell now)
-            return (
+            cellContent = (
               <td key={column.id} className="px-3 py-1.5 text-xs font-semibold text-gray-900" style={{ width: column.width }}>
                 <div className="overflow-hidden text-ellipsis whitespace-nowrap">
                   {project.name}
                 </div>
               </td>
             );
+            break;
           }
             
+          case ProjectField.LAB_NUMBER:
           case 'productType': // Custom field - not in ProjectField enum
           case ProjectField.SERVICE_TYPE:
           case 'currentStage': // Custom field - not in ProjectField enum
@@ -120,20 +132,23 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
           case ProjectField.PURCHASE:
           case ProjectField.DEPOSIT_PAID: {
             // Use the same cells as Sub projects - they already have proper styling
-            const cellContent = renderCell(column.id);
-            if (React.isValidElement(cellContent)) {
-              return React.cloneElement(cellContent, { key: column.id });
+            const content = renderCell(column.id);
+            if (React.isValidElement(content)) {
+              cellContent = React.cloneElement(content, { key: column.id });
+            } else {
+              cellContent = content;
             }
-            return cellContent;
+            break;
           }
           
           case ProjectField.PRIORITY: {
             // Master 프로젝트는 우선순위를 표시하지 않음
-            return (
+            cellContent = (
               <td key={column.id} className="px-3 py-1.5 text-xs text-gray-400">
                 
               </td>
             );
+            break;
           }
             
           case ProjectField.MANUFACTURER:
@@ -170,25 +185,37 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
               />
             );
             
-            return React.cloneElement(factoryCell as React.ReactElement, {
+            cellContent = React.cloneElement(factoryCell as React.ReactElement, {
               key: column.id
             });
+            break;
           }
             
           default: {
             const defaultContent = renderCell(column.id);
             // Most cells return td elements, just add key
             if (React.isValidElement(defaultContent)) {
-              return React.cloneElement(defaultContent, { key: column.id });
+              cellContent = React.cloneElement(defaultContent, { key: column.id });
+            } else {
+              // Fallback for non-element content
+              cellContent = (
+                <td key={column.id} className="px-4 py-3 text-sm text-gray-600" style={{ width: column.width }}>
+                  {defaultContent}
+                </td>
+              );
             }
-            // Fallback for non-element content
-            return (
-              <td key={column.id} className="px-4 py-3 text-sm text-gray-600" style={{ width: column.width }}>
-                {defaultContent}
-              </td>
-            );
+            break;
           }
         }
+        
+        return (
+          <React.Fragment key={column.id}>
+            {cellContent}
+            {isLastMemoColumn && (
+              <td className="px-2 py-1.5 text-xs w-12"></td>
+            )}
+          </React.Fragment>
+        );
       })}
       
       <td className="px-4 py-2 text-sm w-12">
@@ -202,6 +229,3 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
     </tr>
   );
 };
-
-// Import enums for field mapping
-import { ProjectFactoryField, ProjectField } from '@/types/enums';

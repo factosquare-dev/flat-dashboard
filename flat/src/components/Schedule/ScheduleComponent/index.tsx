@@ -128,6 +128,7 @@ const Schedule: React.FC<ScheduleProps> = ({
         onOpenEmail={handleOpenEmail}
         onBack={onBack}
         onAddTask={handleAddTask}
+        onAddFactory={handleAddFactory}
         projectName={projectName}
         onToggleTableView={handleToggleTableView}
         isTableView={viewMode === ViewMode.TABLE}

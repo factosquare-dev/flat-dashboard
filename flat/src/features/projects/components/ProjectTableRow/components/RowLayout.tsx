@@ -45,6 +45,10 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
   onDrop,
   handleToggleTasks
 }) => {
+  // Check if this SUB project is a child of a MASTER
+  const isChildOfMaster = (project as any).isChildOfMaster === true;
+  // Use hierarchical level from HierarchicalProjectTable
+  const level = (project as any).level || 0;
   const handleOptions = (e: React.MouseEvent) => {
     e.stopPropagation();
     const target = e.currentTarget as HTMLElement;
@@ -92,7 +96,7 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <td className="px-4 py-2 w-12">
+      <td className="pl-6 pr-2 py-2 w-14">
         <SelectionCell
           project={project}
           isExpanded={isExpanded}
@@ -100,28 +104,42 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
           onSelect={onSelect}
           handleToggleTasks={handleToggleTasks || (() => {})}
           handleMasterToggle={() => {}}
+          isChildOfMaster={isChildOfMaster}
+          level={level}
         />
       </td>
       
-      {columns.map((column) => {
+      {columns.map((column, index) => {
         const content = renderCell(column.id);
         if (column.visible === false || content === null) return null;
         
-        // All our cell components return td elements now, so just add key
-        if (React.isValidElement(content)) {
-          // Clone element to add key prop
-          return React.cloneElement(content, { key: column.id });
-        }
+        // Check if we should add an empty cell for the "Add Memo" button column
+        const isLastMemoColumn = column.id.startsWith('memo-') && 
+          !columns.some((col, idx) => 
+            idx > index && col.id.startsWith('memo-')
+          );
         
-        // Fallback for non-element content
         return (
-          <td 
-            key={column.id} 
-            className={`px-4 py-2 text-sm ${column.id === 'name' ? 'font-medium' : 'text-gray-600'}`}
-            style={{ width: column.width }}
-          >
-            {content}
-          </td>
+          <React.Fragment key={column.id}>
+            {/* Render the actual cell */}
+            {React.isValidElement(content) ? (
+              // Clone element to add key prop
+              React.cloneElement(content, { key: column.id })
+            ) : (
+              // Fallback for non-element content
+              <td 
+                key={column.id} 
+                className={`px-4 py-2 text-sm ${column.id === 'name' ? 'font-medium' : 'text-gray-600'}`}
+                style={{ width: column.width }}
+              >
+                {content}
+              </td>
+            )}
+            {/* Add empty cell for the "Add Memo" button column */}
+            {isLastMemoColumn && (
+              <td className="px-2 py-1.5 text-xs w-12"></td>
+            )}
+          </React.Fragment>
         );
       })}
       

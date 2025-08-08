@@ -264,13 +264,28 @@ export const FactoryCell: React.FC<FactoryCellProps> = ({ field, project, editab
             
             // Update both ID and name fields
             const newIds = [...new Set([...currentIds, item.id])];
-            onUpdateField(project.id, idField, newIds);
+            console.log(`[FactoryCell] Project type: ${project.type}, ID: ${project.id}`);
+            console.log(`[FactoryCell] Calling onUpdateField with field: ${idField}, newIds:`, newIds);
+            console.log(`[FactoryCell] onUpdateField function:`, onUpdateField.toString().substring(0, 50));
             
-            // Also update the name field - get current names from original factory names
-            const currentNames = originalFactoryNames.length > 0 ? originalFactoryNames : 
-                                (value ? (Array.isArray(value) ? value : [value]) : []);
-            const newNames = [...currentNames, item.name];
-            onUpdateField(project.id, nameField, newNames);
+            if (onUpdateField) {
+              console.log('[FactoryCell] Calling onUpdateField now...');
+              try {
+                onUpdateField(project.id, idField, newIds);
+                console.log('[FactoryCell] onUpdateField for IDs completed');
+                
+                // Also update the name field - get current names from original factory names
+                const currentNames = originalFactoryNames.length > 0 ? originalFactoryNames : 
+                                    (value ? (Array.isArray(value) ? value : [value]) : []);
+                const newNames = [...currentNames, item.name];
+                onUpdateField(project.id, nameField, newNames);
+                console.log('[FactoryCell] onUpdateField for names completed');
+              } catch (error) {
+                console.error('[FactoryCell] Error calling onUpdateField:', error);
+              }
+            } else {
+              console.error('[FactoryCell] onUpdateField is not defined!');
+            }
             
             setShowAddFactory(false);
           }}

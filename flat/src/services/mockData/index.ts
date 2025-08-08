@@ -9,12 +9,16 @@ import { FactoryDataService } from './factoryService';
 import { ProjectDataService } from './projectService';
 import { ProductDataService } from './productService';
 import { TaskDataService } from './taskService';
+import { CustomerDataService } from './customerService';
+import { UserDataService } from './userService';
 
 // Re-export types for convenience
 export type { Factory } from '@/types/factory';
 export type { Task } from '@/types/schedule';
 export type { Project } from '@/types/project';
 export type { ProductCategory, Product } from '@/types/product';
+export type { Customer } from '@/types/customer';
+export type { User } from '@/types/user';
 
 class MockDataService {
   private db: MockDatabaseImpl;
@@ -22,6 +26,8 @@ class MockDataService {
   private projectService: ProjectDataService;
   private productService: ProductDataService;
   private taskService: TaskDataService;
+  private customerService: CustomerDataService;
+  private userService: UserDataService;
 
   constructor() {
     this.db = MockDatabaseImpl.getInstance();
@@ -29,6 +35,8 @@ class MockDataService {
     this.projectService = new ProjectDataService(this.db);
     this.productService = new ProductDataService(this.db);
     this.taskService = new TaskDataService(this.db);
+    this.customerService = new CustomerDataService(this.db);
+    this.userService = new UserDataService(this.db);
   }
 
   /**
@@ -86,6 +94,31 @@ class MockDataService {
   updateTask = (id: string, updates: any) => this.taskService.updateTask(id, updates);
   deleteTask = (id: string) => this.taskService.deleteTask(id);
   reorderTasks = (scheduleId: string, taskIds: string[]) => this.taskService.reorderTasks(scheduleId, taskIds);
+  
+  // Task-Centric methods
+  assignFactoryToTask = (taskId: string, factory: any) => this.taskService.assignFactoryToTask(taskId, factory);
+  removeFactoryFromTask = (taskId: string, factoryId: string) => this.taskService.removeFactoryFromTask(taskId, factoryId);
+  updateFactoryAssignment = (taskId: string, factoryId: string, updates: any) => this.taskService.updateFactoryAssignment(taskId, factoryId, updates);
+  getTasksByFactory = (factoryId: string) => this.taskService.getTasksByFactory(factoryId);
+  getFactoryCount = (taskId: string) => this.taskService.getFactoryCount(taskId);
+
+  /**
+   * Customer 관련 메서드
+   */
+  getCustomers = () => this.customerService.getAllCustomers();
+  searchCustomers = (searchTerm: string) => this.customerService.searchCustomers(searchTerm);
+  getCustomerById = (id: string) => this.customerService.getCustomerById(id);
+  getActiveCustomers = () => this.customerService.getActiveCustomers();
+
+  /**
+   * User 관련 메서드
+   */
+  getUsers = () => this.userService.getAllUsers();
+  searchUsers = (searchTerm: string) => this.userService.searchUsers(searchTerm);
+  getUserById = (id: string) => this.userService.getUserById(id);
+  getUsersByRole = (role: any) => this.userService.getUsersByRole(role);
+  getManagers = () => this.userService.getManagers();
+  getActiveUsers = () => this.userService.getActiveUsers();
 }
 
 // Singleton instance

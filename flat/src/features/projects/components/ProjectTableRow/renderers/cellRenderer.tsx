@@ -7,7 +7,10 @@ import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import { UseEditableCellReturn } from '@/hooks/useEditableCell';
 import * as cellRenderers from '../cellRenderers';
-import { ProjectType, ProjectField, ProjectFactoryField } from '@/types/enums';
+// Direct import for LabNumberCell as fallback
+import { LabNumberCell } from '../cellRenderers/LabNumberCell';
+import { SingleMemoCell } from '../cellRenderers/SingleMemoCell';
+import { ProjectType, ProjectField, ProjectFactoryField, TableColumnId } from '@/types/enums';
 
 interface CellRenderProps {
   project: Project;
@@ -32,10 +35,19 @@ export const renderTableCell = (columnId: string, props: CellRenderProps) => {
     onToggleTasks 
   };
 
+  // Check if this is a memo column
+  if (columnId.startsWith('memo-')) {
+    return <SingleMemoCell project={project} memoId={columnId} />;
+  }
+
   // Using ProjectField enum values for consistency
   switch (columnId) {
     case ProjectField.NAME:
       return <cellRenderers.NameCell {...cellRenderProps} />;
+      
+    case ProjectField.LAB_NUMBER:
+      // Use directly imported LabNumberCell
+      return <LabNumberCell {...cellRenderProps} />;
       
     case 'productType': // Custom field - not in ProjectField enum
       return <cellRenderers.ProductTypeCell {...cellRenderProps} />;

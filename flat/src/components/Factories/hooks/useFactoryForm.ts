@@ -12,6 +12,8 @@ export interface FactoryFormData {
   capacity: string;
   certifications: CertificationType[];
   managers: FactoryManager[];
+  comments?: string;
+  images?: string[];
 }
 
 const initialFormData: FactoryFormData = {
@@ -22,7 +24,9 @@ const initialFormData: FactoryFormData = {
   email: '',
   capacity: '',
   certifications: [],
-  managers: []
+  managers: [],
+  comments: '',
+  images: []
 };
 
 export const useFactoryForm = (editData?: FactoryFormData | null, isOpen?: boolean) => {
@@ -43,7 +47,7 @@ export const useFactoryForm = (editData?: FactoryFormData | null, isOpen?: boole
     }
   }, [editData, isOpen]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,

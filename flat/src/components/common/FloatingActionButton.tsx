@@ -1,12 +1,13 @@
 import React from 'react';
 import { cn } from '@/utils/cn';
+import { ButtonVariant } from '@/types/enums';
 import './FloatingActionButton.css';
 
 interface FloatingActionButtonProps {
   onClick: () => void;
   icon: React.ReactElement;
   label: string;
-  variant?: 'primary' | 'secondary';
+  variant?: ButtonVariant;
   position?: 'first' | 'second' | 'third';
   className?: string;
   draggable?: boolean;
@@ -18,7 +19,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   onClick,
   icon,
   label,
-  variant = 'secondary',
+  variant = ButtonVariant.SECONDARY,
   position = 'first',
   className = '',
   draggable = false,
@@ -82,7 +83,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       className={cn(
         'floating-action-button',
         `floating-action-button--${position}`,
-        `floating-action-button--${variant}`,
+        `floating-action-button--${variant.toLowerCase()}`,
         draggable && 'floating-action-button--draggable',
         className
       )}

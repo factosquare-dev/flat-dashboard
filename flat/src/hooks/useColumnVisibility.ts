@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { TableColumnId } from '@/types/enums';
 
 interface ColumnVisibility {
   [columnId: string]: boolean;
@@ -45,11 +46,15 @@ export const useColumnVisibility = () => {
   };
 
   const hideAllColumns = () => {
-    // Hide ALL columns including checkbox and options
-    const allColumns = ['checkbox', 'name', 'productType', 'client', 'serviceType', 'currentStage', 
-      'status', 'progress', 'startDate', 'endDate', 'manufacturer', 'container', 
-      'packaging', 'sales', 'purchase', 'depositPaid', 'priority', 'options'];
+    // Hide ALL columns using enum values
+    const allColumns = Object.values(TableColumnId);
     setHiddenColumns(new Set(allColumns));
+  };
+
+  const areAllColumnsHidden = () => {
+    // Check if all data columns are hidden
+    const allDataColumns = Object.values(TableColumnId);
+    return allDataColumns.every(columnId => hiddenColumns.has(columnId));
   };
 
   return {
@@ -57,6 +62,7 @@ export const useColumnVisibility = () => {
     toggleColumn,
     isColumnVisible,
     showAllColumns,
-    hideAllColumns
+    hideAllColumns,
+    areAllColumnsHidden
   };
 };

@@ -12,6 +12,19 @@ export interface Participant {
   role: ParticipantRole;
 }
 
+// Factory assignment for a task (Task-Centric Architecture)
+export interface FactoryAssignment {
+  factoryId: FactoryId;
+  factoryName: string;
+  factoryType?: FactoryType;
+  status?: TaskStatus;           // 공장별 개별 상태
+  progress?: number;              // 공장별 개별 진행률 (0-100)
+  startDate?: Date;              // 공장별 시작일
+  endDate?: Date;                // 공장별 종료일
+  completedAt?: Date;
+  notes?: string;
+}
+
 export interface Task {
   id: TaskId;
   scheduleId: ProjectId;
@@ -22,8 +35,7 @@ export interface Task {
   endDate: Date;
   progress: number; // 0-100
   participants: Participant[];
-  factoryId?: FactoryId;
-  factory?: string;         // Factory name for display
+  factoryAssignments: FactoryAssignment[];  // 다중 공장 지원 (필수)
   priority: Priority;
   dependsOn: TaskId[]; // Task IDs this task depends on
   blockedBy: TaskId[]; // Task IDs blocking this task

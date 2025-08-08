@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import type { Participant, Task } from '../../../../types/schedule';
 import type { Project } from '../../../../types/project';
 import type { Factory } from '../../../../types/factory';
@@ -14,6 +14,7 @@ interface ScheduleTableViewProps {
   tasks?: Task[];
   projectId?: string;
   onTaskClick?: (task: Task) => void;
+  onAddFactory?: () => void;
 }
 
 const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
@@ -21,9 +22,27 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
   tasks: propsTasks,
   projectId,
   onTaskClick,
+  onAddFactory,
 }) => {
-  // Use context data if props are not provided
-  const { tasks: contextTasks, participants, onTaskDelete, onFactoryDelete } = useTaskContext();
+  // Use context data if props are not provided (safely)
+  let contextTasks: Task[] = [];
+  let participants: any = null;
+  let onTaskDelete: any = undefined;
+  let onFactoryDelete: any = undefined;
+  
+  try {
+    const taskContext = useTaskContext();
+    contextTasks = taskContext.tasks || [];
+    participants = taskContext.participants;
+    onTaskDelete = taskContext.onTaskDelete;
+    onFactoryDelete = taskContext.onFactoryDelete;
+  } catch (error) {
+    // Context not available, use defaults
+    console.log('TaskContext not available, using defaults');
+  }
+  
+  // State for refresh trigger
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Use taskStore to get unified task data
   const { getTasksForProject } = useTaskStore();
@@ -33,13 +52,41 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
   const mockDbTasks = useMemo(() => {
     try {
       if (projectId) {
-        return mockDataService.getTasksByProjectId(projectId);
+        const tasks = mockDataService.getTasksByProjectId(projectId);
+        console.log(`[TableView] Loading tasks for project ${projectId}:`);
+        console.log(`[TableView] Found ${tasks.length} tasks`);
+        
+        // Log factory assignments for each task
+        tasks.forEach(task => {
+          const factoryCount = task.factoryAssignments?.length || 0;
+          if (factoryCount > 0) {
+            console.log(`  - ${task.title}: ${factoryCount} factories assigned`);
+          }
+        });
+        
+        return tasks;
       }
       return mockDataService.getAllTasks();
     } catch (error) {
-      // Silently fail
       return [];
     }
+  }, [projectId, refreshTrigger]); // Add refreshTrigger to dependencies
+  
+  // Listen for factory assignment events
+  useEffect(() => {
+    const handleFactoryAssigned = (event: CustomEvent) => {
+      // If projectId matches or no projectId (showing all tasks), refresh
+      if (!projectId || event.detail.projectId === projectId) {
+        // Trigger refresh by updating the trigger
+        setRefreshTrigger(prev => prev + 1);
+      }
+    };
+    
+    window.addEventListener('factory-assigned-to-tasks', handleFactoryAssigned as EventListener);
+    
+    return () => {
+      window.removeEventListener('factory-assigned-to-tasks', handleFactoryAssigned as EventListener);
+    };
   }, [projectId]);
   
   // Priority: props > store > mockDB > context
@@ -70,7 +117,7 @@ const ScheduleTableView: React.FC<ScheduleTableViewProps> = React.memo(({
         role="table"
         aria-label="작업 스케줄 테이블"
       >
-        <TableHeader />
+        <TableHeader onAddFactory={onAddFactory} projectId={projectId} />
         <tbody role="rowgroup">
           {sortedTasks.map((task) => {
             // Get actual Project data using task.projectId (new convenience field)

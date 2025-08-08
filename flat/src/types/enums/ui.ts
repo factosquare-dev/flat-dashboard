@@ -2,6 +2,28 @@
  * UI Component related enums
  */
 
+// Table Column IDs (데이터 컬럼만 포함, checkbox와 options는 제외)
+export enum TableColumnId {
+  NAME = 'name',
+  LAB_NUMBER = 'labNumber',
+  MEMO = 'memo',
+  PRODUCT_TYPE = 'productType',
+  CLIENT = 'client',
+  SERVICE_TYPE = 'serviceType',
+  CURRENT_STAGE = 'currentStage',
+  STATUS = 'status',
+  PROGRESS = 'progress',
+  START_DATE = 'startDate',
+  END_DATE = 'endDate',
+  MANUFACTURER = 'manufacturer',
+  CONTAINER = 'container',
+  PACKAGING = 'packaging',
+  SALES = 'sales',
+  PURCHASE = 'purchase',
+  DEPOSIT_PAID = 'depositPaid',
+  PRIORITY = 'priority',
+}
+
 // Badge Variants
 export enum BadgeVariant {
   DEFAULT = 'default',

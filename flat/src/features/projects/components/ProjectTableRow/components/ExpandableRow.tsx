@@ -9,6 +9,7 @@ import type { Column } from '@/hooks/useColumnOrder';
 
 interface ExpandableRowProps {
   isExpanded: boolean;
+  projectId: string;
   tasks: Task[];
   columns: Column[];
   onTaskToggle: (taskId: string) => void;
@@ -16,6 +17,7 @@ interface ExpandableRowProps {
 
 export const ExpandableRow: React.FC<ExpandableRowProps> = ({
   isExpanded,
+  projectId,
   tasks,
   columns,
   onTaskToggle
@@ -30,7 +32,7 @@ export const ExpandableRow: React.FC<ExpandableRowProps> = ({
     <tr>
       <td colSpan={totalColspan} className="px-4 py-2 bg-gray-50">
         <TaskList
-          projectId={`project-${Date.now()}`}
+          projectId={projectId}
           tasks={tasks}
           onTaskToggle={onTaskToggle}
         />

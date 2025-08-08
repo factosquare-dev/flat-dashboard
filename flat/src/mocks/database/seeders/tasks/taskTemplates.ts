@@ -199,6 +199,18 @@ export function getTaskTemplatesByFactoryType(factoryType: FactoryType): TaskTem
   return template?.tasks || [];
 }
 
+// TASK-CENTRIC: Get ALL task templates for a project
+export function getAllTaskTemplates(): TaskTemplate[] {
+  const allTasks: TaskTemplate[] = [];
+  
+  // Collect all tasks from all factory types
+  factoryTaskTemplates.forEach(template => {
+    allTasks.push(...template.tasks);
+  });
+  
+  return allTasks;
+}
+
 // Helper function to calculate task dates based on project start date and dependencies
 export function calculateTaskDates(
   templates: TaskTemplate[], 

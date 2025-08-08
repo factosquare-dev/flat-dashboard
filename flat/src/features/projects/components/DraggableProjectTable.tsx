@@ -5,6 +5,8 @@ import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '@/hooks/useColumnOrder';
 import type { Column } from '../../../hooks/useColumnOrder';
 import { useColumnResize } from '@/hooks/useColumnResize';
+import { useMemoColumns } from '@/hooks/useMemoColumns';
+import { Plus, X, Edit2, Check } from 'lucide-react';
 import { ProjectType } from '@/types/enums';
 import { isProjectType } from '@/utils/projectTypeUtils';
 import { useProjectHierarchy } from '@/hooks/useProjectHierarchy';
@@ -66,6 +68,10 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     resetColumnWidths,
     isResizing
   } = useColumnResize();
+  
+  const { memoColumns, addMemoColumn, removeMemoColumn, updateMemoColumnName } = useMemoColumns();
+  const [editingMemoId, setEditingMemoId] = useState<string | null>(null);
+  const [editingMemoName, setEditingMemoName] = useState<string>('');
   
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const { moveToMaster, makeIndependent, canBeMoved, canAcceptChildren } = useProjectHierarchy();
@@ -222,10 +228,30 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     console.log('[DragDrop] ======= DROP EVENT END =======');
   };
 
+  const handleStartEditMemo = (columnId: string, columnLabel: string) => {
+    setEditingMemoId(columnId);
+    setEditingMemoName(columnLabel);
+  };
+
+  const handleSaveMemoName = (columnId: string) => {
+    if (editingMemoName.trim()) {
+      updateMemoColumnName(columnId, editingMemoName.trim());
+    }
+    setEditingMemoId(null);
+    setEditingMemoName('');
+  };
+
+  const handleCancelEditMemo = () => {
+    setEditingMemoId(null);
+    setEditingMemoName('');
+  };
+
   const renderHeaderCell = (column: Column) => {
     const isDraggable = column.id !== 'checkbox' && column.id !== 'options' && !isResizing;
     const isResizable = column.id !== 'checkbox' && column.id !== 'options';
     const width = getColumnWidth(column.id, column.width);
+    const isMemoColumn = column.id.startsWith('memo-');
+    const isEditingThisMemo = editingMemoId === column.id;
     
     return (
       <th
@@ -237,24 +263,90 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
           width,
           minWidth: '50px'
         }}
-        draggable={isDraggable}
-        onDragStart={isDraggable ? () => handleDragStart(column.id) : undefined}
+        draggable={isDraggable && !isEditingThisMemo}
+        onDragStart={isDraggable && !isEditingThisMemo ? () => handleDragStart(column.id) : undefined}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
         onDrop={isDraggable ? (e) => handleDrop(e, column.id) : undefined}
-        onClick={column.sortable && !isResizing ? () => onSort(column.id as keyof Project) : undefined}
+        onClick={column.sortable && !isResizing && !isEditingThisMemo ? () => onSort(column.id as keyof Project) : undefined}
       >
         <div className={`flex items-center ${
           column.align === 'center' ? 'justify-center' : column.align === 'right' ? 'justify-end' : 'justify-between'
         } overflow-hidden`}>
-          <span className="truncate">{column.label}</span>
-          {column.sortable && sortField === column.id && (
-            <span className="text-blue-600 ml-1 flex-shrink-0">
-              {sortDirection === 'asc' ? '↑' : '↓'}
-            </span>
+          {isMemoColumn && isEditingThisMemo ? (
+            <div className="flex items-center gap-1 w-full">
+              <input
+                type="text"
+                value={editingMemoName}
+                onChange={(e) => setEditingMemoName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSaveMemoName(column.id);
+                  } else if (e.key === 'Escape') {
+                    handleCancelEditMemo();
+                  }
+                }}
+                className="flex-1 px-1 py-0.5 text-xs border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autoFocus
+                onClick={(e) => e.stopPropagation()}
+              />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSaveMemoName(column.id);
+                }}
+                className="p-0.5 text-green-600 hover:bg-green-50 rounded"
+                title="저장"
+              >
+                <Check className="w-3 h-3" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCancelEditMemo();
+                }}
+                className="p-0.5 text-red-600 hover:bg-red-50 rounded"
+                title="취소"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <span className="truncate">{column.label}</span>
+              {isMemoColumn && (
+                <div className="flex items-center gap-1 ml-1">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStartEditMemo(column.id, column.label);
+                    }}
+                    className="p-0.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded"
+                    title="이름 편집"
+                  >
+                    <Edit2 className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeMemoColumn(column.id);
+                    }}
+                    className="p-0.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
+                    title="메모 삭제"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              {column.sortable && sortField === column.id && (
+                <span className="text-blue-600 ml-1 flex-shrink-0">
+                  {sortDirection === 'asc' ? '↑' : '↓'}
+                </span>
+              )}
+            </>
           )}
         </div>
-        {isResizable && (
+        {isResizable && !isEditingThisMemo && (
           <div
             className="resize-handle"
             onMouseDown={(e) => {
@@ -274,6 +366,19 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   };
 
 
+  // 모든 데이터 컬럼이 숨겨진 경우 처리
+  if (visibleColumns.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+        <svg className="w-16 h-16 mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        <p className="text-lg font-medium mb-2">표시할 열이 없습니다</p>
+        <p className="text-sm">열 표시 설정에서 표시할 열을 선택해주세요</p>
+      </div>
+    );
+  }
+
   return (
     <div style={{ width: 'max-content', minWidth: '100%' }}>
       <table ref={tableRef} role="table" style={{ width: 'max-content', minWidth: '1950px' }}>
@@ -289,7 +394,30 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 />
               </div>
             </th>
-            {visibleColumns.map(renderHeaderCell)}
+            {visibleColumns.map((column) => {
+              // Check if we should add the "Add Memo" button after this column
+              const isLastMemoColumn = column.id.startsWith('memo-') && 
+                !visibleColumns.some((col, idx) => 
+                  idx > visibleColumns.indexOf(column) && col.id.startsWith('memo-')
+                );
+              
+              return (
+                <React.Fragment key={column.id}>
+                  {renderHeaderCell(column)}
+                  {isLastMemoColumn && (
+                    <th className="table-header-cell text-center w-12 bg-white" scope="col">
+                      <button
+                        onClick={addMemoColumn}
+                        className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded"
+                        title="메모 추가"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </th>
+                  )}
+                </React.Fragment>
+              );
+            })}
             <th className="table-header-cell text-center w-12 bg-white" scope="col">
               <span className="sr-only">프로젝트 옵션</span>
               <svg className="w-4 h-4 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -361,7 +489,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               handleProjectDrop(e);
             }}
           >
-            <td colSpan={visibleColumns.length + 2} className="text-center text-gray-400 text-xs">
+            <td colSpan={visibleColumns.length + 2 + (visibleColumns.some(col => col.id.startsWith('memo-')) ? 1 : 0)} className="text-center text-gray-400 text-xs">
               {draggedProjectId && (
                 <div className="py-4 border-2 border-dashed border-gray-300 rounded">
                   Drop here to make independent

@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { Project, ProjectStatus, ServiceType, Priority } from '../types/project';
-import { ProjectStatusLabel } from '../types/enums';
+import type { Project, ProjectStatus, ServiceType } from '../types/project';
+import { ProjectStatusLabel, ProjectType, Priority } from '../types/enums';
 
 export const useProjectFilters = () => {
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>(['PLANNING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED']);
@@ -21,9 +21,39 @@ export const useProjectFilters = () => {
   }, [sortField, sortDirection]);
 
   const filterProjects = useCallback((projects: Project[]) => {
+    console.log('[filterProjects] Input projects:', projects.length);
+    console.log('[filterProjects] Selected priority:', selectedPriority, typeof selectedPriority);
+    console.log('[filterProjects] Status filters:', statusFilters);
+    
+    // Debug first project's priority
+    if (projects.length > 0) {
+      console.log('[filterProjects] First project priority:', projects[0].priority, typeof projects[0].priority);
+      console.log('[filterProjects] Sample SUB priorities:', 
+        projects.filter(p => p.type === 'SUB' || p.type === ProjectType.SUB)
+          .slice(0, 3)
+          .map(p => ({ name: p.name, priority: p.priority, type: typeof p.priority }))
+      );
+    }
+    
     const filtered = projects.filter(project => {
       const matchesStatus = statusFilters.includes(project.status);
-      const matchesPriority = selectedPriority === 'all' || project.priority === selectedPriority;
+      
+      // Priority filter - special handling for MASTER projects
+      let matchesPriority = selectedPriority === 'all';
+      if (!matchesPriority) {
+        if (project.type === ProjectType.MASTER) {
+          // For MASTER projects, check if any child SUB project matches the priority
+          const childSubs = projects.filter(p => 
+            p.type === ProjectType.SUB && p.parentId === project.id
+          );
+          // MASTER matches if it has any child that matches the priority filter
+          matchesPriority = childSubs.some(sub => sub.priority === selectedPriority);
+        } else {
+          // For SUB and other projects, check directly
+          matchesPriority = project.priority === selectedPriority;
+        }
+      }
+      
       const matchesServiceType = selectedServiceType === 'all' || project.serviceType === selectedServiceType;
       const matchesSearch = searchValue === '' || 
         project.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -60,30 +90,32 @@ export const useProjectFilters = () => {
         }
       }
       
-      return matchesStatus && matchesPriority && matchesServiceType && matchesSearch && matchesDateRange;
+      const result = matchesStatus && matchesPriority && matchesServiceType && matchesSearch && matchesDateRange;
+      
+      if (!result && project.type === 'MASTER') {
+        console.log('[filterProjects] MASTER filtered out:', {
+          name: project.name,
+          matchesStatus,
+          matchesPriority,
+          matchesServiceType,
+          matchesSearch,
+          matchesDateRange
+        });
+      }
+      
+      return result;
     });
     
+    console.log('[filterProjects] Output filtered:', filtered.length);
     return filtered;
   }, [statusFilters, selectedPriority, selectedServiceType, searchValue, dateRange]);
 
+  // Remove sorting from here as it's now handled in hierarchical structure
   const sortProjects = useCallback((projects: Project[]) => {
-    if (!sortField) return projects;
-
-    return [...projects].sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
-      }
-      
-      const aStr = String(aValue);
-      const bStr = String(bValue);
-      return sortDirection === 'asc' 
-        ? aStr.localeCompare(bStr) 
-        : bStr.localeCompare(aStr);
-    });
-  }, [sortField, sortDirection]);
+    // Sorting is now handled by sortHierarchicalProjects in ProjectTableSection
+    // to maintain parent-child relationships properly
+    return projects;
+  }, []);
 
   const getFilteredAndSortedProjects = useMemo(() => {
     return (projects: Project[]) => {

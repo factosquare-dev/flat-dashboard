@@ -84,12 +84,10 @@ export const useProjects = () => {
       } : setProjects
   });
 
-  // Initialize data on mount
+  // Initialize data on mount - always load projects regardless of mode
   useEffect(() => {
-    if (!useHierarchicalMode) {
-      initializePagination();
-    }
-  }, [initializePagination, useHierarchicalMode]);
+    initializePagination();
+  }, []); // Remove dependencies to only run once on mount
   
   // Listen for hierarchy changes and refresh data
   useEffect(() => {
@@ -121,31 +119,20 @@ export const useProjects = () => {
   };
 
   // Enhanced update methods that work with both modes
-  const enhancedUpdateProject = async (projectId: ProjectId, field: keyof Project, value: any) => {
-    // Update MockDatabase first
-    const db = MockDatabaseImpl.getInstance();
+  const enhancedUpdateProject = async <K extends keyof Project>(projectId: ProjectId, field: K, value: Project[K]) => {
+    console.log(`[enhancedUpdateProject] Called with projectId: ${projectId}, field: ${String(field)}, value:`, value);
     
-    try {
-      // Use the official update method which handles events and storage
-      const result = await db.update('projects', projectId, { [field]: value });
-      
-      if (result.success) {
-        // Refresh the projects from database
-        if (useHierarchicalMode) {
-          // Get fresh data from MockDatabase
-          const freshData = getHierarchicalProjectsData();
-          setHierarchicalData(freshData);
-        } else {
-          // Reload projects from database
-          await refreshProjects();
-        }
-        
-        // Dispatch event to notify other components
-        window.dispatchEvent(new Event('projectHierarchyChanged'));
-      }
-    } catch (error) {
-      console.error('[enhancedUpdateProject] Error updating project:', error);
+    // Use the original updateProject from useProjectData which handles task assignments
+    await updateProject(projectId, field, value);
+    
+    // If in hierarchical mode, refresh the data
+    if (useHierarchicalMode) {
+      const freshData = getHierarchicalProjectsData();
+      setHierarchicalData(freshData);
     }
+    
+    // Dispatch event to notify other components
+    window.dispatchEvent(new Event('projectHierarchyChanged'));
   };
 
   const enhancedDeleteProjects = (projectIds: string[]) => {

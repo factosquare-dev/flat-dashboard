@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { TableColumnId } from '@/types/enums';
+import { useMemoColumns } from './useMemoColumns';
 
 export interface Column {
   id: string;
@@ -6,6 +8,7 @@ export interface Column {
   sortable?: boolean;
   align?: 'left' | 'center' | 'right';
   width?: string;
+  isMemo?: boolean;
 }
 
 // Type guard for Column validation with runtime type checking
@@ -27,28 +30,32 @@ const isValidColumnArray = (arr: any): arr is Column[] => {
 };
 
 const DEFAULT_COLUMNS: Column[] = [
-  { id: 'name', label: '프로젝트명', sortable: true, width: '200px' },
-  { id: 'productType', label: '제품유형', sortable: true, width: '130px' },
-  { id: 'client', label: '고객명', sortable: true, width: '120px' },
-  { id: 'serviceType', label: '서비스', sortable: true, width: '110px' },
-  { id: 'currentStage', label: '진행단계', width: '150px' },
-  { id: 'status', label: '상태', sortable: true, width: '90px' },
-  { id: 'progress', label: '진행률', align: 'center', width: '130px' },
-  { id: 'startDate', label: '시작일', sortable: true, align: 'center', width: '100px' },
-  { id: 'endDate', label: '마감일', sortable: true, align: 'center', width: '100px' },
-  { id: 'manufacturer', label: '제조', width: '110px' },
-  { id: 'container', label: '용기', width: '110px' },
-  { id: 'packaging', label: '포장', width: '110px' },
-  { id: 'sales', label: '매출', align: 'right', width: '110px' },
-  { id: 'purchase', label: '매입', align: 'right', width: '110px' },
-  { id: 'depositPaid', label: '선금입금', align: 'center', width: '90px' },
-  { id: 'priority', label: '우선순위', sortable: true, align: 'center', width: '90px' }
+  { id: TableColumnId.NAME, label: '프로젝트명', sortable: true, width: '200px' },
+  { id: TableColumnId.LAB_NUMBER, label: '확정랩넘버', sortable: true, width: '120px' },
+  // Memo columns will be inserted here dynamically
+  { id: TableColumnId.PRODUCT_TYPE, label: '제품유형', sortable: true, width: '130px' },
+  { id: TableColumnId.CLIENT, label: '고객명', sortable: true, width: '120px' },
+  { id: TableColumnId.SERVICE_TYPE, label: '서비스', sortable: true, width: '110px' },
+  { id: TableColumnId.CURRENT_STAGE, label: '진행단계', width: '150px' },
+  { id: TableColumnId.STATUS, label: '상태', sortable: true, width: '90px' },
+  { id: TableColumnId.PROGRESS, label: '진행률', sortable: true, align: 'center', width: '130px' },
+  { id: TableColumnId.START_DATE, label: '시작일', sortable: true, align: 'center', width: '100px' },
+  { id: TableColumnId.END_DATE, label: '마감일', sortable: true, align: 'center', width: '100px' },
+  { id: TableColumnId.MANUFACTURER, label: '제조', width: '110px' },
+  { id: TableColumnId.CONTAINER, label: '용기', width: '110px' },
+  { id: TableColumnId.PACKAGING, label: '포장', width: '110px' },
+  { id: TableColumnId.SALES, label: '매출', sortable: true, align: 'right', width: '110px' },
+  { id: TableColumnId.PURCHASE, label: '매입', sortable: true, align: 'right', width: '110px' },
+  { id: TableColumnId.DEPOSIT_PAID, label: '선금입금', sortable: true, align: 'center', width: '90px' },
+  { id: TableColumnId.PRIORITY, label: '우선순위', sortable: true, align: 'center', width: '90px' }
 ];
 
 const STORAGE_KEY = 'projectTableColumnOrder';
 
 export const useColumnOrder = () => {
-  const [columns, setColumns] = useState<Column[]>(() => {
+  const { memoColumns } = useMemoColumns();
+  
+  const [baseColumns, setBaseColumns] = useState<Column[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -56,10 +63,12 @@ export const useColumnOrder = () => {
         
         // Runtime type validation using type guard
         if (isValidColumnArray(parsed)) {
+          // Filter out old memo columns (they're managed separately now)
+          const nonMemoColumns = parsed.filter(col => !col.isMemo && col.id !== TableColumnId.MEMO);
           // 새로운 컬럼이 추가된 경우를 대비하여 머지
-          const savedIds = parsed.map(col => col.id);
+          const savedIds = nonMemoColumns.map(col => col.id);
           const newColumns = DEFAULT_COLUMNS.filter(col => !savedIds.includes(col.id));
-          return [...parsed, ...newColumns];
+          return [...nonMemoColumns, ...newColumns];
         } else {
           return DEFAULT_COLUMNS;
         }
@@ -70,11 +79,26 @@ export const useColumnOrder = () => {
     return DEFAULT_COLUMNS;
   });
 
+  // Combine base columns with memo columns
+  // Insert memo columns after LAB_NUMBER
+  const columns = React.useMemo(() => {
+    const labNumberIndex = baseColumns.findIndex(col => col.id === TableColumnId.LAB_NUMBER);
+    if (labNumberIndex === -1) {
+      return [...baseColumns, ...memoColumns];
+    }
+    
+    const before = baseColumns.slice(0, labNumberIndex + 1);
+    const after = baseColumns.slice(labNumberIndex + 1);
+    return [...before, ...memoColumns, ...after];
+  }, [baseColumns, memoColumns]);
+
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(columns));
-  }, [columns]);
+    // Only save non-memo columns to avoid duplication
+    const nonMemoColumns = baseColumns.filter(col => !col.isMemo);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nonMemoColumns));
+  }, [baseColumns]);
 
   const handleDragStart = (columnId: string) => {
     setDraggedColumn(columnId);
@@ -98,15 +122,15 @@ export const useColumnOrder = () => {
 
     if (draggedIndex === -1 || targetIndex === -1) return;
 
-    const newColumns = [...columns];
+    const newColumns = [...baseColumns];
     const [removed] = newColumns.splice(draggedIndex, 1);
     newColumns.splice(targetIndex, 0, removed);
 
-    setColumns(newColumns);
+    setBaseColumns(newColumns);
   };
 
   const resetColumnOrder = () => {
-    setColumns(DEFAULT_COLUMNS);
+    setBaseColumns(DEFAULT_COLUMNS);
     localStorage.removeItem(STORAGE_KEY);
   };
 

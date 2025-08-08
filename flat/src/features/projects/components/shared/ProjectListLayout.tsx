@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Mail } from 'lucide-react';
+import { Plus, Mail, FileEdit, Factory } from 'lucide-react';
 import { PageLayout, FloatingActionButton } from '@/components/common';
 import ProjectActions from '../ProjectActions';
 import type { Priority, ServiceType, ProjectStatus } from '../../../../types/project';
@@ -13,6 +13,7 @@ interface ProjectListLayoutProps {
   onSearch: (query: string) => void;
   onCreateProject: () => void;
   children: React.ReactNode;
+  isTableView?: boolean;
   selectedPriority?: Priority | 'all';
   selectedServiceType?: ServiceType | 'all';
   statusFilters?: ProjectStatus[];
@@ -37,6 +38,7 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
   onSearch,
   onCreateProject,
   children,
+  isTableView = false,
   selectedPriority,
   selectedServiceType,
   statusFilters,
@@ -76,7 +78,26 @@ const ProjectListLayout: React.FC<ProjectListLayoutProps> = ({
     />
   );
 
-  const floatingActions = (
+  const floatingActions = isTableView ? (
+    // Table View: 새 공장과 제품개발의뢰서 편집
+    <>
+      <FloatingActionButton
+        onClick={onCreateProject}
+        icon={<FileEdit />}
+        label="제품개발의뢰서 편집"
+        variant={ButtonVariant.SECONDARY}
+        position="second"
+      />
+      <FloatingActionButton
+        onClick={onCreateProject}
+        icon={<Factory />}
+        label="새 공장"
+        variant={ButtonVariant.PRIMARY}
+        position="first"
+      />
+    </>
+  ) : (
+    // Normal View: 메일 보내기와 새 프로젝트
     <>
       <FloatingActionButton
         onClick={onSendEmail}

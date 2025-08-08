@@ -25,8 +25,10 @@ export const useTaskManagement = (props?: UseTaskManagementProps) => {
   // Pass full task information to TaskList
   const tasks = scheduleTasks;
 
-  const handleToggleTasks = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggleTasks = (e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
     setIsExpanded(!isExpanded);
   };
 

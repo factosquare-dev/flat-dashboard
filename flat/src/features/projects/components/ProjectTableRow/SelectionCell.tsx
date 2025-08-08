@@ -14,6 +14,8 @@ interface SelectionCellProps {
   onStartDrag?: (index: number) => void;
   handleToggleTasks: (e: React.MouseEvent) => void;
   handleMasterToggle: (e: React.MouseEvent) => void;
+  isChildOfMaster?: boolean;
+  level?: number;
 }
 
 const SelectionCell: React.FC<SelectionCellProps> = ({
@@ -25,7 +27,9 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
   onSelect,
   onStartDrag,
   handleToggleTasks,
-  handleMasterToggle
+  handleMasterToggle,
+  isChildOfMaster = false,
+  level = 0
 }) => {
   // Early return if project is undefined
   if (!project) {
@@ -99,18 +103,15 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
       }}
     >
       <div className="flex items-center gap-1 select-none">
-        {/* 들여쓰기 - Task만 들여쓰기, Master와 Sub는 같은 위치 */}
-        <div style={{ 
-          width: `${(
-            (project as any).level !== undefined 
-              ? (project as any).level 
-              : project.type === ProjectType.TASK ? 1 
-              : 0
-          ) * 20}px` 
-        }} />
+        {/* Hierarchical 들여쓰기 - level에 따라 들여쓰기 */}
+        {level > 0 && (
+          <div style={{ width: `${level * 24}px` }} className="flex-shrink-0" />
+        )}
         
-        {/* Master 프로젝트는 폴더 아이콘으로 확장/축소 */}
-        {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
+        {/* Master/Sub 확장 컨트롤 - 공간 할당 */}
+        <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+          {/* Master 프로젝트는 폴더 아이콘으로 확장/축소 */}
+          {(isProjectType(project.type, ProjectType.MASTER) && project.children && project.children.length > 0) && (
           <button
             onClick={(e) => {
               console.log('[SelectionCell] Master toggle button clicked');
@@ -146,11 +147,10 @@ const SelectionCell: React.FC<SelectionCellProps> = ({
             ) : (
               <Folder className="w-4 h-4 text-blue-600" />
             )}
-          </button>
-        )}
-        
-        {/* SUB 프로젝트는 chevron으로 태스크 확장/축소 */}
-        <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+            </button>
+          )}
+          
+          {/* SUB 프로젝트는 chevron으로 태스크 확장/축소 */}
           {isProjectType(project.type, ProjectType.SUB) && (
             <button
               onClick={handleToggleTasks}

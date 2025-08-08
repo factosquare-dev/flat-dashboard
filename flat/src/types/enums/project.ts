@@ -92,6 +92,7 @@ export const DepositStatusLabel: Record<DepositStatus, string> = {
 export enum ProjectField {
   ID = 'id',
   NAME = 'name',
+  LAB_NUMBER = 'labNumber',
   PRODUCT_NAME = 'productName',
   STATUS = 'status',
   TYPE = 'type',
@@ -130,6 +131,7 @@ export enum ProjectField {
 export const ProjectFieldLabel: Record<ProjectField, string> = {
   [ProjectField.ID]: 'ID',
   [ProjectField.NAME]: '프로젝트명',
+  [ProjectField.LAB_NUMBER]: '확정랩넘버',
   [ProjectField.PRODUCT_NAME]: '제품명',
   [ProjectField.STATUS]: '상태',
   [ProjectField.TYPE]: '유형',

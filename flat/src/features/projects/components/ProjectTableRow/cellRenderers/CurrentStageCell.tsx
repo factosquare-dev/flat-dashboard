@@ -37,7 +37,9 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
           
           return todayIsStart || todayIsEnd || isInRange;
         })
-        .map(task => task.name || task.title || '')
+        .map(task => {
+          return task.name || task.title || '';
+        })
         .filter(name => name.length > 0);
         
       // Today tasks

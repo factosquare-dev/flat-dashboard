@@ -34,6 +34,7 @@ export interface Product {
 export interface Project {
   id: ProjectId;
   projectNumber?: string;
+  labNumber?: string; // 확정 랩넘버
   name: string;
   type: ProjectType;
   parentId?: ProjectId;

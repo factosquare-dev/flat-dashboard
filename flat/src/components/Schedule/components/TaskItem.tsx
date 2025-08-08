@@ -134,7 +134,25 @@ const TaskItem: React.FC<TaskItemProps> = React.memo(({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="truncate font-medium whitespace-nowrap">{task.title || task.taskType}</div>
+      <div className="flex items-center gap-1 h-full">
+        <div className="truncate font-medium whitespace-nowrap flex-1">
+          {task.title || task.taskType}
+        </div>
+        {/* Factory Assignments Badge */}
+        {task.factoryAssignments && task.factoryAssignments.length > 0 && (
+          <div className="flex items-center gap-0.5">
+            {task.factoryAssignments.length > 1 ? (
+              <span className="px-1.5 py-0.5 text-[10px] bg-blue-100 text-blue-700 rounded-full font-medium">
+                {task.factoryAssignments.length}개 공장
+              </span>
+            ) : (
+              <span className="px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded-full">
+                {task.factoryAssignments[0].factoryName}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
       
       {/* Resize handles - same size for all tasks */}
       <div

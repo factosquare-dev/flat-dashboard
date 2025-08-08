@@ -4,7 +4,7 @@ import { ErrorBoundary } from '../ErrorBoundary';
 interface LazyBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  errorFallback?: React.ReactNode;
+  errorFallback?: React.ComponentType<{ error: Error; resetError: () => void }>;
 }
 
 /**
@@ -21,7 +21,7 @@ export const LazyBoundary: React.FC<LazyBoundaryProps> = ({
       </div>
     </div>
   ),
-  errorFallback = (
+  errorFallback = ({ error, resetError }: { error: Error; resetError: () => void }) => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 shadow-lg max-w-md">
         <h3 className="text-red-600 font-semibold mb-2">컴포넌트 로딩 실패</h3>

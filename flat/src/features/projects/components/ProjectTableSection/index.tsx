@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import type { Project } from '../../../../types/project';
 import type { ProjectId } from '../../../../types/branded';
 import { useDragSelection } from '@/hooks/useDragSelection';
-import { getHierarchicalProjectsData } from '@/data/hierarchicalProjects';
+import { getHierarchicalProjectsData, sortHierarchicalProjects } from '@/data/hierarchicalProjects';
 import { useProjectTableData } from '@/hooks/useProjectTableData';
 import { ProjectTableService } from '@/services/projectTable.service';
 import { useProjectTableHandlers } from './useProjectTableHandlers';
@@ -46,18 +46,20 @@ const ProjectTableSection: React.FC<ProjectTableSectionProps> = ({
 }) => {
   const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
 
-  // Get hierarchical data
-  const hierarchicalProjects = useMemo(() => {
-    return getHierarchicalProjectsData();
-  }, [projects]);
-
-  // Use custom hook for data transformation
-  const { allProjects } = useProjectTableData(hierarchicalProjects);
-
-  // Extract filter properties
+  // Extract filter properties first (before using them)
   const sortField = filters?.sortField || null;
   const sortDirection = filters?.sortDirection || 'asc';
   const handleSort = filters?.handleSort || (() => {});
+
+  // Get hierarchical data from filtered projects and apply sorting
+  const hierarchicalProjects = useMemo(() => {
+    const hierarchical = getHierarchicalProjectsData(projects);
+    // Apply sorting while maintaining hierarchy
+    return sortHierarchicalProjects(hierarchical, sortField, sortDirection);
+  }, [projects, sortField, sortDirection]);
+
+  // Use custom hook for data transformation
+  const { allProjects } = useProjectTableData(hierarchicalProjects);
 
   // Use drag selection hook
   const {

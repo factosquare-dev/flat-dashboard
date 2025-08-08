@@ -99,6 +99,7 @@ export {
   ValidationMessageTypeLabel,
   IconSizeMap,
   SpacingMap,
+  TableColumnId,
 } from './enums/ui';
 
 // Common/API related enums

@@ -25,14 +25,19 @@ export const loadProjectsFromDb = async (signal: AbortSignal, page: number = 1):
   const dbProjects = dbResponse.success ? dbResponse.data : [];
   
   console.log('[ProjectLoader] Loaded projects from DB:', dbProjects.length);
+  console.log('[ProjectLoader] Sample projects:', dbProjects.slice(0, 3).map(p => ({
+    id: p.id,
+    name: p.name,
+    type: p.type,
+    priority: p.priority,
+    status: p.status
+  })));
   
-  // Implement pagination
-  const itemsPerPage = 50;
-  const startIndex = (page - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedProjects = dbProjects.slice(startIndex, endIndex);
+  // For now, return all projects (pagination can be added later after filtering)
+  // This ensures filters work across all projects, not just the first page
+  const paginatedProjects = dbProjects;
   
-  console.log(`[ProjectLoader] Page ${page}: Returning ${paginatedProjects.length} projects (${startIndex}-${endIndex} of ${dbProjects.length})`);
+  console.log(`[ProjectLoader] Returning all ${paginatedProjects.length} projects for filtering`);
   
   // Enrich projects with factory names and ensure enum types
   const enrichedProjects = paginatedProjects.map(project => {

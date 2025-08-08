@@ -8,7 +8,6 @@ import FactoryTypeBadge from './common/FactoryTypeBadge';
 import { useDebouncedSearch } from '../hooks/common';
 import { useDragSelection } from '@/hooks/useDragSelection';
 import { cn } from '../utils/cn';
-import './FactorySelectionModal.css';
 
 interface FactorySelectionModalProps {
   isOpen: boolean;
@@ -28,7 +27,7 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
   selectedFactoryIds = []
 }) => {
   const [selectedType, setSelectedType] = useState<'all' | FactoryType>(multiSelect ? 'all' : FactoryType.MANUFACTURING);
-  const [selectedFactories, setSelectedFactories] = useState<string[]>(selectedFactoryIds);
+  const [selectedFactories, setSelectedFactories] = useState<string[]>(() => selectedFactoryIds || []);
   const [factories, setFactories] = useState<Factory[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -59,9 +58,13 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
     enabled: multiSelect
   });
 
+  // Reset or initialize when modal opens
   useEffect(() => {
-    setSelectedFactories(selectedFactoryIds);
-  }, [selectedFactoryIds]);
+    if (isOpen) {
+      // Initialize with provided IDs or empty array
+      setSelectedFactories(selectedFactoryIds || []);
+    }
+  }, [isOpen, selectedFactoryIds]);
 
   const filteredFactories = useMemo(() => {
     return factories.filter(factory => {
@@ -90,7 +93,7 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
 
   const handleClose = () => {
     setSearchValue('');
-    setSelectedFactories([]);
+    // Don't reset selectedFactories here to avoid re-render issues
     onClose();
   };
 
@@ -98,8 +101,8 @@ const FactorySelectionModal: React.FC<FactorySelectionModalProps> = ({
     <BaseModal
       isOpen={isOpen}
       onClose={handleClose}
-      title={multiSelect ? "공장 선택 (다중 선택)" : "공장 선택"}
-      description={multiSelect ? "드래그하거나 클릭하여 여러 공장을 선택하세요" : "프로젝트에 할당할 공장을 선택하세요"}
+      title={multiSelect ? "공장 할당 (다중 선택)" : "태스크에 공장 할당"}
+      description={multiSelect ? "드래그하거나 클릭하여 태스크에 할당할 공장들을 선택하세요" : "현재 태스크에 할당할 공장을 선택하세요"}
       size={MODAL_SIZES[ModalSize.MD]}
       footer={
         multiSelect && (

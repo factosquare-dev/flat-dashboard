@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { Project } from '../../../types/project';
 import { useDynamicLayout } from '@/components/Schedule/hooks/useDynamicLayout';
 import { useProjectListState } from './hooks/useProjectListState';
@@ -15,6 +16,10 @@ interface ProjectListProps {
 }
 
 const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, className = '' }) => {
+  const [searchParams] = useSearchParams();
+  const viewMode = searchParams.get('view');
+  const isTableView = viewMode === 'table';
+  
   const { containerStyle } = useDynamicLayout();
   const { hiddenColumns, toggleColumn, isColumnVisible, showAllColumns, hideAllColumns } = useColumnVisibility();
   const { columns } = useColumnOrder();
@@ -38,10 +43,12 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
   } = useProjectListState();
 
   // Memoize filtered and sorted projects
-  const filteredProjects = useMemo(() => 
-    filtersHook.getFilteredAndSortedProjects(projectsHook.projects),
-    [filtersHook.getFilteredAndSortedProjects, projectsHook.projects]
-  );
+  const filteredProjects = useMemo(() => {
+    const filtered = filtersHook.getFilteredAndSortedProjects(projectsHook.projects);
+    console.log('[ProjectList] Projects before filter:', projectsHook.projects.length);
+    console.log('[ProjectList] Projects after filter:', filtered.length);
+    return filtered;
+  }, [filtersHook.getFilteredAndSortedProjects, projectsHook.projects]);
 
   // Memoize layout props to prevent unnecessary re-renders
   const layoutProps = useMemo(() => ({
@@ -50,6 +57,7 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     onSendEmail: handleSendEmail,
     onSearch: handleSearch,
     onCreateProject: handleCreateProject,
+    isTableView,
     selectedPriority: filtersHook.selectedPriority,
     selectedServiceType: filtersHook.selectedServiceType,
     statusFilters: filtersHook.statusFilters,
@@ -71,6 +79,7 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     handleSendEmail,
     handleSearch,
     handleCreateProject,
+    isTableView,
     filtersHook.selectedPriority,
     filtersHook.selectedServiceType,
     filtersHook.statusFilters,

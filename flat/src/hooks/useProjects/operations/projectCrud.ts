@@ -4,11 +4,13 @@
 
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
+import type { FactoryAssignment } from '@/types/schedule';
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
-import { ProjectField } from '@/types/enums';
+import { ProjectField, FactoryType, TaskStatus } from '@/types/enums';
 import { isProjectType } from '@/utils/projectTypeUtils';
 import { factories } from '@/data/factories';
 import { formatCompanyNameForDisplay } from '@/utils/companyUtils';
+import { mockDataService } from '@/services/mockDataService';
 
 const mockDb = MockDatabaseImpl.getInstance();
 
@@ -37,22 +39,136 @@ export const updateProjectField = async <K extends keyof Project>(
   projects: Project[],
   onUpdate?: (projects: Project[]) => void
 ): Promise<Project[]> => {
-  const projectIndex = projects.findIndex(p => p.id === projectId);
+  console.log(`[updateProjectField] Called with field: ${String(field)}, value:`, value);
+  
+  // Try to find project in passed array first
+  let projectIndex = projects.findIndex(p => p.id === projectId);
+  let project: Project | undefined;
+  
   if (projectIndex === -1) {
-    return projects;
+    console.log(`[updateProjectField] Project ${projectId} not found in array, checking MockDB`);
+    // Try to get directly from MockDatabase
+    const db = MockDatabaseImpl.getInstance();
+    const dbProject = db.getDatabase().projects.get(projectId);
+    
+    if (!dbProject) {
+      console.log(`[updateProjectField] Project ${projectId} not found in MockDB either`);
+      return projects;
+    }
+    
+    project = dbProject;
+    // Add to projects array for consistency
+    projects = [...projects, dbProject];
+    projectIndex = projects.length - 1;
+  } else {
+    project = projects[projectIndex];
   }
 
-  const project = projects[projectIndex];
   let updatedProject = { ...project };
 
-  // Handle factory ID fields specially
+  // TASK-CENTRIC: Handle factory ID fields by assigning to tasks
   if ((FACTORY_ID_FIELDS as ReadonlyArray<string>).includes(field as string)) {
+    console.log(`[updateProjectField] Field ${String(field)} is a factory ID field`);
     const factoryIdField = field as typeof FACTORY_ID_FIELDS[number];
     const factoryNameField = getFactoryNameField(factoryIdField);
     
     if (factoryNameField) {
+      // Update project fields (for backward compatibility)
       updatedProject[factoryIdField] = value as any;
       updatedProject[factoryNameField] = value ? getFactoryNames(value as string | string[]) : undefined;
+      
+      // TASK-CENTRIC: Also assign factories to all project tasks
+      const factoryIds = Array.isArray(value) ? value : value ? [value] : [];
+      
+      // Determine factory type from field
+      let factoryType: FactoryType | undefined;
+      if (factoryIdField === ProjectField.MANUFACTURER_ID) {
+        factoryType = FactoryType.MANUFACTURING;
+      } else if (factoryIdField === ProjectField.CONTAINER_ID) {
+        factoryType = FactoryType.CONTAINER;
+      } else if (factoryIdField === ProjectField.PACKAGING_ID) {
+        factoryType = FactoryType.PACKAGING;
+      }
+      
+      const projectTasks = mockDataService.getTasksByProjectId(projectId);
+      
+      console.log(`[ProjectList] Adding ${factoryType} factory to project ${projectId}:`, factoryIds);
+      console.log(`[ProjectList] Found ${projectTasks.length} tasks to update`);
+      
+      // First, clear existing factories of this type from tasks
+      projectTasks.forEach(task => {
+        let shouldClear = false;
+        
+        if (factoryType === FactoryType.MANUFACTURING) {
+          shouldClear = task.title?.includes('제품') || task.title?.includes('생산') || 
+                       task.title?.includes('시제품') || task.title?.includes('품질');
+        } else if (factoryType === FactoryType.CONTAINER) {
+          shouldClear = task.title?.includes('용기') || task.title?.includes('금형') || 
+                       task.title?.includes('사출');
+        } else if (factoryType === FactoryType.PACKAGING) {
+          shouldClear = task.title?.includes('포장') || task.title?.includes('인쇄') || 
+                       task.title?.includes('색상') || task.title?.includes('후가공');
+        }
+        
+        if (shouldClear && task.factoryAssignments) {
+          // Remove factories of this type
+          task.factoryAssignments = task.factoryAssignments.filter(
+            fa => fa.factoryType !== factoryType
+          );
+          mockDataService.updateTask(task.id, { factoryAssignments: task.factoryAssignments });
+        }
+      });
+      
+      // Assign each factory to relevant tasks based on task type
+      factoryIds.forEach((factoryId, index) => {
+        const factory = factories.find(f => f.id === factoryId);
+        console.log(`[ProjectList] Processing factory ${index + 1}/${factoryIds.length}: ${factoryId} (${factory?.name})`);
+        
+        if (factory && factoryType) {
+          let assignedCount = 0;
+          projectTasks.forEach(task => {
+            // Check if task matches the factory type
+            let shouldAssign = false;
+            
+            if (factoryType === FactoryType.MANUFACTURING) {
+              // Manufacturing tasks
+              shouldAssign = task.title?.includes('제품') || task.title?.includes('생산') || 
+                           task.title?.includes('시제품') || task.title?.includes('품질');
+            } else if (factoryType === FactoryType.CONTAINER) {
+              // Container tasks
+              shouldAssign = task.title?.includes('용기') || task.title?.includes('금형') || 
+                           task.title?.includes('사출');
+            } else if (factoryType === FactoryType.PACKAGING) {
+              // Packaging tasks
+              shouldAssign = task.title?.includes('포장') || task.title?.includes('인쇄') || 
+                           task.title?.includes('색상') || task.title?.includes('후가공');
+            }
+            
+            if (shouldAssign) {
+              const newAssignment: FactoryAssignment = {
+                factoryId: factory.id,
+                factoryName: factory.name,
+                factoryType,
+                status: task.status || TaskStatus.PENDING,
+                progress: task.progress,
+                startDate: task.startDate,
+                endDate: task.endDate
+              };
+              
+              const success = mockDataService.assignFactoryToTask(task.id, newAssignment);
+              if (success) {
+                assignedCount++;
+              }
+            }
+          });
+          console.log(`[ProjectList] Factory ${factory.name} assigned to ${assignedCount} tasks`);
+        }
+      });
+      
+      // Trigger a custom event to notify TableView of changes
+      window.dispatchEvent(new CustomEvent('factory-assigned-to-tasks', { 
+        detail: { projectId, factoryType } 
+      }));
     }
   } 
   // Handle date fields with proper serialization

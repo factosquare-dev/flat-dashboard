@@ -34,18 +34,57 @@ const TaskRow: React.FC<TaskRowProps> = ({
   // Check if today is within the task schedule
   const isTodayInSchedule = isDateInRange(new Date(), task.startDate, task.endDate);
 
-  // Get factory information for the task
-  const getTaskFactory = () => {
-    // For TASK type projects, only show the specific factory assigned to this task
-    if (task.factoryId) {
-      const factory = mockDataService.getFactoryById(task.factoryId);
-      if (factory) {
-        return factory.name;
-      }
+  const [isFactoryExpanded, setIsFactoryExpanded] = React.useState(false);
+  
+  // Get factory information for the task (Task-Centric)
+  const getFactoryDisplay = () => {
+    if (!task.factoryAssignments || task.factoryAssignments.length === 0) {
+      return '미할당';
     }
     
-    // If no factory assigned to task, return no info
-    return '정보 없음';
+    // Single factory
+    if (task.factoryAssignments.length === 1) {
+      return task.factoryAssignments[0].factoryName;
+    }
+    
+    // Multiple factories - expandable view
+    if (isFactoryExpanded) {
+      return (
+        <div className="flex flex-col gap-1">
+          {task.factoryAssignments.map((fa, index) => (
+            <div key={index} className="flex items-center gap-1">
+              <span className="text-sm">{fa.factoryName}</span>
+            </div>
+          ))}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsFactoryExpanded(false);
+            }}
+            className="text-xs text-gray-500 hover:text-gray-700 text-left"
+          >
+            접기
+          </button>
+        </div>
+      );
+    }
+    
+    // Collapsed view - show first factory and expand button
+    const factoryName = task.factoryAssignments[0].factoryName;
+    return (
+      <div className="flex items-center gap-1">
+        <span>{factoryName}</span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsFactoryExpanded(true);
+          }}
+          className="px-1.5 py-0.5 text-[10px] bg-blue-100 text-blue-700 rounded-full font-medium hover:bg-blue-200 transition-colors"
+        >
+          +{task.factoryAssignments.length - 1}
+        </button>
+      </div>
+    );
   };
 
 
@@ -96,9 +135,9 @@ const TaskRow: React.FC<TaskRowProps> = ({
       
       {/* 공장 정보 */}
       <td className="px-4 py-3" role="gridcell">
-        <span className="text-sm text-gray-700">
-          {getTaskFactory()}
-        </span>
+        <div className="text-sm text-gray-700">
+          {getFactoryDisplay()}
+        </div>
       </td>
       
       {/* 담당자 */}

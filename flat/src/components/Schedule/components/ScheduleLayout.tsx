@@ -12,6 +12,7 @@ interface ScheduleLayoutProps {
   onOpenEmail: () => void;
   onBack?: () => void;
   onAddTask: () => void;
+  onAddFactory?: () => void;
   projectName?: string;
   onToggleTableView?: () => void;
   isTableView?: boolean;
@@ -25,6 +26,7 @@ const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
   onOpenEmail,
   onBack,
   onAddTask,
+  onAddFactory,
   projectName,
   onToggleTableView,
   isTableView
@@ -41,7 +43,26 @@ const ScheduleLayout: React.FC<ScheduleLayoutProps> = ({
     />
   );
 
-  const floatingActions = (
+  const floatingActions = isTableView ? (
+    // Table View: 새 공장과 제품개발의뢰서 편집
+    <>
+      <FloatingActionButton
+        onClick={onAddProject}
+        icon={<FileEdit />}
+        label="제품개발의뢰서 편집"
+        variant={ButtonVariant.SECONDARY}
+        position="second"
+      />
+      <FloatingActionButton
+        onClick={onAddFactory || onAddProject}
+        icon={<Plus />}
+        label="새 공장"
+        variant={ButtonVariant.PRIMARY}
+        position="first"
+      />
+    </>
+  ) : (
+    // Gantt View: 기존 버튼들
     <>
       <FloatingActionButton
         onClick={onAddProject}

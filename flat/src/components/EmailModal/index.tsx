@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, Mail, AlertCircle } from 'lucide-react';
 import BaseModal, { ModalFooter } from '../common/BaseModal';
 import FactorySelector from './FactorySelector';
+import CustomerSelector from './CustomerSelector';
+import ManagerSelector from './ManagerSelector';
 import FileAttachment from './FileAttachment';
 import { useModalFormValidation } from '@/hooks/useModalFormValidation';
 import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
@@ -46,7 +48,9 @@ const EmailModal: React.FC<EmailModalProps> = ({
     attachments: []
   });
   const [selectedFactories, setSelectedFactories] = useState<string[]>([]);
-  const [showFactoryValidationError, setShowFactoryValidationError] = useState(false);
+  const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
+  const [selectedManagers, setSelectedManagers] = useState<string[]>([]);
+  const [showRecipientValidationError, setShowRecipientValidationError] = useState(false);
 
   // Update recipient when defaultRecipients changes
   React.useEffect(() => {
@@ -75,21 +79,29 @@ const EmailModal: React.FC<EmailModalProps> = ({
   } = useModalFormValidation(emailData, {
     rules: validationRules,
     onSubmit: async (data) => {
-      // Check factory selection
-      if (selectedFactories.length === 0) {
-        setShowFactoryValidationError(true);
+      // Check recipient selection (at least one type must be selected)
+      const hasRecipients = selectedFactories.length > 0 || selectedCustomers.length > 0 || selectedManagers.length > 0;
+      if (!hasRecipients) {
+        setShowRecipientValidationError(true);
         return;
       }
       
       if (onSend) {
+        const allRecipients = [
+          ...selectedFactories,
+          ...selectedCustomers,
+          ...selectedManagers
+        ];
         onSend({
           ...data,
-          recipient: selectedFactories.join(', ')
+          recipient: allRecipients.join(', ')
         });
       }
       // 모달 닫을 때 상태 초기화
       setSelectedFactories([]);
-      setShowFactoryValidationError(false);
+      setSelectedCustomers([]);
+      setSelectedManagers([]);
+      setShowRecipientValidationError(false);
       onClose();
     }
   });
@@ -153,7 +165,7 @@ const EmailModal: React.FC<EmailModalProps> = ({
           </span>
         </div>
       }
-      size={getModalSizeString(ModalSize.MD)}
+      size={getModalSizeString(ModalSize.LG)}
       footer={
         <ModalFooter>
           <Button
@@ -178,10 +190,10 @@ const EmailModal: React.FC<EmailModalProps> = ({
       <form ref={formRef} onSubmit={handleFormSubmit} className="bg-gray-50 -mx-6 -my-6 px-6 py-6">
         <div className="modal-section-spacing">
         {/* Validation error messages */}
-        {showFactoryValidationError && selectedFactories.length === 0 && (
+        {showRecipientValidationError && (
           <div className="email-modal__error">
             <AlertCircle className="email-modal__error-icon" />
-            <span>받는 공장을 선택해주세요</span>
+            <span>받는 사람(공장, 고객, 담당자)을 최소 1명 이상 선택해주세요</span>
           </div>
         )}
         {Object.keys(errors).length > 0 && Object.keys(touched).length > 0 && (
@@ -216,24 +228,34 @@ const EmailModal: React.FC<EmailModalProps> = ({
           selectedFactories={selectedFactories}
           setSelectedFactories={(factories) => {
             setSelectedFactories(factories);
-            if (factories.length > 0) {
-              setShowFactoryValidationError(false);
+            if (factories.length > 0 || selectedCustomers.length > 0 || selectedManagers.length > 0) {
+              setShowRecipientValidationError(false);
             }
           }}
           defaultRecipients={defaultRecipients}
         />
 
+        {/* 받는 고객 */}
+        <CustomerSelector
+          selectedCustomers={selectedCustomers}
+          setSelectedCustomers={(customers) => {
+            setSelectedCustomers(customers);
+            if (customers.length > 0 || selectedFactories.length > 0 || selectedManagers.length > 0) {
+              setShowRecipientValidationError(false);
+            }
+          }}
+        />
+
         {/* 담당자 */}
-        <div className="modal-field-spacing">
-          <label className="modal-field-label">담당자 (팩토)</label>
-          <input
-            type="text"
-            className="modal-input"
-            value={emailData.contactPerson}
-            onChange={(e) => setEmailData({...emailData, contactPerson: e.target.value})}
-            placeholder="담당자 이름"
-          />
-        </div>
+        <ManagerSelector
+          selectedManagers={selectedManagers}
+          setSelectedManagers={(managers) => {
+            setSelectedManagers(managers);
+            if (managers.length > 0 || selectedFactories.length > 0 || selectedCustomers.length > 0) {
+              setShowRecipientValidationError(false);
+            }
+          }}
+        />
 
         {/* 제목 */}
         <div className="modal-field-spacing">

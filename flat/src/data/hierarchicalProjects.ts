@@ -4,7 +4,7 @@ import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
 import { calculateProgressFromTasks } from '../utils/progressCalculator';
 import type { Task } from '../types/schedule';
 import { debugHierarchyIssue } from '../utils/debugHierarchy';
-import { TaskStatus, ProjectType, ServiceType, Priority } from '../types/enums';
+import { TaskStatus, ProjectType, ServiceType, Priority, TableColumnId } from '../types/enums';
 
 // Get projects from mock database instead of hardcoded data
 const getHierarchicalProjects = (): Project[] => {
@@ -72,6 +72,9 @@ const getHierarchicalProjects = (): Project[] => {
       const purchase = typeof sub.purchase === 'string' ? parseFloat(sub.purchase) || 0 : sub.purchase || 0;
       return sum + purchase;
     }, 0);
+    
+    // Aggregate depositPaid from SUB projects (any SUB has deposit = MASTER has deposit)
+    const aggregatedDepositPaid = subProjects.some(sub => sub.depositPaid === true);
 
     // Calculate date range from SUB projects
     const subStartDates = subProjects.map(sub => sub.startDate).filter(Boolean);
@@ -110,6 +113,7 @@ const getHierarchicalProjects = (): Project[] => {
       // Aggregated values from SUB projects
       sales: aggregatedSales,
       purchase: aggregatedPurchase,
+      depositPaid: aggregatedDepositPaid,
       startDate: earliestStartDate,
       endDate: latestEndDate,
       children: subProjects.map(sub => {
@@ -317,10 +321,110 @@ const getAggregatedStagesFromSubProjects = (scheduleIds: ProjectId[]): { stages:
 // Lazy load hierarchical projects to avoid initialization issues
 let _hierarchicalProjects: Project[] | null = null;
 
-export const getHierarchicalProjectsData = (): Project[] => {
-  // Always get fresh data, don't cache
+export const getHierarchicalProjectsData = (filteredProjects?: Project[]): Project[] => {
+  // If filtered projects are provided and not empty, use them
+  if (filteredProjects && filteredProjects.length > 0) {
+    console.log('[getHierarchicalProjectsData] Using filtered projects:', filteredProjects.length);
+    // Build hierarchy from filtered projects
+    return buildHierarchyFromFiltered(filteredProjects);
+  }
+  
+  // If filteredProjects is empty array, return empty (respecting the filter)
+  if (filteredProjects && filteredProjects.length === 0) {
+    console.log('[getHierarchicalProjectsData] Filtered projects is empty, returning empty array');
+    return [];
+  }
+  
+  // Otherwise get all projects from DB (when filteredProjects is undefined)
+  console.log('[getHierarchicalProjectsData] No filter provided, getting all from DB');
   _hierarchicalProjects = getHierarchicalProjects();
   return _hierarchicalProjects;
+};
+
+// Build hierarchical structure from filtered projects
+const buildHierarchyFromFiltered = (projects: Project[]): Project[] => {
+  if (!projects || projects.length === 0) {
+    console.log('[buildHierarchyFromFiltered] No projects to process');
+    return [];
+  }
+
+  const db = MockDatabaseImpl.getInstance();
+  const database = db.getDatabase();
+  const users = Array.from(database.users.values());
+  const factories = Array.from(database.factories.values());
+  const customers = Array.from(database.customers.values());
+  
+  // Debug logging
+  console.log('[buildHierarchyFromFiltered] Input projects:', projects.length);
+  console.log('[buildHierarchyFromFiltered] Project types:', projects.map(p => ({ id: p.id, type: p.type, name: p.name })));
+  
+  // Separate master and sub projects
+  const masterProjects = projects.filter(p => p.type === ProjectType.MASTER || p.type === 'MASTER');
+  const subProjects = projects.filter(p => p.type === ProjectType.SUB || p.type === 'SUB');
+  
+  console.log('[buildHierarchyFromFiltered] Masters:', masterProjects.length, 'Subs:', subProjects.length);
+  
+  // Build hierarchy
+  const hierarchical: Project[] = [];
+  
+  // Add master projects with their filtered children
+  masterProjects.forEach(master => {
+    // Only use SUB projects that passed the filter
+    const filteredSubProjects = subProjects.filter(sub => sub.parentId === master.id);
+    
+    const customer = customers.find(c => c.id === master.customerId);
+    const customerName = customer?.name || master.client || 'Unknown Customer';
+    
+    // Aggregate values from SUB projects
+    const aggregatedSales = filteredSubProjects.reduce((sum, sub) => {
+      const sales = typeof sub.sales === 'string' ? parseFloat(sub.sales) || 0 : sub.sales || 0;
+      return sum + sales;
+    }, 0);
+    
+    const aggregatedPurchase = filteredSubProjects.reduce((sum, sub) => {
+      const purchase = typeof sub.purchase === 'string' ? parseFloat(sub.purchase) || 0 : sub.purchase || 0;
+      return sum + purchase;
+    }, 0);
+    
+    const aggregatedDepositPaid = filteredSubProjects.some(sub => sub.depositPaid === true);
+    
+    hierarchical.push({
+      ...master,
+      level: 0,
+      client: customerName,
+      isExpanded: master.isExpanded !== undefined ? master.isExpanded : true,
+      // Aggregated values
+      sales: aggregatedSales,
+      purchase: aggregatedPurchase,
+      depositPaid: aggregatedDepositPaid,
+      children: filteredSubProjects.map(child => ({
+        ...child,
+        name: master.name, // SUB inherits MASTER's project name
+        level: 1,
+        client: customerName,
+        serviceType: master.serviceType, // Inherit service type
+        status: master.status, // Inherit status
+        isExpanded: false
+      }))
+    });
+  });
+  
+  // Add independent SUB projects (those without parentId)
+  const independentSubs = subProjects.filter(sub => !sub.parentId);
+  independentSubs.forEach(sub => {
+    const customer = customers.find(c => c.id === sub.customerId);
+    const customerName = customer?.name || sub.client || 'Unknown Customer';
+    
+    hierarchical.push({
+      ...sub,
+      level: 0,
+      client: customerName,
+      isExpanded: false
+    });
+  });
+  
+  console.log('[buildHierarchyFromFiltered] Output hierarchical:', hierarchical.length);
+  return hierarchical;
 };
 
 
@@ -349,6 +453,98 @@ export const toggleProject = (projects: Project[], projectId: string): Project[]
     }
     if (project.children) {
       return { ...project, children: toggleProject(project.children, projectId) };
+    }
+    return project;
+  });
+};
+
+// Sort hierarchical projects while maintaining parent-child relationships
+export const sortHierarchicalProjects = (
+  projects: Project[], 
+  sortField: keyof Project | null, 
+  sortDirection: 'asc' | 'desc'
+): Project[] => {
+  if (!sortField) return projects;
+  
+  // Helper function to compare values
+  const compareValues = (aValue: any, bValue: any) => {
+    if (aValue === undefined || aValue === null) aValue = '';
+    if (bValue === undefined || bValue === null) bValue = '';
+    
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+    }
+    
+    const aStr = String(aValue);
+    const bStr = String(bValue);
+    return sortDirection === 'asc' 
+      ? aStr.localeCompare(bStr) 
+      : bStr.localeCompare(aStr);
+  };
+  
+  // Special handling for fields that are SUB-specific
+  if (sortField === TableColumnId.PRODUCT_TYPE || sortField === TableColumnId.PRIORITY) {
+    // For productType and priority, don't sort MASTER projects
+    return projects.map(project => {
+      if (project.type === ProjectType.MASTER && project.children && project.children.length > 0) {
+        // Keep MASTER in place but sort its SUB children by the field
+        return {
+          ...project,
+          children: [...project.children].sort((a, b) => 
+            compareValues(a[sortField], b[sortField])
+          )
+        };
+      } else if (project.type === ProjectType.SUB && !project.parentId) {
+        // Independent SUBs will be sorted at the root level
+        return project;
+      }
+      return project;
+    }).sort((a, b) => {
+      // Only sort independent SUBs at root level, keep MASTERs in original order
+      if (a.type === ProjectType.MASTER && b.type === ProjectType.MASTER) {
+        return 0; // Keep MASTERs in original order
+      }
+      if (a.type === ProjectType.MASTER) return -1; // MASTERs always come first
+      if (b.type === ProjectType.MASTER) return 1;
+      // Both are independent SUBs, sort by the field
+      return compareValues(a[sortField], b[sortField]);
+    });
+  }
+  
+  // Special handling for financial fields - MASTER uses aggregated values
+  if (sortField === TableColumnId.SALES || sortField === TableColumnId.PURCHASE || sortField === TableColumnId.DEPOSIT_PAID) {
+    // Sort all projects including MASTERs (which have aggregated values)
+    const sortedProjects = [...projects].sort((a, b) => {
+      return compareValues(a[sortField], b[sortField]);
+    });
+    
+    // Recursively sort children
+    return sortedProjects.map(project => {
+      if (project.children && project.children.length > 0) {
+        return {
+          ...project,
+          children: [...project.children].sort((a, b) => 
+            compareValues(a[sortField], b[sortField])
+          )
+        };
+      }
+      return project;
+    });
+  }
+  
+  // For other fields, sort normally
+  // Sort projects at the same level
+  const sortedProjects = [...projects].sort((a, b) => {
+    return compareValues(a[sortField], b[sortField]);
+  });
+  
+  // Recursively sort children
+  return sortedProjects.map(project => {
+    if (project.children && project.children.length > 0) {
+      return {
+        ...project,
+        children: sortHierarchicalProjects(project.children, sortField, sortDirection)
+      };
     }
     return project;
   });

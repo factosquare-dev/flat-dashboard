@@ -12,6 +12,7 @@ import type { Customer } from '@/types/customer';
 import type { ProductCategory, ProductCategoryId } from '@/types/productCategory';
 import type { Product, ProductId } from '@/types/product';
 import type { UserId, FactoryId, ProjectId, TaskId, CustomerId } from '@/types/branded';
+import type { CustomFieldDefinition, CustomFieldValue, CustomFieldGroup, CustomFieldTemplate } from '@/types/customField';
 
 /**
  * Database Collections
@@ -38,6 +39,12 @@ export interface MockDatabase {
   priorityMappings: Map<string, PriorityMapping>;
   serviceTypeMappings: Map<string, ServiceTypeMapping>;
   projectTypeMappings: Map<string, ProjectTypeMapping>;
+  
+  // Custom Fields System
+  customFieldDefinitions: Map<string, CustomFieldDefinition>;
+  customFieldValues: Map<string, CustomFieldValue>;
+  customFieldGroups: Map<string, CustomFieldGroup>;
+  customFieldTemplates: Map<string, CustomFieldTemplate>;
   
   // UI Settings
   uiSettings: Map<string, UISettings>;

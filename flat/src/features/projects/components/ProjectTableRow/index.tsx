@@ -60,8 +60,22 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
 
   const handleRowClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    const isInteractive = target.closest('button, input, select, a, .js-inline-edit');
-    if (!isInteractive) {
+    
+    // Check if clicking on interactive elements or editable cells
+    const isInteractive = target.closest(
+      'button, input, select, textarea, a, ' +
+      '.js-inline-edit, .editable-cell, ' +
+      '.modal-input, .SearchBox, ' +
+      '[contenteditable="true"], ' +
+      '[role="combobox"], [role="listbox"], ' +
+      '.factory-cell, .date-picker'
+    );
+    
+    // Also check if it's a td element with onclick handler
+    const isEditableCell = target.closest('td[onclick], td.cursor-pointer');
+    
+    if (!isInteractive && !isEditableCell) {
+      // Only navigate if clicking on non-interactive areas
       // Navigate to table view when row is clicked
       window.location.href = `/projects?view=table&projectId=${project.id}`;
     }
@@ -99,37 +113,22 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
     onDrop?.(e, targetProject);
   };
 
-  // Render Master Project Row
+  // Render Master Project Row (children are handled by HierarchicalProjectTable)
   if (project.type === ProjectType.MASTER) {
     return (
-      <>
-        <MasterProjectRow
-          project={project}
-          columns={columns}
-          isSelected={isSelected}
-          isExpanded={!!isExpanded}
-          onSelect={onSelect}
-          onToggleMaster={handleMasterToggle}
-          onShowOptionsMenu={onShowOptionsMenu}
-          renderCell={renderCell}
-          onDragOver={onDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDropRow}
-        />
-        {isExpanded && project.children && project.children.map((child) => (
-          <ProjectTableRow
-            key={child.id}
-            project={child}
-            columns={columns}
-            isSelected={false}
-            onSelect={() => {}}
-            onRowClick={onRowClick}
-            onUpdateField={onUpdateField}
-            onShowOptionsMenu={onShowOptionsMenu}
-            onToggleMaster={onToggleMaster}
-          />
-        ))}
-      </>
+      <MasterProjectRow
+        project={project}
+        columns={columns}
+        isSelected={isSelected}
+        isExpanded={!!isExpanded}
+        onSelect={onSelect}
+        onToggleMaster={handleMasterToggle}
+        onShowOptionsMenu={onShowOptionsMenu}
+        renderCell={renderCell}
+        onDragOver={onDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDropRow}
+      />
     );
   }
 
@@ -155,6 +154,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
       />
       <ExpandableRow
         isExpanded={isExpanded}
+        projectId={project.id}
         tasks={tasks}
         columns={columns}
         onTaskToggle={handleTaskToggle}
