@@ -7,7 +7,7 @@ import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import { MoreVertical } from 'lucide-react';
 import type { Column } from '@/hooks/useColumnOrder';
-import { ProjectField, ProjectFactoryField } from '@/types/enums';
+import { ProjectField, ProjectFactoryField, TableColumnId } from '@/types/enums';
 import * as cellRenderers from '../cellRenderers';
 import SelectionCell from '../SelectionCell';
 
@@ -97,11 +97,16 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
       {columns.map((column, index) => {
         if (column.visible === false) return null;
         
-        // Check if we should add an empty cell for the "Add Memo" button column
-        const isLastMemoColumn = column.id.startsWith('memo-') && 
-          !columns.some((col, idx) => 
-            idx > index && col.id.startsWith('memo-')
-          );
+        // Check if this is a memo column and if it's the last one
+        const isMemoColumn = column.id.startsWith('memo-');
+        const nextColumn = columns[index + 1];
+        const isLastMemoColumn = isMemoColumn && 
+          (!nextColumn || !nextColumn.id.startsWith('memo-'));
+        
+        // Also check if we need to add button space after LAB_NUMBER when no memos exist
+        const hasMemoColumns = columns.some(col => col.id.startsWith('memo-'));
+        const isLabNumberColumn = column.id === TableColumnId.LAB_NUMBER;
+        const needsButtonSpace = isLastMemoColumn || (isLabNumberColumn && !hasMemoColumns);
         
         let cellContent: React.ReactNode = null;
         
@@ -211,7 +216,7 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
         return (
           <React.Fragment key={column.id}>
             {cellContent}
-            {isLastMemoColumn && (
+            {needsButtonSpace && (
               <td className="px-2 py-1.5 text-xs w-12"></td>
             )}
           </React.Fragment>
