@@ -34,6 +34,26 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
   const customFieldManager = db.getCustomFieldManager();
 
   const [memoColumns, setMemoColumns] = useState<MemoColumn[]>(() => {
+    // Clean up old field- prefix entries (one-time migration)
+    const needsCleanup = localStorage.getItem('memo-migration-v1') !== 'done';
+    if (needsCleanup) {
+      console.log('[MemoContext] Cleaning up old field- prefix entries');
+      // Clear old custom field data
+      const database = db.getDatabase();
+      const oldFields = Array.from(database.customFieldDefinitions.entries())
+        .filter(([id]) => id.startsWith('field-'));
+      oldFields.forEach(([id]) => {
+        database.customFieldDefinitions.delete(id);
+        // Also delete related values
+        database.customFieldValues.forEach((value, key) => {
+          if (value.fieldId === id) {
+            database.customFieldValues.delete(key);
+          }
+        });
+      });
+      localStorage.setItem('memo-migration-v1', 'done');
+    }
+    
     // Load memo fields from MockDB
     const memoFields = customFieldManager.getMemoFields();
     console.log('[MemoContext] Loading memo fields from DB:', memoFields.length);

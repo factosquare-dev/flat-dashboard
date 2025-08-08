@@ -117,13 +117,13 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
         }
         
         // Check if this is a memo column and if it's the last one
-        const isMemoColumn = column.id.startsWith('memo-');
+        const isMemoColumn = column.id.startsWith('memo-') || (column as any).isMemo === true;
         const nextColumn = columns[index + 1];
         const isLastMemoColumn = isMemoColumn && 
-          (!nextColumn || !nextColumn.id.startsWith('memo-'));
+          (!nextColumn || (!nextColumn.id.startsWith('memo-') && !(nextColumn as any).isMemo));
         
         // Also check if we need to add button space after LAB_NUMBER when no memos exist
-        const hasMemoColumns = columns.some(col => col.id.startsWith('memo-'));
+        const hasMemoColumns = columns.some(col => col.id.startsWith('memo-') || (col as any).isMemo === true);
         const isLabNumberColumn = column.id === TableColumnId.LAB_NUMBER;
         const needsButtonSpace = isLastMemoColumn || (isLabNumberColumn && !hasMemoColumns);
         

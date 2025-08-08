@@ -252,7 +252,9 @@ export class CustomFieldManager {
    */
 
   createMemoField(name: string, projectId?: string): MemoField {
-    const memoField = this.createFieldDefinition({
+    // Create field with memo- prefix for ID
+    const newField: CustomFieldDefinition = {
+      id: `memo-${uuidv4()}`,
       name,
       type: 'text' as CustomFieldType,
       entityType: 'project' as CustomFieldEntity,
@@ -263,16 +265,19 @@ export class CustomFieldManager {
         width: '150px'
       },
       metadata: {
-        isSystem: false
+        isSystem: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
-    }) as MemoField;
+    };
 
-    return memoField;
+    this.db.customFieldDefinitions.set(newField.id, newField);
+    return newField as MemoField;
   }
 
   getMemoFields(): MemoField[] {
     return this.getFieldDefinitionsByEntity('project' as CustomFieldEntity)
-      .filter(field => field.type === 'text' || field.type === 'rich_text') as MemoField[];
+      .filter(field => field.id.startsWith('memo-') && (field.type === 'text' || field.type === 'rich_text')) as MemoField[];
   }
 
   /**

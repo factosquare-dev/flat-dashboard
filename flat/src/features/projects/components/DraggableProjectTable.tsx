@@ -368,17 +368,17 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               </div>
             </th>
             {visibleColumns.map((column, idx) => {
-              // Check if this column is a memo column
-              const isMemoColumn = column.id.startsWith('memo-');
+              // Check if this column is a memo column (memo- prefix or has isMemo property)
+              const isMemoColumn = column.id.startsWith('memo-') || (column as any).isMemo === true;
               
               // Check if there's a next column and if it's NOT a memo column
               // This means current column is the last memo column
               const nextColumn = visibleColumns[idx + 1];
               const isLastMemoColumn = isMemoColumn && 
-                (!nextColumn || !nextColumn.id.startsWith('memo-'));
+                (!nextColumn || (!nextColumn.id.startsWith('memo-') && !(nextColumn as any).isMemo));
               
               // If no memo columns exist at all, show after LAB_NUMBER
-              const hasMemoColumns = visibleColumns.some(col => col.id.startsWith('memo-'));
+              const hasMemoColumns = visibleColumns.some(col => col.id.startsWith('memo-') || (col as any).isMemo === true);
               const isLabNumberColumn = column.id === TableColumnId.LAB_NUMBER;
               const shouldShowAddButton = isLastMemoColumn || 
                 (isLabNumberColumn && !hasMemoColumns);
