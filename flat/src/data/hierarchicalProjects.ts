@@ -324,14 +324,12 @@ let _hierarchicalProjects: Project[] | null = null;
 export const getHierarchicalProjectsData = (filteredProjects?: Project[]): Project[] => {
   // If filtered projects are provided and not empty, use them
   if (filteredProjects && filteredProjects.length > 0) {
-    console.log('[getHierarchicalProjectsData] Using filtered projects:', filteredProjects.length);
     // Build hierarchy from filtered projects
     return buildHierarchyFromFiltered(filteredProjects);
   }
   
   // If filteredProjects is empty array, return empty (respecting the filter)
   if (filteredProjects && filteredProjects.length === 0) {
-    console.log('[getHierarchicalProjectsData] Filtered projects is empty, returning empty array');
     return [];
   }
   
@@ -343,7 +341,6 @@ export const getHierarchicalProjectsData = (filteredProjects?: Project[]): Proje
 // Build hierarchical structure from filtered projects
 const buildHierarchyFromFiltered = (projects: Project[]): Project[] => {
   if (!projects || projects.length === 0) {
-    console.log('[buildHierarchyFromFiltered] No projects to process');
     return [];
   }
 
@@ -353,15 +350,9 @@ const buildHierarchyFromFiltered = (projects: Project[]): Project[] => {
   const factories = Array.from(database.factories.values());
   const customers = Array.from(database.customers.values());
   
-  // Debug logging
-  console.log('[buildHierarchyFromFiltered] Input projects:', projects.length);
-  console.log('[buildHierarchyFromFiltered] Project types:', projects.map(p => ({ id: p.id, type: p.type, name: p.name })));
-  
   // Separate master and sub projects
   const masterProjects = projects.filter(p => p.type === ProjectType.MASTER || p.type === 'MASTER');
   const subProjects = projects.filter(p => p.type === ProjectType.SUB || p.type === 'SUB');
-  
-  console.log('[buildHierarchyFromFiltered] Masters:', masterProjects.length, 'Subs:', subProjects.length);
   
   // Build hierarchy
   const hierarchical: Project[] = [];
@@ -422,7 +413,6 @@ const buildHierarchyFromFiltered = (projects: Project[]): Project[] => {
     });
   });
   
-  console.log('[buildHierarchyFromFiltered] Output hierarchical:', hierarchical.length);
   return hierarchical;
 };
 

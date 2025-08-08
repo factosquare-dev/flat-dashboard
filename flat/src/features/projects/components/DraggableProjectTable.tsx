@@ -81,14 +81,6 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   const visibleColumns = columns.filter(col => col && !hiddenColumns.has(col.id));
 
   const handleProjectDragStart = (e: React.DragEvent, projectId: string) => {
-    const project = projects.find(p => p.id === projectId);
-    console.log('[DragDrop] 🚀 DRAG START:', {
-      projectId,
-      projectName: project?.name,
-      projectType: project?.type,
-      parentId: project?.parentId || 'none'
-    });
-    
     setDraggedProjectId(projectId);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('projectId', projectId);
@@ -98,7 +90,6 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   };
 
   const handleProjectDragEnd = (e: React.DragEvent) => {
-    console.log('[DragDrop] 🏁 DRAG END');
     // 드래그 종료 시 정리
     setDraggedProjectId(null);
     if (onDragEnd) {
@@ -119,43 +110,26 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('[DragDrop] ======= DROP EVENT START =======');
-    console.log('[DragDrop] Dragged ID:', draggedProjectId);
-    
     // Case: Drop on empty space (no target)
     if (!targetProject) {
-      console.log('[DragDrop] Target: Empty space (make independent)');
-      
       if (!draggedProjectId) {
-        console.log('[DragDrop] ❌ No dragged project');
         setDraggedProjectId(null);
         return;
       }
       
       const draggedProject = projects.find(p => p.id === draggedProjectId);
       if (!draggedProject || !draggedProject.parentId) {
-        console.log('[DragDrop] ⚠️ Already independent or not found');
         setDraggedProjectId(null);
         return;
       }
       
-      console.log('[DragDrop] ✅ Case: Drop on empty space - making independent');
-      console.log('[DragDrop] Action: makeIndependent(', draggedProjectId, ')');
       makeIndependent(draggedProjectId);
       setDraggedProjectId(null);
       return;
     }
     
-    console.log('[DragDrop] Target:', {
-      id: targetProject.id,
-      name: targetProject.name,
-      type: targetProject.type,
-      parentId: targetProject.parentId || 'none'
-    });
-    
     // 자기 자신에게 드롭하면 무시
     if (!draggedProjectId || draggedProjectId === targetProject.id) {
-      console.log('[DragDrop] ❌ Dropped on itself - no action');
       setDraggedProjectId(null);
       return;
     }
@@ -163,28 +137,17 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     // Find dragged project
     const draggedProject = projects.find(p => p.id === draggedProjectId);
     if (!draggedProject) {
-      console.error('[DragDrop] ❌ Dragged project not found');
       setDraggedProjectId(null);
       return;
     }
     
-    console.log('[DragDrop] Dragged:', {
-      id: draggedProject.id,
-      name: draggedProject.name,
-      type: draggedProject.type,
-      parentId: draggedProject.parentId || 'none'
-    });
-    
     // Case 1: SUB → MASTER
     if (isProjectType(targetProject.type, ProjectType.MASTER)) {
       if (draggedProject.parentId === targetProject.id) {
-        console.log('[DragDrop] ⚠️ Already in this MASTER group');
         setDraggedProjectId(null);
         return;
       }
       
-      console.log('[DragDrop] ✅ Case 1: SUB → MASTER');
-      console.log('[DragDrop] Action: moveToMaster(', draggedProjectId, ',', targetProject.id, ')');
       moveToMaster(draggedProjectId, targetProject.id);
       setDraggedProjectId(null);
       return;
@@ -195,13 +158,10 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
       // Case 2a: Target SUB is in a MASTER group
       if (targetProject.parentId) {
         if (draggedProject.parentId === targetProject.parentId) {
-          console.log('[DragDrop] ⚠️ Same parent group - no action');
           setDraggedProjectId(null);
           return;
         }
         
-        console.log('[DragDrop] ✅ Case 2a: SUB → Different group SUB');
-        console.log('[DragDrop] Action: moveToMaster(', draggedProjectId, ',', targetProject.parentId, ')');
         moveToMaster(draggedProjectId, targetProject.parentId);
         setDraggedProjectId(null);
         return;
@@ -210,32 +170,25 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
       // Case 2b: Target SUB is independent
       if (!targetProject.parentId) {
         if (!draggedProject.parentId) {
-          console.log('[DragDrop] ⚠️ Both already independent - no action');
           setDraggedProjectId(null);
           return;
         }
         
-        console.log('[DragDrop] ✅ Case 2b: SUB → Independent SUB');
-        console.log('[DragDrop] Action: makeIndependent(', draggedProjectId, ')');
         makeIndependent(draggedProjectId);
         setDraggedProjectId(null);
         return;
       }
     }
     
-    console.log('[DragDrop] ❌ Unhandled case');
     setDraggedProjectId(null);
-    console.log('[DragDrop] ======= DROP EVENT END =======');
   };
 
   const handleStartEditMemo = (columnId: string, columnLabel: string) => {
-    console.log('Starting edit memo:', columnId, columnLabel);
     setEditingMemoId(columnId);
     setEditingMemoName(columnLabel);
   };
 
   const handleSaveMemoName = (columnId: string) => {
-    console.log('Saving memo name:', columnId, editingMemoName);
     if (editingMemoName.trim()) {
       updateMemoColumnName(columnId, editingMemoName.trim());
     }
@@ -244,18 +197,15 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   };
 
   const handleCancelEditMemo = () => {
-    console.log('Canceling edit memo');
     setEditingMemoId(null);
     setEditingMemoName('');
   };
   
   const handleAddMemoColumn = () => {
-    console.log('Adding memo column');
     addMemoColumn();
   };
   
   const handleRemoveMemoColumn = (columnId: string) => {
-    console.log('Removing memo column:', columnId);
     removeMemoColumn(columnId);
   };
 
@@ -448,7 +398,6 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
           onDrop={(e) => {
             // Only handle if not dropped on a specific row
             if (e.target === e.currentTarget || !e.currentTarget.contains(e.target as Node)) {
-              console.log('[DragDrop] 💧 DROP on tbody (empty space)');
               handleProjectDrop(e);
             }
           }}
@@ -498,7 +447,6 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
             onDrop={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              console.log('[DragDrop] 💧 DROP on empty row (make independent)');
               handleProjectDrop(e);
             }}
           >
