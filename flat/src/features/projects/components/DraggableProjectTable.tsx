@@ -363,18 +363,20 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               </div>
             </th>
             {visibleColumns.map((column, idx) => {
-              // Find all memo columns and check if this is the last one
-              const memoColumnIndices = visibleColumns
-                .map((col, i) => col.id.startsWith('memo-') ? i : -1)
-                .filter(i => i !== -1);
+              // Check if this column is a memo column
+              const isMemoColumn = column.id.startsWith('memo-');
               
-              const isLastMemoColumn = memoColumnIndices.length > 0 && 
-                idx === memoColumnIndices[memoColumnIndices.length - 1];
+              // Check if there's a next column and if it's NOT a memo column
+              // This means current column is the last memo column
+              const nextColumn = visibleColumns[idx + 1];
+              const isLastMemoColumn = isMemoColumn && 
+                (!nextColumn || !nextColumn.id.startsWith('memo-'));
               
-              // If no memo columns exist, show button after LAB_NUMBER
+              // If no memo columns exist at all, show after LAB_NUMBER
+              const hasMemoColumns = visibleColumns.some(col => col.id.startsWith('memo-'));
               const isLabNumberColumn = column.id === TableColumnId.LAB_NUMBER;
               const shouldShowAddButton = isLastMemoColumn || 
-                (isLabNumberColumn && memoColumnIndices.length === 0);
+                (isLabNumberColumn && !hasMemoColumns);
               
               return (
                 <React.Fragment key={column.id}>
