@@ -363,21 +363,24 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               </div>
             </th>
             {visibleColumns.map((column, idx) => {
-              // Check if we should add the "Add Memo" button after LAB_NUMBER column
+              // Find all memo columns and check if this is the last one
+              const memoColumnIndices = visibleColumns
+                .map((col, i) => col.id.startsWith('memo-') ? i : -1)
+                .filter(i => i !== -1);
+              
+              const isLastMemoColumn = memoColumnIndices.length > 0 && 
+                idx === memoColumnIndices[memoColumnIndices.length - 1];
+              
+              // If no memo columns exist, show button after LAB_NUMBER
               const isLabNumberColumn = column.id === TableColumnId.LAB_NUMBER;
-              // Check if there are any memo columns
-              const hasMemoColumns = visibleColumns.some(col => col.id.startsWith('memo-'));
-              // Check if this is the last memo column
-              const isLastMemoColumn = column.id.startsWith('memo-') && 
-                !visibleColumns.some((col, colIdx) => 
-                  colIdx > idx && col.id.startsWith('memo-')
-                );
+              const shouldShowAddButton = isLastMemoColumn || 
+                (isLabNumberColumn && memoColumnIndices.length === 0);
               
               return (
                 <React.Fragment key={column.id}>
                   {renderHeaderCell(column)}
-                  {/* Add button after LAB_NUMBER if no memo columns, or after last memo column */}
-                  {((isLabNumberColumn && !hasMemoColumns) || isLastMemoColumn) && (
+                  {/* Add button after last memo column, or after LAB_NUMBER if no memos */}
+                  {shouldShowAddButton && (
                     <th className="table-header-cell text-center w-12 bg-white" scope="col">
                       <button
                         onClick={handleAddMemoColumn}
