@@ -86,14 +86,21 @@ export const useColumnOrder = () => {
     // Filter out any undefined memo columns
     const validMemoColumns = (memoColumns || []).filter(col => col != null);
     
+    console.log('[useColumnOrder] Base columns:', baseColumns.length, baseColumns.map(c => c.id));
+    console.log('[useColumnOrder] Memo columns:', validMemoColumns.length, validMemoColumns.map(c => c.id));
+    
     const labNumberIndex = baseColumns.findIndex(col => col.id === TableColumnId.LAB_NUMBER);
     if (labNumberIndex === -1) {
+      console.log('[useColumnOrder] LAB_NUMBER not found, appending memo columns at end');
       return [...baseColumns, ...validMemoColumns];
     }
     
     const before = baseColumns.slice(0, labNumberIndex + 1);
     const after = baseColumns.slice(labNumberIndex + 1);
-    return [...before, ...validMemoColumns, ...after];
+    const combined = [...before, ...validMemoColumns, ...after];
+    
+    console.log('[useColumnOrder] Combined columns:', combined.length, combined.map(c => c.id));
+    return combined;
   }, [baseColumns, memoColumns]);
 
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);

@@ -79,6 +79,10 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
 
   // Filter out hidden columns and any undefined values
   const visibleColumns = columns.filter(col => col && !hiddenColumns.has(col.id));
+  
+  console.log('[DraggableProjectTable] All columns:', columns.length, columns.map(c => c?.id));
+  console.log('[DraggableProjectTable] Visible columns:', visibleColumns.length, visibleColumns.map(c => c.id));
+  console.log('[DraggableProjectTable] Memo columns in visible:', visibleColumns.filter(c => c.id.startsWith('memo-')).map(c => c.id));
 
   const handleProjectDragStart = (e: React.DragEvent, projectId: string) => {
     setDraggedProjectId(projectId);
@@ -352,6 +356,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
       <table ref={tableRef} role="table" style={{ width: 'max-content', minWidth: '1950px' }}>
         <thead className="sticky top-0 z-20 bg-white border-b border-gray-200">
           <tr role="row">
+            {/* Checkbox column */}
             <th className="w-16 px-1 py-1.5 text-left bg-white" scope="col">
               <div className="flex items-center justify-center">
                 <input
@@ -378,6 +383,10 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               const shouldShowAddButton = isLastMemoColumn || 
                 (isLabNumberColumn && !hasMemoColumns);
               
+              if (shouldShowAddButton) {
+                console.log(`[DraggableProjectTable] Add button after column: ${column.id} (idx: ${idx})`);
+              }
+              
               return (
                 <React.Fragment key={column.id}>
                   {renderHeaderCell(column)}
@@ -396,6 +405,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 </React.Fragment>
               );
             })}
+            {/* Options column */}
             <th className="table-header-cell text-center w-12 bg-white" scope="col">
               <span className="sr-only">프로젝트 옵션</span>
               <svg className="w-4 h-4 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -403,6 +413,21 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               </svg>
             </th>
           </tr>
+          {/* Log total header columns */}
+          {(() => {
+            const addButtonCount = visibleColumns.some((col, idx) => {
+              const isMemoColumn = col.id.startsWith('memo-');
+              const nextColumn = visibleColumns[idx + 1];
+              const isLastMemoColumn = isMemoColumn && (!nextColumn || !nextColumn.id.startsWith('memo-'));
+              const hasMemoColumns = visibleColumns.some(c => c.id.startsWith('memo-'));
+              const isLabNumberColumn = col.id === TableColumnId.LAB_NUMBER;
+              return isLastMemoColumn || (isLabNumberColumn && !hasMemoColumns);
+            }) ? 1 : 0;
+            
+            const totalHeaderColumns = 1 + visibleColumns.length + addButtonCount + 1; // checkbox + columns + addButton + options
+            console.log(`[DraggableProjectTable] Total header columns: ${totalHeaderColumns} = 1(checkbox) + ${visibleColumns.length}(columns) + ${addButtonCount}(addButton) + 1(options)`);
+            return null;
+          })()}
         </thead>
         <tbody 
           className="divide-y divide-gray-100"

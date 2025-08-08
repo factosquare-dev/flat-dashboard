@@ -111,7 +111,10 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
       
       {columns.map((column, index) => {
         const content = renderCell(column.id);
-        if (column.visible === false || content === null) return null;
+        if (column.visible === false || content === null) {
+          console.log(`[RowLayout] Skipping column ${column.id} - visible: ${column.visible}, content: ${content}`);
+          return null;
+        }
         
         // Check if this is a memo column and if it's the last one
         const isMemoColumn = column.id.startsWith('memo-');
@@ -148,7 +151,28 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
         );
       })}
       
+      {/* Options column */}
       <td className="px-4 py-2 text-sm w-12">
+        {/* Log total body columns */}
+        {(() => {
+          const renderedColumns = columns.filter((col, index) => {
+            const content = renderCell(col.id);
+            return !(col.visible === false || content === null);
+          });
+          
+          const addButtonCount = columns.some((col, idx) => {
+            const isMemoColumn = col.id.startsWith('memo-');
+            const nextColumn = columns[idx + 1];
+            const isLastMemoColumn = isMemoColumn && (!nextColumn || !nextColumn.id.startsWith('memo-'));
+            const hasMemoColumns = columns.some(c => c.id.startsWith('memo-'));
+            const isLabNumberColumn = col.id === TableColumnId.LAB_NUMBER;
+            return isLastMemoColumn || (isLabNumberColumn && !hasMemoColumns);
+          }) ? 1 : 0;
+          
+          const totalBodyColumns = 1 + renderedColumns.length + addButtonCount + 1; // checkbox + columns + addButton + options
+          console.log(`[RowLayout ${project.name}] Total body columns: ${totalBodyColumns} = 1(checkbox) + ${renderedColumns.length}(columns) + ${addButtonCount}(addButton) + 1(options)`);
+          return null;
+        })()}
         <button
           onClick={handleOptions}
           className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
