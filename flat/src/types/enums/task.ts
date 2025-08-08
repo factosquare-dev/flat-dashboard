@@ -186,11 +186,10 @@ export const ParticipantRoleLabel: Record<ParticipantRole, string> = {
 
 // View Mode for Projects/Schedule
 export enum ViewMode {
-  LIST = 'list',      // Default card/grid view
+  LIST = 'list',      // Default card/grid view for projects
   TASK = 'task',      // Task management view (detailed table)
   GANTT = 'gantt',    // Gantt chart timeline
-  BOARD = 'board',    // Kanban board
-  CALENDAR = 'calendar', // Calendar view
+  TABLE = 'table',    // Table view (used in Schedule component)
 }
 
 // View Mode Labels (Korean)
@@ -198,8 +197,7 @@ export const ViewModeLabel: Record<ViewMode, string> = {
   [ViewMode.LIST]: '목록',
   [ViewMode.TASK]: '작업관리',
   [ViewMode.GANTT]: '간트차트',
-  [ViewMode.BOARD]: '보드',
-  [ViewMode.CALENDAR]: '캘린더',
+  [ViewMode.TABLE]: '테이블',
 };
 
 // Period Type
