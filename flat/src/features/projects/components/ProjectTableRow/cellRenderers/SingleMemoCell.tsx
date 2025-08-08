@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Edit2, Save, X } from 'lucide-react';
 import type { Project } from '@/types/project';
+import { useMemoColumns } from '@/hooks/useMemoColumns';
 
 interface SingleMemoCellProps {
   project: Project;
   memoId: string;
 }
 
-const getMemoKey = (projectId: string, memoId: string) => 
-  `project-memo-${projectId}-${memoId}`;
-
 export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId }) => {
+  const { getMemoValue, setMemoValue } = useMemoColumns();
+  
   const [memo, setMemo] = useState<string>(() => {
-    const saved = localStorage.getItem(getMemoKey(project.id, memoId));
-    return saved || '';
+    return getMemoValue(project.id, memoId);
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(memo);
@@ -26,12 +25,16 @@ export const SingleMemoCell: React.FC<SingleMemoCellProps> = ({ project, memoId 
     }
   }, [isEditing]);
 
+  // Load memo value when component mounts or memoId changes
   useEffect(() => {
-    localStorage.setItem(getMemoKey(project.id, memoId), memo);
-  }, [memo, project.id, memoId]);
+    const value = getMemoValue(project.id, memoId);
+    setMemo(value);
+    setEditValue(value);
+  }, [project.id, memoId]);
 
   const handleSave = () => {
     setMemo(editValue);
+    setMemoValue(project.id, memoId, editValue);
     setIsEditing(false);
   };
 

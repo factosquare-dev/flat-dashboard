@@ -33,6 +33,11 @@ export class StorageManager {
       priorityMappings: Array.from(db.priorityMappings.entries()),
       serviceTypeMappings: Array.from(db.serviceTypeMappings.entries()),
       projectTypeMappings: Array.from(db.projectTypeMappings.entries()),
+      customFieldDefinitions: Array.from(db.customFieldDefinitions?.entries() || []),
+      customFieldValues: Array.from(db.customFieldValues?.entries() || []),
+      customFieldGroups: Array.from(db.customFieldGroups?.entries() || []),
+      customFieldTemplates: Array.from(db.customFieldTemplates?.entries() || []),
+      uiSettings: Array.from(db.uiSettings?.entries() || []),
     };
   }
 
@@ -83,6 +88,11 @@ export class StorageManager {
       priorityMappings: deserializeMap(data.priorityMappings || []),
       serviceTypeMappings: deserializeMap(data.serviceTypeMappings || []),
       projectTypeMappings: deserializeMap(data.projectTypeMappings || []),
+      customFieldDefinitions: deserializeMap(data.customFieldDefinitions || []),
+      customFieldValues: deserializeMap(data.customFieldValues || []),
+      customFieldGroups: deserializeMap(data.customFieldGroups || []),
+      customFieldTemplates: deserializeMap(data.customFieldTemplates || []),
+      uiSettings: deserializeMap(data.uiSettings || []),
     };
   }
 

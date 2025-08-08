@@ -20,6 +20,20 @@ export class CustomFieldManager {
 
   constructor(database: MockDatabase) {
     this.db = database;
+    
+    // Ensure custom field collections are initialized
+    if (!this.db.customFieldDefinitions) {
+      this.db.customFieldDefinitions = new Map();
+    }
+    if (!this.db.customFieldValues) {
+      this.db.customFieldValues = new Map();
+    }
+    if (!this.db.customFieldGroups) {
+      this.db.customFieldGroups = new Map();
+    }
+    if (!this.db.customFieldTemplates) {
+      this.db.customFieldTemplates = new Map();
+    }
   }
 
   /**

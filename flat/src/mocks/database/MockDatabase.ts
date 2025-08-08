@@ -17,6 +17,7 @@ import { EventManager } from './managers/EventManager';
 import { TransactionManager } from './managers/TransactionManager';
 import { CrudOperations } from './managers/CrudOperations';
 import { ProjectAggregationManager } from './managers/ProjectAggregationManager';
+import { CustomFieldManager } from './managers/CustomFieldManager';
 import { ProjectType } from '@/types/enums';
 import type { Project } from '@/types/project';
 
@@ -30,6 +31,7 @@ export class MockDatabaseImpl {
   private transactionManager: TransactionManager;
   private crudOperations: CrudOperations;
   private projectAggregationManager: ProjectAggregationManager;
+  private customFieldManager: CustomFieldManager;
 
   private constructor() {
     // Initialize managers
@@ -41,8 +43,9 @@ export class MockDatabaseImpl {
     // Initialize database
     this.db = this.initializeDatabase();
     
-    // Initialize project aggregation manager after database is ready
+    // Initialize managers that depend on database
     this.projectAggregationManager = new ProjectAggregationManager(this.db, this.storageManager);
+    this.customFieldManager = new CustomFieldManager(this.db);
   }
 
   static getInstance(): MockDatabaseImpl {
@@ -453,6 +456,13 @@ export class MockDatabaseImpl {
     return createResult;
   }
 
+
+  /**
+   * Get Custom Field Manager
+   */
+  getCustomFieldManager(): CustomFieldManager {
+    return this.customFieldManager;
+  }
 
   /**
    * Export database as JSON

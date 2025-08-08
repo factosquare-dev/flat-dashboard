@@ -46,6 +46,10 @@ export const seedData = {
       priorityMappings: new Map(),
       serviceTypeMappings: new Map(),
       projectTypeMappings: new Map(),
+      customFieldDefinitions: new Map(),
+      customFieldValues: new Map(),
+      customFieldGroups: new Map(),
+      customFieldTemplates: new Map(),
       uiSettings: new Map(),
     };
 
