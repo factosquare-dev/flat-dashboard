@@ -1,5 +1,5 @@
 import type { Task, ScheduleFactory } from '@/types/schedule';
-import type { TaskData } from '../types';
+import type { TaskData } from '@/components/Schedule/types';
 import { factories, taskTypesByFactoryType } from '@/data/factories';
 import { findAvailableDateRange } from '@/utils/taskUtils';
 import { getFactoryByIdOrName } from '@/utils/factoryUtils';

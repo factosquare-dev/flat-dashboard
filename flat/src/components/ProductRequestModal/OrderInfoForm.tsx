@@ -1,7 +1,7 @@
 import React from 'react';
 import { Package } from 'lucide-react';
 import { FormInput } from '@/components/forms';
-import ModalSection from '../common/ModalSection';
+import ModalSection from '@/common/ModalSection';
 
 interface OrderInfoFormProps {
   deliveryQuantity: string;

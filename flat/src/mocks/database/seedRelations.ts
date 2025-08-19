@@ -3,7 +3,7 @@
  */
 
 import { UserFactory, ProjectAssignment, FactoryProject, UserCustomer } from './types';
-import { User, UserRole } from '@/types/user';
+import { User, UserRole, InternalManagerType } from '@/types/user';
 import { Customer } from '@/types/customer';
 import { Factory } from '@/types/factory';
 import { Project } from '@/types/project';
@@ -69,11 +69,17 @@ export function createUserFactoryRelations(users: User[], factories: Factory[]):
 export function createProjectAssignments(projects: Project[], users: User[]): ProjectAssignment[] {
   const assignments: ProjectAssignment[] = [];
   
-  // Find specific users
-  const pmUser = users.find(u => u.role === UserRole.PRODUCT_MANAGER)!;
-  const factoryManager = users.find(u => u.role === UserRole.FACTORY_MANAGER)!;
-  const devUser = users.find(u => u.role === UserRole.DEVELOPER)!;
-  const qaUser = users.find(u => u.role === UserRole.QA)!;
+  // Find specific users using new role system
+  const pmUser = users.find(u => u.role === UserRole.INTERNAL_MANAGER && u.internalManagerType === InternalManagerType.SALES);
+  const factoryManager = users.find(u => u.role === UserRole.EXTERNAL_MANAGER);
+  const devUser = users.find(u => u.role === UserRole.ADMIN); // Use admin as fallback for dev tasks
+  const qaUser = users.find(u => u.role === UserRole.INTERNAL_MANAGER && u.internalManagerType === InternalManagerType.QA);
+  
+  // Add safety checks
+  if (!pmUser || !factoryManager || !devUser || !qaUser) {
+    console.warn('Some required users not found for project assignments');
+    return assignments;
+  }
   
   projects.forEach((project, index) => {
     // PM is always the manager

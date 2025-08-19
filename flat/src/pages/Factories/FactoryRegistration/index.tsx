@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, X } from 'lucide-react';
-import type { CertificationType, FactoryManager } from '../../../data/factories';
+import type { CertificationType, FactoryManager } from '@/data/factories';
 import type { FactoryFormData } from './types';
 import { BasicInfoForm } from './BasicInfoForm';
 import { CertificationForm } from './CertificationForm';

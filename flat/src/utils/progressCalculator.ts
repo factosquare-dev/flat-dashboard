@@ -1,4 +1,4 @@
-import { Task, TaskStatus } from '../types/schedule';
+import { Task, TaskStatus } from '@/types/schedule';
 
 export interface ProgressInfo {
   progress: number; // 0-100

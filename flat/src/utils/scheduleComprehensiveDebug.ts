@@ -3,7 +3,7 @@
  * Shows all relevant data in table format
  */
 
-import type { Task, Participant } from '../types/schedule';
+import type { Task, Participant } from '@/types/schedule';
 import { formatDateKey } from './scheduleDateCalculation';
 import { parseScheduleDate } from './scheduleDateParsing';
 

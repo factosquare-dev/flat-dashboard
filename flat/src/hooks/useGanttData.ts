@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import type { Project } from '../components/GanttChart/types';
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import type { Project } from '@/components/GanttChart/types';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 // Helper to get projects from MockDB with real dates and tasks
 const getProjectsFromMockDB = (): Project[] => {

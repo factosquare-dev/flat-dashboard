@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import type { Project } from '../../../../types/project';
-import type { ProjectId } from '../../../../types/branded';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
 import { useDragSelection } from '@/hooks/useDragSelection';
 import { getHierarchicalProjectsData, sortHierarchicalProjects } from '@/data/hierarchicalProjects';
 import { useProjectTableData } from '@/hooks/useProjectTableData';

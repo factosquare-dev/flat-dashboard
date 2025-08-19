@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { UserRole } from '../store/slices/userSlice';
+import type { UserRole } from '@/store/slices/userSlice';
 
 export interface UserData {
   id: string;

@@ -6,10 +6,10 @@ import React from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
 import { UseEditableCellReturn } from '@/hooks/useEditableCell';
-import * as cellRenderers from '../cellRenderers';
+import * as cellRenderers from '@/features/projects/components/ProjectTableRow/cellRenderers';
 // Direct import for LabNumberCell as fallback
-import { LabNumberCell } from '../cellRenderers/LabNumberCell';
-import { SingleMemoCell } from '../cellRenderers/SingleMemoCell';
+import { LabNumberCell } from '@/features/projects/components/ProjectTableRow/cellRenderers/LabNumberCell';
+import { SingleMemoCell } from '@/features/projects/components/ProjectTableRow/cellRenderers/SingleMemoCell';
 import { ProjectType, ProjectField, ProjectFactoryField, TableColumnId } from '@/types/enums';
 
 interface CellRenderProps {

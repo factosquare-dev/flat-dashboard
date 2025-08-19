@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CertificationType } from '../../../data/factories';
+import type { CertificationType } from '@/data/factories';
 import { CERTIFICATE_TYPE_OPTIONS, FACTORY_FORM_LABELS } from '@/constants';
 
 interface CertificationFormProps {

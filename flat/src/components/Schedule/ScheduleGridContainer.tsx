@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ScheduleFactory, Task, TaskControls, DragControls, ModalState } from '../../types/schedule';
+import type { ScheduleFactory, Task, TaskControls, DragControls, ModalState } from '@/types/schedule';
 import { findAvailableDateRange } from '@/utils/taskUtils';
 import ScheduleGrid from './ScheduleGrid';
 import { factories, taskTypesByFactoryType } from '@/data/factories';

@@ -3,7 +3,7 @@
  * Handles project queries and filtering
  */
 
-import { BaseService } from '../BaseService';
+import { BaseService } from '@/mocks/services/BaseService';
 import { Project, ProjectStatus, ProjectType } from '@/types/project';
 import { DbResponse } from '@/mocks/database/types';
 

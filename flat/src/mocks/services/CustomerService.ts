@@ -5,7 +5,7 @@
 
 import { BaseService } from './BaseService';
 import { Customer, CreateCustomerInput, UpdateCustomerInput } from '@/types/customer';
-import { DbResponse } from '../database/types';
+import { DbResponse } from '@/mocks/database/types';
 import { Project } from '@/types/project';
 
 export interface CustomerWithStats extends Customer {

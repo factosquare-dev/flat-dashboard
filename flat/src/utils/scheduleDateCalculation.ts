@@ -4,7 +4,7 @@
  */
 
 import { format, differenceInDays } from 'date-fns';
-import type { Task } from '../types/schedule';
+import type { Task } from '@/types/schedule';
 import { parseScheduleDate } from './scheduleDateParsing';
 
 /**

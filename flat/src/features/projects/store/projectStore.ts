@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import type { Project, ProjectFilter } from '../types';
+import type { Project, ProjectFilter } from '@/features/types';
 
 interface ProjectStore {
   // State

@@ -1,5 +1,5 @@
 import { useMemoContext } from '@/contexts/MemoContext';
-import { Column } from './useColumnOrder';
+import { Column } from '@/types/column';
 
 export interface MemoColumn extends Column {
   isMemo: true;

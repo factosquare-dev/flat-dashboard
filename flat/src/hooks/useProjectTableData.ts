@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { Project, HierarchicalProject } from '../types/project';
-import { ProjectTableService } from '../services/projectTable.service';
+import type { Project, HierarchicalProject } from '@/types/project';
+import { ProjectTableService } from '@/services/projectTable.service';
 
 export const useProjectTableData = (hierarchicalProjects: HierarchicalProject[]) => {
   // Flatten hierarchical projects

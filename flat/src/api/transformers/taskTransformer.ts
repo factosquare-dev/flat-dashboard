@@ -1,5 +1,5 @@
-import type { Task, TaskStatus, TaskPriority, TaskType } from '../../types/task';
-import type { ApiResponse } from '../../types/api';
+import type { Task, TaskStatus, TaskPriority, TaskType } from '@/types/task';
+import type { ApiResponse } from '@/types/api';
 import { 
   toTaskId, 
   toTaskIdSafe, 

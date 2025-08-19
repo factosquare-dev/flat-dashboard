@@ -4,7 +4,7 @@
 
 import React, { useCallback } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import type { TableHeaderProps } from '../types';
+import type { TableHeaderProps } from '@/components/types';
 
 export const TableHeader = <T,>({
   columns,

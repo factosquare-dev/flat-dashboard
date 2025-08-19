@@ -3,9 +3,9 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import type { Project } from '../../types/project';
-import type { ProjectId } from '../../types/branded';
-import type { Schedule } from '../../types/schedule';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
+import type { Schedule } from '@/types/schedule';
 import { loadProjectsFromDb } from './operations/projectLoader';
 import { updateProjectField, addNewProject, deleteProjectById, bulkUpdate } from './operations/projectCrud';
 import { loadScheduleForProject } from './operations/scheduleLoader';

@@ -3,7 +3,7 @@
  * Handles basic Create, Read, Update, Delete operations
  */
 
-import { MockDatabase, DbResponse, DbEventType } from '../types';
+import { MockDatabase, DbResponse, DbEventType } from '@/mocks/database/types';
 import { EventManager } from './EventManager';
 
 export class CrudOperations {

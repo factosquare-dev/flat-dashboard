@@ -1,52 +1,75 @@
-import { useState, useCallback } from 'react';
-import type { Comment } from '../types/comment';
-import type { User } from '../types/user';
-import { ProjectModalService } from '../services/projectModal.service';
+import { useState, useCallback, useEffect } from 'react';
+import type { Comment } from '@/types/comment';
+import type { User } from '@/types/user';
+import { ProjectModalService } from '@/services/projectModal.service';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 export const useProjectComments = (projectId: string, currentUser: User) => {
-  const [comments, setComments] = useState<Comment[]>(() => 
-    ProjectModalService.generateMockComments(projectId)
-  );
+  const db = MockDatabaseImpl.getInstance();
+  const [comments, setComments] = useState<Comment[]>([]);
+
+  // Load comments from MockDB
+  useEffect(() => {
+    if (projectId) {
+      const dbComments = db.getCommentsByProjectId(projectId);
+      setComments(dbComments);
+    }
+  }, [projectId]);
 
   const handleAddComment = useCallback((
     content: string, 
     parentId?: string, 
     mentions?: string[]
   ) => {
-    const newComment = ProjectModalService.createComment(
+    // Use MockDB to create comment
+    const dbUser = db.getCurrentUser();
+    if (!dbUser) return;
+
+    const newComment = db.createComment({
       content,
-      currentUser,
       projectId,
-      parentId,
-      mentions
-    );
+      userId: dbUser.id as string,
+      parentId
+    });
 
-    setComments(prevComments => [...prevComments, newComment]);
-
-    // TODO: API 호출하여 댓글 저장
-    // TODO: 멘션된 사용자에게 알림 전송
-  }, [currentUser, projectId]);
+    if (newComment) {
+      setComments(prevComments => [...prevComments, newComment]);
+    }
+  }, [projectId]);
 
   const handleEditComment = useCallback((commentId: string, content: string) => {
-    setComments(prevComments => 
-      prevComments.map(comment => 
-        comment.id === commentId 
-          ? ProjectModalService.updateComment(comment, content)
-          : comment
-      )
-    );
-    // TODO: API 호출하여 댓글 수정
+    const updated = db.updateComment(commentId, { content });
+    if (updated) {
+      setComments(prevComments => 
+        prevComments.map(comment => 
+          comment.id === commentId 
+            ? { ...comment, content, updatedAt: new Date() }
+            : comment
+        )
+      );
+    }
   }, []);
 
   const handleDeleteComment = useCallback((commentId: string) => {
-    setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
-    // TODO: API 호출하여 댓글 삭제
+    const deleted = db.deleteComment(commentId);
+    if (deleted) {
+      setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
+    }
   }, []);
+  
+  // Function to reload comments (for reactions update)
+  const reloadComments = useCallback(() => {
+    if (projectId) {
+      const dbComments = db.getCommentsByProjectId(projectId);
+      setComments(dbComments);
+    }
+  }, [projectId]);
 
   return {
     comments,
     handleAddComment,
     handleEditComment,
-    handleDeleteComment
+    handleDeleteComment,
+    reloadComments
   };
 };

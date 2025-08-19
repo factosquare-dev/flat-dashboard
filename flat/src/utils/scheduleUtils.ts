@@ -2,7 +2,7 @@
  * Common utilities for Schedule views (Table and Gantt)
  */
 
-import type { Task, Participant } from '../types/schedule';
+import type { Task, Participant } from '@/types/schedule';
 import { eachDayOfInterval, startOfDay } from 'date-fns';
 
 /**

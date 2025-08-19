@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { FileText, Mail, AlertCircle } from 'lucide-react';
-import EmailModal from '../EmailModal/index';
-import BaseModal, { ModalFooter } from '../common/BaseModal';
+import EmailModal from '@/EmailModal/index';
+import BaseModal, { ModalFooter } from '@/common/BaseModal';
 import { BasicInfoForm } from './components/BasicInfoForm';
 import { DeliveryForm } from './components/DeliveryForm';
 import OrderInfoForm from './OrderInfoForm';
@@ -9,7 +9,7 @@ import ContentInfoForm from './ContentInfoForm';
 import IngredientInfoForm from './IngredientInfoForm';
 import { useProductRequestForm } from './hooks/useProductRequestForm';
 import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
-import { Button } from '../ui/Button';
+import { Button } from '@/ui/Button';
 import { getModalSizeString } from '@/utils/modalUtils';
 import type { ProductRequestModalProps } from './types';
 import './ProductRequestModal.css';

@@ -136,8 +136,6 @@ body {
 #root {
   width: 100%;
   min-height: 100vh;
-  max-width: var(--container-max);
-  margin: 0 auto;
 }
 
 /* Responsive font sizing */

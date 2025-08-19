@@ -3,7 +3,7 @@
  */
 
 import React, { useMemo, useCallback } from 'react';
-import type { TableRowProps } from '../types';
+import type { TableRowProps } from '@/components/types';
 
 export const TableRow = React.memo(<T,>({
   record,

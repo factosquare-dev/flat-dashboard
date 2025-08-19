@@ -1,4 +1,4 @@
-import { ModalSize } from '../types/enums';
+import { ModalSize } from '@/types/enums';
 
 /**
  * Convert ModalSize enum to string format for BaseModal

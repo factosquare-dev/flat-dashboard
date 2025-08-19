@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import type { FactoryManager } from '../../../data/factories';
+import type { FactoryManager } from '@/data/factories';
 
 interface ManagerFormProps {
   managers: FactoryManager[];

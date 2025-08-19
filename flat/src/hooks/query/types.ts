@@ -1,4 +1,4 @@
-import type { AsyncState, UseAsyncStateOptions } from '../useAsyncState';
+import type { AsyncState, UseAsyncStateOptions } from '@/useAsyncState';
 
 export interface QueryOptions<T = any> extends UseAsyncStateOptions {
   enabled?: boolean;

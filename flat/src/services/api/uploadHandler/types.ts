@@ -1,4 +1,4 @@
-import type { RequestOptions } from '../requestHandlers';
+import type { RequestOptions } from '@/services/api/requestHandlers';
 
 export interface UploadOptions extends RequestOptions {
   onProgress?: (progress: number) => void;

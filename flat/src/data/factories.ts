@@ -1,6 +1,6 @@
-import { FactoryType } from '../types/enums';
-import { TaskType } from '../types/enums/task';
-import { FactoryId, toFactoryId } from '../types/branded';
+import { FactoryType } from '@/types/enums';
+import { TaskType } from '@/types/enums/task';
+import { FactoryId, toFactoryId } from '@/types/branded';
 
 // 공장 인증 타입
 export type CertificationType = 
@@ -36,7 +36,7 @@ export interface Factory {
 }
 
 // Import at the top to avoid circular dependency issues
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 // Export factories as a getter function
 export const getFactories = (): Factory[] => {

@@ -1,4 +1,4 @@
-import type { Task, ResizePreview, ModalState } from '../../../../types/schedule';
+import type { Task, ResizePreview, ModalState } from '@/types/schedule';
 import { setInteractionMode, setPreventClickUntil } from '@/utils/schedule/globalState';
 import { SCHEDULE_CONSTANTS } from '@/components/Schedule/constants';
 import { calculateResizeDateFromX, calculateHoveredDateIndex, calculateSnapIndicatorX } from './dateCalculations';

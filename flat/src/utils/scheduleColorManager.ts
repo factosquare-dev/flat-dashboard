@@ -8,7 +8,7 @@
  * - D: Dependency inversion - Provides interface, not implementation
  */
 
-import { FactoryId } from '../types/branded';
+import { FactoryId } from '@/types/branded';
 
 // Type-safe color values (Foundation - Level 1 Type Safety)
 export const SCHEDULE_COLORS = {

@@ -5,7 +5,7 @@
 import { getServices } from '@/mocks/services';
 import { QueryOptions } from '@/mocks/database/types';
 import { Factory } from '@/types/factory';
-import { simulateDelay, shouldSimulateError, formatResponse } from '../common';
+import { simulateDelay, shouldSimulateError, formatResponse } from '@/mocks/common';
 
 export const factoryApi = {
   async getAll(params?: QueryOptions) {

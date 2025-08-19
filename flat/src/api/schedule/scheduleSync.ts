@@ -2,8 +2,8 @@
  * Schedule synchronization operations
  */
 
-import type { Schedule, Task } from '../../types/schedule';
-import type { Project } from '../../types/project';
+import type { Schedule, Task } from '@/types/schedule';
+import type { Project } from '@/types/project';
 import { USE_MOCK_DATA } from '@/config/mock';
 import { getDatabaseWithRetry } from '@/mocks/database/utils';
 import { mockDataService } from '@/services/mockDataService';

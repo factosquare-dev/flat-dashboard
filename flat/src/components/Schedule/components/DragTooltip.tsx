@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DragTooltip as DragTooltipType } from '../../../types/schedule';
+import type { DragTooltip as DragTooltipType } from '@/types/schedule';
 
 interface DragTooltipProps {
   tooltip: DragTooltipType;

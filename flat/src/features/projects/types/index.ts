@@ -1,4 +1,4 @@
-import type { BaseEntity, Status, Priority } from '../../common/types';
+import type { BaseEntity, Status, Priority } from '@/common/types';
 
 // Project types
 export interface Project extends BaseEntity {

@@ -1,7 +1,8 @@
 import React, { useState, memo } from 'react';
 import type { Comment, CommentAuthor } from '@/types/comment';
 import { MessageSquare, Edit2, Trash2, MoreVertical } from 'lucide-react';
-import CommentInput from '../CommentInput';
+import CommentInput from '@/components/CommentSection/CommentInput';
+import EmojiReactions from '@/components/CommentSection/EmojiReactions';
 import { formatRelativeTime } from '@/utils/coreUtils';
 
 interface CommentItemProps {
@@ -13,6 +14,7 @@ interface CommentItemProps {
   onDelete: (commentId: string) => void;
   onAddComment: (content: string, parentId?: string, mentions?: string[]) => void;
   onCancelReply: () => void;
+  onAddReaction?: (commentId: string, emoji: string) => void;
   replyToId?: string | null;
   isTopLevel?: boolean; // 최상위 댓글인지 구분
 }
@@ -26,6 +28,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onDelete,
   onAddComment,
   onCancelReply,
+  onAddReaction,
   replyToId,
   isTopLevel = false
 }) => {
@@ -140,6 +143,16 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 )}
               </div>
               
+              {/* Emoji Reactions */}
+              {onAddReaction && (
+                <EmojiReactions
+                  reactions={comment.reactions}
+                  commentId={comment.id}
+                  onAddReaction={onAddReaction}
+                  currentUserId={currentUser.id as string}
+                />
+              )}
+              
               {/* Reply button - 자기 자신의 댓글이 아닐 때만 표시 */}
               {!isAuthor && (
                 <button
@@ -172,6 +185,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 onDelete={onDelete}
                 onAddComment={onAddComment}
                 onCancelReply={onCancelReply}
+                onAddReaction={onAddReaction}
                 replyToId={replyToId}
                 isTopLevel={false}
               />

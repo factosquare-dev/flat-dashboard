@@ -2,8 +2,8 @@
  * Core error handling utilities
  */
 
-import { logger } from '../logger';
-import { getCurrentTimestamp } from '../unifiedDateUtils';
+import { logger } from '@/utils/logger';
+import { getCurrentTimestamp } from '@/utils/unifiedDateUtils';
 
 /**
  * Standard error codes

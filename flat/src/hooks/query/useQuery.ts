@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useAsyncState } from '../useAsyncState';
+import { useAsyncState } from '@/useAsyncState';
 import type { QueryOptions, QueryResult } from './types';
 import { queryCache } from './queryCache';
 import { executeWithRetry } from './retryLogic';

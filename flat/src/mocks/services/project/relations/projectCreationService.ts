@@ -3,13 +3,13 @@
  * Handles project creation with all related entities
  */
 
-import { BaseService } from '../../BaseService';
+import { BaseService } from '@/mocks/services/BaseService';
 import { Project, ProjectType } from '@/types/project';
 import { DbResponse, ProjectAssignment } from '@/mocks/database/types';
 import { Schedule, Task, TaskType } from '@/types/schedule';
-import { ProjectWithRelations, CreateProjectData } from '../types';
-import { ProjectCrudService } from '../ProjectCrudService';
-import { TaskService } from '../../TaskService';
+import { ProjectWithRelations, CreateProjectData } from '@/mocks/services/types';
+import { ProjectCrudService } from '@/mocks/services/project/ProjectCrudService';
+import { TaskService } from '@/mocks/services/TaskService';
 
 export class ProjectCreationService extends BaseService<Project> {
   private projectCrud: ProjectCrudService;

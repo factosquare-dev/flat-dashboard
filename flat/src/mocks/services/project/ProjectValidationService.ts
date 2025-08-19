@@ -3,7 +3,7 @@
  * Handles project validation and synchronization between MASTER and SUB projects
  */
 
-import { BaseService } from '../BaseService';
+import { BaseService } from '@/mocks/services/BaseService';
 import { Project, ProjectType } from '@/types/project';
 import { DbResponse } from '@/mocks/database/types';
 import { 

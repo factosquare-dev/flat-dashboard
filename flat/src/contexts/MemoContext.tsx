@@ -11,6 +11,7 @@ interface MemoContextType {
   removeMemoColumn: (columnId: string) => void;
   updateMemoColumnName: (columnId: string, newName: string) => void;
   resetMemoColumns: () => void;
+  reorderMemoColumns: (draggedId: string, targetId: string) => void;
   getMemoValue: (projectId: string, memoId: string) => string;
   setMemoValue: (projectId: string, memoId: string, value: string) => void;
 }
@@ -203,6 +204,27 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
     setMemoColumns(defaultMemos);
   };
 
+  const reorderMemoColumns = (draggedId: string, targetId: string) => {
+    console.log('[MemoContext] Reordering memo columns:', draggedId, '->', targetId);
+    
+    if (draggedId === targetId) return;
+    
+    const draggedIndex = memoColumns.findIndex(col => col.id === draggedId);
+    const targetIndex = memoColumns.findIndex(col => col.id === targetId);
+    
+    if (draggedIndex === -1 || targetIndex === -1) {
+      console.error('[MemoContext] Column not found for reordering');
+      return;
+    }
+    
+    const newColumns = [...memoColumns];
+    const [removed] = newColumns.splice(draggedIndex, 1);
+    newColumns.splice(targetIndex, 0, removed);
+    
+    console.log('[MemoContext] New column order:', newColumns.map(c => c.label));
+    setMemoColumns(newColumns);
+  };
+
   // Function to get memo value for a project
   const getMemoValue = (projectId: string, memoId: string): string => {
     const column = memoColumns.find(col => col.id === memoId);
@@ -246,6 +268,7 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
     removeMemoColumn,
     updateMemoColumnName,
     resetMemoColumns,
+    reorderMemoColumns,
     getMemoValue,
     setMemoValue
   };

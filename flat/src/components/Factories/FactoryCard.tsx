@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Factory } from 'lucide-react';
-import type { Factory as FactoryDataType } from '../../data/factories';
+import type { Factory as FactoryDataType } from '@/data/factories';
 import { FactoryType, FactoryTypeLabel } from '@/types/enums';
-import FactoryTypeBadge from '../common/FactoryTypeBadge';
+import FactoryTypeBadge from '@/common/FactoryTypeBadge';
 
 interface FactoryCardProps {
   factory: FactoryDataType;

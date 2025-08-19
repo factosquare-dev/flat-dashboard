@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import type { ScheduleProps } from './types';
 import { ViewMode } from '@/types/enums';
-import { useScheduleState } from '../hooks/useScheduleState';
-import { useScheduleEffects } from '../hooks/useScheduleEffects';
-import { useDynamicLayout } from '../hooks/useDynamicLayout';
+import { useScheduleState } from '@/components/hooks/useScheduleState';
+import { useScheduleEffects } from '@/components/hooks/useScheduleEffects';
+import { useDynamicLayout } from '@/components/hooks/useDynamicLayout';
 import { useTaskStore } from '@/stores/taskStore';
-import ScheduleLayout from '../components/ScheduleLayout';
-import ScheduleModals from '../ScheduleModals';
+import ScheduleLayout from '@/components/components/ScheduleLayout';
+import ScheduleModals from '@/components/ScheduleModals';
 import ScheduleViewSwitcher from './ScheduleViewSwitcher';
 import ScheduleDataValidator from './ScheduleDataValidator';
 import { useToast } from '@/hooks/useToast';

@@ -1,7 +1,7 @@
 import { apiClient } from './client/interceptors';
-import type { Project } from '../types';
-import { ProjectId, CustomerId, extractIdString } from '../types/branded';
-import { convertApiProject, convertApiProjects } from '../utils/apiConversions';
+import type { Project } from '@/types/project';
+import { ProjectId, CustomerId, extractIdString } from '@/types/branded';
+import { convertApiProject, convertApiProjects } from '@/utils/apiConversions';
 
 export interface ProjectsApiResponse {
   data: Project[];

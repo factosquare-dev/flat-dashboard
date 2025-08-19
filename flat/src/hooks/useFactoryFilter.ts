@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import type { Factory } from '../data/factories';
-import { FactoryType, FactoryTypeLabel } from '../types/enums';
+import type { Factory } from '@/data/factories';
+import { FactoryType, FactoryTypeLabel } from '@/types/enums';
 
 // Using FactoryTypeLabel values as string literals
 

@@ -1,12 +1,12 @@
 import { apiClient } from './api';
-import type { Factory, FactoryType } from '../types/factory';
-import type { ApiResponse } from '../types/api';
-import type { FactoryId } from '../types/branded';
+import type { Factory, FactoryType } from '@/types/factory';
+import type { ApiResponse } from '@/types/api';
+import type { FactoryId } from '@/types/branded';
 import { 
   transformApiFactory, 
   transformApiFactoryList, 
   transformFactoryToApi 
-} from '../api/transformers';
+} from '@/api/transformers';
 
 interface FactoryFilter {
   type?: FactoryType;

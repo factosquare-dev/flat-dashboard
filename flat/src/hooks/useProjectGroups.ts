@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Project } from '../types/project';
+import type { Project } from '@/types/project';
 
 interface ProjectGroup {
   id: string;

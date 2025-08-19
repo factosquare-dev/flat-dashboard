@@ -1,6 +1,6 @@
-import type { Participant, Task } from '../../../types/schedule';
-import type { Factory } from '../../../types/factory';
-import type { ProjectId, FactoryId } from '../../../types/branded';
+import type { Participant, Task } from '@/types/schedule';
+import type { Factory } from '@/types/factory';
+import type { ProjectId, FactoryId } from '@/types/branded';
 
 export interface ScheduleProps {
   participants: Factory[];  // Should be Factory[] not Participant[]
@@ -24,4 +24,4 @@ export interface TaskData {
 }
 
 // Re-export ViewMode type from enums
-export { ViewMode } from '../../../types/enums';
+export { ViewMode } from '@/types/enums';

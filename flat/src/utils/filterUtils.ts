@@ -2,7 +2,7 @@
  * Common filtering and sorting utilities
  */
 
-import type { Project, Priority, ServiceType, ProjectStatus } from '../types/project';
+import type { Project, Priority, ServiceType, ProjectStatus } from '@/types/project';
 
 export interface FilterOptions {
   searchQuery?: string;

@@ -1,6 +1,6 @@
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import type { Project } from '../types/project';
-import { ProjectType } from '../types/enums';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import type { Project } from '@/types/project';
+import { ProjectType } from '@/types/enums';
 
 export function debugHierarchyIssue() {
   try {

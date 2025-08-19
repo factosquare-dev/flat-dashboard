@@ -15,7 +15,7 @@ import {
   toTaskIdSafe,
   toCustomerIdSafe,
   extractIdString
-} from '../types/branded';
+} from '@/types/branded';
 
 /**
  * Extract ID from URL parameter

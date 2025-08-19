@@ -1,5 +1,5 @@
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import type { ServiceType } from '../types/project';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import type { ServiceType } from '@/types/project';
 
 export interface ServiceTypeInfo {
   code: string;

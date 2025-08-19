@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { EditingCell } from '../types/project';
+import type { EditingCell } from '@/types/project';
 
 export interface UseEditableCellReturn {
   editingCell: EditingCell | null;

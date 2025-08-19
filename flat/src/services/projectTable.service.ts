@@ -1,9 +1,9 @@
-import type { Project, HierarchicalProject } from '../types/project';
-import type { ProjectId } from '../types/branded';
-import { ProjectType } from '../types/enums';
-import { isProjectType } from '../utils/projectTypeUtils';
-import { toLocalDateString } from '../utils/unifiedDateUtils';
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import type { Project, HierarchicalProject } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
+import { ProjectType } from '@/types/enums';
+import { isProjectType } from '@/utils/projectTypeUtils';
+import { toLocalDateString } from '@/utils/unifiedDateUtils';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 export class ProjectTableService {
   /**

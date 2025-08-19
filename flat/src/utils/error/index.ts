@@ -46,7 +46,7 @@ export {
   isApiError,
   isNetworkError,
   isTimeoutError
-} from '../apiClient';
+} from '@/utils/apiClient';
 
 // Export ApiError as a type
-export type { ApiError } from '../apiClient';
+export type { ApiError } from '@/utils/apiClient';

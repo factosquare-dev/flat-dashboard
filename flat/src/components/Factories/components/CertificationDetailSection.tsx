@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, X, Award } from 'lucide-react';
-import type { CertificationDetail, CertificationFormData } from '../types/certification';
+import type { CertificationDetail, CertificationFormData } from '@/components/types/certification';
 import type { CertificationType } from '@/data/factories';
 import { Button } from '@/components/ui/Button';
 import { ButtonVariant, ButtonSize } from '@/types/enums';

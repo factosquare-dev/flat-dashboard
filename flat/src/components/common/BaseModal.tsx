@@ -73,7 +73,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
         focusManagement.restoreFocus(previouslyFocusedRef.current);
       };
     }
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

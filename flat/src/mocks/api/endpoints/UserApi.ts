@@ -5,7 +5,7 @@
 import { getServices } from '@/mocks/services';
 import { QueryOptions } from '@/mocks/database/types';
 import { User } from '@/types/user';
-import { simulateDelay, shouldSimulateError, formatResponse } from '../common';
+import { simulateDelay, shouldSimulateError, formatResponse } from '@/mocks/common';
 
 export const userApi = {
   async getAll(params?: QueryOptions) {

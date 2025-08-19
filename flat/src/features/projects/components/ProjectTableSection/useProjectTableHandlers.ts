@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
-import type { Project } from '../../../../types/project';
-import type { ProjectId } from '../../../../types/branded';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
 import { ProjectTableService } from '@/services/projectTable.service';
 import { useProjectHierarchy } from '@/hooks/useProjectHierarchy';
 import { ProjectType } from '@/types/enums';

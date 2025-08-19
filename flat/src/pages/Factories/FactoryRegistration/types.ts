@@ -1,4 +1,4 @@
-import type { CertificationType, FactoryManager } from '../../../data/factories';
+import type { CertificationType, FactoryManager } from '@/data/factories';
 import { FactoryType } from '@/types/enums';
 
 export interface FactoryFormData {

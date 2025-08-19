@@ -3,8 +3,8 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import type { Project } from '../../types/project';
-import type { ProjectId } from '../../types/branded';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
 
 export interface UseProjectSelectionProps {
   projects: Project[];

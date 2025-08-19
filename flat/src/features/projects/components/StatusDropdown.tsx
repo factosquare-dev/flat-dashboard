@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { ProjectStatus } from '../../../types/project';
+import type { ProjectStatus } from '@/types/project';
 import { getStatusDisplayName, getStatusStyles, getStatusIcon, getAllStatuses } from '@/utils/statusUtils';
 import '../../../design-system/styles/dropdown.css';
 

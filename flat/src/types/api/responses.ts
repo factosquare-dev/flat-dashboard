@@ -8,19 +8,19 @@ import type {
   ProjectStatus, 
   Priority, 
   ServiceType 
-} from '../project';
+} from '@/types/project';
 import type { 
   User, 
   UserRole 
-} from '../user';
+} from '@/types/user';
 import type { 
   Factory, 
   FactoryType 
-} from '../factory';
+} from '@/types/factory';
 import type { 
   Schedule, 
   Task 
-} from '../schedule';
+} from '@/types/schedule';
 
 // Base response structure
 export interface BaseResponse<T> {

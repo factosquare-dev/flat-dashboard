@@ -6,7 +6,7 @@ import {
   TaskType,
   TaskTypeLabel,
   TasksByFactoryType
-} from '../types/enums';
+} from '@/types/enums';
 
 // Factory type constants - use FactoryType enum values
 export const FACTORY_TYPES = FactoryType;
@@ -30,4 +30,4 @@ export const FACTORY_FORM_LABELS = {
 } as const;
 
 // Re-export task types from enums for backward compatibility
-export { TaskType, TaskTypeLabel, TasksByFactoryType } from '../types/enums';
+export { TaskType, TaskTypeLabel, TasksByFactoryType } from '@/types/enums';

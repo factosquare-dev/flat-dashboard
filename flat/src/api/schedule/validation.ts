@@ -2,8 +2,8 @@
  * Schedule and Task validation utilities
  */
 
-import type { Task } from '../../types/schedule';
-import { TaskStatus } from '../../types/enums';
+import type { Task } from '@/types/schedule';
+import { TaskStatus } from '@/types/enums';
 
 /**
  * Validate task dates - throw error if tasks overlap

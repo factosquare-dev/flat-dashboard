@@ -76,9 +76,8 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
     const isEditableCell = target.closest('td[onclick], td.cursor-pointer');
     
     if (!isInteractive && !isEditableCell) {
-      // Only navigate if clicking on non-interactive areas
-      // Navigate to task view when row is clicked
-      window.location.href = `/projects?view=task&projectId=${project.id}`;
+      // Use the onRowClick prop to handle navigation properly
+      onRowClick(project);
     }
   };
 
@@ -126,6 +125,7 @@ const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
         onToggleMaster={handleMasterToggle}
         onShowOptionsMenu={onShowOptionsMenu}
         renderCell={renderCell}
+        onRowClick={onRowClick}
         onDragOver={onDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDropRow}

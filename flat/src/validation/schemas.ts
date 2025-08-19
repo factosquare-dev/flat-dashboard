@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { APP_CONSTANTS } from '../config/constants';
-import { TaskStatus, ProjectStatus, Priority, UserRole } from '../types/enums';
+import { APP_CONSTANTS } from '@/config/constants';
+import { TaskStatus, ProjectStatus, Priority, UserRole } from '@/types/enums';
 
 // Base validation schemas
 export const emailSchema = z

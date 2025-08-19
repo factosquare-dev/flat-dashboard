@@ -1,12 +1,12 @@
 import { apiClient } from './api';
-import type { Task, TaskStatus, TaskPriority, TaskType } from '../types/task';
-import type { ApiResponse } from '../types/api';
-import type { TaskId, ProjectId, UserId } from '../types/branded';
+import type { Task, TaskStatus, TaskPriority, TaskType } from '@/types/task';
+import type { ApiResponse } from '@/types/api';
+import type { TaskId, ProjectId, UserId } from '@/types/branded';
 import { 
   transformApiTask, 
   transformApiTaskList, 
   transformTaskToApi 
-} from '../api/transformers';
+} from '@/api/transformers';
 
 interface TaskFilter {
   projectId?: ProjectId;

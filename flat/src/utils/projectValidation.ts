@@ -1,4 +1,4 @@
-import { Project, ProjectType } from '../types/project';
+import { Project, ProjectType } from '@/types/project';
 
 /**
  * Fields that must be synchronized between MASTER and SUB projects

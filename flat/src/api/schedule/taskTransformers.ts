@@ -2,8 +2,8 @@
  * Task transformation utilities
  */
 
-import type { Task, Participant } from '../../types/schedule';
-import type { Factory } from '../../types/factory';
+import type { Task, Participant } from '@/types/schedule';
+import type { Factory } from '@/types/factory';
 import { FactoryType } from '@/types/enums';
 
 /**

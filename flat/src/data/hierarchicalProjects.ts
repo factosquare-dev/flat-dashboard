@@ -1,10 +1,10 @@
-import type { Project } from '../types/project';
-import type { ProjectId } from '../types/branded';
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { calculateProgressFromTasks } from '../utils/progressCalculator';
-import type { Task } from '../types/schedule';
-import { debugHierarchyIssue } from '../utils/debugHierarchy';
-import { TaskStatus, ProjectType, ServiceType, Priority, TableColumnId } from '../types/enums';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { calculateProgressFromTasks } from '@/utils/progressCalculator';
+import type { Task } from '@/types/schedule';
+import { debugHierarchyIssue } from '@/utils/debugHierarchy';
+import { TaskStatus, ProjectType, ServiceType, Priority, TableColumnId } from '@/types/enums';
 
 // Get projects from mock database instead of hardcoded data
 const getHierarchicalProjects = (): Project[] => {

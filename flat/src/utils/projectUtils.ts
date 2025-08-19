@@ -1,6 +1,6 @@
-import type { Project } from '../types/project';
-import { getHierarchicalProjectsData } from '../data/hierarchicalProjects';
-import { ProjectType } from '../types/enums';
+import type { Project } from '@/types/project';
+import { getHierarchicalProjectsData } from '@/data/hierarchicalProjects';
+import { ProjectType } from '@/types/enums';
 
 /**
  * Get the count of sub-projects for a master project

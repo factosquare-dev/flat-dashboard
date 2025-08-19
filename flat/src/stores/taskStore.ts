@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { createSelector } from 'reselect';
-import type { Task, Schedule } from '../types/schedule';
-import type { Project } from '../types/project';
-import { scheduleApi } from '../api/schedule';
-import { TaskStatus } from '../types/enums';
-import { ProjectNotFoundError, assertDefined } from '../errors';
+import type { Task, Schedule } from '@/types/schedule';
+import type { Project } from '@/types/project';
+import { scheduleApi } from '@/api/schedule';
+import { TaskStatus } from '@/types/enums';
+import { ProjectNotFoundError, assertDefined } from '@/errors';
 
 interface TaskStore {
   // 상태

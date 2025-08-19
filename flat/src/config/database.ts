@@ -5,7 +5,7 @@
 
 export const DATABASE_CONFIG = {
   // Current database version - increment when schema changes require data regeneration
-  VERSION: '1.1.0',
+  VERSION: '1.3.0',
   
   // Version key in localStorage
   VERSION_KEY: 'mockDbVersion',
@@ -21,7 +21,9 @@ export const DATABASE_CONFIG = {
     '1.0.3': 'Task dates for currentStage display',
     '1.0.4': 'Fix task overlap issue',
     '1.0.5': 'Fundamental fix: simple sequential task generation',
-    '1.1.0': 'Added ProductCategories and Products collections'
+    '1.1.0': 'Added ProductCategories and Products collections',
+    '1.2.0': 'Updated User Role system - ADMIN, INTERNAL_MANAGER, EXTERNAL_MANAGER, CUSTOMER',
+    '1.3.0': 'Added more Manager roles and updated Customer data with real cosmetic companies'
   }
 } as const;
 

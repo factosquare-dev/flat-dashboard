@@ -1,9 +1,9 @@
 import React from 'react';
 import { Plus, Mail, FileEdit, Factory } from 'lucide-react';
 import { PageLayout, FloatingActionButton } from '@/components/common';
-import ProjectActions from '../ProjectActions';
-import type { Priority, ServiceType, ProjectStatus } from '../../../../types/project';
-import type { Column } from '../../../../hooks/useColumnOrder';
+import ProjectActions from '@/features/projects/components/ProjectActions';
+import type { Priority, ServiceType, ProjectStatus } from '@/types/project';
+import type { Column } from '@/hooks/useColumnOrder';
 import { ButtonVariant } from '@/types/enums';
 
 interface ProjectListLayoutProps {

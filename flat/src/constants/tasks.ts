@@ -1,4 +1,4 @@
-import { FactoryType } from '../types/enums';
+import { FactoryType } from '@/types/enums';
 
 export const DEFAULT_TASKS = {
   MANUFACTURING: [

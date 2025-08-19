@@ -1,4 +1,4 @@
-import type { Task, Schedule } from '../types/schedule';
+import type { Task, Schedule } from '@/types/schedule';
 
 // 태스크 스케줄링 제약사항
 export const TASK_CONSTRAINTS = {

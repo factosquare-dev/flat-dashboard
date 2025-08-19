@@ -1,5 +1,5 @@
 import React, { lazy, useCallback } from 'react';
-import type { Project } from '../../../types/project';
+import type { Project } from '@/types/project';
 import LazyBoundary from '@/components/common/LazyBoundary';
 
 // Lazy load modal components

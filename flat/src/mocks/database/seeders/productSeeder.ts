@@ -1,5 +1,5 @@
 import { ProductStatus, type Product, type ProductId } from '@/types/product';
-import type { ProductCategoryId } from '../../../types/productCategory';
+import type { ProductCategoryId } from '@/types/productCategory';
 import { getCurrentISOString } from '@/utils/unifiedDateUtils';
 
 export function createProducts(): Product[] {

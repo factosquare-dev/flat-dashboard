@@ -1,7 +1,7 @@
 import React from 'react';
 // Alert component removed, using inline styling instead
-import { Button } from '../ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
+import { Button } from '@/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/ui/Card';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import type { ErrorBoundaryState } from './types';
 import { ButtonVariant, ModalSize } from '@/types/enums';

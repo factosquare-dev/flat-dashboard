@@ -3,8 +3,8 @@
  * Handles factory relationships with users and projects
  */
 
-import { MockDatabaseImpl } from '../../database/MockDatabase';
-import { DbResponse, UserFactory, FactoryProject } from '../../database/types';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { DbResponse, UserFactory, FactoryProject } from '@/mocks/database/types';
 import { User } from '@/types/user';
 import { Project, ProjectStatus } from '@/types/project';
 

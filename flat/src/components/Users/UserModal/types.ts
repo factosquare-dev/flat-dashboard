@@ -1,4 +1,4 @@
-import type { UserRole } from '../../../store/slices/userSlice';
+import type { UserRole } from '@/store/slices/userSlice';
 
 export interface UserModalProps {
   isOpen: boolean;

@@ -3,7 +3,7 @@
  * This file provides TypeScript access to CSS variables defined in theme.css
  */
 
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '../constants';
+import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/constants';
 
 export const theme = {
   colors: {

@@ -6,8 +6,8 @@
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import type { Project, Customer, Task, Participant } from '../types';
-import { generateProjectId, generateCustomerId, generateTaskId } from '../types/branded';
+import type { Project, Customer, Task, Participant } from '@/types';
+import { generateProjectId, generateCustomerId, generateTaskId } from '@/types/branded';
 
 interface ModalState<T = unknown> {
   isOpen: boolean;

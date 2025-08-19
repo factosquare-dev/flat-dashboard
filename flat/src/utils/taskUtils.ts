@@ -1,4 +1,4 @@
-import type { Task, Participant } from '../types/schedule';
+import type { Task, Participant } from '@/types/schedule';
 import { getTasksForFactory } from './scheduleUtils';
 import { formatDateISO } from './coreUtils';
 

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import type { Task, Factory } from '../types/schedule';
-import { calculateTaskPositionByDate } from '../utils/scheduleDateCalculation';
+import type { Task, Factory } from '@/types/schedule';
+import { calculateTaskPositionByDate } from '@/utils/scheduleDateCalculation';
 
 const generateTaskColor = (index: number): string => {
   // 모든 태스크에 동일한 파란색 사용

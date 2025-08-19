@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
-import type { Project } from '../../../types/project';
-import type { ProjectId } from '../../../types/branded';
+import React, { useState, useRef, useEffect } from 'react';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
 import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '@/hooks/useColumnOrder';
-import type { Column } from '../../../hooks/useColumnOrder';
+import type { Column } from '@/hooks/useColumnOrder';
 import { useColumnResize } from '@/hooks/useColumnResize';
 import { useMemoColumns } from '@/hooks/useMemoColumns';
 import { Plus, X, Edit2, Check } from 'lucide-react';
@@ -72,6 +72,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   const { memoColumns, addMemoColumn, removeMemoColumn, updateMemoColumnName } = useMemoColumns();
   const [editingMemoId, setEditingMemoId] = useState<string | null>(null);
   const [editingMemoName, setEditingMemoName] = useState<string>('');
+  const editInputRef = useRef<HTMLInputElement>(null);
   
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const { moveToMaster, makeIndependent, canBeMoved, canAcceptChildren } = useProjectHierarchy();
@@ -83,6 +84,26 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   console.log('[DraggableProjectTable] All columns:', columns.length, columns.map(c => c?.id));
   console.log('[DraggableProjectTable] Visible columns:', visibleColumns.length, visibleColumns.map(c => c.id));
   console.log('[DraggableProjectTable] Memo columns in visible:', visibleColumns.filter(c => c.id.startsWith('memo-')).map(c => c.id));
+
+  // Handle click outside for memo header edit
+  useEffect(() => {
+    if (!editingMemoId) return;
+    
+    const handleClickOutside = (e: MouseEvent) => {
+      // Check if click is outside the edit input
+      if (editInputRef.current && !editInputRef.current.contains(e.target as Node)) {
+        // Save the changes
+        if (editingMemoName.trim()) {
+          updateMemoColumnName(editingMemoId, editingMemoName.trim());
+        }
+        setEditingMemoId(null);
+        setEditingMemoName('');
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [editingMemoId, editingMemoName, updateMemoColumnName]);
 
   const handleProjectDragStart = (e: React.DragEvent, projectId: string) => {
     setDraggedProjectId(projectId);
@@ -246,8 +267,9 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
           column.align === 'center' ? 'justify-center' : column.align === 'right' ? 'justify-end' : 'justify-between'
         } overflow-hidden`}>
           {isMemoColumn && isEditingThisMemo ? (
-            <div className="flex items-center gap-1 w-full">
+            <div className="flex items-center w-full">
               <input
+                ref={editInputRef}
                 type="text"
                 value={editingMemoName}
                 onChange={(e) => setEditingMemoName(e.target.value)}
@@ -261,27 +283,11 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 className="flex-1 px-1 py-0.5 text-xs border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 autoFocus
                 onClick={(e) => e.stopPropagation()}
+                placeholder="메모 이름..."
               />
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSaveMemoName(column.id);
-                }}
-                className="p-0.5 text-green-600 hover:bg-green-50 rounded"
-                title="저장"
-              >
-                <Check className="w-3 h-3" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCancelEditMemo();
-                }}
-                className="p-0.5 text-red-600 hover:bg-red-50 rounded"
-                title="취소"
-              >
-                <X className="w-3 h-3" />
-              </button>
+              <div className="ml-1 text-[10px] text-gray-400 whitespace-nowrap">
+                Enter: 저장 | ESC: 취소
+              </div>
             </div>
           ) : (
             <>
@@ -367,44 +373,17 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 />
               </div>
             </th>
-            {visibleColumns.map((column, idx) => {
-              // Check if this column is a memo column (memo- prefix or has isMemo property)
-              const isMemoColumn = column.id.startsWith('memo-') || (column as any).isMemo === true;
-              
-              // Check if there's a next column and if it's NOT a memo column
-              // This means current column is the last memo column
-              const nextColumn = visibleColumns[idx + 1];
-              const isLastMemoColumn = isMemoColumn && 
-                (!nextColumn || (!nextColumn.id.startsWith('memo-') && !(nextColumn as any).isMemo));
-              
-              // If no memo columns exist at all, show after LAB_NUMBER
-              const hasMemoColumns = visibleColumns.some(col => col.id.startsWith('memo-') || (col as any).isMemo === true);
-              const isLabNumberColumn = column.id === TableColumnId.LAB_NUMBER;
-              const shouldShowAddButton = isLastMemoColumn || 
-                (isLabNumberColumn && !hasMemoColumns);
-              
-              if (shouldShowAddButton) {
-                console.log(`[DraggableProjectTable] Add button after column: ${column.id} (idx: ${idx})`);
-              }
-              
-              return (
-                <React.Fragment key={column.id}>
-                  {renderHeaderCell(column)}
-                  {/* Add button after last memo column, or after LAB_NUMBER if no memos */}
-                  {shouldShowAddButton && (
-                    <th className="table-header-cell text-center w-12 bg-white" scope="col">
-                      <button
-                        onClick={handleAddMemoColumn}
-                        className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded"
-                        title="메모 추가"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </th>
-                  )}
-                </React.Fragment>
-              );
-            })}
+            {visibleColumns.map((column) => renderHeaderCell(column))}
+            {/* Add memo button - fixed position before Options */}
+            <th className="table-header-cell text-center w-12 bg-white" scope="col">
+              <button
+                onClick={handleAddMemoColumn}
+                className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded"
+                title="메모 추가"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </th>
             {/* Options column */}
             <th className="table-header-cell text-center w-12 bg-white" scope="col">
               <span className="sr-only">프로젝트 옵션</span>
@@ -413,21 +392,6 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
               </svg>
             </th>
           </tr>
-          {/* Log total header columns */}
-          {(() => {
-            const addButtonCount = visibleColumns.some((col, idx) => {
-              const isMemoColumn = col.id.startsWith('memo-');
-              const nextColumn = visibleColumns[idx + 1];
-              const isLastMemoColumn = isMemoColumn && (!nextColumn || !nextColumn.id.startsWith('memo-'));
-              const hasMemoColumns = visibleColumns.some(c => c.id.startsWith('memo-'));
-              const isLabNumberColumn = col.id === TableColumnId.LAB_NUMBER;
-              return isLastMemoColumn || (isLabNumberColumn && !hasMemoColumns);
-            }) ? 1 : 0;
-            
-            const totalHeaderColumns = 1 + visibleColumns.length + addButtonCount + 1; // checkbox + columns + addButton + options
-            console.log(`[DraggableProjectTable] Total header columns: ${totalHeaderColumns} = 1(checkbox) + ${visibleColumns.length}(columns) + ${addButtonCount}(addButton) + 1(options)`);
-            return null;
-          })()}
         </thead>
         <tbody 
           className="divide-y divide-gray-100"

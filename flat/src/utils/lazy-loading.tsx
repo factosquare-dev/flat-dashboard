@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, ComponentType } from 'react';
 import { reducedMotion } from './accessibility';
-import LoadingSpinner from '../components/loading/LoadingSpinner';
+import LoadingSpinner from '@/components/loading/LoadingSpinner';
 
 // Lazy loading wrapper with error boundary
 interface LazyComponentProps {

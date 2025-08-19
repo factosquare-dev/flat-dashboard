@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useLoadingStore } from '@/stores/loadingStore';
-import { LoadingFullScreen } from '../loading/LoadingSpinner';
+import { LoadingFullScreen } from '@/loading/LoadingSpinner';
 
 export const LoadingRenderer: React.FC = () => {
   const isLoading = useLoadingStore(state => state.isLoading);

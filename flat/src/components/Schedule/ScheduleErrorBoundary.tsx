@@ -1,5 +1,5 @@
 import React from 'react';
-import { ErrorBoundary, ScheduleErrorFallback } from '../ErrorBoundary';
+import { ErrorBoundary, ScheduleErrorFallback } from '@/ErrorBoundary';
 
 interface ScheduleErrorBoundaryProps {
   children: React.ReactNode;

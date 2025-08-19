@@ -3,8 +3,8 @@
  * Provides common CRUD functionality for all services
  */
 
-import { MockDatabaseImpl } from '../database/MockDatabase';
-import { DbResponse, QueryOptions, QueryResult } from '../database/types';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { DbResponse, QueryOptions, QueryResult } from '@/mocks/database/types';
 
 export abstract class BaseService<T> {
   protected db: MockDatabaseImpl;

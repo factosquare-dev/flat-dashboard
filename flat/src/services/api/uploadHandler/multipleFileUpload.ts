@@ -1,6 +1,6 @@
 import { logger } from '@/utils/logger';
-import type { ApiResponse } from '../requestHandlers';
-import { ApiErrorHandler } from '../errorHandling';
+import type { ApiResponse } from '@/services/api/requestHandlers';
+import { ApiErrorHandler } from '@/services/api/errorHandling';
 import type { UploadOptions, UploadResponse } from './types';
 import { FileValidator } from './fileValidation';
 

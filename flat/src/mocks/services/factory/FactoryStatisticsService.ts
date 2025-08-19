@@ -3,8 +3,8 @@
  * Calculates and manages factory-related statistics
  */
 
-import { MockDatabaseImpl } from '../../database/MockDatabase';
-import { DbResponse, UserFactory, FactoryProject } from '../../database/types';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { DbResponse, UserFactory, FactoryProject } from '@/mocks/database/types';
 import { ProjectStatus } from '@/types/project';
 import { TaskStatus } from '@/types/schedule';
 

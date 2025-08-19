@@ -5,7 +5,7 @@
 
 import { BaseService } from './BaseService';
 import { Factory } from '@/types/factory';
-import { DbResponse } from '../database/types';
+import { DbResponse } from '@/mocks/database/types';
 import { User } from '@/types/user';
 import { Project } from '@/types/project';
 import { FactoryRelationsService } from './factory/FactoryRelationsService';

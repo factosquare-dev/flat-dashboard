@@ -3,9 +3,9 @@
  * Handles Master/Sub project relationship and aggregation logic
  */
 
-import { MockDatabase } from '../types';
+import { MockDatabase } from '@/mocks/database/types';
 import { Project, ProjectType } from '@/types/project';
-import { DbResponse } from '../types';
+import { DbResponse } from '@/mocks/database/types';
 import { StorageManager } from './StorageManager';
 
 export class ProjectAggregationManager {

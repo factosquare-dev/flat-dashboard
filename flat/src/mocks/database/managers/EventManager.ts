@@ -3,7 +3,7 @@
  * Handles database events and subscriptions
  */
 
-import { DbEvent, DbEventType, MockDatabase } from '../types';
+import { DbEvent, DbEventType, MockDatabase } from '@/mocks/database/types';
 
 export class EventManager {
   private listeners: Map<string, Set<(event: DbEvent) => void>>;

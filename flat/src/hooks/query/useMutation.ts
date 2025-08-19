@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { useAsyncState } from '../useAsyncState';
+import { useAsyncState } from '@/useAsyncState';
 import type { MutationOptions, MutationResult } from './types';
 import { executeWithRetry } from './retryLogic';
 

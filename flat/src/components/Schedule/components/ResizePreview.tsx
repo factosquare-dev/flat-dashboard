@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ResizePreview as ResizePreviewType } from '../../../types/schedule';
+import type { ResizePreview as ResizePreviewType } from '@/types/schedule';
 
 interface ResizePreviewProps {
   preview: ResizePreviewType;

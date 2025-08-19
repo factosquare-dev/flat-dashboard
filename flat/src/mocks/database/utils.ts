@@ -5,7 +5,7 @@
 
 import { MockDatabaseImpl } from './MockDatabase';
 import type { MockDatabase } from './types';
-import { ensureMockSystemInitialized } from '../initialize';
+import { ensureMockSystemInitialized } from '@/mocks/initialize';
 
 /**
  * Safely get database instance with retry mechanism

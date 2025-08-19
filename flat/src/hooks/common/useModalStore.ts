@@ -5,7 +5,7 @@
 
 import { useCallback } from 'react';
 import { useModalStore } from '@/stores/modalStore';
-import type { BaseModalProps, ModalConfig } from '../../stores/modalStore';
+import type { BaseModalProps, ModalConfig } from '@/stores/modalStore';
 
 /**
  * Hook for managing a single modal instance

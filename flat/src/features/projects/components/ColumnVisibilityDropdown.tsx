@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Eye, EyeOff, ChevronDown } from 'lucide-react';
-import type { Column } from '../../../hooks/useColumnOrder';
+import type { Column } from '@/hooks/useColumnOrder';
 
 interface ColumnVisibilityDropdownProps {
   columns: Column[];

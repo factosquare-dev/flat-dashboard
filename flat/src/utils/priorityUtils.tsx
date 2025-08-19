@@ -1,6 +1,6 @@
 import React from 'react';
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { Priority, PriorityLabel } from '../types/enums';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { Priority, PriorityLabel } from '@/types/enums';
 import { logger } from './logger';
 
 export interface PriorityInfo {

@@ -2,13 +2,13 @@
  * Main API client - Refactored to use modular architecture
  */
 
-import { logger, PerformanceLogger } from '../utils/logger';
+import { logger, PerformanceLogger } from '@/utils/logger';
 import { CachedRequestHandlers } from './api/cachedRequestHandlers';
 import { UploadHandler } from './api/uploadHandler';
 import type { ApiResponse, RequestOptions } from './api/requestHandlers';
 import type { UploadOptions, UploadResponse } from './api/uploadHandler';
 import type { ApiError } from './api/errorHandling';
-import { apiConfig } from '../config';
+import { apiConfig } from '@/config';
 
 export interface ApiConfig {
   baseURL: string;

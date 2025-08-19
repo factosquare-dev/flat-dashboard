@@ -1,5 +1,5 @@
-import { customerSchema, validateSchema, CustomerFormData } from '@/../validation/schemas';
-import type { Customer } from '../../../types/customer';
+import { customerSchema, validateSchema, CustomerFormData } from '@/validation/schemas';
+import type { Customer } from '@/../types/customer';
 
 export { CustomerFormData };
 

@@ -3,18 +3,19 @@ import BasicInfoSection from './BasicInfoSection';
 import ProductInfoSection from './ProductInfoSection';
 import ProjectStatusSection from './ProjectStatusSection';
 import ScheduleSection from './ScheduleSection';
-import FactoryInfoSection from './FactoryInfoSection';
-import BaseModal, { ModalFooter } from '../common/BaseModal';
-import CommentSection from '../CommentSection';
+import FactorySection from './FactorySection';
+import BaseModal, { ModalFooter } from '@/common/BaseModal';
+import CommentSection from '@/CommentSection';
 import type { ProjectModalProps, ProjectData } from './types';
 import type { Comment } from '@/types/comment';
 import type { User } from '@/types/user';
 import { useProjectComments } from '@/hooks/useProjectComments';
 import { ProjectModalService } from '@/services/projectModal.service';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 import { ProjectStatusLabel, ProjectStatus, PriorityLabel, Priority, ServiceTypeLabel, ServiceType, ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
 import { useModalFormValidation } from '@/hooks/useModalFormValidation';
 import { AlertCircle } from 'lucide-react';
-import { Button } from '../ui/Button';
+import { Button } from '@/ui/Button';
 import { getModalSizeString } from '@/utils/modalUtils';
 import './ProjectModal.css';
 
@@ -37,6 +38,22 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
     handleEditComment,
     handleDeleteComment
   } = useProjectComments(editData?.id || '', currentUser);
+
+  // Add reaction handler
+  const handleAddReaction = useCallback((commentId: string, emoji: string) => {
+    const db = MockDatabaseImpl.getInstance();
+    const dbUser = db.getCurrentUser();
+    
+    if (dbUser) {
+      const success = db.addReaction(commentId, emoji, dbUser.id as string);
+      if (success) {
+        // Refresh comments by re-fetching from DB
+        const updatedComments = db.getCommentsByProjectId(editData?.id || '');
+        // Need to update comments state - will add this functionality
+        console.log('Reaction added successfully');
+      }
+    }
+  }, [editData?.id]);
 
   useEffect(() => {
     if (editData && mode === 'edit') {
@@ -131,19 +148,17 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
               </div>
             )}
             <BasicInfoSection formData={formData} onChange={updateFormData} />
-            <ProductInfoSection formData={formData} onChange={updateFormData} />
-            <ProjectStatusSection formData={formData} onChange={updateFormData} />
             <ScheduleSection formData={formData} onChange={updateFormData} />
-            <FactoryInfoSection formData={formData} onChange={updateFormData} />
+            <FactorySection formData={formData} onChange={updateFormData} />
 
             {/* 댓글 섹션 */}
             <CommentSection
-              projectId={editData?.id || 'new'}
               comments={comments}
               currentUser={currentUser}
               onAddComment={handleAddComment}
               onDeleteComment={handleDeleteComment}
               onEditComment={handleEditComment}
+              onAddReaction={handleAddReaction}
             />
           </div>
         </form>

@@ -47,7 +47,7 @@ import {
   // Browser utilities
   generateId,
   slugify,
-} from '../common';
+} from '@/common';
 
 describe('Common Utilities', () => {
   describe('String utilities', () => {

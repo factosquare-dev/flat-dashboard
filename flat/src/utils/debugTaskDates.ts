@@ -2,7 +2,7 @@
  * Debug utility for task date issues
  */
 
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 import { isToday } from './coreUtils';
 import { formatDateLocale } from './unifiedDateUtils';
 

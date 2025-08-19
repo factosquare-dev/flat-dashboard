@@ -5,4 +5,4 @@ export type {
   DragState,
   GridCell,
   GanttConstants
-} from '../components/GanttChart/types';
+} from '@/components/GanttChart/types';

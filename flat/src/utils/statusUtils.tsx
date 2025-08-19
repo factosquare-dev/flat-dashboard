@@ -1,6 +1,6 @@
 import React from 'react';
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { ProjectStatus, TaskStatus } from '../types/enums';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { ProjectStatus, TaskStatus } from '@/types/enums';
 
 export interface StatusInfo {
   code: string;

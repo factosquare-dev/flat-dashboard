@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TableColumnId } from '@/types/enums';
+import { useColumnOrder } from './useColumnOrder';
 
 interface ColumnVisibility {
   [columnId: string]: boolean;
@@ -8,6 +9,7 @@ interface ColumnVisibility {
 const STORAGE_KEY = 'projectTableColumnVisibility';
 
 export const useColumnVisibility = () => {
+  const { columns } = useColumnOrder();
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -46,15 +48,15 @@ export const useColumnVisibility = () => {
   };
 
   const hideAllColumns = () => {
-    // Hide ALL columns using enum values
-    const allColumns = Object.values(TableColumnId);
-    setHiddenColumns(new Set(allColumns));
+    // Hide ALL columns including memo columns
+    const allColumnIds = columns.map(col => col.id);
+    setHiddenColumns(new Set(allColumnIds));
   };
 
   const areAllColumnsHidden = () => {
-    // Check if all data columns are hidden
-    const allDataColumns = Object.values(TableColumnId);
-    return allDataColumns.every(columnId => hiddenColumns.has(columnId));
+    // Check if all columns including memo columns are hidden
+    const allColumnIds = columns.map(col => col.id);
+    return allColumnIds.every(columnId => hiddenColumns.has(columnId));
   };
 
   return {

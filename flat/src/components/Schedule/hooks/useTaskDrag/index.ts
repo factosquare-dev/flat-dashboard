@@ -4,11 +4,11 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import type { Task, ModalState, Participant, TaskControls } from '../../../../types/schedule';
-import { useAutoScroll } from '../useAutoScroll';
-import { useDragTooltip } from '../useDragTooltip';
-import { useDragPreview } from '../useDragPreview';
-import { useProjectFinder } from '../useProjectFinder';
+import type { Task, ModalState, Participant, TaskControls } from '@/types/schedule';
+import { useAutoScroll } from '@/components/Schedule/useAutoScroll';
+import { useDragTooltip } from '@/components/Schedule/useDragTooltip';
+import { useDragPreview } from '@/components/Schedule/useDragPreview';
+import { useProjectFinder } from '@/components/Schedule/useProjectFinder';
 import { useToast } from '@/hooks/useToast';
 import { getDragImageElement } from '@/utils/schedule/globalState';
 import { initializeDragState, setupDragImage, cleanupDragState } from './dragState';

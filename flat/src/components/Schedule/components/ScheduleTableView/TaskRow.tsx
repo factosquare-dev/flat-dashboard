@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import type { Task } from '../../../../types/schedule';
-import type { Project } from '../../../../types/project';
+import type { Task } from '@/types/schedule';
+import type { Project } from '@/types/project';
 import { APP_CONSTANTS } from '@/config/constants';
 import { gridColors } from '@/design-system/colors/grid';
 import { getStatusDisplayName, getStatusStyles } from '@/utils/statusUtils';

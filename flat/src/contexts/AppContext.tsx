@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useProjects } from '@/hooks/useProjects/index';
-import { useModalState } from '../hooks/common/useModalState';
-import type { Project, Customer, Task, Participant } from '../types';
+import { useModalState } from '@/hooks/common/useModalState';
+import type { Project, Customer, Task, Participant } from '@/types';
 
 interface AppContextValue {
   // Project management

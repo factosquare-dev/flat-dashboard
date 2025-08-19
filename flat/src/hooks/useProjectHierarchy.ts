@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import type { Project } from '../types/project';
-import { ProjectType } from '../types/project';
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import type { Project } from '@/types/project';
+import { ProjectType } from '@/types/project';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 export const useProjectHierarchy = () => {
   // Update project's parentId in mock database

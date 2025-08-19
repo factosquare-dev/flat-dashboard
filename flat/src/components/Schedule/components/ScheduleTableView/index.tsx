@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import type { Participant, Task } from '../../../../types/schedule';
-import type { Project } from '../../../../types/project';
-import type { Factory } from '../../../../types/factory';
+import type { Participant, Task } from '@/types/schedule';
+import type { Project } from '@/types/project';
+import type { Factory } from '@/types/factory';
 import { useTaskContext } from '@/contexts/AppContext';
 import { useTaskStore } from '@/stores/taskStore';
 import { mockDataService } from '@/services/mockDataService';

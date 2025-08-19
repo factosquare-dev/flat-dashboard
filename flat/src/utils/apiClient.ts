@@ -11,9 +11,9 @@ export {
   isNetworkError,
   isTimeoutError,
   handleApiError
-} from '../services/api/errorHandling';
+} from '@/services/api/errorHandling';
 
 // Export ApiError interface from services/api/errorHandling 
-export type { ApiError } from '../services/api/errorHandling';
+export type { ApiError } from '@/services/api/errorHandling';
 
-export { apiClient as default } from '../services/api';
+export { apiClient as default } from '@/services/api';

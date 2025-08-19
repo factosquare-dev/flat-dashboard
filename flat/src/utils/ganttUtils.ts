@@ -1,6 +1,6 @@
 import { formatDateISO, dateToString, getDateIndex as getDateIndexBase, getDateFromIndex as getDateFromIndexBase, getDuration as getDurationBase } from './dateUtils';
-import { GANTT_CONSTANTS, TOTAL_DAYS } from '../constants/gantt';
-import { TIME_CONSTANTS } from '../constants/time';
+import { GANTT_CONSTANTS, TOTAL_DAYS } from '@/constants/gantt';
+import { TIME_CONSTANTS } from '@/constants/time';
 
 // Date index calculations with GANTT_CONSTANTS base date
 export const getDateIndex = (dateStr: string): number => {

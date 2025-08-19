@@ -67,19 +67,10 @@ export const renderProgress = (project: Project) => (
 );
 
 export const renderClient = ({ project }: CellRenderProps) => {
-  const navigate = useNavigate();
-  
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Navigate to TableView with project ID
-    navigate(`/projects?view=table&projectId=${project.id}`);
-  };
-
   return (
     <td 
-      className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px] cursor-pointer" 
+      className="px-3 py-1.5 text-xs text-gray-900 min-w-[110px]" 
       title={project.client}
-      onClick={handleClick}
     >
       <div className="overflow-hidden text-ellipsis whitespace-nowrap">
         {project.client}

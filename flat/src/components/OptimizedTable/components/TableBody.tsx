@@ -3,9 +3,9 @@
  */
 
 import React from 'react';
-import VirtualList from '../../VirtualList';
+import VirtualList from '@/VirtualList';
 import { TableRow } from './TableRow';
-import type { Column } from '../types';
+import type { Column } from '@/components/types';
 
 interface TableBodyProps<T> {
   data: T[];

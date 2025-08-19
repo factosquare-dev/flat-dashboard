@@ -10,6 +10,15 @@ export interface CommentAuthor {
   profileImage?: string;
 }
 
+export interface EmojiReaction {
+  emoji: string;
+  users: Array<{
+    id: string;
+    name: string;
+    avatar?: string;
+  }>;
+}
+
 export interface Comment {
   id: string; // Comment IDs remain as strings for now
   projectId: ProjectId;
@@ -21,6 +30,7 @@ export interface Comment {
   parentId?: string; // Comment IDs remain as strings
   replies?: Comment[];
   mentions?: CommentAuthor[];
+  reactions?: EmojiReaction[];
 }
 
 export interface CreateCommentInput {

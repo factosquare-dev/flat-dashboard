@@ -1,14 +1,14 @@
 import { apiClient } from '@/features/common/services';
-import type { Project, ProjectFilter, ProjectFormData, ProjectMetrics } from '../types';
-import type { ApiResponse, PaginationParams, SortParams } from '../../common/types';
-import type { Project as ProjectModel, ProjectType } from '../../../types/project';
+import type { Project, ProjectFilter, ProjectFormData, ProjectMetrics } from '@/features/types';
+import type { ApiResponse, PaginationParams, SortParams } from '@/common/types';
+import type { Project as ProjectModel, ProjectType } from '@/types/project';
 import type { 
   ProjectsResponse, 
   ProjectResponse, 
   CreateProjectResponse, 
   UpdateProjectResponse,
   DeleteProjectResponse 
-} from '../../../types/api';
+} from '@/types/api';
 import { API_ENDPOINTS } from '@/types/api';
 import { 
   transformApiProject, 

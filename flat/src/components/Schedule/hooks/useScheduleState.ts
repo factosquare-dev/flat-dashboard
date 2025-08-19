@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
-import type { ScheduleFactory, Task } from '../../../types/schedule';
-import type { Factory } from '../../../types/factory';
+import type { ScheduleFactory, Task } from '@/types/schedule';
+import type { Factory } from '@/types/factory';
 import { getDaysArray } from '@/utils/scheduleUtils';
 import { formatDate } from '@/utils/coreUtils';
 import { useScheduleDrag } from '@/hooks/useScheduleDrag';

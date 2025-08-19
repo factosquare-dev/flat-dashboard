@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import type { UseTaskDragProps, UseTaskDragReturn, DragState } from './types';
-import { useAutoScroll } from '../useAutoScroll';
-import { useDragTooltip } from '../useDragTooltip';
-import { useDragPreview } from '../useDragPreview';
-import { useProjectFinder } from '../useProjectFinder';
+import { useAutoScroll } from '@/components/Schedule/useAutoScroll';
+import { useDragTooltip } from '@/components/Schedule/useDragTooltip';
+import { useDragPreview } from '@/components/Schedule/useDragPreview';
+import { useProjectFinder } from '@/components/Schedule/useProjectFinder';
 import { useToast } from '@/hooks/useToast';
 import { UI_DELAYS } from '@/constants/time';
 import { createDragStartHandler, createDragEndHandler, createDragOverHandler } from './dragHandlers';

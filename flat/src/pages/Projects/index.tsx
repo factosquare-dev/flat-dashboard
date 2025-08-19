@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import ProjectList from '@/features/projects/components/ProjectList';
-import ScheduleTableView from '@/components/Schedule/components/ScheduleTableView';
+import TaskViewWithSidebar from '@/components/TaskViewWithSidebar';
 import FactorySelectionModal from '@/components/FactorySelectionModal';
+import ProjectDetailsView from '@/components/ProjectDetailsView';
 import type { Project } from '@/types/project';
 import type { Factory } from '@/data/factories';
 import type { FactoryAssignment } from '@/types/schedule';
 import { mockDataService } from '@/services/mockDataService';
-import { FactoryType, TaskStatus, ViewMode } from '@/types/enums';
+import { FactoryType, TaskStatus, ViewMode, ProjectType } from '@/types/enums';
 
 const Projects: React.FC = () => {
   const navigate = useNavigate();
@@ -32,8 +33,14 @@ const Projects: React.FC = () => {
   }, [searchParams]);
   
   const handleSelectProject = useCallback((project: Project) => {
-    // Navigate to task view with project ID
-    navigate(`/projects?view=${ViewMode.TASK}&projectId=${project.id}`);
+    // Check if it's a master project (use 'type' not 'projectType')
+    if (project.type === ProjectType.MASTER) {
+      // Navigate to master project detail page
+      navigate(`/projects/master/${project.id}`);
+    } else {
+      // Navigate to task view with project ID for other project types
+      navigate(`/projects?view=${ViewMode.TASK}&projectId=${project.id}`);
+    }
   }, [navigate]);
 
   const handleBackToList = () => {
@@ -91,20 +98,32 @@ const Projects: React.FC = () => {
   // Show TaskView or ProjectList based on view mode
   if (viewMode === ViewMode.TASK) {
     return (
-      <div className="h-full">
-        <div className="p-4 border-b border-gray-200 bg-white">
-          <button
-            onClick={handleBackToList}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            ← 프로젝트 목록으로 돌아가기
-          </button>
+      <>
+        <div className="h-full flex flex-col">
+          <div className="p-4 border-b border-gray-200 bg-white">
+            <button
+              onClick={handleBackToList}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              ← 프로젝트 목록으로 돌아가기
+            </button>
+          </div>
+          <div className="flex-1">
+            <TaskViewWithSidebar 
+              projectId={selectedProjectId || undefined}
+              onAddFactory={handleAddFactory}
+            />
+          </div>
         </div>
-        <ScheduleTableView 
-          projectId={selectedProjectId || undefined}
-          onAddFactory={handleAddFactory}
+        
+        {/* Factory Selection Modal */}
+        <FactorySelectionModal
+          isOpen={showFactoryModal}
+          onClose={() => setShowFactoryModal(false)}
+          onSelectFactories={handleFactoriesSelect}
+          multiSelect={true}
         />
-      </div>
+      </>
     );
   }
   

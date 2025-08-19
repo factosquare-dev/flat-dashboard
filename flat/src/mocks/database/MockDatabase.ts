@@ -465,6 +465,131 @@ export class MockDatabaseImpl {
   }
 
   /**
+   * Comment CRUD operations
+   */
+  createComment(data: { content: string; projectId: string; userId: string; parentId?: string }): Comment | null {
+    const user = this.getUserById(data.userId);
+    if (!user) return null;
+
+    const comment: Comment = {
+      id: `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      projectId: data.projectId as any,
+      userId: data.userId as any,
+      author: {
+        id: user.id,
+        name: user.name,
+        profileImage: user.profileImage
+      },
+      content: data.content,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      parentId: data.parentId,
+      reactions: []
+    };
+
+    this.db.comments.set(comment.id, comment);
+    this.storageManager.saveToStorage(this.db);
+    return comment;
+  }
+
+  getCommentsByProjectId(projectId: string): Comment[] {
+    const comments: Comment[] = [];
+    this.db.comments.forEach(comment => {
+      if (comment.projectId === projectId) {
+        comments.push(comment);
+      }
+    });
+    return comments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+
+  updateComment(commentId: string, updates: { content?: string }): boolean {
+    const comment = this.db.comments.get(commentId);
+    if (!comment) return false;
+
+    if (updates.content !== undefined) {
+      comment.content = updates.content;
+    }
+    comment.updatedAt = new Date();
+
+    this.db.comments.set(commentId, comment);
+    this.storageManager.saveToStorage(this.db);
+    return true;
+  }
+
+  deleteComment(commentId: string): boolean {
+    const deleted = this.db.comments.delete(commentId);
+    if (deleted) {
+      this.storageManager.saveToStorage(this.db);
+    }
+    return deleted;
+  }
+
+  getCurrentUser(): User | null {
+    // Return the first user as current user (in real app, this would be from auth)
+    const users = Array.from(this.db.users.values());
+    return users[0] || null;
+  }
+
+  getTaskById(taskId: string): Task | null {
+    return this.db.tasks.get(taskId as any) || null;
+  }
+
+  getUserById(userId: string): User | null {
+    return this.db.users.get(userId as any) || null;
+  }
+
+  /**
+   * Emoji reaction operations
+   */
+  addReaction(commentId: string, emoji: string, userId: string): boolean {
+    const comment = this.db.comments.get(commentId);
+    const user = this.getUserById(userId);
+    
+    if (!comment || !user) return false;
+
+    if (!comment.reactions) {
+      comment.reactions = [];
+    }
+
+    const existingReaction = comment.reactions.find(r => r.emoji === emoji);
+    
+    if (existingReaction) {
+      // Check if user already reacted with this emoji
+      const userIndex = existingReaction.users.findIndex(u => u.id === userId);
+      if (userIndex === -1) {
+        // Add user to existing reaction
+        existingReaction.users.push({
+          id: userId,
+          name: user.name,
+          avatar: user.profileImage
+        });
+      } else {
+        // Remove user's reaction (toggle)
+        existingReaction.users.splice(userIndex, 1);
+        // Remove reaction if no users left
+        if (existingReaction.users.length === 0) {
+          const reactionIndex = comment.reactions.indexOf(existingReaction);
+          comment.reactions.splice(reactionIndex, 1);
+        }
+      }
+    } else {
+      // Add new reaction
+      comment.reactions.push({
+        emoji: emoji,
+        users: [{
+          id: userId,
+          name: user.name,
+          avatar: user.profileImage
+        }]
+      });
+    }
+
+    this.db.comments.set(commentId, comment);
+    this.storageManager.saveToStorage(this.db);
+    return true;
+  }
+
+  /**
    * Export database as JSON
    */
   export(): string {

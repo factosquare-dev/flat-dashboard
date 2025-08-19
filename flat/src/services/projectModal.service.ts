@@ -1,11 +1,11 @@
-import type { Comment } from '../types/comment';
-import type { User } from '../types/user';
-import { UserRole } from '../types/user';
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import type { Project } from '../types/project';
-import { ProjectStatus, Priority, ServiceType } from '../types/enums';
-import type { ProjectData } from '../components/ProjectModal/types';
-import { toLocalDateString } from '../utils/unifiedDateUtils';
+import type { Comment } from '@/types/comment';
+import type { User } from '@/types/user';
+import { UserRole } from '@/types/user';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import type { Project } from '@/types/project';
+import { ProjectStatus, Priority, ServiceType } from '@/types/enums';
+import type { ProjectData } from '@/components/ProjectModal/types';
+import { toLocalDateString } from '@/utils/unifiedDateUtils';
 
 export class ProjectModalService {
   /**

@@ -2,7 +2,7 @@
  * Centralized error handler class
  */
 
-import { logger } from '../logger';
+import { logger } from '@/utils/logger';
 import { 
   ErrorContext, 
   getErrorMessage, 

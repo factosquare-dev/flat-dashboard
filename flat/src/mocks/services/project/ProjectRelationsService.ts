@@ -8,7 +8,7 @@
 
 import { ProjectCreationService } from './relations/projectCreationService';
 import { ProjectQueryService } from './relations/projectQueryService';
-import { BaseService } from '../BaseService';
+import { BaseService } from '@/mocks/services/BaseService';
 import { Project } from '@/types/project';
 
 export class ProjectRelationsService extends BaseService<Project> {

@@ -3,7 +3,7 @@
  * Handles basic Create, Read, Update, Delete operations for projects
  */
 
-import { BaseService } from '../BaseService';
+import { BaseService } from '@/mocks/services/BaseService';
 import { Project, ProjectType, ProjectStatus } from '@/types/project';
 import { DbResponse } from '@/mocks/database/types';
 import { 

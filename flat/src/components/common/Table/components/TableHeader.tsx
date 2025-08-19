@@ -5,7 +5,7 @@
 import React from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/utils/cn';
-import { useTableContext } from '../context/TableContext';
+import { useTableContext } from '@/components/common/context/TableContext';
 
 interface TableHeaderProps {
   children: React.ReactNode;

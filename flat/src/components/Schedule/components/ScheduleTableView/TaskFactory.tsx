@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import type { Task, Participant } from '../../../../types/schedule';
+import type { Task, Participant } from '@/types/schedule';
 
 interface TaskFactoryProps {
   project: Participant | undefined;

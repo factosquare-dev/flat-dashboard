@@ -4,9 +4,9 @@
  */
 
 import React, { useEffect } from 'react';
-import { useAppStore } from '../appStore';
-import { useModalStore } from '../modalStore';
-import type { Project, Customer, Task, Participant } from '../../types';
+import { useAppStore } from '@/appStore';
+import { useModalStore } from '@/modalStore';
+import type { Project, Customer, Task, Participant } from '@/types';
 
 /**
  * Compatibility wrapper for AppContext

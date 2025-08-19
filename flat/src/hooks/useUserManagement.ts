@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { UserData } from './useUserFilter';
-import type { UserFormData } from '../components/Users/UserModal';
-import type { UserRole } from '../store/slices/userSlice';
-import { UserService } from '../mocks/services/UserService';
-import type { User } from '../types/user';
+import type { UserFormData } from '@/components/Users/UserModal';
+import type { UserRole } from '@/store/slices/userSlice';
+import { UserService } from '@/mocks/services/UserService';
+import type { User } from '@/types/user';
 
 // Create user service instance
 const userService = new UserService();

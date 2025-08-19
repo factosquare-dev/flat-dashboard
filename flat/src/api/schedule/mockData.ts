@@ -1,4 +1,4 @@
-import type { Schedule } from '../../types/schedule';
+import type { Schedule } from '@/types/schedule';
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 // Mock 데이터 저장소

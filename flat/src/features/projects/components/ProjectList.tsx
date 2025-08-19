@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { Project } from '../../../types/project';
+import type { Project } from '@/types/project';
 import { useDynamicLayout } from '@/components/Schedule/hooks/useDynamicLayout';
 import { useProjectListState } from './hooks/useProjectListState';
 import { useColumnVisibility } from '@/hooks/useColumnVisibility';
@@ -125,6 +125,19 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     projectsHook.loadMoreRef,
   ]);
 
+  // Memoize modal close handlers
+  const handleCloseEmailModal = useCallback(() => {
+    setShowEmailModal(false);
+  }, []);
+
+  const handleCloseProjectModal = useCallback(() => {
+    setShowProjectModal(false);
+  }, []);
+
+  const handleSendEmailAndClose = useCallback(() => {
+    setShowEmailModal(false);
+  }, []);
+
   // Memoize modal props
   const modalProps = useMemo(() => ({
     showEmailModal,
@@ -132,18 +145,19 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, c
     modalMode,
     editingProject,
     availableFactories: factories,
-    onCloseEmailModal: () => setShowEmailModal(false),
-    onCloseProjectModal: () => setShowProjectModal(false),
+    onCloseEmailModal: handleCloseEmailModal,
+    onCloseProjectModal: handleCloseProjectModal,
     onSaveProject: handleSaveProject,
-    onSendEmail: () => setShowEmailModal(false),
+    onSendEmail: handleSendEmailAndClose,
   }), [
     showEmailModal,
     showProjectModal,
     modalMode,
     editingProject,
-    setShowEmailModal,
-    setShowProjectModal,
+    handleCloseEmailModal,
+    handleCloseProjectModal,
     handleSaveProject,
+    handleSendEmailAndClose,
   ]);
 
   return (

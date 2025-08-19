@@ -3,7 +3,7 @@
  * This file ensures the mock database is initialized when imported
  */
 
-import { USE_MOCK_DATA } from '../config/mock';
+import { USE_MOCK_DATA } from '@/config/mock';
 import { initializeServices } from './services';
 import { MockDatabaseImpl } from './database/MockDatabase';
 

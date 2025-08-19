@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { CertificationType, FactoryManager } from '../../../data/factories';
+import type { CertificationType, FactoryManager } from '@/data/factories';
 import { FactoryType, FactoryTypeLabel } from '@/types/enums';
 
 export interface FactoryFormData {

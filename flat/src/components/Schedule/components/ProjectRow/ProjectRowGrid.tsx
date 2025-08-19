@@ -1,5 +1,5 @@
 import React from 'react';
-import GridCell from '../GridCell';
+import GridCell from '@/components/Schedule/GridCell';
 import { formatDateISO } from '@/utils/coreUtils';
 import { getInteractionState } from '@/utils/schedule/globalState';
 import './ProjectRowGrid.css';

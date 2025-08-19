@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useClickOutsideRef } from '@/hooks/useClickOutside';
 import type { Comment, CommentAuthor } from '@/types/comment';
 import CommentItem from './CommentItem';
 import CommentInput from './CommentInput';
-import { LoadingState } from '../loading/LoadingState';
+import { LoadingState } from '@/components/loading/LoadingState';
 
 interface CommentSectionProps {
   comments: Comment[];
@@ -11,6 +11,7 @@ interface CommentSectionProps {
   onAddComment: (content: string, parentId?: string, mentions?: string[]) => void;
   onDeleteComment: (commentId: string) => void;
   onEditComment: (commentId: string, content: string) => void;
+  onAddReaction?: (commentId: string, emoji: string) => void;
   isLoading?: boolean;
   error?: Error | null;
 }
@@ -21,11 +22,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   onAddComment,
   onDeleteComment,
   onEditComment,
+  onAddReaction,
   isLoading = false,
   error = null
 }) => {
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const commentSectionRef = React.useRef<HTMLDivElement>(null);
+  const commentsEndRef = React.useRef<HTMLDivElement>(null);
 
   // Optimize comment structure with memoization
   const commentStructure = useMemo(() => {
@@ -85,6 +88,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     }
   };
 
+  // Auto scroll to bottom when comments change
+  useEffect(() => {
+    if (commentsEndRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [comments]);
+
   // 외부 클릭 시 답글 입력창 닫기 - custom hook 사용
   useClickOutsideRef(
     commentSectionRef,
@@ -93,25 +103,18 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   );
 
   return (
-    <div ref={commentSectionRef} className="bg-white rounded-xl border border-gray-200" onClick={(e) => e.stopPropagation()}>
+    <div ref={commentSectionRef} className="flex flex-col h-full bg-white rounded-xl border border-gray-200" onClick={(e) => e.stopPropagation()}>
       <div className="p-5 border-b border-gray-200">
         <h3 className="text-sm font-semibold text-gray-700">댓글</h3>
       </div>
       
-      <div className="p-5">
-        {/* Main comment input */}
-        <CommentInput
-          currentUser={currentUser}
-          onSubmit={(content, mentions) => handleSubmit(content, mentions)}
-          placeholder="댓글을 작성하세요..."
-        />
-        
-        {/* Comments list - 최상위 댓글만 표시 (replies는 각 comment 내부에서 렌더링) */}
+      {/* Comments list area - scrollable */}
+      <div className="flex-1 overflow-y-auto p-5">
         <LoadingState
           isLoading={isLoading}
           error={error}
           isEmpty={comments.length === 0}
-          className="mt-6"
+          className=""
           emptyComponent={
             <div className="text-center py-8">
               <div className="text-gray-400 mb-2">
@@ -136,12 +139,24 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 onDelete={onDeleteComment}
                 onAddComment={(content, parentId, mentions) => handleSubmit(content, mentions, parentId)}
                 onCancelReply={() => setReplyToId(null)}
+                onAddReaction={onAddReaction}
                 replyToId={replyToId}
                 isTopLevel={true}
               />
             ))}
           </div>
         </LoadingState>
+        {/* Scroll anchor */}
+        <div ref={commentsEndRef} />
+      </div>
+      
+      {/* Comment input - fixed at bottom */}
+      <div className="border-t border-gray-200 p-5 bg-gray-50">
+        <CommentInput
+          currentUser={currentUser}
+          onSubmit={(content, mentions) => handleSubmit(content, mentions)}
+          placeholder="댓글을 작성하세요..."
+        />
       </div>
     </div>
   );

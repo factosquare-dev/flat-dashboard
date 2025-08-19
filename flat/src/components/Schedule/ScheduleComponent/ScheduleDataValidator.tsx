@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { validateTaskFactoryData } from '@/utils/scheduleUtils';
-import type { Task, Participant } from '../../../types/schedule';
+import type { Task, Participant } from '@/types/schedule';
 import type { ViewMode } from './types';
 
 interface ScheduleDataValidatorProps {

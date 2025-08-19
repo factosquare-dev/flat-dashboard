@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, Mail, Search, Filter, Eye, EyeOff } from 'lucide-react';
-import type { Priority, ServiceType, ProjectStatus } from '../../types/project';
-import type { Column } from '../../hooks/useColumnOrder';
+import type { Priority, ServiceType, ProjectStatus } from '@/types/project';
+import type { Column } from '@/hooks/useColumnOrder';
 import ProjectFilters from './ProjectFilters';
 import ColumnVisibilityDropdown from './ColumnVisibilityDropdown';
 

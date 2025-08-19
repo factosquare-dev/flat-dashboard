@@ -1,5 +1,5 @@
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { MOCK_COMPANY_NAMES } from '../constants';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { MOCK_COMPANY_NAMES } from '@/constants';
 
 // 고객사 목록 - Mock DB에서 가져오기
 const getAllClients = (): string[] => {

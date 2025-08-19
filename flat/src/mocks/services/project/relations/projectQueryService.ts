@@ -3,14 +3,14 @@
  * Handles project queries with relations
  */
 
-import { BaseService } from '../../BaseService';
+import { BaseService } from '@/mocks/services/BaseService';
 import { Project } from '@/types/project';
 import { DbResponse } from '@/mocks/database/types';
 import { User } from '@/types/user';
 import { Factory } from '@/types/factory';
 import { Schedule, Task } from '@/types/schedule';
 import type { Comment } from '@/types/comment';
-import { ProjectWithRelations } from '../types';
+import { ProjectWithRelations } from '@/mocks/services/types';
 
 export class ProjectQueryService extends BaseService<Project> {
   constructor() {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Mail, FileEdit, Plus } from 'lucide-react';
 import { PageLayout, FloatingActionButton } from '@/components/common';
-import ScheduleHeader from '../ScheduleHeader';
+import ScheduleHeader from '@/components/ScheduleHeader';
 import { ButtonVariant } from '@/types/enums';
 
 interface ScheduleLayoutProps {

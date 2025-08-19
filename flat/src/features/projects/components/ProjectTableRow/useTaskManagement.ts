@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTaskStore } from '@/stores/taskStore';
-import type { Project } from '../../../../types/project';
+import type { Project } from '@/types/project';
 import { TaskStatus } from '@/types/enums';
 
 interface UseTaskManagementProps {

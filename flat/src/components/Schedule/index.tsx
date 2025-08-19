@@ -1,7 +1,7 @@
 import React from 'react';
 import ScheduleComponent from './Schedule';
 import ScheduleErrorBoundary from './ScheduleErrorBoundary';
-import type { Factory, Task } from '../../types/schedule';
+import type { Factory, Task } from '@/types/schedule';
 
 interface ScheduleProps {
   participants: Factory[];

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { cn } from '@/utils/cn';
-import { useTableContext } from '../context/TableContext';
+import { useTableContext } from '@/components/common/context/TableContext';
 
 interface TableBodyProps {
   children: React.ReactNode;

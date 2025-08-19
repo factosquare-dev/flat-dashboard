@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import CategoryTree from './CategoryTree';
 import CategoryEditModal from './CategoryEditModal';
-import FloatingActionButton from '../common/FloatingActionButton';
+import FloatingActionButton from '@/common/FloatingActionButton';
 import type { ProductCategory, ProductCategoryId } from '@/types/productCategory';
 import { generateProductCategoryId } from '@/types/branded';
 import { useProductCategories } from '@/hooks/useProducts';

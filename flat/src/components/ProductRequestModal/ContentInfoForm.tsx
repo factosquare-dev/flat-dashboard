@@ -1,7 +1,7 @@
 import React from 'react';
 import { Beaker } from 'lucide-react';
 import { FormInput } from '@/components/forms';
-import ModalSection from '../common/ModalSection';
+import ModalSection from '@/common/ModalSection';
 
 interface ReceiptInfo {
   targetType: string;

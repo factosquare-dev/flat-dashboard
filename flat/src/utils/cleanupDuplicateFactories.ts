@@ -3,9 +3,9 @@
  * This utility removes duplicate factory IDs from all projects in the database
  */
 
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { DB_COLLECTIONS } from '../mocks/database/types';
-import { ProjectFactoryIdField, FactoryTypeLabel, FactoryType, ProjectType } from '../types/enums';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { DB_COLLECTIONS } from '@/mocks/database/types';
+import { ProjectFactoryIdField, FactoryTypeLabel, FactoryType, ProjectType } from '@/types/enums';
 
 export const cleanupDuplicateFactories = async () => {
   try {

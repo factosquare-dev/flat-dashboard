@@ -4,7 +4,7 @@
  */
 
 import { Project, ProjectType, ProjectStatus } from '@/types/project';
-import { DbResponse } from '../database/types';
+import { DbResponse } from '@/mocks/database/types';
 import { 
   ProjectCrudService,
   ProjectRelationsService,
@@ -12,7 +12,7 @@ import {
   ProjectValidationService
 } from './project';
 import type { ProjectWithRelations, CreateProjectData } from './project/types';
-import { MockDatabaseImpl } from '../database/MockDatabase';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 export type { ProjectWithRelations, CreateProjectData };
 

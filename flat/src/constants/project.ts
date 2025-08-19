@@ -5,7 +5,7 @@ import {
   PriorityLabel,
   ServiceType,
   ServiceTypeLabel
-} from '../types/enums';
+} from '@/types/enums';
 
 // Legacy support - use ProjectStatusLabel from enums instead
 export const PROJECT_STATUS = {

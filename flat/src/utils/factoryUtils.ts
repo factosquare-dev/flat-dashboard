@@ -1,7 +1,7 @@
-import type { Factory } from '../data/factories';
-import { FactoryType } from '../types/enums';
-import { FactoryId, toFactoryId, toFactoryIdSafe, extractIdString } from '../types/branded';
-import { FactoryNotFoundError, assertDefined } from '../errors';
+import type { Factory } from '@/data/factories';
+import { FactoryType } from '@/types/enums';
+import { FactoryId, toFactoryId, toFactoryIdSafe, extractIdString } from '@/types/branded';
+import { FactoryNotFoundError, assertDefined } from '@/errors';
 
 /**
  * Get factory by ID with explicit error handling

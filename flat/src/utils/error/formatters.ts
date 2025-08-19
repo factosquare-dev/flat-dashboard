@@ -2,7 +2,7 @@
  * Error formatting utilities for UI display
  */
 
-import { isApiError, isNetworkError, isTimeoutError, ApiError } from '../apiClient';
+import { isApiError, isNetworkError, isTimeoutError, ApiError } from '@/utils/apiClient';
 import { getErrorCode, getErrorMessage } from './core';
 
 /**

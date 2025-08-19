@@ -61,4 +61,4 @@ export type Status = 'active' | 'inactive' | 'pending' | 'completed' | 'cancelle
 export type Priority = 'low' | 'medium' | 'high' | 'urgent';
 
 // Re-export existing common types
-export * from '../../../types/common';
+export * from '@/types/common';

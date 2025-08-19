@@ -3,7 +3,7 @@
  * Manages dynamic custom fields for various entities
  */
 
-import type { MockDatabase } from '../types';
+import type { MockDatabase } from '@/mocks/database/types';
 import type { 
   CustomFieldDefinition, 
   CustomFieldValue, 

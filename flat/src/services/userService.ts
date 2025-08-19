@@ -1,12 +1,12 @@
 import { apiClient } from './api';
-import type { User, UserRole } from '../types/user';
-import type { ApiResponse } from '../types/api';
-import type { UserId } from '../types/branded';
+import type { User, UserRole } from '@/types/user';
+import type { ApiResponse } from '@/types/api';
+import type { UserId } from '@/types/branded';
 import { 
   transformApiUser, 
   transformApiUserList, 
   transformUserToApi 
-} from '../api/transformers';
+} from '@/api/transformers';
 
 interface UserFilter {
   role?: UserRole;

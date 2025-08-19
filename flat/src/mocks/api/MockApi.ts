@@ -20,7 +20,7 @@ export const mockApi = {
  */
 export function initializeMockApi() {
   // Initialize services on first use
-  const { initializeServices } = require('../services');
+  const { initializeServices } = require('@/services');
   initializeServices();
   
 }

@@ -1,4 +1,4 @@
-import type { Participant } from '../../types/schedule';
+import type { Participant } from '@/types/schedule';
 import { formatDate } from '@/utils/formatUtils';
 import { TASK_COLORS } from './constants';
 

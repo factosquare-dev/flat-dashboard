@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Participant, Task, DragTooltip, ResizePreview } from '../../types/schedule';
+import type { Participant, Task, DragTooltip, ResizePreview } from '@/types/schedule';
 import { useProjectDragSelection } from './hooks/useProjectDragSelection';
 import ScheduleProjectColumn from './components/ScheduleProjectColumn';
 import ScheduleTimelineGrid from './components/ScheduleTimelineGrid';

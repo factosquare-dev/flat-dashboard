@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ModalState, Participant } from '../../../../types/schedule';
+import type { ModalState, Participant } from '@/types/schedule';
 import type { DragState } from './types';
 import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '@/utils/schedule/dragCalculations';
 import { findAvailableDateRange } from '@/utils/taskUtils';

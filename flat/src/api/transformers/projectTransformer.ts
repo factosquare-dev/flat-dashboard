@@ -1,5 +1,5 @@
-import type { Project, Customer } from '../../types/project';
-import type { ApiResponse } from '../../types/api';
+import type { Project, Customer } from '@/types/project';
+import type { ApiResponse } from '@/types/api';
 import { 
   toProjectId, 
   toCustomerId, 

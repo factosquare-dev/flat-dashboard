@@ -6,7 +6,7 @@ export { MemoProvider, useMemoContext } from './MemoContext';
 // Combined providers for app root
 import React from 'react';
 import { QueryClient } from '@tanstack/react-query';
-import { QueryProvider } from '../providers/query/QueryProvider';
+import { QueryProvider } from '@/providers/query/QueryProvider';
 import { AuthProvider } from './AuthContext';
 import { AppProvider } from './AppContext';
 import { MemoProvider } from './MemoContext';

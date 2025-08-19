@@ -5,8 +5,8 @@
 
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { Theme } from '../types/enums';
-import { lightTheme, darkTheme } from '../styles/themes';
+import { Theme } from '@/types/enums';
+import { lightTheme, darkTheme } from '@/styles/themes';
 
 type ThemeObject = typeof lightTheme;
 

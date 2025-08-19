@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { Project, ProjectStatus, ServiceType } from '../types/project';
-import { ProjectStatusLabel, ProjectType, Priority } from '../types/enums';
+import type { Project, ProjectStatus, ServiceType } from '@/types/project';
+import { ProjectStatusLabel, ProjectType, Priority } from '@/types/enums';
 
 export const useProjectFilters = () => {
   const [statusFilters, setStatusFilters] = useState<ProjectStatus[]>(['PLANNING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED']);

@@ -5,8 +5,8 @@
 import React, { useMemo } from 'react';
 import { logError } from '@/utils/error';
 import { ModalVariant, ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
-import BaseModal, { ModalFooter } from '../common/BaseModal';
-import { Button } from '../ui/Button';
+import BaseModal, { ModalFooter } from '@/common/BaseModal';
+import { Button } from '@/ui/Button';
 import { cn } from '@/utils/cn';
 import './ConfirmationModal.css';
 

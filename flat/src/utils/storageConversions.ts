@@ -15,10 +15,10 @@ import {
   toTaskIdSafe,
   toCustomerIdSafe,
   extractIdString
-} from '../types/branded';
-import type { User } from '../types/user';
+} from '@/types/branded';
+import type { User } from '@/types/user';
 import { convertApiUser } from './apiConversions';
-import { localStorage as storageService } from '../services/storageService';
+import { localStorage as storageService } from '@/services/storageService';
 
 /**
  * Storage keys

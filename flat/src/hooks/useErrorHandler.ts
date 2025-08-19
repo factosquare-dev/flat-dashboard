@@ -7,8 +7,8 @@ import {
   isRetryableError,
   AppError,
   ERROR_CODES 
-} from '../utils/error/errorHandler';
-import { storageKeys } from '../config';
+} from '@/utils/error/errorHandler';
+import { storageKeys } from '@/config';
 
 interface UseErrorHandlerOptions {
   showToast?: boolean;

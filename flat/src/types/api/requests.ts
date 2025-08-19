@@ -7,10 +7,10 @@ import type {
   ProjectStatus, 
   Priority, 
   ServiceType 
-} from '../project';
-import type { UserRole } from '../user';
-import type { FactoryType } from '../factory';
-import type { UserId, FactoryId, ProjectId, CustomerId, TaskId } from '../branded';
+} from '@/types/project';
+import type { UserRole } from '@/types/user';
+import type { FactoryType } from '@/types/factory';
+import type { UserId, FactoryId, ProjectId, CustomerId, TaskId } from '@/types/branded';
 
 // Common filter types
 export interface DateRangeFilter {

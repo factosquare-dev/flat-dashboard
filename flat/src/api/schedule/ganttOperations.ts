@@ -2,7 +2,7 @@
  * Gantt chart specific operations
  */
 
-import type { Task } from '../../types/schedule';
+import type { Task } from '@/types/schedule';
 
 export interface GanttTask {
   id: string;

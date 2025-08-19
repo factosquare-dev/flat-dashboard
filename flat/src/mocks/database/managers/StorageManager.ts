@@ -3,7 +3,7 @@
  * Handles database persistence and serialization
  */
 
-import { MockDatabase } from '../types';
+import { MockDatabase } from '@/mocks/database/types';
 import { storageKeys } from '@/config';
 import { DATABASE_CONFIG } from '@/config/database';
 

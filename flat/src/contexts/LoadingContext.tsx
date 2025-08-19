@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { LoadingFullScreen } from '../components/loading/LoadingSpinner';
+import { LoadingFullScreen } from '@/components/loading/LoadingSpinner';
 
 interface LoadingContextValue {
   isLoading: boolean;

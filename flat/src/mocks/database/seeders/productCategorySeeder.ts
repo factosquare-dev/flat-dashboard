@@ -1,4 +1,4 @@
-import type { ProductCategory, ProductCategoryId } from '../../../types/productCategory';
+import type { ProductCategory, ProductCategoryId } from '@/types/productCategory';
 import { generateProductCategoryId } from '@/types/branded';
 
 export function createProductCategories(): ProductCategory[] {

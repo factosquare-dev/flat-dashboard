@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { BaseModalProps } from '../contexts/ModalContext';
+import type { BaseModalProps } from '@/contexts/ModalContext';
 
 // Reuse types from ModalContext for compatibility
 export interface ModalConfig<T extends BaseModalProps = BaseModalProps> {

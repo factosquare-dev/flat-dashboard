@@ -1,12 +1,12 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react';
-import type { Participant, Task } from '../../../types/schedule';
+import type { Participant, Task } from '@/types/schedule';
 import { TaskStatus } from '@/types/enums';
 import GanttHeader from '@/components/GanttChart/GanttHeader';
 import ProjectSidebar from '@/components/GanttChart/ProjectSidebar';
 import GanttGrid from '@/components/GanttChart/GanttGrid';
 import TaskRenderer from '@/components/GanttChart/TaskRenderer';
 import { useGanttDrag } from '@/components/GanttChart/hooks/useGanttDrag';
-import type { Project } from '../../GanttChart/types';
+import type { Project } from '@/GanttChart/types';
 import { getTotalRows } from '@/components/GanttChart/utils/ganttHelpers';
 import { GANTT_CONSTANTS, getTotalDays, getGanttDateRange } from '@/components/GanttChart/constants';
 

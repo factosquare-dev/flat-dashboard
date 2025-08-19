@@ -9,7 +9,7 @@
  * - Consistent key prefixing
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '@/utils/logger';
 
 export interface StorageItem<T> {
   value: T;

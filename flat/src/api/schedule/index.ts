@@ -3,10 +3,10 @@
  * 기능별로 모듈화하여 관리
  */
 
-import type { Schedule, Task, Participant } from '../../types/schedule';
-import type { Project } from '../../types/project';
+import type { Schedule, Task, Participant } from '@/types/schedule';
+import type { Project } from '@/types/project';
 import { USE_MOCK_DATA } from '@/config/mock';
-import { apiClient } from '../client/interceptors';
+import { apiClient } from '@/api/client/interceptors';
 import {
   getOrCreateScheduleForProject,
   addTaskToSchedule,

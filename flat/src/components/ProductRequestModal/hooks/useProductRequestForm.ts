@@ -4,7 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import { useModalFormValidation } from '@/hooks/useModalFormValidation';
-import type { ProductRequestData } from '../types';
+import type { ProductRequestData } from '@/components/types';
 
 const initialFormData: ProductRequestData = {
   brandName: '',

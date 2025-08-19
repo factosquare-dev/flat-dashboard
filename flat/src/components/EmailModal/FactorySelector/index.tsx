@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, X, Building2 } from 'lucide-react';
-import type { Factory } from '../../data/factories';
+import type { Factory } from '@/data/factories';
 import './FactorySelector.css';
 import { FactoryId, extractIdString } from '@/components/types/branded';
 

@@ -2,7 +2,7 @@
  * Database Management API endpoints
  */
 
-import { simulateDelay, formatResponse } from '../common';
+import { simulateDelay, formatResponse } from '@/mocks/common';
 
 export const databaseApi = {
   async getStats() {

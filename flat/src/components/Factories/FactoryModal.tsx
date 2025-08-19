@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import type { CertificationType } from '../../data/factories';
+import type { CertificationType } from '@/data/factories';
 import { useFactoryForm, type FactoryFormData } from './hooks/useFactoryForm';
 import ManagerSection from './components/ManagerSection';
 import CertificationSection from './components/CertificationSection';
-import BaseModal, { ModalFooter } from '../common/BaseModal';
+import BaseModal, { ModalFooter } from '@/common/BaseModal';
 import { useModalFormValidation } from '@/hooks/useModalFormValidation';
 import { AlertCircle, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { FactoryType, FactoryTypeLabel, ModalSize, ButtonVariant } from '@/types/enums';
 import { MODAL_SIZES } from '@/utils/modalUtils';
-import { Button } from '../ui/Button';
+import { Button } from '@/ui/Button';
 import './FactoryModal.css';
 
 interface FactoryModalProps {

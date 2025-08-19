@@ -7,7 +7,7 @@ import { ProjectStatus, Priority, ServiceType, ProductType, ProjectType } from '
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 import { factories } from '@/data/factories';
 import { formatCompanyNameForDisplay } from '@/utils/companyUtils';
-import { SIMULATION_CONSTANTS } from '../helpers/projectHelpers';
+import { SIMULATION_CONSTANTS } from '@/hooks/useProjects/helpers/projectHelpers';
 
 /**
  * Load projects from the database

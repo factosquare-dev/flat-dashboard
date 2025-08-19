@@ -1,4 +1,4 @@
-import type { Project } from '../../types/project';
+import type { Project } from '@/types/project';
 import type { StateCreator } from 'zustand';
 
 export interface ProjectSlice {

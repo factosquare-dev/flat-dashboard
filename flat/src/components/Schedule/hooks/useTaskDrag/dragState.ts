@@ -2,7 +2,7 @@
  * Drag state management utilities for useTaskDrag
  */
 
-import type { Task, ModalState } from '../../../../types/schedule';
+import type { Task, ModalState } from '@/types/schedule';
 import type { DragState } from './types';
 import { setInteractionMode, setDragImageElement } from '@/utils/schedule/globalState';
 

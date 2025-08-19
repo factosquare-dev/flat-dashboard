@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import UserModal, { type UserFormData } from '../../components/Users/UserModal';
-import UserCard, { type UserData } from '../../components/Users/UserCard';
+import UserModal, { type UserFormData } from '@/components/Users/UserModal';
+import UserCard, { type UserData } from '@/components/Users/UserCard';
 import UserToolbar from '@/components/Users/UserToolbar';
 import FloatingActionButton from '@/components/common/FloatingActionButton';
 import { useUserFilter } from '@/hooks/useUserFilter';

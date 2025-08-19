@@ -1,4 +1,4 @@
-import type { Task, ModalState, Participant, TaskControls, DragTooltip } from '../../../../types/schedule';
+import type { Task, ModalState, Participant, TaskControls, DragTooltip } from '@/types/schedule';
 
 export type DragState = {
   offsetX: number;

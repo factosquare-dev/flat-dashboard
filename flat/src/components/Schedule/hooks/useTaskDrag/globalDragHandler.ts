@@ -1,5 +1,5 @@
 import { GridCoordinateCalculator, calculateTaskDuration, calculateEndDate } from '@/utils/schedule/dragCalculations';
-import type { ModalState } from '../../../../types/schedule';
+import type { ModalState } from '@/types/schedule';
 import type { DragState } from './types';
 
 export const createGlobalDragOverHandler = (

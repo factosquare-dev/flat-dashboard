@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Save } from 'lucide-react';
 import { APP_CONSTANTS } from '@/config/constants';
-import BaseModal, { ModalFooter } from '../common/BaseModal';
-import { Button } from '../ui/Button';
+import BaseModal, { ModalFooter } from '@/common/BaseModal';
+import { Button } from '@/ui/Button';
 import BasicInfoSection from './components/BasicInfoSection';
 import ContactInfoSection from './components/ContactInfoSection';
 import AdditionalInfoSection from './components/AdditionalInfoSection';

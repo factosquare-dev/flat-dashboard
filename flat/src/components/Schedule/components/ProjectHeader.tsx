@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Participant } from '../../../types/schedule';
+import type { Participant } from '@/types/schedule';
 
 interface ProjectHeaderProps {
   project: Participant;

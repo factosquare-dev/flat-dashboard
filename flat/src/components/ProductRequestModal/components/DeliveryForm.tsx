@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { FormInput, FormTextarea } from '@/components/forms';
-import type { FormFieldProps } from '../types';
+import type { FormFieldProps } from '@/components/types';
 
 export const DeliveryForm: React.FC<FormFieldProps> = ({ 
   formData, 

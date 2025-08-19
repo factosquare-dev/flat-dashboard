@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { DragTooltip } from '../../../types/schedule';
+import type { DragTooltip } from '@/types/schedule';
 
 export const useDragTooltip = () => {
   const [dragTooltip, setDragTooltip] = useState<DragTooltip | null>(null);

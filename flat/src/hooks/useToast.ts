@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useStore } from '../store';
+import { useStore } from '@/store';
 
 export const useToast = () => {
   const { addNotification } = useStore();

@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { createLazyRoute } from '../utils/lazy-loading';
+import { createLazyRoute } from '@/utils/lazy-loading';
 
 // Lazy load page components with proper error boundaries
 export const DashboardPage = createLazyRoute(() => import('../pages/Dashboard'));

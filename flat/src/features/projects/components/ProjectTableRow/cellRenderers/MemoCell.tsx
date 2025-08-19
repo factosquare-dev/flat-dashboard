@@ -1,5 +1,5 @@
 import React from 'react';
-import MemoTabs from '../../MemoTabs';
+import MemoTabs from '@/features/projects/MemoTabs';
 import type { Project } from '@/types/project';
 
 interface MemoCellProps {

@@ -1,5 +1,5 @@
-import type { BaseEntity } from '../../common/types';
-import type { Project } from '../../projects/types';
+import type { BaseEntity } from '@/common/types';
+import type { Project } from '@/projects/types';
 
 // Schedule types
 export interface Schedule extends BaseEntity {

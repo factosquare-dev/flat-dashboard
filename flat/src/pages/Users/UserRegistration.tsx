@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, X } from 'lucide-react';
-import type { UserRole } from '../../store/slices/userSlice';
+import type { UserRole } from '@/store/slices/userSlice';
 
 interface UserFormData {
   name: string;

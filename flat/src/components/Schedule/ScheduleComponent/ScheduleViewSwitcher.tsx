@@ -1,10 +1,12 @@
-import React from 'react';
-import ScheduleGridContainer from '../ScheduleGridContainer';
-import ScheduleTableView from '../components/ScheduleTableView';
+import React, { useMemo } from 'react';
+import ScheduleGridContainer from '@/components/ScheduleGridContainer';
+import ScheduleTableView from '@/components/components/ScheduleTableView';
+import TaskCentricGanttChart from '@/components/components/TaskCentricGanttChart';
 import type { ViewMode } from './types';
-import type { Participant, Task } from '../../../types/schedule';
-import type { Factory } from '../../../types/factory';
-import { ViewMode as ViewModeEnum } from '@/types/enums';
+import type { Participant, Task } from '@/types/schedule';
+import type { Factory } from '@/types/factory';
+import { ViewMode as ViewModeEnum, ProjectType } from '@/types/enums';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 interface ScheduleViewSwitcherProps {
   viewMode: ViewMode;
@@ -60,7 +62,34 @@ const ScheduleViewSwitcher: React.FC<ScheduleViewSwitcherProps> = React.memo(({
   onGridWidthChange,
   onQuickTaskCreate,
 }) => {
+  // Get project type from MockDB
+  const projectType = useMemo(() => {
+    if (!projectId) return null;
+    
+    try {
+      const db = MockDatabaseImpl.getInstance();
+      const project = db.getProjectById(projectId);
+      return project?.type || null;
+    } catch {
+      return null;
+    }
+  }, [projectId]);
+
   if (viewMode === ViewModeEnum.GANTT) {
+    // Use TaskCentricGanttChart for SUB and INDEPENDENT projects
+    if (projectType === ProjectType.SUB || projectType === ProjectType.INDEPENDENT) {
+      return (
+        <TaskCentricGanttChart
+          tasks={tasks}
+          onTaskUpdate={(taskId, updates) => {
+            // Handle task updates if needed
+            console.log('Task update:', taskId, updates);
+          }}
+        />
+      );
+    }
+    
+    // Use existing ScheduleGridContainer for MASTER projects or when type is unknown
     return (
       <ScheduleGridContainer
         projects={projects}

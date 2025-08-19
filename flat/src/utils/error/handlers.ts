@@ -2,9 +2,9 @@
  * Error handling functions
  */
 
-import { logger } from '../logger';
-import { getCurrentTimestamp } from '../unifiedDateUtils';
-import { isApiError, isNetworkError, isTimeoutError, ApiError } from '../apiClient';
+import { logger } from '@/utils/logger';
+import { getCurrentTimestamp } from '@/utils/unifiedDateUtils';
+import { isApiError, isNetworkError, isTimeoutError, ApiError } from '@/utils/apiClient';
 import { ErrorContext, getErrorMessage } from './core';
 
 /**

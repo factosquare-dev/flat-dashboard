@@ -1,7 +1,7 @@
-import { useStore } from '../index';
+import { useStore } from '@/index';
 import { shallow } from 'zustand/shallow';
 import { createSelector } from 'zustand';
-import type { RootState } from '../index';
+import type { RootState } from '@/index';
 import { ProjectStatus } from '@/types/enums';
 
 /**

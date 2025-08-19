@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { ErrorBoundary } from '../ErrorBoundary';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface LazyBoundaryProps {
   children: React.ReactNode;

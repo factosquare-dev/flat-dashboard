@@ -30,7 +30,7 @@ export {
   CardDescription,
   CardContent,
   CardFooter
-} from '../ui/Card';
+} from '@/ui/Card';
 
 // Example usage documentation
 export const CompoundComponentExamples = {

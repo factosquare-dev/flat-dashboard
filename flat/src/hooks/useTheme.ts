@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useStore } from '../store';
-import { lightTheme, darkTheme } from '../styles/themes';
-import { Theme } from '../types/enums';
+import { useStore } from '@/store';
+import { lightTheme, darkTheme } from '@/styles/themes';
+import { Theme } from '@/types/enums';
 
 type ThemeObject = typeof lightTheme;
 

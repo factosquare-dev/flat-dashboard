@@ -1,6 +1,8 @@
 import React from 'react';
-import { Users } from 'lucide-react';
 import type { ProjectData } from './types';
+import CustomerSelector from './components/CustomerSelector';
+import ProductServiceSelector from './components/ProductServiceSelector';
+import ManagerSelector from './components/ManagerSelector';
 
 interface BasicInfoSectionProps {
   formData: ProjectData;
@@ -9,34 +11,47 @@ interface BasicInfoSectionProps {
 
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, onChange }) => {
   return (
-    <div className="modal-field-spacing">
-      <div className="modal-field-label">
-        <Users />
-        기본 정보
+    <div className="space-y-6">
+      {/* Vertical Form Layout - Based on GG.png */}
+      
+      {/* Section 1: Basic Info */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">기본 정보</h3>
+        
+        {/* Customer */}
+        <CustomerSelector
+          value={formData.customerId}
+          onChange={(customerId, customerName) => {
+            onChange({ 
+              customerId,
+              client: customerName 
+            });
+          }}
+          required
+        />
+
+        {/* Product & Service */}
+        <ProductServiceSelector
+          productId={formData.productId}
+          serviceType={formData.serviceType}
+          onChange={(updates) => onChange(updates)}
+          required
+        />
       </div>
-      <div className="modal-grid-2">
-        <div className="modal-field-spacing">
-          <label className="modal-field-label">고객명 *</label>
-          <input
-            type="text"
-            className="modal-input"
-            value={formData.client}
-            onChange={(e) => onChange({ client: e.target.value })}
-            placeholder="고객명을 입력하세요"
-            required
-          />
-        </div>
-        <div className="modal-field-spacing">
-          <label className="modal-field-label">담당자 *</label>
-          <input
-            type="text"
-            className="modal-input"
-            value={formData.manager}
-            onChange={(e) => onChange({ manager: e.target.value })}
-            placeholder="담당자명을 입력하세요"
-            required
-          />
-        </div>
+
+      {/* Section 2: Manager Assignment */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">담당자 배정</h3>
+        
+        <ManagerSelector
+          value={formData.managerId}
+          onChange={(managerIds, managerNames) => {
+            onChange({ 
+              managerId: managerIds,
+              manager: managerNames 
+            });
+          }}
+        />
       </div>
     </div>
   );

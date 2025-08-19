@@ -1,10 +1,10 @@
 import React from 'react';
-import type { Project } from '../../types/project';
-import type { ProjectId } from '../../types/branded';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
 import { MoreVertical, GripVertical } from 'lucide-react';
 import ProjectTableRow from './ProjectTableRow/index';
 import { useColumnOrder } from '@/features/hooks/useColumnOrder';
-import type { Column } from '../../hooks/useColumnOrder';
+import type { Column } from '@/hooks/useColumnOrder';
 
 interface ProjectTableProps {
   projects: Project[];

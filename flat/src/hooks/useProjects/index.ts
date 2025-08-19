@@ -4,8 +4,8 @@
  */
 
 import { useEffect, useState } from 'react';
-import type { Project } from '../../types/project';
-import type { ProjectId } from '../../types/branded';
+import type { Project } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
 import { getHierarchicalProjectsData, flattenProjects, toggleProject } from '@/data/hierarchicalProjects';
 import { useProjectData } from './useProjectData';
 import { useProjectSelection } from './useProjectSelection';

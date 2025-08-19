@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { ResizePreview, TaskControls, ModalState } from '../../../../types/schedule';
+import type { ResizePreview, TaskControls, ModalState } from '@/types/schedule';
 import { 
   createTaskMouseDownHandler, 
   createMouseMoveHandler, 

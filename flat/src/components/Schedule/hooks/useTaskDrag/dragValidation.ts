@@ -2,7 +2,7 @@
  * Drag validation utilities for useTaskDrag
  */
 
-import type { Task, Participant } from '../../../../types/schedule';
+import type { Task, Participant } from '@/types/schedule';
 import { findAvailableDateRange } from '@/utils/taskUtils';
 import { factories } from '@/data/factories';
 import { mockDataService } from '@/services/mockDataService';

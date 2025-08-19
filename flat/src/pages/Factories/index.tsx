@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getFactories, type Factory as FactoryType } from '@/data/factories';
-import FactoryModal, { type FactoryFormData } from '../../components/Factories/FactoryModal';
+import FactoryModal, { type FactoryFormData } from '@/components/Factories/FactoryModal';
 import FactoryCard from '@/components/Factories/FactoryCard';
 import FactoryToolbar from '@/components/Factories/FactoryToolbar';
 import FloatingActionButton from '@/components/common/FloatingActionButton';

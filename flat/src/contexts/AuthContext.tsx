@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { APP_CONSTANTS } from '../config/constants';
-import { logger } from '../utils/logger';
-import { User } from '../types/user';
+import { APP_CONSTANTS } from '@/config/constants';
+import { logger } from '@/utils/logger';
+import { User } from '@/types/user';
 import { 
   getCurrentUserFromStorage, 
   saveCurrentUserToStorage,
@@ -13,7 +13,7 @@ import {
   saveTheme,
   saveLocale,
   STORAGE_KEYS
-} from '../utils/storageConversions';
+} from '@/utils/storageConversions';
 
 interface AuthContextValue {
   user: User | null;

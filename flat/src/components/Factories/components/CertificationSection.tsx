@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CertificationType } from '../../../data/factories';
+import type { CertificationType } from '@/data/factories';
 
 interface CertificationSectionProps {
   certifications: CertificationType[];

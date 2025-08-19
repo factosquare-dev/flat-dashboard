@@ -9,7 +9,7 @@ import ProjectSidebar from './ProjectSidebar';
 import GanttGrid from './GanttGrid';
 import TaskRenderer from './TaskRenderer';
 import { useGanttDrag } from './hooks/useGanttDrag';
-import { useGanttData } from '@/../hooks/useGanttData';
+import { useGanttData } from '@/hooks/useGanttData';
 import { getTotalRows } from './utils/ganttHelpers';
 import { GANTT_CONSTANTS, getTotalDays } from './constants';
 

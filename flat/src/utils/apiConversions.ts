@@ -19,12 +19,12 @@ import {
   toUserIdSafe,
   toTaskIdSafe,
   toCustomerIdSafe
-} from '../types/branded';
-import type { Factory } from '../types/factory';
-import type { Project } from '../types/project';
-import type { User } from '../types/user';
-import type { Task } from '../types/schedule';
-import type { Customer } from '../types/customer';
+} from '@/types/branded';
+import type { Factory } from '@/types/factory';
+import type { Project } from '@/types/project';
+import type { User } from '@/types/user';
+import type { Task } from '@/types/schedule';
+import type { Customer } from '@/types/customer';
 import type {
   ApiFactoryResponse,
   ApiProjectResponse,
@@ -32,7 +32,7 @@ import type {
   ApiTaskResponse,
   ApiCustomerResponse,
   ApiTaskParticipant
-} from '../types/api';
+} from '@/types/api';
 
 /**
  * Convert raw API factory response to typed Factory

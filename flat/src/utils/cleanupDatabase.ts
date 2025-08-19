@@ -3,7 +3,7 @@
  * Removes invalid entries from the database
  */
 
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 /**
  * Clean up invalid entries from all database collections

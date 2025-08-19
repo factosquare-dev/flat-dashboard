@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { Project } from '../../../types/project';
-import type { Customer } from '../../../types/customer';
+import type { Project } from '@/types/project';
+import type { Customer } from '@/types/customer';
 import SearchBox from './SearchBox';
 import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 import { factories } from '@/data/factories';

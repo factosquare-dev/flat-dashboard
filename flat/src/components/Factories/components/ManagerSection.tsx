@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, X, User } from 'lucide-react';
-import type { FactoryManager } from '../../../data/factories';
+import type { FactoryManager } from '@/data/factories';
 import { Button } from '@/components/ui/Button';
 import { ButtonVariant, ButtonSize } from '@/types/enums';
 

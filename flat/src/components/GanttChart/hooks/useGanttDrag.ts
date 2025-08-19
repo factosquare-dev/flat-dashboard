@@ -3,8 +3,8 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import type { DragState, Task, Project } from '../types';
-import { getRowFromY, getColFromX, getDateFromIndex } from '../utils/ganttCalculations';
+import type { DragState, Task, Project } from '@/components/types';
+import { getRowFromY, getColFromX, getDateFromIndex } from '@/components/utils/ganttCalculations';
 
 interface UseGanttDragProps {
   projects: Project[];

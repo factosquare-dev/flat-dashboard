@@ -45,10 +45,14 @@ const ScheduleHeader: React.FC<ScheduleHeaderProps> = ({
                 <span className="font-medium">테이블 뷰</span>
               </button>
             ) : (
-              <div className="px-3 py-1.5 bg-gray-100 text-gray-500 rounded-md border border-gray-200 flex items-center gap-2 text-sm cursor-not-allowed opacity-50">
+              <button
+                onClick={onToggleTableView}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 rounded-md border border-gray-200 transition-all hover:shadow-sm flex items-center gap-2 text-sm"
+                title="간트차트 뷰로 전환"
+              >
                 <Calendar className="w-4 h-4" />
-                <span className="font-medium">간트차트 뷰 (비활성화)</span>
-              </div>
+                <span className="font-medium">간트차트 뷰</span>
+              </button>
             )}
           </>
         )}

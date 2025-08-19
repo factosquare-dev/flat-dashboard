@@ -8,8 +8,8 @@ import type { ProjectId } from '@/types/branded';
 import { MoreVertical } from 'lucide-react';
 import type { Column } from '@/hooks/useColumnOrder';
 import { ProjectField, ProjectFactoryField, TableColumnId } from '@/types/enums';
-import * as cellRenderers from '../cellRenderers';
-import SelectionCell from '../SelectionCell';
+import * as cellRenderers from '@/features/projects/components/ProjectTableRow/cellRenderers';
+import SelectionCell from '@/features/projects/components/ProjectTableRow/SelectionCell';
 
 interface MasterProjectRowProps {
   project: Project;
@@ -20,6 +20,7 @@ interface MasterProjectRowProps {
   onToggleMaster: () => void;
   onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }, event?: React.MouseEvent) => void;
   renderCell: (columnId: string) => React.ReactNode;
+  onRowClick?: (project: Project) => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDragLeave?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent, project: Project) => void;
@@ -34,6 +35,7 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
   onToggleMaster,
   onShowOptionsMenu,
   renderCell,
+  onRowClick,
   onDragOver,
   onDragLeave,
   onDrop
@@ -73,11 +75,31 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
     onDrop?.(e, project);
   };
 
+  const handleRowClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    
+    // Check if clicking on interactive elements
+    const isInteractive = target.closest(
+      'button, input, select, textarea, a, ' +
+      '.js-inline-edit, .editable-cell, ' +
+      '.modal-input, .SearchBox, ' +
+      '[contenteditable="true"], ' +
+      '[role="combobox"], [role="listbox"], ' +
+      '.factory-cell, .date-picker, ' +
+      '.memo-cell, [data-memo-cell="true"]'
+    );
+    
+    if (!isInteractive && onRowClick) {
+      onRowClick(project);
+    }
+  };
+
   return (
     <tr 
       className={`group border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-150 cursor-pointer ${
         isDragOver ? 'bg-blue-50' : ''
       }`}
+      onClick={handleRowClick}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -94,33 +116,16 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
         />
       </td>
       
-      {columns.map((column, index) => {
+      {columns.map((column) => {
         if (column.visible === false) return null;
-        
-        // Check if this is a memo column and if it's the last one
-        const isMemoColumn = column.id.startsWith('memo-') || (column as any).isMemo === true;
-        const nextColumn = columns[index + 1];
-        const isLastMemoColumn = isMemoColumn && 
-          (!nextColumn || (!nextColumn.id.startsWith('memo-') && !(nextColumn as any).isMemo));
-        
-        // Also check if we need to add button space after LAB_NUMBER when no memos exist
-        const hasMemoColumns = columns.some(col => col.id.startsWith('memo-') || (col as any).isMemo === true);
-        const isLabNumberColumn = column.id === TableColumnId.LAB_NUMBER;
-        const needsButtonSpace = isLastMemoColumn || (isLabNumberColumn && !hasMemoColumns);
         
         let cellContent: React.ReactNode = null;
         
         // Special handling for master project cells
         switch (column.id) {
           case ProjectField.NAME: {
-            // For master project name, just display the name (chevron is in SelectionCell now)
-            cellContent = (
-              <td key={column.id} className="px-3 py-1.5 text-xs font-semibold text-gray-900" style={{ width: column.width }}>
-                <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                  {project.name}
-                </div>
-              </td>
-            );
+            // Use renderCell to get EditableCell for master project name
+            cellContent = renderCell(column.id);
             break;
           }
             
@@ -213,15 +218,11 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
           }
         }
         
-        return (
-          <React.Fragment key={column.id}>
-            {cellContent}
-            {needsButtonSpace && (
-              <td className="px-2 py-1.5 text-xs w-12"></td>
-            )}
-          </React.Fragment>
-        );
+        return cellContent;
       })}
+      
+      {/* Add memo button column - empty cell */}
+      <td className="px-2 py-1.5 text-xs w-12"></td>
       
       <td className="px-4 py-2 text-sm w-12">
         <button

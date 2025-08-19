@@ -1,12 +1,13 @@
 import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
-import { LoadingScreen } from '../components/ui/LoadingScreen';
-import { ErrorBoundary } from '../components/ErrorBoundary';
+import MainLayout from '@/layouts/MainLayout';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Lazy load pages for better performance
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Projects = lazy(() => import('../pages/Projects'));
+const MasterProjectDetail = lazy(() => import('../pages/Projects/MasterProjectDetail'));
 const Users = lazy(() => import('../pages/Users'));
 const Factories = lazy(() => import('../pages/Factories'));
 const ProductTypes = lazy(() => import('../pages/ProductTypes'));
@@ -32,6 +33,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingScreen />}>
             <Projects />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'projects/master/:projectId',
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <MasterProjectDetail />
           </Suspense>
         ),
       },

@@ -3,7 +3,7 @@
  * Handles database transactions
  */
 
-import { DbTransaction, DbOperation, DbResponse, MockDatabase } from '../types';
+import { DbTransaction, DbOperation, DbResponse, MockDatabase } from '@/mocks/database/types';
 
 export class TransactionManager {
   private transactions: Map<string, DbTransaction>;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
-import type { Task, Participant } from '../types/schedule';
-import { useTaskStore } from '../stores/taskStore';
-import { calculateTaskPositionByDate } from '../utils/scheduleDateCalculation';
+import type { Task, Participant } from '@/types/schedule';
+import { useTaskStore } from '@/stores/taskStore';
+import { calculateTaskPositionByDate } from '@/utils/scheduleDateCalculation';
 
 const generateTaskColor = (index: number): string => {
   // 모든 태스크에 동일한 파란색 사용

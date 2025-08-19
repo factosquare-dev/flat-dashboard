@@ -1,6 +1,6 @@
 import React from 'react';
-import BaseModal from '../common/BaseModal';
-import { Button } from '../ui/Button';
+import BaseModal from '@/common/BaseModal';
+import { Button } from '@/ui/Button';
 import { TaskFormFields } from './TaskFormFields';
 import { useTaskCreateForm } from '@/hooks/useTaskCreateForm';
 import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';

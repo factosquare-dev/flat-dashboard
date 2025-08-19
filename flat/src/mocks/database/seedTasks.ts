@@ -4,7 +4,7 @@
 
 import { Project, ProjectType, ProjectStatus } from '@/types/project';
 import { Schedule, Task, TaskStatus, Participant, ParticipantRole, FactoryAssignment } from '@/types/schedule';
-import { User, UserRole } from '@/types/user';
+import { User, UserRole, InternalManagerType } from '@/types/user';
 import { Factory, FactoryType } from '@/types/factory';
 import { TaskType } from '@/types/enums';
 import { getTaskTemplatesByFactoryType, calculateTaskDates, getAllTaskTemplates, TaskTemplate } from './seeders/tasks/taskTemplates';
@@ -88,10 +88,10 @@ export function createSchedulesAndTasks(projects: Project[], users: User[], fact
   const tasks: Task[] = [];
   const currentDate = new Date();
   
-  // Find specific users for consistent task assignment
-  const pmUser = users.find(u => u.role === UserRole.PRODUCT_MANAGER)!;
-  const factoryManager = users.find(u => u.role === UserRole.FACTORY_MANAGER)!;
-  const qaUser = users.find(u => u.role === UserRole.QA)!;
+  // Find specific users for consistent task assignment using new role system
+  const pmUser = users.find(u => u.role === UserRole.INTERNAL_MANAGER && u.internalManagerType === InternalManagerType.SALES)!;
+  const factoryManager = users.find(u => u.role === UserRole.EXTERNAL_MANAGER)!;
+  const qaUser = users.find(u => u.role === UserRole.INTERNAL_MANAGER && u.internalManagerType === InternalManagerType.QA)!;
 
   projects.forEach((project) => {
     const schedule: Schedule = {

@@ -1,4 +1,4 @@
-import type { UserRole } from '../../../store/slices/userSlice';
+import type { UserRole } from '@/store/slices/userSlice';
 import type { UserFormData, FormErrors } from './types';
 import { UserRole as UserRoleEnum } from '@/types/enums';
 

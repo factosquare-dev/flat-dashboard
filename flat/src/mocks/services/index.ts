@@ -11,7 +11,7 @@ export { ProjectService } from './ProjectService';
 import { UserService } from './UserService';
 import { FactoryService } from './FactoryService';
 import { ProjectService } from './ProjectService';
-import { MockDatabaseImpl } from '../database/MockDatabase';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
 
 // Service instances
 let userService: UserService | null = null;

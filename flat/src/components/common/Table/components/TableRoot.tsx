@@ -4,7 +4,7 @@
 
 import React, { useMemo } from 'react';
 import { cn } from '@/utils/cn';
-import { TableProvider, SortConfig } from '../context/TableContext';
+import { TableProvider, SortConfig } from '@/components/common/context/TableContext';
 
 interface TableRootProps {
   children: React.ReactNode;

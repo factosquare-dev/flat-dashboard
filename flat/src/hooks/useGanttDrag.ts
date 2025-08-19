@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import type { DragState, Task, Project, GridCell } from '../types/gantt';
-import { GANTT_CONSTANTS, TOTAL_DAYS } from '../constants/gantt';
-import { getDateIndex, getDuration, getDateFromIndex } from '../utils/ganttUtils';
+import type { DragState, Task, Project, GridCell } from '@/types/gantt';
+import { GANTT_CONSTANTS, TOTAL_DAYS } from '@/constants/gantt';
+import { getDateIndex, getDuration, getDateFromIndex } from '@/utils/ganttUtils';
 
 interface UseGanttDragProps {
   projects: Project[];

@@ -50,13 +50,14 @@ export {
   DragItemType,
 } from './enums/task';
 
-// User related enums
+// User related enums - moved to /types/user.ts
 export {
   UserRole,
-  UserRoleLabel,
-  RoleCategory,
-  UserStatus,
-  UserStatusLabel,
+  InternalManagerType,
+} from './user';
+
+// Auth and permission related enums
+export {
   PermissionLevel,
   PermissionLevelLabel,
   AuthStatus,

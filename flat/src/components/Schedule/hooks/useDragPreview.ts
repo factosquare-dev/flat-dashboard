@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { factories } from '@/data/factories';
 import { formatDateISO } from '@/utils/coreUtils';
 
-import type { Participant, Task } from '../../../types/schedule';
+import type { Participant, Task } from '@/types/schedule';
 
 export const useDragPreview = (projects: Participant[]) => {
   const [dragPreview, setDragPreview] = useState<{ projectId: string; startDate: string; endDate: string } | null>(null);

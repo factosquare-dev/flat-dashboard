@@ -1,11 +1,11 @@
 import React from 'react';
-import type { Project, HierarchicalProject } from '../../../../types/project';
-import type { ProjectId } from '../../../../types/branded';
-import DraggableProjectTable from '../DraggableProjectTable';
-import HierarchicalProjectTable from '../HierarchicalProjectTable';
-import OptionsMenu from '../OptionsMenu';
-import LoadingIndicator from '../shared/LoadingIndicator';
-import InfiniteScrollTrigger from '../shared/InfiniteScrollTrigger';
+import type { Project, HierarchicalProject } from '@/types/project';
+import type { ProjectId } from '@/types/branded';
+import DraggableProjectTable from '@/features/projects/components/DraggableProjectTable';
+import HierarchicalProjectTable from '@/features/projects/components/HierarchicalProjectTable';
+import OptionsMenu from '@/features/projects/components/OptionsMenu';
+import LoadingIndicator from '@/features/projects/components/shared/LoadingIndicator';
+import InfiniteScrollTrigger from '@/features/projects/components/shared/InfiniteScrollTrigger';
 
 interface ProjectTableUIProps {
   hierarchicalProjects: HierarchicalProject[];

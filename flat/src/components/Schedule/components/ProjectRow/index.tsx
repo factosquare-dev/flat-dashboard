@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Participant, Task } from '../../../../types/schedule';
+import type { Participant, Task } from '@/types/schedule';
 import { getProjectRowCount } from '@/utils/taskUtils';
 import { getTasksForFactory } from '@/utils/scheduleUtils';
 import { ProjectRowGrid } from './ProjectRowGrid';

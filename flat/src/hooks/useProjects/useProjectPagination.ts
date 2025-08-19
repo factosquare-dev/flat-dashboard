@@ -3,8 +3,8 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import type { Project } from '../../types/project';
-import { useInfiniteScroll } from '../useInfiniteScroll';
+import type { Project } from '@/types/project';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 
 // Constants for pagination
 const PAGINATION_CONSTANTS = {

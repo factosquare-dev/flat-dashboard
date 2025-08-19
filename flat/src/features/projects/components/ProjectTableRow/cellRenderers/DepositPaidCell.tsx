@@ -1,6 +1,8 @@
 import React from 'react';
 import type { Project } from '@/types/project';
 import type { ProjectId } from '@/types/branded';
+import { ProjectType } from '@/types/enums';
+import { mockDataService } from '@/services/mockDataService';
 
 interface DepositPaidCheckboxProps {
   checked: boolean;
@@ -61,6 +63,24 @@ interface CellRenderProps {
 }
 
 export const renderDepositPaid = ({ project, onUpdateField, index, isDragging, onStartDrag }: CellRenderProps) => {
+  const handleDepositChange = (checked: boolean) => {
+    // Update the current project
+    onUpdateField(project.id, 'depositPaid', checked);
+    
+    // If this is a MASTER project, update all its SUB projects
+    if (project.type === ProjectType.MASTER) {
+      const allProjects = mockDataService.getAllProjects();
+      const subProjects = allProjects.filter(
+        p => p.parentId === project.id && p.type === ProjectType.SUB
+      );
+      
+      // Update each SUB project's deposit status
+      subProjects.forEach(subProject => {
+        onUpdateField(subProject.id, 'depositPaid', checked);
+      });
+    }
+  };
+
   return (
     <td 
       className="px-3 py-1.5 text-center" 
@@ -68,7 +88,7 @@ export const renderDepositPaid = ({ project, onUpdateField, index, isDragging, o
     >
       <DepositPaidCheckbox
         checked={project.depositPaid || false}
-        onChange={(checked) => onUpdateField(project.id, 'depositPaid', checked)}
+        onChange={handleDepositChange}
         onStartDrag={index !== undefined && onStartDrag ? () => onStartDrag(index) : undefined}
         isDragging={isDragging}
       />

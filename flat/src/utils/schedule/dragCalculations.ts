@@ -1,5 +1,5 @@
 // Unified coordinate calculation utilities for consistent grid positioning
-import { formatDateISO } from '@/../utils/coreUtils';
+import { formatDateISO } from '@/utils/coreUtils';
 
 export interface GridCoordinates {
   x: number;

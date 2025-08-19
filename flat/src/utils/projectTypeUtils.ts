@@ -1,5 +1,5 @@
-import { MockDatabaseImpl } from '../mocks/database/MockDatabase';
-import { ProjectType } from '../types/enums';
+import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
+import { ProjectType } from '@/types/enums';
 
 export interface ProjectTypeInfo {
   code: string;

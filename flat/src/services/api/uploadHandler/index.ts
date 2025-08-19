@@ -1,4 +1,4 @@
-import type { ApiResponse } from '../requestHandlers';
+import type { ApiResponse } from '@/services/api/requestHandlers';
 import type { UploadOptions, UploadResponse } from './types';
 import { SingleFileUploader } from './singleFileUpload';
 import { MultipleFileUploader } from './multipleFileUpload';

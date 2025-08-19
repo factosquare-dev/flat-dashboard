@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Task } from '../../../types/schedule';
+import type { Task } from '@/types/schedule';
 import { getInteractionState } from '@/utils/schedule/globalState';
 import { TaskStatus } from '@/types/enums';
 import './TaskItem.css';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Participant } from '../../../types/schedule';
+import type { Participant } from '@/types/schedule';
 
 interface UseProjectDragSelectionProps {
   projects: Participant[];
