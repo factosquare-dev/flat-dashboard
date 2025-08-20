@@ -180,19 +180,15 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
                 key={project.id}
                 project={project}
                 columns={visibleColumns}
-                selected={selectedRows.includes(project.id)}
-                onSelectRow={onSelectRow}
-                onSelectProject={onSelectProject}
-                onUpdateProject={onUpdateProject}
+                index={index}
+                isSelected={selectedRows.includes(project.id)}
+                onSelect={(checked) => onSelectRow(project.id, checked, index)}
+                onRowClick={onSelectProject}
+                onUpdateField={onUpdateProject}
                 onShowOptionsMenu={onShowOptionsMenu}
-                onMouseEnterRow={onMouseEnterRow}
+                onMouseEnter={() => onMouseEnterRow?.(index)}
                 isDragging={isDragging}
                 onStartDrag={onStartDrag}
-                rowIndex={index}
-                getColumnWidth={getColumnWidth}
-                memoColumns={memoColumns}
-                isDraggable={isDraggable}
-                canReceiveDrop={canReceiveDrop}
                 onDragStart={(e) => handleProjectDragStart(e, project.id)}
                 onDragEnd={handleProjectDragEnd}
                 onDragOver={handleProjectDragOver}
