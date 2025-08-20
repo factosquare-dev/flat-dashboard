@@ -105,6 +105,8 @@ export const theme = {
       low: 'var(--color-priority-low)',
     },
     factory: {
+      fragrance: 'var(--color-factory-fragrance)',
+      material: 'var(--color-factory-material)',
       manufacturing: 'var(--color-factory-manufacturing)',
       container: 'var(--color-factory-container)',
       packaging: 'var(--color-factory-packaging)',
