@@ -119,6 +119,24 @@ class MockDataService {
   getUsersByRole = (role: any) => this.userService.getUsersByRole(role);
   getManagers = () => this.userService.getManagers();
   getActiveUsers = () => this.userService.getActiveUsers();
+
+  /**
+   * 프로젝트 상세 섹션 데이터 관련 메서드
+   */
+  getProjectSectionData = (projectId: string, section: string) => {
+    return this.projectService.getProjectSectionData(projectId, section);
+  };
+
+  /**
+   * TaskChecklist 관련 메서드
+   */
+  getProjectTaskChecklist = (projectId: string) => {
+    return this.projectService.getProjectTaskChecklist(projectId);
+  };
+
+  getCurrentTaskStages = (projectId: string) => {
+    return this.projectService.getCurrentTaskStages(projectId);
+  };
 }
 
 // Singleton instance

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Mail, AlertCircle } from 'lucide-react';
-import BaseModal, { ModalFooter } from '@/common/BaseModal';
+import BaseModal, { ModalFooter } from '@/components/common/BaseModal';
 import FactorySelector from './FactorySelector';
 import CustomerSelector from './CustomerSelector';
 import ManagerSelector from './ManagerSelector';

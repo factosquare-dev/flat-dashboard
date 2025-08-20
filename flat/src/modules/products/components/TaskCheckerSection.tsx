@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { mockDataService } from '@/core/services/mockDataService';
-import { ProjectType, ProductType, ProductTypeLabel } from '@/shared/types/enums';
-
-interface TaskStatus {
-  [key: string]: boolean;
-}
+import { ProjectType } from '@/shared/types/enums';
+import { TaskChecklistItem, TaskChecklistLabel, TaskChecklistOrder } from '@/shared/types/enums/taskChecklist';
+import type { TaskChecklistStatus } from '@/shared/types/taskChecklist';
+import { getProductLabel } from '@/shared/utils/productTypeUtils';
 
 interface TaskCheckerSectionProps {
   projectId?: string;
@@ -24,68 +23,40 @@ export const TaskCheckerSection: React.FC<TaskCheckerSectionProps> = ({ projectI
     }
   }, [projectId]);
 
-  // 제품 타입별로 라벨 생성 (한글로 변환)
-  const getProductLabel = (project: any, index: number): string => {
-    const productType = project.productType || project.product?.productType || ProductType.OTHER;
-    const typeLabel = ProductTypeLabel[productType as ProductType] || productType;
-    
-    const sameTypeProjects = subProjects.filter(
-      p => (p.productType || p.product?.productType) === productType
-    );
-    
-    if (sameTypeProjects.length > 1) {
-      const typeIndex = sameTypeProjects.findIndex(p => p.id === project.id);
-      return `${typeLabel} (${typeIndex + 1})`;
-    }
-    
-    return typeLabel;
-  };
   
-  const tasks = [
-    '제품개발의뢰서 검토',
-    '제품개발의뢰서 미팅',
-    '샘플의뢰',
-    '샘플확정',
-    'CT 의뢰',
-    'CT 확정',
-    '표시문구',
-    '디자인',
-    '용기 발주',
-    '용기 입고',
-    '내용물 발주',
-    '원료 발주',
-    '포장사양서',
-    '생산일정',
-    '인증/인허가',
-    '최종 확인'
-  ];
+  // Template화된 TaskChecklist 사용 - useMemo로 메모이제이션
+  const tasks = useMemo(() => {
+    return TaskChecklistOrder.map(item => TaskChecklistLabel[item]);
+  }, []);
 
-  const [taskStatus, setTaskStatus] = useState<TaskStatus>(() => {
-    const initial: TaskStatus = {};
-    subProjects.forEach((project, index) => {
-      const label = getProductLabel(project, index);
-      tasks.forEach(task => {
-        initial[`${label}-${task}`] = false;
-      });
-    });
-    return initial;
-  });
+  const [taskStatus, setTaskStatus] = useState<TaskStatus>({});
 
-  // SUB 프로젝트가 변경될 때 taskStatus 업데이트
+  // SUB 프로젝트가 변경될 때 실제 MockDB에서 TaskChecklist 데이터 로드
   useEffect(() => {
     const newStatus: TaskStatus = {};
     subProjects.forEach((project, index) => {
-      const label = getProductLabel(project, index);
-      tasks.forEach(task => {
-        const key = `${label}-${task}`;
-        newStatus[key] = taskStatus[key] || false;
-      });
+      // MockDB에서 실제 TaskChecklist 데이터 가져오기
+      const checklist = mockDataService.getProjectTaskChecklist(project.id);
+      
+      if (checklist) {
+        TaskChecklistOrder.forEach((item) => {
+          const taskLabel = TaskChecklistLabel[item];
+          const key = `${project.id}-${taskLabel}`; // Use project.id for unique key
+          newStatus[key] = checklist.status[item] || false;
+        });
+      } else {
+        // 체크리스트가 없으면 기본값으로 false
+        tasks.forEach(task => {
+          const key = `${project.id}-${task}`; // Use project.id for unique key
+          newStatus[key] = false;
+        });
+      }
     });
     setTaskStatus(newStatus);
-  }, [subProjects]);
+  }, [subProjects, tasks]);
 
-  const toggleTask = (productLabel: string, task: string) => {
-    const key = `${productLabel}-${task}`;
+  const toggleTask = (projectId: string, task: string) => {
+    const key = `${projectId}-${task}`;
     setTaskStatus(prev => ({
       ...prev,
       [key]: !prev[key]
@@ -114,7 +85,7 @@ export const TaskCheckerSection: React.FC<TaskCheckerSectionProps> = ({ projectI
               {subProjects.map((project, index) => (
                 <th key={project.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2.5 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider last:rounded-tr-lg">
                   <div className="whitespace-nowrap">
-                    <span className="text-[11px]">{getProductLabel(project, index)}</span>
+                    <span className="text-[11px]">{getProductLabel(subProjects, project, index)}</span>
                   </div>
                 </th>
               ))}
@@ -127,15 +98,15 @@ export const TaskCheckerSection: React.FC<TaskCheckerSectionProps> = ({ projectI
                   {task}
                 </td>
                 {subProjects.map((project, index) => {
-                  const productLabel = getProductLabel(project, index);
-                  const key = `${productLabel}-${task}`;
-                  const isChecked = taskStatus[key];
+                  const productLabel = getProductLabel(subProjects, project, index);
+                  const key = `${project.id}-${task}`; // Use project.id for unique key
+                  const isChecked = taskStatus[key]; // Use project.id for taskStatus too
                   const isLast = index === subProjects.length - 1 && taskIndex === tasks.length - 1;
                   
                   return (
                     <td key={key} className={`px-3 py-2 text-center ${isLast ? 'rounded-br-lg' : ''}`}>
                       <button
-                        onClick={() => toggleTask(productLabel, task)}
+                        onClick={() => toggleTask(project.id, task)}
                         className={`inline-flex items-center justify-center w-5 h-5 rounded-full transition-all transform hover:scale-125 ${
                           isChecked 
                             ? 'bg-gradient-to-r from-green-400 to-emerald-500 shadow-md' 

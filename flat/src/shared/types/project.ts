@@ -8,6 +8,7 @@ export {
 } from './enums';
 
 import { ProjectId, CustomerId, FactoryId, UserId } from './branded';
+import { ProjectTaskChecklist } from './taskChecklist';
 
 // Legacy type aliases - will be removed in future versions
 export type ServiceTypeString = 'OEM' | 'ODM' | 'OBM' | 'Private Label' | 'White Label' | '기타';
@@ -74,6 +75,14 @@ export interface Project {
   children?: Project[];
   isExpanded?: boolean;
   level?: number;
+
+  // Project detail section data
+  developmentRequest?: ProjectDevelopmentRequest;
+  contentDetails?: ProjectContentDetails;
+  containerDetails?: ProjectContainerDetails;
+  designLabeling?: ProjectDesignLabeling;
+  certification?: ProjectCertification;
+  taskChecklist?: ProjectTaskChecklist;
 }
 
 // Re-export FactoryType from enums
@@ -89,4 +98,55 @@ export interface ProjectFactory {
 export interface EditingCell {
   projectId: ProjectId;
   field: string;
+}
+
+// Project detail section interfaces
+export interface ProjectDevelopmentRequest {
+  requestDate: string;
+  content: string;
+  manager: string;
+  companyName?: string;
+  contactPerson?: string;
+  contactNumber?: string;
+  emailAddress?: string;
+  sampleDeliveryAddress?: string;
+}
+
+export interface ProjectContentDetails {
+  mainIngredients: string;
+  volume: string;
+  requiredIngredients?: string[];
+  optionalIngredients?: string[];
+  excludedIngredients?: string[];
+}
+
+export interface ProjectContainerDetails {
+  containerType: string;
+  material: string;
+  color: string;
+  sealingLabel?: string;
+  unitBox?: string;
+  design?: string;
+}
+
+export interface ProjectDesignLabeling {
+  productName: string;
+  labelInfo: string;
+  isTemporaryName?: boolean;
+  targetProductLink?: string;
+  productConcept?: string;
+  desiredFormulation?: string;
+  desiredTexture?: string;
+  fragrance?: string;
+}
+
+export interface ProjectCertification {
+  status: string;
+  expectedCompletion: string;
+  exportCountry?: string;
+  clinicalTrial?: string;
+  functionalCertifications?: string[];
+  desiredShelfLife?: string;
+  forInfants?: string;
+  otherCertifications?: string[];
 }

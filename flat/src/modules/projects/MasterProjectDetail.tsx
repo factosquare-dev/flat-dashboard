@@ -1,107 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useParams } from 'react-router-dom';
 import ProjectDetailsView from '@/components/ProjectDetailsView';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
-import { mockDataService } from '@/core/services/mockDataService';
-import { ProjectType, ProductType } from '@/shared/types/enums';
-import type { Project } from '@/shared/types/project';
-import { getProductTypeLabel, getProductLabel } from '@/shared/utils/productTypeUtils';
+import { getProductLabel } from '@/shared/utils/productTypeUtils';
+import { useMasterProjectDetail } from './hooks/useMasterProjectDetail';
 
 const MasterProjectDetail: React.FC = () => {
   const { projectId } = useParams();
-  const navigate = useNavigate();
-  const [subProjects, setSubProjects] = useState<Project[]>([]);
-  const [selectedProjectIndex, setSelectedProjectIndex] = useState(0);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [pendingProjectIndex, setPendingProjectIndex] = useState<number | null>(null);
   
-  // Load SUB projects for this master project
-  useEffect(() => {
-    if (projectId) {
-      const allProjects = mockDataService.getAllProjects();
-      const subs = allProjects.filter(
-        (p) => p.parentId === projectId && p.type === ProjectType.SUB
-      );
-      setSubProjects(subs);
-      setSelectedProjectIndex(0);
-    }
-  }, [projectId]);
-  
-  
-  // Pagination logic for more than 5 items
-  const itemsPerPage = 5;
-  const showPagination = subProjects.length > itemsPerPage;
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  
-  // Calculate displayed projects
-  const totalPages = Math.ceil(subProjects.length / itemsPerPage);
-  const displayProjects = showPagination 
-    ? subProjects.slice(
-        currentPageIndex * itemsPerPage,
-        (currentPageIndex + 1) * itemsPerPage
-      )
-    : subProjects;
-
-  const handlePrevious = () => {
-    if (currentPageIndex > 0) {
-      setCurrentPageIndex(currentPageIndex - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentPageIndex < totalPages - 1) {
-      setCurrentPageIndex(currentPageIndex + 1);
-    }
-  };
-
-  const handleSelectProject = (absoluteIndex: number) => {
-    if (hasUnsavedChanges) {
-      setPendingProjectIndex(absoluteIndex);
-      setShowSaveDialog(true);
-    } else {
-      switchToProject(absoluteIndex);
-    }
-  };
-
-  const switchToProject = (absoluteIndex: number) => {
-    setSelectedProjectIndex(absoluteIndex);
-    setHasUnsavedChanges(false);
-    // Update page index if selecting item outside current page
-    if (showPagination) {
-      const pageOfSelectedItem = Math.floor(absoluteIndex / itemsPerPage);
-      if (pageOfSelectedItem !== currentPageIndex) {
-        setCurrentPageIndex(pageOfSelectedItem);
-      }
-    }
-  };
-
-  const handleSaveAndSwitch = () => {
-    // 여기서 실제 저장 로직 구현
-    console.log('Saving current form data...');
-    if (pendingProjectIndex !== null) {
-      switchToProject(pendingProjectIndex);
-      setPendingProjectIndex(null);
-    }
-    setShowSaveDialog(false);
-  };
-
-  const handleDiscardAndSwitch = () => {
-    if (pendingProjectIndex !== null) {
-      switchToProject(pendingProjectIndex);
-      setPendingProjectIndex(null);
-    }
-    setShowSaveDialog(false);
-  };
-
-  const handleCancelSwitch = () => {
-    setPendingProjectIndex(null);
-    setShowSaveDialog(false);
-  };
-
-  const handleBack = () => {
-    navigate('/projects');
-  };
+  const {
+    // Project data
+    subProjects,
+    selectedProjectIndex,
+    
+    // Pagination data
+    showPagination,
+    currentPageIndex,
+    totalPages,
+    displayProjects,
+    itemsPerPage,
+    
+    // Save confirmation state
+    hasUnsavedChanges,
+    showSaveDialog,
+    pendingProjectIndex,
+    
+    // Handlers
+    handleBack,
+    handlePrevious,
+    handleNext,
+    handleSelectProject,
+    setHasUnsavedChanges,
+    handleSaveAndSwitch,
+    handleDiscardAndSwitch,
+    handleCancelSwitch,
+  } = useMasterProjectDetail(projectId);
 
   return (
     <div className="min-h-screen">
@@ -174,7 +107,7 @@ const MasterProjectDetail: React.FC = () => {
         <ProjectDetailsView 
           projectId={projectId} 
           selectedProjectIndex={selectedProjectIndex}
-          onProjectSelect={setSelectedProjectIndex}
+          onProjectSelect={handleSelectProject}
           hideHeader={true}
           onFormChange={setHasUnsavedChanges}
         />

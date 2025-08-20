@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { mockDataService } from '@/core/services/mockDataService';
-import { ProjectType, ProductType } from '@/shared/types/enums';
-import type { Project } from '@/shared/types/project';
+import React from 'react';
 import { ProductDevelopmentForm } from '@/modules/products/ProductDevelopmentForm';
 import { TaskCheckerToggle } from '@/modules/products/components/TaskCheckerToggle';
 import { ContentExcelTable } from '@/modules/products/components/ContentExcelTable';
-import { getProductTypeLabel, getProductLabel } from '@/shared/utils/productTypeUtils';
+import { getProductLabel } from '@/shared/utils/productTypeUtils';
+import { useProjectDetailsView } from '@/modules/projects/hooks/useProjectDetailsView';
 import './ProjectDetailsView.css';
-
 
 interface ProjectDetailsViewProps {
   projectId?: string;
@@ -25,136 +21,112 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
   hideHeader = false,
   onFormChange
 }) => {
-  const [subProjects, setSubProjects] = useState<Project[]>([]);
-  const [internalSelectedIndex, setInternalSelectedIndex] = useState(0);
-  const selectedProjectIndex = externalSelectedIndex !== undefined ? externalSelectedIndex : internalSelectedIndex;
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const [showRequestForm, setShowRequestForm] = useState(false);
-  const [showContentTable, setShowContentTable] = useState(false);
+  const {
+    // Project data
+    subProjects,
+    selectedProject,
+    selectedProjectIndex,
+    
+    // Section state
+    expandedSection,
+    showRequestForm,
+    showContentTable,
+    
+    // Handlers
+    handleSelectProject,
+    handleSectionToggle,
+    renderSectionContent,
+  } = useProjectDetailsView({
+    projectId,
+    selectedProjectIndex: externalSelectedIndex,
+    onProjectSelect
+  });
 
-  // Load SUB projects for this master project
-  useEffect(() => {
-    if (projectId) {
-      // Get all projects and filter SUB projects that belong to this master
-      const allProjects = mockDataService.getAllProjects();
-      const subs = allProjects.filter(
-        (p) => p.parentId === projectId && p.type === ProjectType.SUB
-      );
-      
-      setSubProjects(subs);
-      if (externalSelectedIndex === undefined) {
-        setInternalSelectedIndex(0);
-      }
-    }
-  }, [projectId]);
+  // Helper function to render section content using data from the hook
+  const renderExpandedSectionContent = (section: string) => {
+    const sectionData = renderSectionContent(section);
+    if (!sectionData) return null;
 
+    const { title, bgColor, borderColor, data } = sectionData;
 
-  // Currently selected SUB project
-  const selectedProject = subProjects[selectedProjectIndex];
-  
-  const handleSelectProject = (absoluteIndex: number) => {
-    if (onProjectSelect) {
-      onProjectSelect(absoluteIndex);
-    } else {
-      setInternalSelectedIndex(absoluteIndex);
-    }
-  };
-
-  const handleSectionToggle = (section: string) => {
-    if (section === 'request') {
-      setShowRequestForm(!showRequestForm);
-      setShowContentTable(false);
-      setExpandedSection(null);
-    } else if (section === 'content') {
-      setShowContentTable(!showContentTable);
-      setShowRequestForm(false);
-      setExpandedSection(null);
-    } else {
-      setExpandedSection(expandedSection === section ? null : section);
-      setShowRequestForm(false);
-      setShowContentTable(false);
-    }
-  };
-
-  const renderSectionContent = (section: string) => {
     switch (section) {
       case 'request':
         return (
-          <div className="p-6 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">제품 개발 의뢰서</h3>
+          <div className={`p-6 ${bgColor} rounded-lg`}>
+            <h3 className="text-lg font-semibold mb-4">{title}</h3>
             <div className="space-y-3">
-              <div className="bg-white p-4 rounded border border-gray-200">
-                <p className="text-sm text-gray-600">의뢰일자: 2025.01.15</p>
-                <p className="text-sm text-gray-600">의뢰내용: 스킨케어 제품 개발</p>
-                <p className="text-sm text-gray-600">담당자: 김개발</p>
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
+                <p className="text-sm text-gray-600">의뢰일자: {data.requestDate}</p>
+                <p className="text-sm text-gray-600">의뢰내용: {data.content}</p>
+                <p className="text-sm text-gray-600">담당자: {data.manager}</p>
               </div>
             </div>
           </div>
         );
       case 'content':
         return (
-          <div className="p-6 bg-blue-50 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">내용물</h3>
+          <div className={`p-6 ${bgColor} rounded-lg`}>
+            <h3 className="text-lg font-semibold mb-4">{title}</h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded border border-blue-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">주요 성분</p>
-                <p className="text-sm text-gray-600 mt-1">히알루론산, 나이아신아마이드</p>
+                <p className="text-sm text-gray-600 mt-1">{data.mainIngredients}</p>
               </div>
-              <div className="bg-white p-4 rounded border border-blue-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">용량</p>
-                <p className="text-sm text-gray-600 mt-1">150ml</p>
+                <p className="text-sm text-gray-600 mt-1">{data.volume}</p>
               </div>
             </div>
           </div>
         );
       case 'container':
         return (
-          <div className="p-6 bg-green-50 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">용기</h3>
+          <div className={`p-6 ${bgColor} rounded-lg`}>
+            <h3 className="text-lg font-semibold mb-4">{title}</h3>
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded border border-green-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">용기 타입</p>
-                <p className="text-sm text-gray-600 mt-1">펌프 보틀</p>
+                <p className="text-sm text-gray-600 mt-1">{data.containerType}</p>
               </div>
-              <div className="bg-white p-4 rounded border border-green-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">재질</p>
-                <p className="text-sm text-gray-600 mt-1">PET</p>
+                <p className="text-sm text-gray-600 mt-1">{data.material}</p>
               </div>
-              <div className="bg-white p-4 rounded border border-green-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">색상</p>
-                <p className="text-sm text-gray-600 mt-1">투명</p>
+                <p className="text-sm text-gray-600 mt-1">{data.color}</p>
               </div>
             </div>
           </div>
         );
       case 'design':
         return (
-          <div className="p-6 bg-purple-50 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">디자인표시문구</h3>
+          <div className={`p-6 ${bgColor} rounded-lg`}>
+            <h3 className="text-lg font-semibold mb-4">{title}</h3>
             <div className="space-y-3">
-              <div className="bg-white p-4 rounded border border-purple-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">제품명</p>
-                <p className="text-sm text-gray-600 mt-1">{selectedProject?.name || '제품명'}</p>
+                <p className="text-sm text-gray-600 mt-1">{data.productName}</p>
               </div>
-              <div className="bg-white p-4 rounded border border-purple-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">표시사항</p>
-                <p className="text-sm text-gray-600 mt-1">사용방법, 주의사항, 제조번호 표기</p>
+                <p className="text-sm text-gray-600 mt-1">{data.labelInfo}</p>
               </div>
             </div>
           </div>
         );
       case 'certification':
         return (
-          <div className="p-6 bg-orange-50 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">인증인허가임상</h3>
+          <div className={`p-6 ${bgColor} rounded-lg`}>
+            <h3 className="text-lg font-semibold mb-4">{title}</h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded border border-orange-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">인증 상태</p>
-                <p className="text-sm text-gray-600 mt-1">진행중</p>
+                <p className="text-sm text-gray-600 mt-1">{data.status}</p>
               </div>
-              <div className="bg-white p-4 rounded border border-orange-200">
+              <div className={`bg-white p-4 rounded border ${borderColor}`}>
                 <p className="text-sm font-medium">예상 완료일</p>
-                <p className="text-sm text-gray-600 mt-1">2025.03.01</p>
+                <p className="text-sm text-gray-600 mt-1">{data.expectedCompletion}</p>
               </div>
             </div>
           </div>
@@ -349,7 +321,7 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
         <div className={`mt-4 overflow-hidden transition-all duration-500 ease-in-out ${
           expandedSection ? 'opacity-100' : 'max-h-0 opacity-0'
         }`}>
-          {expandedSection && renderSectionContent(expandedSection)}
+          {expandedSection && renderExpandedSectionContent(expandedSection)}
         </div>
       </div>
 

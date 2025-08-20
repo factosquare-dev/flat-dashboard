@@ -7,29 +7,32 @@ import { isToday } from '@/shared/utils/date/operations';
 const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // 오늘 진행 중인 작업 가져오기
-  const todayTasks = React.useMemo(() => {
-    // Getting tasks for project
+  // Template 기반 TaskChecklist에서 현재 진행 단계 가져오기
+  const currentStages = React.useMemo(() => {
     try {
+      // Template 기반 현재 진행 단계 가져오기
+      const templateStages = mockDataService.getCurrentTaskStages(project.id);
+      
+      if (templateStages.length > 0) {
+        return templateStages;
+      }
+
+      // 오늘 진행 중인 Schedule Task 가져오기 (Fallback)
       const tasks = mockDataService.getTasksByProjectId(project.id);
       
       if (tasks.length === 0) {
-        // No tasks found for project
         return [];
       }
       
-      const filteredTasks = tasks
+      const todayTasks = tasks
         .filter(task => {
-          // 오늘이 작업 기간에 포함되는지 확인
           if (!task.startDate || !task.endDate) {
-            // Task missing dates
             return false;
           }
           
           const startDate = typeof task.startDate === 'string' ? parseISO(task.startDate) : task.startDate;
           const endDate = typeof task.endDate === 'string' ? parseISO(task.endDate) : task.endDate;
           
-          // Check if today is the start date, end date, or within the range
           const todayIsStart = isToday(startDate);
           const todayIsEnd = isToday(endDate);
           const today = new Date();
@@ -37,26 +40,16 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
           
           return todayIsStart || todayIsEnd || isInRange;
         })
-        .map(task => {
-          return task.name || task.title || '';
-        })
+        .map(task => task.name || task.title || '')
         .filter(name => name.length > 0);
         
-      // Today tasks
-      return filteredTasks;
+      return todayTasks;
     } catch (error) {
-      // Error getting today tasks
       return [];
     }
   }, [project.id]);
   
-  // 오늘 작업이 있으면 표시, 없으면 기존 currentStage 표시
-  const hasToday = todayTasks.length > 0;
-  // Ensure currentStage is always an array
-  const currentStageArray = Array.isArray(project.currentStage) 
-    ? project.currentStage 
-    : (project.currentStage ? [project.currentStage] : []);
-  const stagesToShow = hasToday ? todayTasks : currentStageArray;
+  const stagesToShow = currentStages;
   const hasMultipleStages = stagesToShow.length > 1;
   
   // If no stages at all, return empty
@@ -72,11 +65,7 @@ const CurrentStageContent: React.FC<{ project: Project }> = ({ project }) => {
       {displayStages.map((stage, index) => (
         <span
           key={index}
-          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-            hasToday 
-              ? 'bg-blue-500 text-white' 
-              : 'bg-purple-500 text-white'
-          }`}
+          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap bg-purple-500 text-white"
           title={stage}
         >
           {stage.length > 8 && !isExpanded ? `${stage.slice(0, 8)}...` : stage}
