@@ -112,18 +112,18 @@ export const getFactoryId = (
 
 /**
  * Get factory type color based on FactoryType enum
- * The Rule of Three: This pattern was repeated 3+ times
  */
-export const getFactoryTypeColor = (type: FactoryType | string): string => {
+export const getFactoryTypeColor = (type: FactoryType): string => {
   switch (type) {
+    case FactoryType.FRAGRANCE:
+      return 'bg-purple-500';
+    case FactoryType.MATERIAL:
+      return 'bg-green-500';
     case FactoryType.MANUFACTURING:
-    case '제조': // Legacy support
       return 'bg-blue-500';
     case FactoryType.CONTAINER:
-    case '용기': // Legacy support
       return 'bg-red-500';
     case FactoryType.PACKAGING:
-    case '포장': // Legacy support
       return 'bg-yellow-500';
     default:
       return 'bg-gray-500';
@@ -133,16 +133,17 @@ export const getFactoryTypeColor = (type: FactoryType | string): string => {
 /**
  * Get factory type styles (background and text colors)
  */
-export const getFactoryTypeStyles = (type: FactoryType | string): { bg: string; text: string } => {
+export const getFactoryTypeStyles = (type: FactoryType): { bg: string; text: string } => {
   switch (type) {
+    case FactoryType.FRAGRANCE:
+      return { bg: 'bg-purple-100', text: 'text-purple-700' };
+    case FactoryType.MATERIAL:
+      return { bg: 'bg-green-100', text: 'text-green-700' };
     case FactoryType.MANUFACTURING:
-    case '제조':
       return { bg: 'bg-blue-100', text: 'text-blue-700' };
     case FactoryType.CONTAINER:
-    case '용기':
       return { bg: 'bg-red-100', text: 'text-red-700' };
     case FactoryType.PACKAGING:
-    case '포장':
       return { bg: 'bg-yellow-100', text: 'text-yellow-700' };
     default:
       return { bg: 'bg-gray-100', text: 'text-gray-700' };
