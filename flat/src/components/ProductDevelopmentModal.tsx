@@ -35,7 +35,7 @@ export const ProductDevelopmentModal: React.FC<ProductDevelopmentModalProps> = (
       />
       
       {/* Modal Content */}
-      <div className="relative bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden z-10 mx-4">
+      <div className="relative bg-white rounded-lg shadow-xl w-[480px] max-w-[480px] max-h-[90vh] overflow-hidden z-10 mx-4">
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-xl font-bold">제품 개발 의뢰서</h2>
           <button

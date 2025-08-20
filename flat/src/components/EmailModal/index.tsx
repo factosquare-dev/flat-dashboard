@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Mail, AlertCircle } from 'lucide-react';
-import BaseModal, { ModalFooter } from '@/components/common/BaseModal';
+import BaseModal, { ModalFooter } from '@/shared/components/BaseModal';
 import FactorySelector from './FactorySelector';
 import CustomerSelector from './CustomerSelector';
 import ManagerSelector from './ManagerSelector';
 import FileAttachment from './FileAttachment';
 import { useModalFormValidation } from '@/shared/hooks/useModalFormValidation';
 import { ModalSize, ButtonVariant, ButtonSize } from '@/shared/types/enums';
-import { Button } from '@/ui/Button';
+import { Button } from '@/shared/components/Button';
 import { getModalSizeString } from '@/shared/utils/modalUtils';
 import './EmailModal.css';
 

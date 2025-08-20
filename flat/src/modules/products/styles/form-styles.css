@@ -66,17 +66,17 @@
   @apply text-xs text-gray-500 mt-1;
 }
 
-/* Grid Layouts */
+/* Grid Layouts - Forced single column for compact modal */
 .form-grid-2 {
-  @apply grid grid-cols-2 gap-4;
+  @apply grid grid-cols-1 gap-4;
 }
 
 .form-grid-3 {
-  @apply grid grid-cols-3 gap-4;
+  @apply grid grid-cols-1 gap-4;
 }
 
 .form-grid-4 {
-  @apply grid grid-cols-4 gap-4;
+  @apply grid grid-cols-1 gap-4;
 }
 
 /* Checkbox */

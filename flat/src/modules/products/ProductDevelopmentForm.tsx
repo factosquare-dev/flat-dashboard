@@ -105,24 +105,9 @@ export const ProductDevelopmentForm: React.FC<ProductDevelopmentFormProps> = ({
   };
   
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-orange-500">FACTOSQUARE 제품개발의뢰서</h1>
-        <div className="flex gap-2">
-          <button 
-            type="button" 
-            onClick={handleSaveDraft}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            임시 저장
-          </button>
-          <button 
-            type="submit" 
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            제출하기
-          </button>
-        </div>
+    <form onSubmit={handleSubmit} className="w-full p-6 space-y-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-orange-500 text-center">FACTOSQUARE 제품개발의뢰서</h1>
       </div>
       
       <BasicInfoSection 
@@ -154,6 +139,22 @@ export const ProductDevelopmentForm: React.FC<ProductDevelopmentFormProps> = ({
         data={currentFormData} 
         onChange={handleFieldChange} 
       />
+
+      <div className="flex justify-center gap-4 pt-6 mt-8 border-t border-gray-200">
+        <button 
+          type="button" 
+          onClick={handleSaveDraft}
+          className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          임시 저장
+        </button>
+        <button 
+          type="submit" 
+          className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+        >
+          제출하기
+        </button>
+      </div>
     </form>
   );
 };

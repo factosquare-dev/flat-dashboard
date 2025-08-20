@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { UserPlus, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { UserPlus } from 'lucide-react';
 import type { User as UserType } from '@/shared/types/user';
 import { UserRole, InternalManagerType } from '@/shared/types/user';
 import { MockDatabaseImpl } from '@/core/database/MockDatabase';
+import { BaseSelector, type SelectorOption } from './shared/BaseSelector';
 
 interface ManagerSelectorProps {
   value?: string;
@@ -19,6 +20,8 @@ interface SelectedManagers {
 type ManagerType = keyof SelectedManagers;
 
 const ManagerSelector: React.FC<ManagerSelectorProps> = ({ value, onChange }) => {
+  console.log('ManagerSelector rendered with value:', value);
+  const isInitialized = useRef(false);
   const [managers, setManagers] = useState<SelectedManagers>({
     sales: [],
     content: [],
@@ -33,9 +36,6 @@ const ManagerSelector: React.FC<ManagerSelectorProps> = ({ value, onChange }) =>
     qa: []
   });
 
-  const [showSearch, setShowSearch] = useState<ManagerType | null>(null);
-  const dropdownRefs = React.useRef<{ [key in ManagerType]?: HTMLDivElement }>({});
-
   const db = MockDatabaseImpl.getInstance();
 
   const managerTypeLabels: Record<ManagerType, string> = {
@@ -45,179 +45,173 @@ const ManagerSelector: React.FC<ManagerSelectorProps> = ({ value, onChange }) =>
     qa: 'QA/RA 담당'
   };
 
+  // Load managers from DB once
   useEffect(() => {
-    // Load managers from DB
-    const usersResult = db.getAll('users');
-    if (usersResult.success && usersResult.data) {
-      const users = usersResult.data as UserType[];
-      const internalManagers = users.filter(u => u.role === UserRole.INTERNAL_MANAGER);
+    const loadManagers = async () => {
+      try {
+        const usersResult = await db.getAll('users');
+        if (usersResult.success && usersResult.data) {
+          const users = usersResult.data as UserType[];
+          console.log('Total users:', users.length);
+          
+          // Manager users are UserRole.INTERNAL_MANAGER
+          const managerUsers = users.filter(u => u.role === UserRole.INTERNAL_MANAGER);
+          console.log('Manager users:', managerUsers.length);
+          console.log('Manager users details:', managerUsers.map(u => ({ id: u.id, name: u.name, type: u.internalManagerType })));
+          
+          // Categorize managers by their specialization
+          const categorizedManagers: SelectedManagers = {
+            sales: managerUsers.filter(m => m.internalManagerType === InternalManagerType.SALES),
+            content: managerUsers.filter(m => m.internalManagerType === InternalManagerType.CONTENT),
+            container: managerUsers.filter(m => m.internalManagerType === InternalManagerType.CONTAINER),
+            qa: managerUsers.filter(m => m.internalManagerType === InternalManagerType.QA || m.internalManagerType === InternalManagerType.RA)
+          };
+          
+          console.log('Categorized managers:', categorizedManagers);
+          console.log('Sales managers:', categorizedManagers.sales.length);
+          console.log('Content managers:', categorizedManagers.content.length);
+          console.log('Container managers:', categorizedManagers.container.length);
+          console.log('QA managers:', categorizedManagers.qa.length);
+          
+          setManagers(categorizedManagers);
+        } else {
+          console.error('Failed to load users from database:', usersResult);
+        }
+      } catch (error) {
+        console.error('Error loading managers:', error);
+      }
+    };
 
-      setManagers({
-        sales: internalManagers.filter(u => u.internalManagerType === InternalManagerType.SALES),
-        content: internalManagers.filter(u => u.internalManagerType === InternalManagerType.CONTENT),
-        container: internalManagers.filter(u => u.internalManagerType === InternalManagerType.CONTAINER),
-        qa: internalManagers.filter(u =>
-          u.internalManagerType === InternalManagerType.QA ||
-          u.internalManagerType === InternalManagerType.RA
-        )
+    loadManagers();
+  }, []); // Only run once on mount
+
+  // Handle value changes separately
+  useEffect(() => {
+    if (value && value !== 'undefined' && managers.sales.length > 0) {
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed && typeof parsed === 'object') {
+          const initialSelected: SelectedManagers = {
+            sales: [],
+            content: [],
+            container: [],
+            qa: []
+          };
+
+          Object.keys(parsed).forEach(type => {
+            if (type in initialSelected && Array.isArray(parsed[type])) {
+              initialSelected[type as ManagerType] = parsed[type].map((id: string) => 
+                managers[type as ManagerType].find(manager => manager.id === id)
+              ).filter(Boolean);
+            }
+          });
+
+          setSelectedManagers(initialSelected);
+        }
+      } catch (error) {
+        console.warn('Failed to parse manager value:', error);
+      }
+    }
+  }, [value, managers]); // React to value and managers changes
+
+  // Remove the useEffect that calls onChange automatically
+  // onChange will be called only when user makes selections in handleManagerTypeSelectionChange
+
+  const handleManagerTypeSelectionChange = (managerType: ManagerType) => 
+    (selectedOptions: SelectorOption[]) => {
+      const selectedUsers = selectedOptions.map(option => 
+        managers[managerType].find(manager => manager.id === option.id)
+      ).filter(Boolean) as UserType[];
+
+      const updatedSelectedManagers = {
+        ...selectedManagers,
+        [managerType]: selectedUsers
+      };
+
+      setSelectedManagers(updatedSelectedManagers);
+
+      // Call onChange with updated data
+      const managerData: Record<string, string[]> = {};
+      const managerNames: Record<string, string[]> = {};
+      
+      Object.entries(updatedSelectedManagers).forEach(([type, managers]) => {
+        if (managers.length > 0) {
+          managerData[type] = managers.map(m => m.id);
+          managerNames[type] = managers.map(m => m.name);
+        }
       });
 
-      // Set initial selected managers if value is provided
-      if (value) {
-        const managerIds = value.split(',');
-        const selected: SelectedManagers = { sales: [], content: [], container: [], qa: [] };
-
-        managerIds.forEach(id => {
-          const manager = users.find(u => u.id === id);
-          if (manager && manager.role === UserRole.INTERNAL_MANAGER) {
-            if (manager.internalManagerType === InternalManagerType.SALES) {
-              selected.sales.push(manager);
-            } else if (manager.internalManagerType === InternalManagerType.CONTENT) {
-              selected.content.push(manager);
-            } else if (manager.internalManagerType === InternalManagerType.CONTAINER) {
-              selected.container.push(manager);
-            } else if (manager.internalManagerType === InternalManagerType.QA || 
-                       manager.internalManagerType === InternalManagerType.RA) {
-              selected.qa.push(manager);
-            }
-          }
-        });
-
-        setSelectedManagers(selected);
-      }
-    }
-  }, [value]);
-
-  // Handle click outside
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showSearch) {
-        const currentRef = dropdownRefs.current[showSearch];
-        if (currentRef && !currentRef.contains(event.target as Node)) {
-          setShowSearch(null);
-        }
-      }
+      const ids = JSON.stringify(managerData);
+      const names = JSON.stringify(managerNames);
+      onChange(ids, names);
     };
 
-    if (showSearch) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+  const renderManagerOption = (option: SelectorOption) => (
+    <div className="flex items-center gap-2">
+      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs font-semibold text-white">
+        {option.name.charAt(0)}
+      </div>
+      <span className="text-sm font-medium">{option.name}</span>
+    </div>
+  );
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showSearch]);
-
-  const handleSelect = (type: ManagerType, manager: UserType) => {
-    const exists = selectedManagers[type].find(m => m.id === manager.id);
-    if (!exists) {
-      const updated = {
-        ...selectedManagers,
-        [type]: [...selectedManagers[type], manager]
-      };
-      setSelectedManagers(updated);
-      updateFormData(updated);
-    }
-    setShowSearch(null);
-  };
-
-  const handleRemove = (type: ManagerType, managerId: string) => {
-    const updated = {
-      ...selectedManagers,
-      [type]: selectedManagers[type].filter(m => m.id !== managerId)
-    };
-    setSelectedManagers(updated);
-    updateFormData(updated);
-  };
-
-  const updateFormData = (managers: SelectedManagers) => {
-    const allManagers = Object.values(managers).flat();
-    onChange(
-      allManagers.map(m => m.id).join(','),
-      allManagers.map(m => m.name).join(', ')
-    );
-  };
+  const renderSelectedManagerItem = (option: SelectorOption, onRemove: () => void) => (
+    <div className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+      <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-xs font-semibold text-white">
+        {option.name.charAt(0)}
+      </div>
+      <span>{option.name}</span>
+      <button
+        onClick={onRemove}
+        className="hover:bg-blue-200 rounded-full p-0.5 ml-1"
+      >
+        ×
+      </button>
+    </div>
+  );
 
   return (
-    <div className="grid grid-cols-4 gap-4">
-      {/* All manager types in a simple 4-column grid */}
-      {(Object.keys(managerTypeLabels) as ManagerType[]).map(type => (
-        <div key={type} className="space-y-2" ref={(el) => { if (el) dropdownRefs.current[type] = el; }}>
-          <label className="block text-xs font-medium text-gray-700">
-            {managerTypeLabels[type]}
-          </label>
-          
-          {/* Selected Managers Box */}
-          <div className="bg-gray-50 border border-gray-200 rounded-md p-2 min-h-[80px]">
-            {selectedManagers[type].length > 0 ? (
-              <div className="space-y-1">
-                {selectedManagers[type].map(manager => (
-                  <div
-                    key={manager.id}
-                    className="flex items-center justify-between bg-white px-2 py-1 rounded text-xs"
-                  >
-                    <span className="text-gray-900 truncate">{manager.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemove(type, manager.id)}
-                      className="ml-1 text-gray-400 hover:text-red-500"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-xs text-gray-400 text-center pt-6">
-                미배정
-              </div>
-            )}
-          </div>
+    <div className="w-full space-y-4">
+      {(Object.keys(managers) as ManagerType[]).map(managerType => {
+        const typeManagers = managers[managerType];
+        const selectedTypeManagers = selectedManagers[managerType];
+        
+        if (typeManagers.length === 0) return null;
 
-          {/* Add Button */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowSearch(showSearch === type ? null : type)}
-              className="w-full flex items-center justify-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded hover:bg-blue-100 transition-colors text-xs"
-            >
-              <UserPlus className="w-3 h-3" />
-              <span>추가</span>
-            </button>
+        const options: SelectorOption[] = typeManagers.map(manager => ({
+          id: manager.id,
+          name: manager.name,
+        }));
 
-            {/* Dropdown */}
-            {showSearch === type && (
-              <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                {managers[type].length > 0 ? (
-                  <div className="py-1" onClick={(e) => e.stopPropagation()}>
-                    {managers[type].map(manager => {
-                      const isSelected = selectedManagers[type].some(m => m.id === manager.id);
-                      return (
-                        <button
-                          key={manager.id}
-                          type="button"
-                          onClick={() => !isSelected && handleSelect(type, manager)}
-                          disabled={isSelected}
-                          className={`w-full px-2 py-1.5 text-left hover:bg-gray-50 ${
-                            isSelected ? 'opacity-50 cursor-not-allowed bg-gray-100' : ''
-                          }`}
-                        >
-                          <div className="text-xs text-gray-900">{manager.name}</div>
-                          <div className="text-xs text-gray-500">{manager.email}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="px-3 py-3 text-xs text-gray-500 text-center">
-                    등록된 담당자가 없습니다
-                  </div>
-                )}
-              </div>
-            )}
+        const selectedOptions: SelectorOption[] = selectedTypeManagers.map(manager => ({
+          id: manager.id,
+          name: manager.name,
+        }));
+
+        return (
+          <div key={managerType} className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              {managerTypeLabels[managerType]}
+            </label>
+            <BaseSelector
+              options={options}
+              selectedOptions={selectedOptions}
+              onSelectionChange={handleManagerTypeSelectionChange(managerType)}
+              placeholder={`${managerTypeLabels[managerType]}를 선택하세요`}
+              searchPlaceholder="담당자명으로 검색..."
+              multiSelect={true}
+              renderOption={renderManagerOption}
+              renderSelectedItem={renderSelectedManagerItem}
+              addNewText="새 담당자 추가"
+              onAddNew={() => {
+                // TODO: Open manager creation modal
+                console.log(`Add new ${managerType} manager`);
+              }}
+              className="w-full"
+            />
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

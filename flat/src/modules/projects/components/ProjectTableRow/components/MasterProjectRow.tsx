@@ -125,7 +125,16 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
         switch (column.id) {
           case ProjectField.NAME: {
             // Use renderCell to get EditableCell for master project name
-            cellContent = renderCell(column.id);
+            const defaultContent = renderCell(column.id);
+            if (React.isValidElement(defaultContent)) {
+              cellContent = React.cloneElement(defaultContent, { key: column.id });
+            } else {
+              cellContent = (
+                <td key={column.id} className="px-4 py-3 text-sm text-gray-600" style={{ width: column.width }}>
+                  {defaultContent}
+                </td>
+              );
+            }
             break;
           }
             
@@ -222,9 +231,9 @@ export const MasterProjectRow: React.FC<MasterProjectRowProps> = ({
       })}
       
       {/* Add memo button column - empty cell */}
-      <td className="px-2 py-1.5 text-xs w-12"></td>
+      <td key="memo-column" className="px-2 py-1.5 text-xs w-12"></td>
       
-      <td className="px-4 py-2 text-sm w-12">
+      <td key="options-column" className="px-4 py-2 text-sm w-12">
         <button
           onClick={handleOptions}
           className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
