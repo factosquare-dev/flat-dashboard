@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Smile } from 'lucide-react';
-import type { EmojiReaction } from '@/types/comment';
+import type { EmojiReaction } from '@/shared/types/comment';
 
 interface EmojiReactionsProps {
   reactions?: EmojiReaction[];

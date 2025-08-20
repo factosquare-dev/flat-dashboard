@@ -1,0 +1,106 @@
+/* Table resize styles */
+.table-header-cell {
+  position: relative;
+  user-select: none;
+}
+
+/* Prevent text selection during resize */
+.resizing {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Table layout for proper resizing */
+table {
+  border-collapse: collapse;
+  table-layout: auto;
+  width: auto !important;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: white;
+}
+
+th {
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  background-color: white;
+}
+
+/* Resize handle */
+.resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+
+.resize-handle:hover,
+.resize-handle.active {
+  background-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Prevent column from shrinking below minimum width */
+th[style*="width"] {
+  min-width: 50px !important;
+}
+
+/* Specific minimum widths for all columns based on content */
+th:nth-child(2) { /* 프로젝트명 */
+  min-width: 180px !important;
+}
+
+th:nth-child(3) { /* 제품유형 */
+  min-width: 120px !important;
+}
+
+th:nth-child(4) { /* 고객명 */
+  min-width: 110px !important;
+}
+
+th:nth-child(5) { /* 서비스 */
+  min-width: 100px !important;
+}
+
+th:nth-child(6) { /* 진행단계 */
+  min-width: 140px !important;
+}
+
+th:nth-child(7) { /* 상태 */
+  min-width: 80px !important;
+}
+
+th:nth-child(8) { /* 진행률 */
+  min-width: 120px !important;
+}
+
+th:nth-child(9), th:nth-child(10) { /* 시작일, 마감일 */
+  min-width: 90px !important;
+}
+
+th:nth-child(11), th:nth-child(12), th:nth-child(13) { /* 제조, 용기, 포장 */
+  min-width: 120px !important;
+}
+
+th:nth-child(14), th:nth-child(15) { /* 매출, 매입 */
+  min-width: 100px !important;
+}
+
+th:nth-child(16) { /* 선금입금 */
+  min-width: 80px !important;
+}
+
+th:nth-child(17) { /* 우선순위 */
+  min-width: 80px !important;
+}

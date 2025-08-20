@@ -1,0 +1,102 @@
+/**
+ * ProjectModal Styles
+ */
+
+/* Form container */
+.project-modal__form {
+  background-color: #f9fafb;
+  margin: -1.5rem;
+  padding: 1.5rem;
+}
+
+.project-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* Validation error message */
+.project-modal__error {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  background-color: rgba(254, 202, 202, 0.3); /* red-50 */
+  border: 1px solid rgba(252, 165, 165, 1); /* red-200 */
+  border-radius: var(--radius-sm);
+  color: rgba(185, 28, 28, 1); /* red-700 */
+  font-size: var(--font-size-xs); /* modal-text-xs */
+}
+
+.project-modal__error-icon {
+  width: var(--icon-size-sm); /* modal-icon-sm */
+  height: var(--icon-size-sm);
+  flex-shrink: 0;
+}
+
+/* Form sections */
+.project-modal__section {
+  margin-bottom: var(--spacing-6);
+}
+
+.project-modal__section:last-child {
+  margin-bottom: 0;
+}
+
+.project-modal__section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+/* Form fields */
+.project-modal__field {
+  margin-bottom: var(--spacing-4);
+}
+
+.project-modal__field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+}
+
+/* Labels */
+.project-modal__label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.project-modal__required {
+  color: var(--color-status-error);
+  margin-left: var(--spacing-1);
+}
+
+/* Status badges */
+.project-modal__status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Comments section */
+.project-modal__comments {
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.project-modal__comments-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-4);
+}

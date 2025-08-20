@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, X, Users } from 'lucide-react';
-import { useCustomers } from '@/hooks/useCustomers';
+import { useCustomers } from '@/shared/hooks/useCustomers';
 import './CustomerSelector.css';
 
 interface CustomerSelectorProps {

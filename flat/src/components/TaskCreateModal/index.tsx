@@ -2,9 +2,9 @@ import React from 'react';
 import BaseModal from '@/common/BaseModal';
 import { Button } from '@/ui/Button';
 import { TaskFormFields } from './TaskFormFields';
-import { useTaskCreateForm } from '@/hooks/useTaskCreateForm';
-import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
-import { FactoryId, ProjectId } from '@/types/branded';
+import { useTaskCreateForm } from '@/shared/hooks/useTaskCreateForm';
+import { ModalSize, ButtonVariant, ButtonSize } from '@/shared/types/enums';
+import { FactoryId, ProjectId } from '@/shared/types/branded';
 import '../TaskCreateModal.css';
 
 interface TaskCreateModalProps {

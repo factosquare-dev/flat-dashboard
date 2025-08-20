@@ -1,0 +1,2854 @@
+[
+  {
+    "from": "router/index.tsx",
+    "to": "app/router/index.tsx"
+  },
+  {
+    "from": "router/lazy-routes.tsx",
+    "to": "app/router/lazy-routes.tsx"
+  },
+  {
+    "from": "providers/query/QueryProvider.tsx",
+    "to": "app/providers/query/QueryProvider.tsx"
+  },
+  {
+    "from": "providers/query/hooks/index.ts",
+    "to": "app/providers/query/hooks/index.ts"
+  },
+  {
+    "from": "providers/query/queryClient.ts",
+    "to": "app/providers/query/queryClient.ts"
+  },
+  {
+    "from": "contexts/AppContext.tsx",
+    "to": "app/providers/AppContext.tsx"
+  },
+  {
+    "from": "contexts/AuthContext.tsx",
+    "to": "app/providers/AuthContext.tsx"
+  },
+  {
+    "from": "contexts/LoadingContext.tsx",
+    "to": "app/providers/LoadingContext.tsx"
+  },
+  {
+    "from": "contexts/MemoContext.tsx",
+    "to": "app/providers/MemoContext.tsx"
+  },
+  {
+    "from": "contexts/ModalContext.tsx",
+    "to": "app/providers/ModalContext.tsx"
+  },
+  {
+    "from": "contexts/ThemeContext.tsx",
+    "to": "app/providers/ThemeContext.tsx"
+  },
+  {
+    "from": "contexts/index.tsx",
+    "to": "app/providers/index.tsx"
+  },
+  {
+    "from": "context/ProviderUtils.tsx",
+    "to": "app/providers/ProviderUtils.tsx"
+  },
+  {
+    "from": "layouts/MainLayout/Header.tsx",
+    "to": "app/layouts/MainLayout/Header.tsx"
+  },
+  {
+    "from": "layouts/MainLayout/Sidebar.tsx",
+    "to": "app/layouts/MainLayout/Sidebar.tsx"
+  },
+  {
+    "from": "layouts/MainLayout/index.tsx",
+    "to": "app/layouts/MainLayout/index.tsx"
+  },
+  {
+    "from": "config/constants.ts",
+    "to": "app/config/constants.ts"
+  },
+  {
+    "from": "config/database.ts",
+    "to": "app/config/database.ts"
+  },
+  {
+    "from": "config/index.ts",
+    "to": "app/config/index.ts"
+  },
+  {
+    "from": "config/mock.ts",
+    "to": "app/config/mock.ts"
+  },
+  {
+    "from": "config/theme.ts",
+    "to": "app/config/theme.ts"
+  },
+  {
+    "from": "features/projects/components/ColumnVisibilityDropdown.tsx",
+    "to": "modules/projects/components/ColumnVisibilityDropdown.tsx"
+  },
+  {
+    "from": "features/projects/components/DateRangeFilter.tsx",
+    "to": "modules/projects/components/DateRangeFilter.tsx"
+  },
+  {
+    "from": "features/projects/components/DraggableProjectTable.tsx",
+    "to": "modules/projects/components/DraggableProjectTable.tsx"
+  },
+  {
+    "from": "features/projects/components/EditableCell.tsx",
+    "to": "modules/projects/components/EditableCell.tsx"
+  },
+  {
+    "from": "features/projects/components/GroupActionsMenu.tsx",
+    "to": "modules/projects/components/GroupActionsMenu.tsx"
+  },
+  {
+    "from": "features/projects/components/HierarchicalProjectTable.tsx",
+    "to": "modules/projects/components/HierarchicalProjectTable.tsx"
+  },
+  {
+    "from": "features/projects/components/MemoTabs/MemoTabs.css",
+    "to": "modules/projects/components/MemoTabs/MemoTabs.css"
+  },
+  {
+    "from": "features/projects/components/MemoTabs/index.tsx",
+    "to": "modules/projects/components/MemoTabs/index.tsx"
+  },
+  {
+    "from": "features/projects/components/OptionsMenu.tsx",
+    "to": "modules/projects/components/OptionsMenu.tsx"
+  },
+  {
+    "from": "features/projects/components/PriorityDropdown.tsx",
+    "to": "modules/projects/components/PriorityDropdown.tsx"
+  },
+  {
+    "from": "features/projects/components/ProductTypeDropdown.tsx",
+    "to": "modules/projects/components/ProductTypeDropdown.tsx"
+  },
+  {
+    "from": "features/projects/components/ProgressBar.css",
+    "to": "modules/projects/components/ProgressBar.css"
+  },
+  {
+    "from": "features/projects/components/ProgressBar.tsx",
+    "to": "modules/projects/components/ProgressBar.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectActions.tsx",
+    "to": "modules/projects/components/ProjectActions.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectFilters.tsx",
+    "to": "modules/projects/components/ProjectFilters.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectHeader.tsx",
+    "to": "modules/projects/components/ProjectHeader.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectList.tsx",
+    "to": "modules/projects/components/ProjectList.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectModals.tsx",
+    "to": "modules/projects/components/ProjectModals.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTable.tsx",
+    "to": "modules/projects/components/ProjectTable.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/SelectionCell.tsx",
+    "to": "modules/projects/components/ProjectTableRow/SelectionCell.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/CurrentStageCell.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/CurrentStageCell.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/DepositPaidCell.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/DepositPaidCell.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/FactoryCell.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/FactoryCell.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/LabNumberCell.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/LabNumberCell.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/MemoCell.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/MemoCell.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/SingleMemoCell.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/SingleMemoCell.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/basicCells.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/basicCells.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/dropdownCells.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/dropdownCells.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers/index.ts",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers/index.ts"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/cellRenderers.tsx",
+    "to": "modules/projects/components/ProjectTableRow/cellRenderers.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/components/ExpandableRow.tsx",
+    "to": "modules/projects/components/ProjectTableRow/components/ExpandableRow.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/components/MasterProjectRow.tsx",
+    "to": "modules/projects/components/ProjectTableRow/components/MasterProjectRow.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/components/RowLayout.tsx",
+    "to": "modules/projects/components/ProjectTableRow/components/RowLayout.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/index.tsx",
+    "to": "modules/projects/components/ProjectTableRow/index.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/renderers/cellRenderer.tsx",
+    "to": "modules/projects/components/ProjectTableRow/renderers/cellRenderer.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/useDragAndDrop.ts",
+    "to": "modules/projects/components/ProjectTableRow/useDragAndDrop.ts"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/useTaskManagement.ts",
+    "to": "modules/projects/components/ProjectTableRow/useTaskManagement.ts"
+  },
+  {
+    "from": "features/projects/components/ProjectTableRow/utils.tsx",
+    "to": "modules/projects/components/ProjectTableRow/utils.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableSection/ProjectTableUI.tsx",
+    "to": "modules/projects/components/ProjectTableSection/ProjectTableUI.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableSection/index.tsx",
+    "to": "modules/projects/components/ProjectTableSection/index.tsx"
+  },
+  {
+    "from": "features/projects/components/ProjectTableSection/useProjectTableHandlers.ts",
+    "to": "modules/projects/components/ProjectTableSection/useProjectTableHandlers.ts"
+  },
+  {
+    "from": "features/projects/components/SearchBox.css",
+    "to": "modules/projects/components/SearchBox.css"
+  },
+  {
+    "from": "features/projects/components/SearchBox.tsx",
+    "to": "modules/projects/components/SearchBox.tsx"
+  },
+  {
+    "from": "features/projects/components/SearchableCell.tsx",
+    "to": "modules/projects/components/SearchableCell.tsx"
+  },
+  {
+    "from": "features/projects/components/ServiceTypeDropdown.tsx",
+    "to": "modules/projects/components/ServiceTypeDropdown.tsx"
+  },
+  {
+    "from": "features/projects/components/StatusDropdown.tsx",
+    "to": "modules/projects/components/StatusDropdown.tsx"
+  },
+  {
+    "from": "features/projects/components/TaskList.css",
+    "to": "modules/projects/components/TaskList.css"
+  },
+  {
+    "from": "features/projects/components/TaskList.tsx",
+    "to": "modules/projects/components/TaskList.tsx"
+  },
+  {
+    "from": "features/projects/components/hooks/useProjectActions.ts",
+    "to": "modules/projects/components/hooks/useProjectActions.ts"
+  },
+  {
+    "from": "features/projects/components/hooks/useProjectListState.ts",
+    "to": "modules/projects/components/hooks/useProjectListState.ts"
+  },
+  {
+    "from": "features/projects/components/hooks/useProjectModal.ts",
+    "to": "modules/projects/components/hooks/useProjectModal.ts"
+  },
+  {
+    "from": "features/projects/components/index.ts",
+    "to": "modules/projects/components/index.ts"
+  },
+  {
+    "from": "features/projects/components/shared/InfiniteScrollTrigger.tsx",
+    "to": "modules/projects/components/shared/InfiniteScrollTrigger.tsx"
+  },
+  {
+    "from": "features/projects/components/shared/LoadingIndicator.tsx",
+    "to": "modules/projects/components/shared/LoadingIndicator.tsx"
+  },
+  {
+    "from": "features/projects/components/shared/ProjectListLayout.tsx",
+    "to": "modules/projects/components/shared/ProjectListLayout.tsx"
+  },
+  {
+    "from": "features/projects/components/shared/index.ts",
+    "to": "modules/projects/components/shared/index.ts"
+  },
+  {
+    "from": "features/projects/hooks/index.ts",
+    "to": "modules/projects/hooks/index.ts"
+  },
+  {
+    "from": "features/projects/index.ts",
+    "to": "modules/projects/index.ts"
+  },
+  {
+    "from": "features/projects/services/index.ts",
+    "to": "modules/projects/services/index.ts"
+  },
+  {
+    "from": "features/projects/services/projectService.ts",
+    "to": "modules/projects/services/projectService.ts"
+  },
+  {
+    "from": "features/projects/store/projectStore.ts",
+    "to": "modules/projects/store/projectStore.ts"
+  },
+  {
+    "from": "features/projects/types/index.ts",
+    "to": "modules/projects/types/index.ts"
+  },
+  {
+    "from": "pages/Projects/MasterProjectDetail.tsx",
+    "to": "modules/projects/MasterProjectDetail.tsx"
+  },
+  {
+    "from": "pages/Projects/index.tsx",
+    "to": "modules/projects/index.tsx"
+  },
+  {
+    "from": "components/ProjectModal/AmountInfoSection.css",
+    "to": "modules/projects/AmountInfoSection.css"
+  },
+  {
+    "from": "components/ProjectModal/AmountInfoSection.tsx",
+    "to": "modules/projects/AmountInfoSection.tsx"
+  },
+  {
+    "from": "components/ProjectModal/BasicInfoSection.tsx",
+    "to": "modules/projects/BasicInfoSection.tsx"
+  },
+  {
+    "from": "components/ProjectModal/FactoryInfoSection.tsx",
+    "to": "modules/projects/FactoryInfoSection.tsx"
+  },
+  {
+    "from": "components/ProjectModal/FactorySection.tsx",
+    "to": "modules/projects/FactorySection.tsx"
+  },
+  {
+    "from": "components/ProjectModal/ProductInfoSection.tsx",
+    "to": "modules/projects/ProductInfoSection.tsx"
+  },
+  {
+    "from": "components/ProjectModal/ProjectModal.css",
+    "to": "modules/projects/ProjectModal.css"
+  },
+  {
+    "from": "components/ProjectModal/ProjectStatusSection.tsx",
+    "to": "modules/projects/ProjectStatusSection.tsx"
+  },
+  {
+    "from": "components/ProjectModal/ScheduleSection.tsx",
+    "to": "modules/projects/ScheduleSection.tsx"
+  },
+  {
+    "from": "components/ProjectModal/components/CustomerSelector.tsx",
+    "to": "modules/projects/components/CustomerSelector.tsx"
+  },
+  {
+    "from": "components/ProjectModal/components/FactorySelector.tsx",
+    "to": "modules/projects/components/FactorySelector.tsx"
+  },
+  {
+    "from": "components/ProjectModal/components/ManagerSelector.tsx",
+    "to": "modules/projects/components/ManagerSelector.tsx"
+  },
+  {
+    "from": "components/ProjectModal/components/ProductServiceSelector.tsx",
+    "to": "modules/projects/components/ProductServiceSelector.tsx"
+  },
+  {
+    "from": "components/ProjectModal/components/SearchDropdown.tsx",
+    "to": "modules/projects/components/SearchDropdown.tsx"
+  },
+  {
+    "from": "components/ProjectModal/components/SearchableSelect.tsx",
+    "to": "modules/projects/components/SearchableSelect.tsx"
+  },
+  {
+    "from": "components/ProjectModal/index.tsx",
+    "to": "modules/projects/index.tsx"
+  },
+  {
+    "from": "components/ProjectModal/types.ts",
+    "to": "modules/projects/types.ts"
+  },
+  {
+    "from": "components/ProjectDetailsView/components/ProjectNavigation.tsx",
+    "to": "modules/projects/components/ProjectNavigation.tsx"
+  },
+  {
+    "from": "components/ProjectDetailsView/components/SectionContent.tsx",
+    "to": "modules/projects/components/SectionContent.tsx"
+  },
+  {
+    "from": "components/ProjectDetailsView/hooks/useProjectDetails.ts",
+    "to": "modules/projects/hooks/useProjectDetails.ts"
+  },
+  {
+    "from": "components/ProjectDetailsView/index.ts",
+    "to": "modules/projects/index.ts"
+  },
+  {
+    "from": "components/ProjectDetailsView/utils/productTypeUtils.ts",
+    "to": "modules/projects/utils/productTypeUtils.ts"
+  },
+  {
+    "from": "pages/Factories/FactoryRegistration/BasicInfoForm.tsx",
+    "to": "modules/factories/FactoryRegistration/BasicInfoForm.tsx"
+  },
+  {
+    "from": "pages/Factories/FactoryRegistration/CertificationForm.tsx",
+    "to": "modules/factories/FactoryRegistration/CertificationForm.tsx"
+  },
+  {
+    "from": "pages/Factories/FactoryRegistration/ManagerForm.tsx",
+    "to": "modules/factories/FactoryRegistration/ManagerForm.tsx"
+  },
+  {
+    "from": "pages/Factories/FactoryRegistration/index.tsx",
+    "to": "modules/factories/FactoryRegistration/index.tsx"
+  },
+  {
+    "from": "pages/Factories/FactoryRegistration/types.ts",
+    "to": "modules/factories/FactoryRegistration/types.ts"
+  },
+  {
+    "from": "pages/Factories/FactoryRegistration.tsx",
+    "to": "modules/factories/FactoryRegistration.tsx"
+  },
+  {
+    "from": "pages/Factories/index.tsx",
+    "to": "modules/factories/index.tsx"
+  },
+  {
+    "from": "components/Factories/FactoryCard.tsx",
+    "to": "modules/factories/FactoryCard.tsx"
+  },
+  {
+    "from": "components/Factories/FactoryModal.css",
+    "to": "modules/factories/FactoryModal.css"
+  },
+  {
+    "from": "components/Factories/FactoryModal.tsx",
+    "to": "modules/factories/FactoryModal.tsx"
+  },
+  {
+    "from": "components/Factories/FactoryToolbar.tsx",
+    "to": "modules/factories/FactoryToolbar.tsx"
+  },
+  {
+    "from": "components/Factories/components/CertificationDetailSection.tsx",
+    "to": "modules/factories/components/CertificationDetailSection.tsx"
+  },
+  {
+    "from": "components/Factories/components/CertificationSection.tsx",
+    "to": "modules/factories/components/CertificationSection.tsx"
+  },
+  {
+    "from": "components/Factories/components/ManagerSection.tsx",
+    "to": "modules/factories/components/ManagerSection.tsx"
+  },
+  {
+    "from": "components/Factories/components/ProductSelectionSection.tsx",
+    "to": "modules/factories/components/ProductSelectionSection.tsx"
+  },
+  {
+    "from": "components/Factories/hooks/useFactoryForm.ts",
+    "to": "modules/factories/hooks/useFactoryForm.ts"
+  },
+  {
+    "from": "components/Factories/types/certification.ts",
+    "to": "modules/factories/types/certification.ts"
+  },
+  {
+    "from": "pages/Users/UserRegistration.tsx",
+    "to": "modules/users/UserRegistration.tsx"
+  },
+  {
+    "from": "pages/Users/index.tsx",
+    "to": "modules/users/index.tsx"
+  },
+  {
+    "from": "components/Users/UserCard.module.css",
+    "to": "modules/users/UserCard.module.css"
+  },
+  {
+    "from": "components/Users/UserCard.tsx",
+    "to": "modules/users/UserCard.tsx"
+  },
+  {
+    "from": "components/Users/UserModal/FormFields.tsx",
+    "to": "modules/users/UserModal/FormFields.tsx"
+  },
+  {
+    "from": "components/Users/UserModal/UserModal.css",
+    "to": "modules/users/UserModal/UserModal.css"
+  },
+  {
+    "from": "components/Users/UserModal/index.tsx",
+    "to": "modules/users/UserModal/index.tsx"
+  },
+  {
+    "from": "components/Users/UserModal/types.ts",
+    "to": "modules/users/UserModal/types.ts"
+  },
+  {
+    "from": "components/Users/UserModal/utils.ts",
+    "to": "modules/users/UserModal/utils.ts"
+  },
+  {
+    "from": "components/Users/UserModal.tsx",
+    "to": "modules/users/UserModal.tsx"
+  },
+  {
+    "from": "components/Users/UserToolbar.tsx",
+    "to": "modules/users/UserToolbar.tsx"
+  },
+  {
+    "from": "features/schedule/types/index.ts",
+    "to": "modules/schedule/types/index.ts"
+  },
+  {
+    "from": "components/Schedule/LazySchedule.tsx",
+    "to": "modules/schedule/LazySchedule.tsx"
+  },
+  {
+    "from": "components/Schedule/ProjectRow.tsx",
+    "to": "modules/schedule/ProjectRow.tsx"
+  },
+  {
+    "from": "components/Schedule/Schedule.tsx",
+    "to": "modules/schedule/Schedule.tsx"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/ScheduleDataValidator.tsx",
+    "to": "modules/schedule/ScheduleComponent/ScheduleDataValidator.tsx"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/ScheduleViewSwitcher.tsx",
+    "to": "modules/schedule/ScheduleComponent/ScheduleViewSwitcher.tsx"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/handlers/index.ts",
+    "to": "modules/schedule/ScheduleComponent/handlers/index.ts"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/handlers/modalHandlers.ts",
+    "to": "modules/schedule/ScheduleComponent/handlers/modalHandlers.ts"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/handlers/projectHandlers.ts",
+    "to": "modules/schedule/ScheduleComponent/handlers/projectHandlers.ts"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/handlers/taskHandlers.ts",
+    "to": "modules/schedule/ScheduleComponent/handlers/taskHandlers.ts"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/handlers.ts",
+    "to": "modules/schedule/ScheduleComponent/handlers.ts"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/index.tsx",
+    "to": "modules/schedule/ScheduleComponent/index.tsx"
+  },
+  {
+    "from": "components/Schedule/ScheduleComponent/types.ts",
+    "to": "modules/schedule/ScheduleComponent/types.ts"
+  },
+  {
+    "from": "components/Schedule/ScheduleErrorBoundary.tsx",
+    "to": "modules/schedule/ScheduleErrorBoundary.tsx"
+  },
+  {
+    "from": "components/Schedule/ScheduleGrid.tsx",
+    "to": "modules/schedule/ScheduleGrid.tsx"
+  },
+  {
+    "from": "components/Schedule/ScheduleGridContainer.tsx",
+    "to": "modules/schedule/ScheduleGridContainer.tsx"
+  },
+  {
+    "from": "components/Schedule/ScheduleHeader.tsx",
+    "to": "modules/schedule/ScheduleHeader.tsx"
+  },
+  {
+    "from": "components/Schedule/ScheduleModals.tsx",
+    "to": "modules/schedule/ScheduleModals.tsx"
+  },
+  {
+    "from": "components/Schedule/ScrollControls.tsx",
+    "to": "modules/schedule/ScrollControls.tsx"
+  },
+  {
+    "from": "components/Schedule/TaskItem.css",
+    "to": "modules/schedule/TaskItem.css"
+  },
+  {
+    "from": "components/Schedule/TaskItem.tsx",
+    "to": "modules/schedule/TaskItem.tsx"
+  },
+  {
+    "from": "components/Schedule/TimelineHeader.css",
+    "to": "modules/schedule/TimelineHeader.css"
+  },
+  {
+    "from": "components/Schedule/TimelineHeader.tsx",
+    "to": "modules/schedule/TimelineHeader.tsx"
+  },
+  {
+    "from": "components/Schedule/components/AddFactoryRow.tsx",
+    "to": "modules/schedule/components/AddFactoryRow.tsx"
+  },
+  {
+    "from": "components/Schedule/components/DragPreview.tsx",
+    "to": "modules/schedule/components/DragPreview.tsx"
+  },
+  {
+    "from": "components/Schedule/components/DragTooltip.tsx",
+    "to": "modules/schedule/components/DragTooltip.tsx"
+  },
+  {
+    "from": "components/Schedule/components/GridCell.css",
+    "to": "modules/schedule/components/GridCell.css"
+  },
+  {
+    "from": "components/Schedule/components/GridCell.tsx",
+    "to": "modules/schedule/components/GridCell.tsx"
+  },
+  {
+    "from": "components/Schedule/components/IntegratedGanttChart.tsx",
+    "to": "modules/schedule/components/IntegratedGanttChart.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ProjectHeader.tsx",
+    "to": "modules/schedule/components/ProjectHeader.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ProjectRow/ProjectRow.css",
+    "to": "modules/schedule/components/ProjectRow/ProjectRow.css"
+  },
+  {
+    "from": "components/Schedule/components/ProjectRow/ProjectRowDragPreview.tsx",
+    "to": "modules/schedule/components/ProjectRow/ProjectRowDragPreview.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ProjectRow/ProjectRowGrid.css",
+    "to": "modules/schedule/components/ProjectRow/ProjectRowGrid.css"
+  },
+  {
+    "from": "components/Schedule/components/ProjectRow/ProjectRowGrid.tsx",
+    "to": "modules/schedule/components/ProjectRow/ProjectRowGrid.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ProjectRow/ProjectRowResizePreview.tsx",
+    "to": "modules/schedule/components/ProjectRow/ProjectRowResizePreview.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ProjectRow/ProjectRowTasks.tsx",
+    "to": "modules/schedule/components/ProjectRow/ProjectRowTasks.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ProjectRow/index.tsx",
+    "to": "modules/schedule/components/ProjectRow/index.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ResizeIndicator.tsx",
+    "to": "modules/schedule/components/ResizeIndicator.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ResizePreview.tsx",
+    "to": "modules/schedule/components/ResizePreview.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleLayout.tsx",
+    "to": "modules/schedule/components/ScheduleLayout.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleProjectColumn.tsx",
+    "to": "modules/schedule/components/ScheduleProjectColumn.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/EmptyState.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/EmptyState.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/TableHeader.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/TableHeader.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/TaskActions.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/TaskActions.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/TaskAssignee.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/TaskAssignee.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/TaskFactory.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/TaskFactory.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/TaskRow.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/TaskRow.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/TaskSchedule.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/TaskSchedule.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/TaskStatusIcons.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/TaskStatusIcons.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTableView/index.tsx",
+    "to": "modules/schedule/components/ScheduleTableView/index.tsx"
+  },
+  {
+    "from": "components/Schedule/components/ScheduleTimelineGrid.tsx",
+    "to": "modules/schedule/components/ScheduleTimelineGrid.tsx"
+  },
+  {
+    "from": "components/Schedule/components/TaskCentricGanttChart.tsx",
+    "to": "modules/schedule/components/TaskCentricGanttChart.tsx"
+  },
+  {
+    "from": "components/Schedule/components/TaskItem.css",
+    "to": "modules/schedule/components/TaskItem.css"
+  },
+  {
+    "from": "components/Schedule/components/TaskItem.tsx",
+    "to": "modules/schedule/components/TaskItem.tsx"
+  },
+  {
+    "from": "components/Schedule/constants.ts",
+    "to": "modules/schedule/constants.ts"
+  },
+  {
+    "from": "components/Schedule/defaultData.ts",
+    "to": "modules/schedule/defaultData.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useAutoScroll.ts",
+    "to": "modules/schedule/hooks/useAutoScroll.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useDragPreview.ts",
+    "to": "modules/schedule/hooks/useDragPreview.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useDragTooltip.ts",
+    "to": "modules/schedule/hooks/useDragTooltip.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useDynamicLayout.ts",
+    "to": "modules/schedule/hooks/useDynamicLayout.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useModals.ts",
+    "to": "modules/schedule/hooks/useModals.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useProjectDragSelection.ts",
+    "to": "modules/schedule/hooks/useProjectDragSelection.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useProjectFinder.ts",
+    "to": "modules/schedule/hooks/useProjectFinder.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useScheduleEffects.ts",
+    "to": "modules/schedule/hooks/useScheduleEffects.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useScheduleState.ts",
+    "to": "modules/schedule/hooks/useScheduleState.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag/dragHandlers.ts",
+    "to": "modules/schedule/hooks/useTaskDrag/dragHandlers.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag/dragState.ts",
+    "to": "modules/schedule/hooks/useTaskDrag/dragState.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag/dragValidation.ts",
+    "to": "modules/schedule/hooks/useTaskDrag/dragValidation.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag/dropHandler.ts",
+    "to": "modules/schedule/hooks/useTaskDrag/dropHandler.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag/globalDragHandler.ts",
+    "to": "modules/schedule/hooks/useTaskDrag/globalDragHandler.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag/index.ts",
+    "to": "modules/schedule/hooks/useTaskDrag/index.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag/types.ts",
+    "to": "modules/schedule/hooks/useTaskDrag/types.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag/useTaskDrag.ts",
+    "to": "modules/schedule/hooks/useTaskDrag/useTaskDrag.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskDrag.ts",
+    "to": "modules/schedule/hooks/useTaskDrag.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskResize/dateCalculations.ts",
+    "to": "modules/schedule/hooks/useTaskResize/dateCalculations.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskResize/eventHandlers.ts",
+    "to": "modules/schedule/hooks/useTaskResize/eventHandlers.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskResize/index.ts",
+    "to": "modules/schedule/hooks/useTaskResize/index.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskResize/resizeValidation.ts",
+    "to": "modules/schedule/hooks/useTaskResize/resizeValidation.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskResize/useTaskResize.ts",
+    "to": "modules/schedule/hooks/useTaskResize/useTaskResize.ts"
+  },
+  {
+    "from": "components/Schedule/hooks/useTaskResize.ts",
+    "to": "modules/schedule/hooks/useTaskResize.ts"
+  },
+  {
+    "from": "components/Schedule/index.tsx",
+    "to": "modules/schedule/index.tsx"
+  },
+  {
+    "from": "components/GanttChart/GanttGrid.tsx",
+    "to": "modules/schedule/GanttGrid.tsx"
+  },
+  {
+    "from": "components/GanttChart/GanttHeader.css",
+    "to": "modules/schedule/GanttHeader.css"
+  },
+  {
+    "from": "components/GanttChart/GanttHeader.tsx",
+    "to": "modules/schedule/GanttHeader.tsx"
+  },
+  {
+    "from": "components/GanttChart/LazyGanttChart.tsx",
+    "to": "modules/schedule/LazyGanttChart.tsx"
+  },
+  {
+    "from": "components/GanttChart/ProjectSidebar.tsx",
+    "to": "modules/schedule/ProjectSidebar.tsx"
+  },
+  {
+    "from": "components/GanttChart/TaskRenderer.tsx",
+    "to": "modules/schedule/TaskRenderer.tsx"
+  },
+  {
+    "from": "components/GanttChart/constants.ts",
+    "to": "modules/schedule/constants.ts"
+  },
+  {
+    "from": "components/GanttChart/hooks/useGanttDrag.ts",
+    "to": "modules/schedule/hooks/useGanttDrag.ts"
+  },
+  {
+    "from": "components/GanttChart/index.tsx",
+    "to": "modules/schedule/index.tsx"
+  },
+  {
+    "from": "components/GanttChart/types.ts",
+    "to": "modules/schedule/types.ts"
+  },
+  {
+    "from": "components/Gantt/GanttGrid.css",
+    "to": "modules/schedule/GanttGrid.css"
+  },
+  {
+    "from": "components/Gantt/GanttGrid.tsx",
+    "to": "modules/schedule/GanttGrid.tsx"
+  },
+  {
+    "from": "components/Gantt/GanttHeader.css",
+    "to": "modules/schedule/GanttHeader.css"
+  },
+  {
+    "from": "components/Gantt/GanttHeader.tsx",
+    "to": "modules/schedule/GanttHeader.tsx"
+  },
+  {
+    "from": "pages/Customers/index.tsx",
+    "to": "modules/customers/index.tsx"
+  },
+  {
+    "from": "components/CustomerModal/components/AdditionalInfoSection/index.tsx",
+    "to": "modules/customers/components/AdditionalInfoSection/index.tsx"
+  },
+  {
+    "from": "components/CustomerModal/components/BasicInfoSection/index.tsx",
+    "to": "modules/customers/components/BasicInfoSection/index.tsx"
+  },
+  {
+    "from": "components/CustomerModal/components/ContactInfoSection/index.tsx",
+    "to": "modules/customers/components/ContactInfoSection/index.tsx"
+  },
+  {
+    "from": "components/CustomerModal/index.tsx",
+    "to": "modules/customers/index.tsx"
+  },
+  {
+    "from": "features/product-development/ProductDevelopmentForm.tsx",
+    "to": "modules/products/ProductDevelopmentForm.tsx"
+  },
+  {
+    "from": "features/product-development/components/BasicInfoSection.tsx",
+    "to": "modules/products/components/BasicInfoSection.tsx"
+  },
+  {
+    "from": "features/product-development/components/CertificationSection.tsx",
+    "to": "modules/products/components/CertificationSection.tsx"
+  },
+  {
+    "from": "features/product-development/components/ConceptSection.tsx",
+    "to": "modules/products/components/ConceptSection.tsx"
+  },
+  {
+    "from": "features/product-development/components/ContainerSection.tsx",
+    "to": "modules/products/components/ContainerSection.tsx"
+  },
+  {
+    "from": "features/product-development/components/ContentExcelTable.tsx",
+    "to": "modules/products/components/ContentExcelTable.tsx"
+  },
+  {
+    "from": "features/product-development/components/ContentsSection.tsx",
+    "to": "modules/products/components/ContentsSection.tsx"
+  },
+  {
+    "from": "features/product-development/components/OrderInfoSection.tsx",
+    "to": "modules/products/components/OrderInfoSection.tsx"
+  },
+  {
+    "from": "features/product-development/components/TaskCheckerSection.tsx",
+    "to": "modules/products/components/TaskCheckerSection.tsx"
+  },
+  {
+    "from": "features/product-development/components/TaskCheckerSectionAlt.tsx",
+    "to": "modules/products/components/TaskCheckerSectionAlt.tsx"
+  },
+  {
+    "from": "features/product-development/components/TaskCheckerToggle.tsx",
+    "to": "modules/products/components/TaskCheckerToggle.tsx"
+  },
+  {
+    "from": "components/ProductRequestModal/ContentInfoForm.tsx",
+    "to": "modules/products/ContentInfoForm.tsx"
+  },
+  {
+    "from": "components/ProductRequestModal/IngredientInfoForm.tsx",
+    "to": "modules/products/IngredientInfoForm.tsx"
+  },
+  {
+    "from": "components/ProductRequestModal/OrderInfoForm.tsx",
+    "to": "modules/products/OrderInfoForm.tsx"
+  },
+  {
+    "from": "components/ProductRequestModal/ProductRequestModal.css",
+    "to": "modules/products/ProductRequestModal.css"
+  },
+  {
+    "from": "components/ProductRequestModal/components/BasicInfoForm.tsx",
+    "to": "modules/products/components/BasicInfoForm.tsx"
+  },
+  {
+    "from": "components/ProductRequestModal/components/DeliveryForm.tsx",
+    "to": "modules/products/components/DeliveryForm.tsx"
+  },
+  {
+    "from": "components/ProductRequestModal/hooks/useProductRequestForm.ts",
+    "to": "modules/products/hooks/useProductRequestForm.ts"
+  },
+  {
+    "from": "components/ProductRequestModal/index.tsx",
+    "to": "modules/products/index.tsx"
+  },
+  {
+    "from": "components/ProductRequestModal/types.ts",
+    "to": "modules/products/types.ts"
+  },
+  {
+    "from": "components/ProductTypes/CategoryEditModal.tsx",
+    "to": "modules/products/CategoryEditModal.tsx"
+  },
+  {
+    "from": "components/ProductTypes/CategoryTree.tsx",
+    "to": "modules/products/CategoryTree.tsx"
+  },
+  {
+    "from": "components/ProductTypes/ProductTypeCategoryManager.tsx",
+    "to": "modules/products/ProductTypeCategoryManager.tsx"
+  },
+  {
+    "from": "pages/ProductTypes/index.tsx",
+    "to": "modules/products/index.tsx"
+  },
+  {
+    "from": "pages/Dashboard/index.tsx",
+    "to": "modules/dashboard/index.tsx"
+  },
+  {
+    "from": "components/common/Badge/Badge.module.css",
+    "to": "shared/components/Badge/Badge.module.css"
+  },
+  {
+    "from": "components/common/Badge/index.tsx",
+    "to": "shared/components/Badge/index.tsx"
+  },
+  {
+    "from": "components/common/BaseModal.css",
+    "to": "shared/components/BaseModal.css"
+  },
+  {
+    "from": "components/common/BaseModal.tsx",
+    "to": "shared/components/BaseModal.tsx"
+  },
+  {
+    "from": "components/common/Card/Card.module.css",
+    "to": "shared/components/Card/Card.module.css"
+  },
+  {
+    "from": "components/common/Card/index.tsx",
+    "to": "shared/components/Card/index.tsx"
+  },
+  {
+    "from": "components/common/CompoundComponents.tsx",
+    "to": "shared/components/CompoundComponents.tsx"
+  },
+  {
+    "from": "components/common/EmptyState.css",
+    "to": "shared/components/EmptyState.css"
+  },
+  {
+    "from": "components/common/EmptyState.tsx",
+    "to": "shared/components/EmptyState.tsx"
+  },
+  {
+    "from": "components/common/FactoryTypeBadge.css",
+    "to": "shared/components/FactoryTypeBadge.css"
+  },
+  {
+    "from": "components/common/FactoryTypeBadge.tsx",
+    "to": "shared/components/FactoryTypeBadge.tsx"
+  },
+  {
+    "from": "components/common/FloatingActionButton.css",
+    "to": "shared/components/FloatingActionButton.css"
+  },
+  {
+    "from": "components/common/FloatingActionButton.tsx",
+    "to": "shared/components/FloatingActionButton.tsx"
+  },
+  {
+    "from": "components/common/LazyBoundary.tsx",
+    "to": "shared/components/LazyBoundary.tsx"
+  },
+  {
+    "from": "components/common/LoadingIndicator.css",
+    "to": "shared/components/LoadingIndicator.css"
+  },
+  {
+    "from": "components/common/LoadingIndicator.tsx",
+    "to": "shared/components/LoadingIndicator.tsx"
+  },
+  {
+    "from": "components/common/LoadingRenderer.tsx",
+    "to": "shared/components/LoadingRenderer.tsx"
+  },
+  {
+    "from": "components/common/Modal/Modal.css",
+    "to": "shared/components/Modal/Modal.css"
+  },
+  {
+    "from": "components/common/Modal/index.tsx",
+    "to": "shared/components/Modal/index.tsx"
+  },
+  {
+    "from": "components/common/ModalField.tsx",
+    "to": "shared/components/ModalField.tsx"
+  },
+  {
+    "from": "components/common/ModalRenderer.tsx",
+    "to": "shared/components/ModalRenderer.tsx"
+  },
+  {
+    "from": "components/common/ModalSection.tsx",
+    "to": "shared/components/ModalSection.tsx"
+  },
+  {
+    "from": "components/common/PageLayout.tsx",
+    "to": "shared/components/PageLayout.tsx"
+  },
+  {
+    "from": "components/common/SafeHTML.tsx",
+    "to": "shared/components/SafeHTML.tsx"
+  },
+  {
+    "from": "components/common/Skeleton.css",
+    "to": "shared/components/Skeleton.css"
+  },
+  {
+    "from": "components/common/Skeleton.tsx",
+    "to": "shared/components/Skeleton.tsx"
+  },
+  {
+    "from": "components/common/StatusBadge.css",
+    "to": "shared/components/StatusBadge.css"
+  },
+  {
+    "from": "components/common/StatusBadge.tsx",
+    "to": "shared/components/StatusBadge.tsx"
+  },
+  {
+    "from": "components/common/Table/Table.css",
+    "to": "shared/components/Table/Table.css"
+  },
+  {
+    "from": "components/common/Table/components/TableBody.tsx",
+    "to": "shared/components/Table/components/TableBody.tsx"
+  },
+  {
+    "from": "components/common/Table/components/TableHeader.tsx",
+    "to": "shared/components/Table/components/TableHeader.tsx"
+  },
+  {
+    "from": "components/common/Table/components/TableRoot.tsx",
+    "to": "shared/components/Table/components/TableRoot.tsx"
+  },
+  {
+    "from": "components/common/Table/components/index.ts",
+    "to": "shared/components/Table/components/index.ts"
+  },
+  {
+    "from": "components/common/Table/context/TableContext.tsx",
+    "to": "shared/components/Table/context/TableContext.tsx"
+  },
+  {
+    "from": "components/common/Table/index.tsx",
+    "to": "shared/components/Table/index.tsx"
+  },
+  {
+    "from": "components/common/index.ts",
+    "to": "shared/components/index.ts"
+  },
+  {
+    "from": "components/ui/Button.css",
+    "to": "shared/components/Button.css"
+  },
+  {
+    "from": "components/ui/Button.tsx",
+    "to": "shared/components/Button.tsx"
+  },
+  {
+    "from": "components/ui/Card.css",
+    "to": "shared/components/Card.css"
+  },
+  {
+    "from": "components/ui/Card.tsx",
+    "to": "shared/components/Card.tsx"
+  },
+  {
+    "from": "components/ui/LoadingScreen.css",
+    "to": "shared/components/LoadingScreen.css"
+  },
+  {
+    "from": "components/ui/LoadingScreen.tsx",
+    "to": "shared/components/LoadingScreen.tsx"
+  },
+  {
+    "from": "components/ui/Toast.css",
+    "to": "shared/components/Toast.css"
+  },
+  {
+    "from": "components/ui/Toast.tsx",
+    "to": "shared/components/Toast.tsx"
+  },
+  {
+    "from": "components/ui/VirtualList.css",
+    "to": "shared/components/VirtualList.css"
+  },
+  {
+    "from": "components/ui/VirtualList.tsx",
+    "to": "shared/components/VirtualList.tsx"
+  },
+  {
+    "from": "components/ui/index.ts",
+    "to": "shared/components/index.ts"
+  },
+  {
+    "from": "components/forms/Form.tsx",
+    "to": "shared/components/Form.tsx"
+  },
+  {
+    "from": "components/forms/FormField.css",
+    "to": "shared/components/FormField.css"
+  },
+  {
+    "from": "components/forms/FormField.tsx",
+    "to": "shared/components/FormField.tsx"
+  },
+  {
+    "from": "components/forms/FormGroup.tsx",
+    "to": "shared/components/FormGroup.tsx"
+  },
+  {
+    "from": "components/forms/FormInput.css",
+    "to": "shared/components/FormInput.css"
+  },
+  {
+    "from": "components/forms/FormInput.tsx",
+    "to": "shared/components/FormInput.tsx"
+  },
+  {
+    "from": "components/forms/FormRow.tsx",
+    "to": "shared/components/FormRow.tsx"
+  },
+  {
+    "from": "components/forms/FormSection.tsx",
+    "to": "shared/components/FormSection.tsx"
+  },
+  {
+    "from": "components/forms/FormSelect.tsx",
+    "to": "shared/components/FormSelect.tsx"
+  },
+  {
+    "from": "components/forms/FormTextarea.tsx",
+    "to": "shared/components/FormTextarea.tsx"
+  },
+  {
+    "from": "components/forms/ValidationMessage.tsx",
+    "to": "shared/components/ValidationMessage.tsx"
+  },
+  {
+    "from": "components/forms/index.ts",
+    "to": "shared/components/index.ts"
+  },
+  {
+    "from": "components/forms/types.ts",
+    "to": "shared/components/types.ts"
+  },
+  {
+    "from": "components/forms/useFormValidation.ts",
+    "to": "shared/components/useFormValidation.ts"
+  },
+  {
+    "from": "components/Modal/ConfirmationModal.css",
+    "to": "shared/components/ConfirmationModal.css"
+  },
+  {
+    "from": "components/Modal/ConfirmationModal.tsx",
+    "to": "shared/components/ConfirmationModal.tsx"
+  },
+  {
+    "from": "components/Modal/LazyModal.tsx",
+    "to": "shared/components/LazyModal.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/ComponentErrorBoundary/index.tsx",
+    "to": "shared/components/ComponentErrorBoundary/index.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/ErrorBoundary.tsx",
+    "to": "shared/components/ErrorBoundary.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/ErrorFallback/index.tsx",
+    "to": "shared/components/ErrorFallback/index.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/ErrorFallbacks.tsx",
+    "to": "shared/components/ErrorFallbacks.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/ErrorViews.tsx",
+    "to": "shared/components/ErrorViews.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/PageErrorBoundary.tsx",
+    "to": "shared/components/PageErrorBoundary.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/SectionErrorBoundary.tsx",
+    "to": "shared/components/SectionErrorBoundary.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/SpecializedBoundaries.tsx",
+    "to": "shared/components/SpecializedBoundaries.tsx"
+  },
+  {
+    "from": "components/ErrorBoundary/index.ts",
+    "to": "shared/components/index.ts"
+  },
+  {
+    "from": "components/ErrorBoundary/types.ts",
+    "to": "shared/components/types.ts"
+  },
+  {
+    "from": "components/ErrorBoundary/withErrorBoundary.tsx",
+    "to": "shared/components/withErrorBoundary.tsx"
+  },
+  {
+    "from": "components/loading/LoadingSpinner.css",
+    "to": "shared/components/LoadingSpinner.css"
+  },
+  {
+    "from": "components/loading/LoadingSpinner.tsx",
+    "to": "shared/components/LoadingSpinner.tsx"
+  },
+  {
+    "from": "components/loading/LoadingState.tsx",
+    "to": "shared/components/LoadingState.tsx"
+  },
+  {
+    "from": "components/loading/index.ts",
+    "to": "shared/components/index.ts"
+  },
+  {
+    "from": "components/VirtualList/index.tsx",
+    "to": "shared/components/index.tsx"
+  },
+  {
+    "from": "components/OptimizedTable/components/TableBody.tsx",
+    "to": "shared/components/components/TableBody.tsx"
+  },
+  {
+    "from": "components/OptimizedTable/components/TableHeader.tsx",
+    "to": "shared/components/components/TableHeader.tsx"
+  },
+  {
+    "from": "components/OptimizedTable/components/TableRow.tsx",
+    "to": "shared/components/components/TableRow.tsx"
+  },
+  {
+    "from": "components/OptimizedTable/index.tsx",
+    "to": "shared/components/index.tsx"
+  },
+  {
+    "from": "components/OptimizedTable/types.ts",
+    "to": "shared/components/types.ts"
+  },
+  {
+    "from": "hooks/asyncState/executor.ts",
+    "to": "shared/hooks/asyncState/executor.ts"
+  },
+  {
+    "from": "hooks/asyncState/index.ts",
+    "to": "shared/hooks/asyncState/index.ts"
+  },
+  {
+    "from": "hooks/asyncState/types.ts",
+    "to": "shared/hooks/asyncState/types.ts"
+  },
+  {
+    "from": "hooks/asyncState/useAsyncState.ts",
+    "to": "shared/hooks/asyncState/useAsyncState.ts"
+  },
+  {
+    "from": "hooks/asyncState/utils.ts",
+    "to": "shared/hooks/asyncState/utils.ts"
+  },
+  {
+    "from": "hooks/common/index.ts",
+    "to": "shared/hooks/common/index.ts"
+  },
+  {
+    "from": "hooks/common/useApiCache.ts",
+    "to": "shared/hooks/common/useApiCache.ts"
+  },
+  {
+    "from": "hooks/common/useAsyncData.ts",
+    "to": "shared/hooks/common/useAsyncData.ts"
+  },
+  {
+    "from": "hooks/common/useDebounce.ts",
+    "to": "shared/hooks/common/useDebounce.ts"
+  },
+  {
+    "from": "hooks/common/useDebouncedSearch.ts",
+    "to": "shared/hooks/common/useDebouncedSearch.ts"
+  },
+  {
+    "from": "hooks/common/useDragAndDrop.ts",
+    "to": "shared/hooks/common/useDragAndDrop.ts"
+  },
+  {
+    "from": "hooks/common/useFormValidation.ts",
+    "to": "shared/hooks/common/useFormValidation.ts"
+  },
+  {
+    "from": "hooks/common/useModal.ts",
+    "to": "shared/hooks/common/useModal.ts"
+  },
+  {
+    "from": "hooks/common/useModalPreloader.ts",
+    "to": "shared/hooks/common/useModalPreloader.ts"
+  },
+  {
+    "from": "hooks/common/useModalState.ts",
+    "to": "shared/hooks/common/useModalState.ts"
+  },
+  {
+    "from": "hooks/common/useModalStore.ts",
+    "to": "shared/hooks/common/useModalStore.ts"
+  },
+  {
+    "from": "hooks/common/usePagination.ts",
+    "to": "shared/hooks/common/usePagination.ts"
+  },
+  {
+    "from": "hooks/common/useTableSelection.ts",
+    "to": "shared/hooks/common/useTableSelection.ts"
+  },
+  {
+    "from": "hooks/common/useTaskStatistics.ts",
+    "to": "shared/hooks/common/useTaskStatistics.ts"
+  },
+  {
+    "from": "hooks/index.ts",
+    "to": "shared/hooks/index.ts"
+  },
+  {
+    "from": "hooks/query/cacheUtils.ts",
+    "to": "shared/hooks/query/cacheUtils.ts"
+  },
+  {
+    "from": "hooks/query/index.ts",
+    "to": "shared/hooks/query/index.ts"
+  },
+  {
+    "from": "hooks/query/queryCache.ts",
+    "to": "shared/hooks/query/queryCache.ts"
+  },
+  {
+    "from": "hooks/query/retryLogic.ts",
+    "to": "shared/hooks/query/retryLogic.ts"
+  },
+  {
+    "from": "hooks/query/types.ts",
+    "to": "shared/hooks/query/types.ts"
+  },
+  {
+    "from": "hooks/query/useMutation.ts",
+    "to": "shared/hooks/query/useMutation.ts"
+  },
+  {
+    "from": "hooks/query/useQuery.ts",
+    "to": "shared/hooks/query/useQuery.ts"
+  },
+  {
+    "from": "hooks/useAsyncData.ts",
+    "to": "shared/hooks/useAsyncData.ts"
+  },
+  {
+    "from": "hooks/useClickOutside.ts",
+    "to": "shared/hooks/useClickOutside.ts"
+  },
+  {
+    "from": "hooks/useColumnOrder.ts",
+    "to": "shared/hooks/useColumnOrder.ts"
+  },
+  {
+    "from": "hooks/useColumnResize.ts",
+    "to": "shared/hooks/useColumnResize.ts"
+  },
+  {
+    "from": "hooks/useColumnVisibility.ts",
+    "to": "shared/hooks/useColumnVisibility.ts"
+  },
+  {
+    "from": "hooks/useCustomers.ts",
+    "to": "shared/hooks/useCustomers.ts"
+  },
+  {
+    "from": "hooks/useDragAndDrop.ts",
+    "to": "shared/hooks/useDragAndDrop.ts"
+  },
+  {
+    "from": "hooks/useDragSelection.ts",
+    "to": "shared/hooks/useDragSelection.ts"
+  },
+  {
+    "from": "hooks/useEditableCell.ts",
+    "to": "shared/hooks/useEditableCell.ts"
+  },
+  {
+    "from": "hooks/useErrorHandler.ts",
+    "to": "shared/hooks/useErrorHandler.ts"
+  },
+  {
+    "from": "hooks/useFactories.ts",
+    "to": "shared/hooks/useFactories.ts"
+  },
+  {
+    "from": "hooks/useFactoryFilter.ts",
+    "to": "shared/hooks/useFactoryFilter.ts"
+  },
+  {
+    "from": "hooks/useFormValidation.ts",
+    "to": "shared/hooks/useFormValidation.ts"
+  },
+  {
+    "from": "hooks/useGanttData.ts",
+    "to": "shared/hooks/useGanttData.ts"
+  },
+  {
+    "from": "hooks/useGanttDrag.ts",
+    "to": "shared/hooks/useGanttDrag.ts"
+  },
+  {
+    "from": "hooks/useHeaderVisibility.ts",
+    "to": "shared/hooks/useHeaderVisibility.ts"
+  },
+  {
+    "from": "hooks/useInfiniteScroll.ts",
+    "to": "shared/hooks/useInfiniteScroll.ts"
+  },
+  {
+    "from": "hooks/useLogging/constants.ts",
+    "to": "shared/hooks/useLogging/constants.ts"
+  },
+  {
+    "from": "hooks/useLogging/index.ts",
+    "to": "shared/hooks/useLogging/index.ts"
+  },
+  {
+    "from": "hooks/useLogging/useApiLogging.ts",
+    "to": "shared/hooks/useLogging/useApiLogging.ts"
+  },
+  {
+    "from": "hooks/useLogging/useComponentLogging.ts",
+    "to": "shared/hooks/useLogging/useComponentLogging.ts"
+  },
+  {
+    "from": "hooks/useLogging/useErrorLogging.ts",
+    "to": "shared/hooks/useLogging/useErrorLogging.ts"
+  },
+  {
+    "from": "hooks/useLogging/useNavigationLogging.ts",
+    "to": "shared/hooks/useLogging/useNavigationLogging.ts"
+  },
+  {
+    "from": "hooks/useLogging/usePerformanceLogging.ts",
+    "to": "shared/hooks/useLogging/usePerformanceLogging.ts"
+  },
+  {
+    "from": "hooks/useLogging/useSessionLogging.ts",
+    "to": "shared/hooks/useLogging/useSessionLogging.ts"
+  },
+  {
+    "from": "hooks/useLogging/useUserActionLogging.ts",
+    "to": "shared/hooks/useLogging/useUserActionLogging.ts"
+  },
+  {
+    "from": "hooks/useLogging.ts",
+    "to": "shared/hooks/useLogging.ts"
+  },
+  {
+    "from": "hooks/useMemoColumns.ts",
+    "to": "shared/hooks/useMemoColumns.ts"
+  },
+  {
+    "from": "hooks/useModalFormValidation.ts",
+    "to": "shared/hooks/useModalFormValidation.ts"
+  },
+  {
+    "from": "hooks/useModalState.ts",
+    "to": "shared/hooks/useModalState.ts"
+  },
+  {
+    "from": "hooks/useProducts.ts",
+    "to": "shared/hooks/useProducts.ts"
+  },
+  {
+    "from": "hooks/useProjectComments.ts",
+    "to": "shared/hooks/useProjectComments.ts"
+  },
+  {
+    "from": "hooks/useProjectDateRange.ts",
+    "to": "shared/hooks/useProjectDateRange.ts"
+  },
+  {
+    "from": "hooks/useProjectFactories.ts",
+    "to": "shared/hooks/useProjectFactories.ts"
+  },
+  {
+    "from": "hooks/useProjectFactoryManagement.ts",
+    "to": "shared/hooks/useProjectFactoryManagement.ts"
+  },
+  {
+    "from": "hooks/useProjectFilters.ts",
+    "to": "shared/hooks/useProjectFilters.ts"
+  },
+  {
+    "from": "hooks/useProjectGroups.ts",
+    "to": "shared/hooks/useProjectGroups.ts"
+  },
+  {
+    "from": "hooks/useProjectHierarchy.ts",
+    "to": "shared/hooks/useProjectHierarchy.ts"
+  },
+  {
+    "from": "hooks/useProjectTableData.ts",
+    "to": "shared/hooks/useProjectTableData.ts"
+  },
+  {
+    "from": "hooks/useProjects/helpers/projectHelpers.ts",
+    "to": "shared/hooks/useProjects/helpers/projectHelpers.ts"
+  },
+  {
+    "from": "hooks/useProjects/index.ts",
+    "to": "shared/hooks/useProjects/index.ts"
+  },
+  {
+    "from": "hooks/useProjects/operations/projectCrud.ts",
+    "to": "shared/hooks/useProjects/operations/projectCrud.ts"
+  },
+  {
+    "from": "hooks/useProjects/operations/projectLoader.ts",
+    "to": "shared/hooks/useProjects/operations/projectLoader.ts"
+  },
+  {
+    "from": "hooks/useProjects/operations/scheduleLoader.ts",
+    "to": "shared/hooks/useProjects/operations/scheduleLoader.ts"
+  },
+  {
+    "from": "hooks/useProjects/useProjectData.ts",
+    "to": "shared/hooks/useProjects/useProjectData.ts"
+  },
+  {
+    "from": "hooks/useProjects/useProjectPagination.ts",
+    "to": "shared/hooks/useProjects/useProjectPagination.ts"
+  },
+  {
+    "from": "hooks/useProjects/useProjectSelection.ts",
+    "to": "shared/hooks/useProjects/useProjectSelection.ts"
+  },
+  {
+    "from": "hooks/useQuery.ts",
+    "to": "shared/hooks/useQuery.ts"
+  },
+  {
+    "from": "hooks/useScheduleDrag.ts",
+    "to": "shared/hooks/useScheduleDrag.ts"
+  },
+  {
+    "from": "hooks/useScheduleTasks.ts",
+    "to": "shared/hooks/useScheduleTasks.ts"
+  },
+  {
+    "from": "hooks/useScheduleTasksWithStore.ts",
+    "to": "shared/hooks/useScheduleTasksWithStore.ts"
+  },
+  {
+    "from": "hooks/useTaskCreateForm.ts",
+    "to": "shared/hooks/useTaskCreateForm.ts"
+  },
+  {
+    "from": "hooks/useTasks.ts",
+    "to": "shared/hooks/useTasks.ts"
+  },
+  {
+    "from": "hooks/useTheme.ts",
+    "to": "shared/hooks/useTheme.ts"
+  },
+  {
+    "from": "hooks/useToast.ts",
+    "to": "shared/hooks/useToast.ts"
+  },
+  {
+    "from": "hooks/useUserFilter.ts",
+    "to": "shared/hooks/useUserFilter.ts"
+  },
+  {
+    "from": "hooks/useUserManagement.ts",
+    "to": "shared/hooks/useUserManagement.ts"
+  },
+  {
+    "from": "hooks/useUsers.ts",
+    "to": "shared/hooks/useUsers.ts"
+  },
+  {
+    "from": "features/common/hooks/index.ts",
+    "to": "shared/hooks/index.ts"
+  },
+  {
+    "from": "utils/__tests__/common.test.ts",
+    "to": "shared/utils/__tests__/common.test.ts"
+  },
+  {
+    "from": "utils/accessibility.ts",
+    "to": "shared/utils/accessibility.ts"
+  },
+  {
+    "from": "utils/api/cache.ts",
+    "to": "shared/utils/api/cache.ts"
+  },
+  {
+    "from": "utils/apiClient.ts",
+    "to": "shared/utils/apiClient.ts"
+  },
+  {
+    "from": "utils/apiConversions.ts",
+    "to": "shared/utils/apiConversions.ts"
+  },
+  {
+    "from": "utils/asyncHelpers.ts",
+    "to": "shared/utils/asyncHelpers.ts"
+  },
+  {
+    "from": "utils/classNames.ts",
+    "to": "shared/utils/classNames.ts"
+  },
+  {
+    "from": "utils/cleanupDatabase.ts",
+    "to": "shared/utils/cleanupDatabase.ts"
+  },
+  {
+    "from": "utils/cleanupDuplicateFactories.ts",
+    "to": "shared/utils/cleanupDuplicateFactories.ts"
+  },
+  {
+    "from": "utils/cn.ts",
+    "to": "shared/utils/cn.ts"
+  },
+  {
+    "from": "utils/common/arrays.ts",
+    "to": "shared/utils/common/arrays.ts"
+  },
+  {
+    "from": "utils/common/async.ts",
+    "to": "shared/utils/common/async.ts"
+  },
+  {
+    "from": "utils/common/dates.ts",
+    "to": "shared/utils/common/dates.ts"
+  },
+  {
+    "from": "utils/common/files.ts",
+    "to": "shared/utils/common/files.ts"
+  },
+  {
+    "from": "utils/common/index.ts",
+    "to": "shared/utils/common/index.ts"
+  },
+  {
+    "from": "utils/common/numbers.ts",
+    "to": "shared/utils/common/numbers.ts"
+  },
+  {
+    "from": "utils/common/strings.ts",
+    "to": "shared/utils/common/strings.ts"
+  },
+  {
+    "from": "utils/common/styles.ts",
+    "to": "shared/utils/common/styles.ts"
+  },
+  {
+    "from": "utils/common/typeGuards.ts",
+    "to": "shared/utils/common/typeGuards.ts"
+  },
+  {
+    "from": "utils/common/url.ts",
+    "to": "shared/utils/common/url.ts"
+  },
+  {
+    "from": "utils/common/validation.ts",
+    "to": "shared/utils/common/validation.ts"
+  },
+  {
+    "from": "utils/common.ts",
+    "to": "shared/utils/common.ts"
+  },
+  {
+    "from": "utils/companyUtils.ts",
+    "to": "shared/utils/companyUtils.ts"
+  },
+  {
+    "from": "utils/coreUtils.ts",
+    "to": "shared/utils/coreUtils.ts"
+  },
+  {
+    "from": "utils/cssOptimizer.ts",
+    "to": "shared/utils/cssOptimizer.ts"
+  },
+  {
+    "from": "utils/customer/validation.ts",
+    "to": "shared/utils/customer/validation.ts"
+  },
+  {
+    "from": "utils/date/formatting.ts",
+    "to": "shared/utils/date/formatting.ts"
+  },
+  {
+    "from": "utils/date/gantt.ts",
+    "to": "shared/utils/date/gantt.ts"
+  },
+  {
+    "from": "utils/date/index.ts",
+    "to": "shared/utils/date/index.ts"
+  },
+  {
+    "from": "utils/date/operations.ts",
+    "to": "shared/utils/date/operations.ts"
+  },
+  {
+    "from": "utils/date/parsing.ts",
+    "to": "shared/utils/date/parsing.ts"
+  },
+  {
+    "from": "utils/date/validation.ts",
+    "to": "shared/utils/date/validation.ts"
+  },
+  {
+    "from": "utils/debugHierarchy.ts",
+    "to": "shared/utils/debugHierarchy.ts"
+  },
+  {
+    "from": "utils/debugTaskDates.ts",
+    "to": "shared/utils/debugTaskDates.ts"
+  },
+  {
+    "from": "utils/error/core.ts",
+    "to": "shared/utils/error/core.ts"
+  },
+  {
+    "from": "utils/error/errorHandler.ts",
+    "to": "shared/utils/error/errorHandler.ts"
+  },
+  {
+    "from": "utils/error/formatters.ts",
+    "to": "shared/utils/error/formatters.ts"
+  },
+  {
+    "from": "utils/error/handlers.ts",
+    "to": "shared/utils/error/handlers.ts"
+  },
+  {
+    "from": "utils/error/index.ts",
+    "to": "shared/utils/error/index.ts"
+  },
+  {
+    "from": "utils/factoryUtils.ts",
+    "to": "shared/utils/factoryUtils.ts"
+  },
+  {
+    "from": "utils/fileHelpers.ts",
+    "to": "shared/utils/fileHelpers.ts"
+  },
+  {
+    "from": "utils/filterUtils.ts",
+    "to": "shared/utils/filterUtils.ts"
+  },
+  {
+    "from": "utils/ganttUtils.ts",
+    "to": "shared/utils/ganttUtils.ts"
+  },
+  {
+    "from": "utils/index.ts",
+    "to": "shared/utils/index.ts"
+  },
+  {
+    "from": "utils/lazy-loading.tsx",
+    "to": "shared/utils/lazy-loading.tsx"
+  },
+  {
+    "from": "utils/logger/consoleFormatter.ts",
+    "to": "shared/utils/logger/consoleFormatter.ts"
+  },
+  {
+    "from": "utils/logger/errorHandlers.ts",
+    "to": "shared/utils/logger/errorHandlers.ts"
+  },
+  {
+    "from": "utils/logger/index.ts",
+    "to": "shared/utils/logger/index.ts"
+  },
+  {
+    "from": "utils/logger/loggerInstance.ts",
+    "to": "shared/utils/logger/loggerInstance.ts"
+  },
+  {
+    "from": "utils/logger/performanceLogger.ts",
+    "to": "shared/utils/logger/performanceLogger.ts"
+  },
+  {
+    "from": "utils/logger/remoteLogger.ts",
+    "to": "shared/utils/logger/remoteLogger.ts"
+  },
+  {
+    "from": "utils/logger/specializedLoggers.ts",
+    "to": "shared/utils/logger/specializedLoggers.ts"
+  },
+  {
+    "from": "utils/logger/types/index.ts",
+    "to": "shared/utils/logger/types/index.ts"
+  },
+  {
+    "from": "utils/logger/types.ts",
+    "to": "shared/utils/logger/types.ts"
+  },
+  {
+    "from": "utils/logger/useLogger.ts",
+    "to": "shared/utils/logger/useLogger.ts"
+  },
+  {
+    "from": "utils/logger.ts",
+    "to": "shared/utils/logger.ts"
+  },
+  {
+    "from": "utils/modalUtils.ts",
+    "to": "shared/utils/modalUtils.ts"
+  },
+  {
+    "from": "utils/numberUtils.ts",
+    "to": "shared/utils/numberUtils.ts"
+  },
+  {
+    "from": "utils/objectHelpers.ts",
+    "to": "shared/utils/objectHelpers.ts"
+  },
+  {
+    "from": "utils/performance/debounce-throttle.ts",
+    "to": "shared/utils/performance/debounce-throttle.ts"
+  },
+  {
+    "from": "utils/performance/index.ts",
+    "to": "shared/utils/performance/index.ts"
+  },
+  {
+    "from": "utils/performance/memoization.tsx",
+    "to": "shared/utils/performance/memoization.tsx"
+  },
+  {
+    "from": "utils/performance/monitor.ts",
+    "to": "shared/utils/performance/monitor.ts"
+  },
+  {
+    "from": "utils/performance/virtualization.tsx",
+    "to": "shared/utils/performance/virtualization.tsx"
+  },
+  {
+    "from": "utils/performance.ts",
+    "to": "shared/utils/performance.ts"
+  },
+  {
+    "from": "utils/priorityUtils.tsx",
+    "to": "shared/utils/priorityUtils.tsx"
+  },
+  {
+    "from": "utils/progressCalculator.ts",
+    "to": "shared/utils/progressCalculator.ts"
+  },
+  {
+    "from": "utils/projectTypeUtils.ts",
+    "to": "shared/utils/projectTypeUtils.ts"
+  },
+  {
+    "from": "utils/projectUtils.ts",
+    "to": "shared/utils/projectUtils.ts"
+  },
+  {
+    "from": "utils/projectValidation.ts",
+    "to": "shared/utils/projectValidation.ts"
+  },
+  {
+    "from": "utils/resetDbForTimezone.ts",
+    "to": "shared/utils/resetDbForTimezone.ts"
+  },
+  {
+    "from": "utils/resetMockData.ts",
+    "to": "shared/utils/resetMockData.ts"
+  },
+  {
+    "from": "utils/schedule/dragCalculations.ts",
+    "to": "shared/utils/schedule/dragCalculations.ts"
+  },
+  {
+    "from": "utils/schedule/globalState.ts",
+    "to": "shared/utils/schedule/globalState.ts"
+  },
+  {
+    "from": "utils/scheduleColorManager.ts",
+    "to": "shared/utils/scheduleColorManager.ts"
+  },
+  {
+    "from": "utils/scheduleComprehensiveDebug.ts",
+    "to": "shared/utils/scheduleComprehensiveDebug.ts"
+  },
+  {
+    "from": "utils/scheduleDateCalculation.ts",
+    "to": "shared/utils/scheduleDateCalculation.ts"
+  },
+  {
+    "from": "utils/scheduleDateParsing.ts",
+    "to": "shared/utils/scheduleDateParsing.ts"
+  },
+  {
+    "from": "utils/scheduleUtils.ts",
+    "to": "shared/utils/scheduleUtils.ts"
+  },
+  {
+    "from": "utils/security/xss.ts",
+    "to": "shared/utils/security/xss.ts"
+  },
+  {
+    "from": "utils/serviceTypeUtils.ts",
+    "to": "shared/utils/serviceTypeUtils.ts"
+  },
+  {
+    "from": "utils/statusUtils.tsx",
+    "to": "shared/utils/statusUtils.tsx"
+  },
+  {
+    "from": "utils/storageConversions.ts",
+    "to": "shared/utils/storageConversions.ts"
+  },
+  {
+    "from": "utils/store/storeUtils.ts",
+    "to": "shared/utils/store/storeUtils.ts"
+  },
+  {
+    "from": "utils/stringUtils.ts",
+    "to": "shared/utils/stringUtils.ts"
+  },
+  {
+    "from": "utils/styleUtils.ts",
+    "to": "shared/utils/styleUtils.ts"
+  },
+  {
+    "from": "utils/taskUtils.ts",
+    "to": "shared/utils/taskUtils.ts"
+  },
+  {
+    "from": "utils/taskValidation.ts",
+    "to": "shared/utils/taskValidation.ts"
+  },
+  {
+    "from": "utils/unifiedDateUtils.ts",
+    "to": "shared/utils/unifiedDateUtils.ts"
+  },
+  {
+    "from": "utils/urlConversions.ts",
+    "to": "shared/utils/urlConversions.ts"
+  },
+  {
+    "from": "utils/validationUtils.ts",
+    "to": "shared/utils/validationUtils.ts"
+  },
+  {
+    "from": "types/api/index.ts",
+    "to": "shared/types/api/index.ts"
+  },
+  {
+    "from": "types/api/requests.ts",
+    "to": "shared/types/api/requests.ts"
+  },
+  {
+    "from": "types/api/responses.ts",
+    "to": "shared/types/api/responses.ts"
+  },
+  {
+    "from": "types/api.ts",
+    "to": "shared/types/api.ts"
+  },
+  {
+    "from": "types/branded.ts",
+    "to": "shared/types/branded.ts"
+  },
+  {
+    "from": "types/column.ts",
+    "to": "shared/types/column.ts"
+  },
+  {
+    "from": "types/comment.ts",
+    "to": "shared/types/comment.ts"
+  },
+  {
+    "from": "types/common.ts",
+    "to": "shared/types/common.ts"
+  },
+  {
+    "from": "types/components.ts",
+    "to": "shared/types/components.ts"
+  },
+  {
+    "from": "types/customField.ts",
+    "to": "shared/types/customField.ts"
+  },
+  {
+    "from": "types/customer.ts",
+    "to": "shared/types/customer.ts"
+  },
+  {
+    "from": "types/enums/common.ts",
+    "to": "shared/types/enums/common.ts"
+  },
+  {
+    "from": "types/enums/content.ts",
+    "to": "shared/types/enums/content.ts"
+  },
+  {
+    "from": "types/enums/factory.ts",
+    "to": "shared/types/enums/factory.ts"
+  },
+  {
+    "from": "types/enums/product.ts",
+    "to": "shared/types/enums/product.ts"
+  },
+  {
+    "from": "types/enums/project.ts",
+    "to": "shared/types/enums/project.ts"
+  },
+  {
+    "from": "types/enums/task.ts",
+    "to": "shared/types/enums/task.ts"
+  },
+  {
+    "from": "types/enums/taskChecklist.ts",
+    "to": "shared/types/enums/taskChecklist.ts"
+  },
+  {
+    "from": "types/enums/ui.ts",
+    "to": "shared/types/enums/ui.ts"
+  },
+  {
+    "from": "types/enums/user.ts",
+    "to": "shared/types/enums/user.ts"
+  },
+  {
+    "from": "types/enums.ts",
+    "to": "shared/types/enums.ts"
+  },
+  {
+    "from": "types/factory.ts",
+    "to": "shared/types/factory.ts"
+  },
+  {
+    "from": "types/gantt.ts",
+    "to": "shared/types/gantt.ts"
+  },
+  {
+    "from": "types/index.ts",
+    "to": "shared/types/index.ts"
+  },
+  {
+    "from": "types/mockSchedule.ts",
+    "to": "shared/types/mockSchedule.ts"
+  },
+  {
+    "from": "types/modal.ts",
+    "to": "shared/types/modal.ts"
+  },
+  {
+    "from": "types/notification.ts",
+    "to": "shared/types/notification.ts"
+  },
+  {
+    "from": "types/product.ts",
+    "to": "shared/types/product.ts"
+  },
+  {
+    "from": "types/productCategory.ts",
+    "to": "shared/types/productCategory.ts"
+  },
+  {
+    "from": "types/project.ts",
+    "to": "shared/types/project.ts"
+  },
+  {
+    "from": "types/schedule.ts",
+    "to": "shared/types/schedule.ts"
+  },
+  {
+    "from": "types/scheduleView.ts",
+    "to": "shared/types/scheduleView.ts"
+  },
+  {
+    "from": "types/taskChecklist.ts",
+    "to": "shared/types/taskChecklist.ts"
+  },
+  {
+    "from": "types/user.ts",
+    "to": "shared/types/user.ts"
+  },
+  {
+    "from": "types/userRole.ts",
+    "to": "shared/types/userRole.ts"
+  },
+  {
+    "from": "features/common/types/index.ts",
+    "to": "shared/types/index.ts"
+  },
+  {
+    "from": "constants/api.ts",
+    "to": "shared/constants/api.ts"
+  },
+  {
+    "from": "constants/factory.ts",
+    "to": "shared/constants/factory.ts"
+  },
+  {
+    "from": "constants/gantt.ts",
+    "to": "shared/constants/gantt.ts"
+  },
+  {
+    "from": "constants/index.ts",
+    "to": "shared/constants/index.ts"
+  },
+  {
+    "from": "constants/project.ts",
+    "to": "shared/constants/project.ts"
+  },
+  {
+    "from": "constants/tasks.ts",
+    "to": "shared/constants/tasks.ts"
+  },
+  {
+    "from": "constants/time.ts",
+    "to": "shared/constants/time.ts"
+  },
+  {
+    "from": "constants/ui.ts",
+    "to": "shared/constants/ui.ts"
+  },
+  {
+    "from": "styles/animations.css",
+    "to": "shared/styles/animations.css"
+  },
+  {
+    "from": "styles/components.ts",
+    "to": "shared/styles/components.ts"
+  },
+  {
+    "from": "styles/design-tokens.css",
+    "to": "shared/styles/design-tokens.css"
+  },
+  {
+    "from": "styles/modal-system.css",
+    "to": "shared/styles/modal-system.css"
+  },
+  {
+    "from": "styles/shared.css",
+    "to": "shared/styles/shared.css"
+  },
+  {
+    "from": "styles/tableResize.css",
+    "to": "shared/styles/tableResize.css"
+  },
+  {
+    "from": "styles/theme.css",
+    "to": "shared/styles/theme.css"
+  },
+  {
+    "from": "styles/theme.ts",
+    "to": "shared/styles/theme.ts"
+  },
+  {
+    "from": "styles/themes.ts",
+    "to": "shared/styles/themes.ts"
+  },
+  {
+    "from": "styles/tokens.css",
+    "to": "shared/styles/tokens.css"
+  },
+  {
+    "from": "styles/utilities.css",
+    "to": "shared/styles/utilities.css"
+  },
+  {
+    "from": "styles/utilities.ts",
+    "to": "shared/styles/utilities.ts"
+  },
+  {
+    "from": "design-system/styles/button.css",
+    "to": "shared/styles/button.css"
+  },
+  {
+    "from": "design-system/styles/dropdown.css",
+    "to": "shared/styles/dropdown.css"
+  },
+  {
+    "from": "design-system/styles/input.css",
+    "to": "shared/styles/input.css"
+  },
+  {
+    "from": "design-system/styles/table.css",
+    "to": "shared/styles/table.css"
+  },
+  {
+    "from": "design-system/colors/grid.ts",
+    "to": "shared/styles/grid.ts"
+  },
+  {
+    "from": "api/client/interceptors.ts",
+    "to": "core/api/client/interceptors.ts"
+  },
+  {
+    "from": "api/projects.ts",
+    "to": "core/api/projects.ts"
+  },
+  {
+    "from": "api/schedule/ganttOperations.ts",
+    "to": "core/api/schedule/ganttOperations.ts"
+  },
+  {
+    "from": "api/schedule/index.ts",
+    "to": "core/api/schedule/index.ts"
+  },
+  {
+    "from": "api/schedule/mockData.ts",
+    "to": "core/api/schedule/mockData.ts"
+  },
+  {
+    "from": "api/schedule/mockStore.ts",
+    "to": "core/api/schedule/mockStore.ts"
+  },
+  {
+    "from": "api/schedule/operations.ts",
+    "to": "core/api/schedule/operations.ts"
+  },
+  {
+    "from": "api/schedule/scheduleOperations.ts",
+    "to": "core/api/schedule/scheduleOperations.ts"
+  },
+  {
+    "from": "api/schedule/scheduleSync.ts",
+    "to": "core/api/schedule/scheduleSync.ts"
+  },
+  {
+    "from": "api/schedule/taskTransformers.ts",
+    "to": "core/api/schedule/taskTransformers.ts"
+  },
+  {
+    "from": "api/schedule/validation.ts",
+    "to": "core/api/schedule/validation.ts"
+  },
+  {
+    "from": "api/scheduleApi.ts",
+    "to": "core/api/scheduleApi.ts"
+  },
+  {
+    "from": "api/transformers/factoryTransformer.ts",
+    "to": "core/api/transformers/factoryTransformer.ts"
+  },
+  {
+    "from": "api/transformers/index.ts",
+    "to": "core/api/transformers/index.ts"
+  },
+  {
+    "from": "api/transformers/projectTransformer.ts",
+    "to": "core/api/transformers/projectTransformer.ts"
+  },
+  {
+    "from": "api/transformers/taskTransformer.ts",
+    "to": "core/api/transformers/taskTransformer.ts"
+  },
+  {
+    "from": "api/transformers/userTransformer.ts",
+    "to": "core/api/transformers/userTransformer.ts"
+  },
+  {
+    "from": "services/api/cachedRequestHandlers.ts",
+    "to": "core/api/cachedRequestHandlers.ts"
+  },
+  {
+    "from": "services/api/errorHandling.ts",
+    "to": "core/api/errorHandling.ts"
+  },
+  {
+    "from": "services/api/requestHandlers.ts",
+    "to": "core/api/requestHandlers.ts"
+  },
+  {
+    "from": "services/api/types.ts",
+    "to": "core/api/types.ts"
+  },
+  {
+    "from": "services/api/uploadHandler/fileValidation.ts",
+    "to": "core/api/uploadHandler/fileValidation.ts"
+  },
+  {
+    "from": "services/api/uploadHandler/index.ts",
+    "to": "core/api/uploadHandler/index.ts"
+  },
+  {
+    "from": "services/api/uploadHandler/multipleFileUpload.ts",
+    "to": "core/api/uploadHandler/multipleFileUpload.ts"
+  },
+  {
+    "from": "services/api/uploadHandler/singleFileUpload.ts",
+    "to": "core/api/uploadHandler/singleFileUpload.ts"
+  },
+  {
+    "from": "services/api/uploadHandler/types.ts",
+    "to": "core/api/uploadHandler/types.ts"
+  },
+  {
+    "from": "services/api/uploadHandler.ts",
+    "to": "core/api/uploadHandler.ts"
+  },
+  {
+    "from": "services/api/urlBuilder.ts",
+    "to": "core/api/urlBuilder.ts"
+  },
+  {
+    "from": "mocks/api/MockApi.ts",
+    "to": "core/api/MockApi.ts"
+  },
+  {
+    "from": "mocks/api/apiInterceptor.ts",
+    "to": "core/api/apiInterceptor.ts"
+  },
+  {
+    "from": "mocks/api/common.ts",
+    "to": "core/api/common.ts"
+  },
+  {
+    "from": "mocks/api/endpoints/DatabaseApi.ts",
+    "to": "core/api/endpoints/DatabaseApi.ts"
+  },
+  {
+    "from": "mocks/api/endpoints/FactoryApi.ts",
+    "to": "core/api/endpoints/FactoryApi.ts"
+  },
+  {
+    "from": "mocks/api/endpoints/ProjectApi.ts",
+    "to": "core/api/endpoints/ProjectApi.ts"
+  },
+  {
+    "from": "mocks/api/endpoints/UserApi.ts",
+    "to": "core/api/endpoints/UserApi.ts"
+  },
+  {
+    "from": "mocks/api/endpoints/index.ts",
+    "to": "core/api/endpoints/index.ts"
+  },
+  {
+    "from": "store/hooks/index.ts",
+    "to": "core/store/hooks/index.ts"
+  },
+  {
+    "from": "store/index.ts",
+    "to": "core/store/index.ts"
+  },
+  {
+    "from": "store/slices/projectSlice-optimized.ts",
+    "to": "core/store/slices/projectSlice-optimized.ts"
+  },
+  {
+    "from": "store/slices/projectSlice.ts",
+    "to": "core/store/slices/projectSlice.ts"
+  },
+  {
+    "from": "store/slices/uiSlice.ts",
+    "to": "core/store/slices/uiSlice.ts"
+  },
+  {
+    "from": "store/slices/userSlice.ts",
+    "to": "core/store/slices/userSlice.ts"
+  },
+  {
+    "from": "stores/README.md",
+    "to": "core/store/README.md"
+  },
+  {
+    "from": "stores/appStore.ts",
+    "to": "core/store/appStore.ts"
+  },
+  {
+    "from": "stores/index.ts",
+    "to": "core/store/index.ts"
+  },
+  {
+    "from": "stores/loadingStore.ts",
+    "to": "core/store/loadingStore.ts"
+  },
+  {
+    "from": "stores/migration/contextToZustand.tsx",
+    "to": "core/store/migration/contextToZustand.tsx"
+  },
+  {
+    "from": "stores/modalStore.ts",
+    "to": "core/store/modalStore.ts"
+  },
+  {
+    "from": "stores/notificationStore.ts",
+    "to": "core/store/notificationStore.ts"
+  },
+  {
+    "from": "stores/taskStore.ts",
+    "to": "core/store/taskStore.ts"
+  },
+  {
+    "from": "stores/themeStore.ts",
+    "to": "core/store/themeStore.ts"
+  },
+  {
+    "from": "features/common/store/createStore.ts",
+    "to": "core/store/createStore.ts"
+  },
+  {
+    "from": "features/common/store/index.ts",
+    "to": "core/store/index.ts"
+  },
+  {
+    "from": "services/api.ts",
+    "to": "core/services/api.ts"
+  },
+  {
+    "from": "services/cachedApiService.ts",
+    "to": "core/services/cachedApiService.ts"
+  },
+  {
+    "from": "services/factoryService.ts",
+    "to": "core/services/factoryService.ts"
+  },
+  {
+    "from": "services/index.ts",
+    "to": "core/services/index.ts"
+  },
+  {
+    "from": "services/mockData/customerService.ts",
+    "to": "core/services/mockData/customerService.ts"
+  },
+  {
+    "from": "services/mockData/factoryService.ts",
+    "to": "core/services/mockData/factoryService.ts"
+  },
+  {
+    "from": "services/mockData/index.ts",
+    "to": "core/services/mockData/index.ts"
+  },
+  {
+    "from": "services/mockData/productService.ts",
+    "to": "core/services/mockData/productService.ts"
+  },
+  {
+    "from": "services/mockData/projectService.ts",
+    "to": "core/services/mockData/projectService.ts"
+  },
+  {
+    "from": "services/mockData/taskService.ts",
+    "to": "core/services/mockData/taskService.ts"
+  },
+  {
+    "from": "services/mockData/userService.ts",
+    "to": "core/services/mockData/userService.ts"
+  },
+  {
+    "from": "services/mockDataService.ts",
+    "to": "core/services/mockDataService.ts"
+  },
+  {
+    "from": "services/projectModal.service.ts",
+    "to": "core/services/projectModal.service.ts"
+  },
+  {
+    "from": "services/projectTable.service.ts",
+    "to": "core/services/projectTable.service.ts"
+  },
+  {
+    "from": "services/storageService.ts",
+    "to": "core/services/storageService.ts"
+  },
+  {
+    "from": "services/taskCreateModal.service.ts",
+    "to": "core/services/taskCreateModal.service.ts"
+  },
+  {
+    "from": "services/taskService.ts",
+    "to": "core/services/taskService.ts"
+  },
+  {
+    "from": "services/userService.ts",
+    "to": "core/services/userService.ts"
+  },
+  {
+    "from": "features/common/services/index.ts",
+    "to": "core/services/index.ts"
+  },
+  {
+    "from": "mocks/services/BaseService.ts",
+    "to": "core/services/BaseService.ts"
+  },
+  {
+    "from": "mocks/services/CustomerService.ts",
+    "to": "core/services/CustomerService.ts"
+  },
+  {
+    "from": "mocks/services/FactoryService.ts",
+    "to": "core/services/FactoryService.ts"
+  },
+  {
+    "from": "mocks/services/ProjectService.ts",
+    "to": "core/services/ProjectService.ts"
+  },
+  {
+    "from": "mocks/services/TaskService.ts",
+    "to": "core/services/TaskService.ts"
+  },
+  {
+    "from": "mocks/services/UserService.ts",
+    "to": "core/services/UserService.ts"
+  },
+  {
+    "from": "mocks/services/factory/FactoryRelationsService.ts",
+    "to": "core/services/factory/FactoryRelationsService.ts"
+  },
+  {
+    "from": "mocks/services/factory/FactoryStatisticsService.ts",
+    "to": "core/services/factory/FactoryStatisticsService.ts"
+  },
+  {
+    "from": "mocks/services/index.ts",
+    "to": "core/services/index.ts"
+  },
+  {
+    "from": "mocks/services/project/ProjectCrudService.ts",
+    "to": "core/services/project/ProjectCrudService.ts"
+  },
+  {
+    "from": "mocks/services/project/ProjectQueryService.ts",
+    "to": "core/services/project/ProjectQueryService.ts"
+  },
+  {
+    "from": "mocks/services/project/ProjectRelationsService.ts",
+    "to": "core/services/project/ProjectRelationsService.ts"
+  },
+  {
+    "from": "mocks/services/project/ProjectValidationService.ts",
+    "to": "core/services/project/ProjectValidationService.ts"
+  },
+  {
+    "from": "mocks/services/project/index.ts",
+    "to": "core/services/project/index.ts"
+  },
+  {
+    "from": "mocks/services/project/relations/index.ts",
+    "to": "core/services/project/relations/index.ts"
+  },
+  {
+    "from": "mocks/services/project/relations/projectCreationService.ts",
+    "to": "core/services/project/relations/projectCreationService.ts"
+  },
+  {
+    "from": "mocks/services/project/relations/projectQueryService.ts",
+    "to": "core/services/project/relations/projectQueryService.ts"
+  },
+  {
+    "from": "mocks/services/project/types.ts",
+    "to": "core/services/project/types.ts"
+  },
+  {
+    "from": "mocks/database/MockDatabase.ts",
+    "to": "core/database/MockDatabase.ts"
+  },
+  {
+    "from": "mocks/database/index.ts",
+    "to": "core/database/index.ts"
+  },
+  {
+    "from": "mocks/database/managers/CrudOperations.ts",
+    "to": "core/database/managers/CrudOperations.ts"
+  },
+  {
+    "from": "mocks/database/managers/CustomFieldManager.ts",
+    "to": "core/database/managers/CustomFieldManager.ts"
+  },
+  {
+    "from": "mocks/database/managers/EventManager.ts",
+    "to": "core/database/managers/EventManager.ts"
+  },
+  {
+    "from": "mocks/database/managers/ProjectAggregationManager.ts",
+    "to": "core/database/managers/ProjectAggregationManager.ts"
+  },
+  {
+    "from": "mocks/database/managers/StorageManager.ts",
+    "to": "core/database/managers/StorageManager.ts"
+  },
+  {
+    "from": "mocks/database/managers/TransactionManager.ts",
+    "to": "core/database/managers/TransactionManager.ts"
+  },
+  {
+    "from": "mocks/database/seedData.ts",
+    "to": "core/database/seedData.ts"
+  },
+  {
+    "from": "mocks/database/seedDataInterface.ts",
+    "to": "core/database/seedDataInterface.ts"
+  },
+  {
+    "from": "mocks/database/seedHelpers.ts",
+    "to": "core/database/seedHelpers.ts"
+  },
+  {
+    "from": "mocks/database/seedMappings.ts",
+    "to": "core/database/seedMappings.ts"
+  },
+  {
+    "from": "mocks/database/seedRelations.ts",
+    "to": "core/database/seedRelations.ts"
+  },
+  {
+    "from": "mocks/database/seedTasks.ts",
+    "to": "core/database/seedTasks.ts"
+  },
+  {
+    "from": "mocks/database/seeders/customerSeeder.ts",
+    "to": "core/database/seeders/customerSeeder.ts"
+  },
+  {
+    "from": "mocks/database/seeders/factorySeeder.ts",
+    "to": "core/database/seeders/factorySeeder.ts"
+  },
+  {
+    "from": "mocks/database/seeders/productCategorySeeder.ts",
+    "to": "core/database/seeders/productCategorySeeder.ts"
+  },
+  {
+    "from": "mocks/database/seeders/productSeeder.ts",
+    "to": "core/database/seeders/productSeeder.ts"
+  },
+  {
+    "from": "mocks/database/seeders/projectSeeder.ts",
+    "to": "core/database/seeders/projectSeeder.ts"
+  },
+  {
+    "from": "mocks/database/seeders/projects/independentSubProjects.ts",
+    "to": "core/database/seeders/projects/independentSubProjects.ts"
+  },
+  {
+    "from": "mocks/database/seeders/projects/linkedSubProjects.ts",
+    "to": "core/database/seeders/projects/linkedSubProjects.ts"
+  },
+  {
+    "from": "mocks/database/seeders/projects/masterProjects.ts",
+    "to": "core/database/seeders/projects/masterProjects.ts"
+  },
+  {
+    "from": "mocks/database/seeders/projects/projectHelpers.ts",
+    "to": "core/database/seeders/projects/projectHelpers.ts"
+  },
+  {
+    "from": "mocks/database/seeders/scheduleTaskSeeder.ts",
+    "to": "core/database/seeders/scheduleTaskSeeder.ts"
+  },
+  {
+    "from": "mocks/database/seeders/tasks/taskTemplates.ts",
+    "to": "core/database/seeders/tasks/taskTemplates.ts"
+  },
+  {
+    "from": "mocks/database/seeders/userSeeder.ts",
+    "to": "core/database/seeders/userSeeder.ts"
+  },
+  {
+    "from": "mocks/database/types.ts",
+    "to": "core/database/types.ts"
+  },
+  {
+    "from": "mocks/database/utils.ts",
+    "to": "core/database/utils.ts"
+  },
+  {
+    "from": "data/factories.ts",
+    "to": "core/database/factories.ts"
+  },
+  {
+    "from": "data/hierarchicalProjects.ts",
+    "to": "core/database/hierarchicalProjects.ts"
+  },
+  {
+    "from": "data/mockData.ts",
+    "to": "core/database/mockData.ts"
+  },
+  {
+    "from": "mocks/data/common.ts",
+    "to": "core/database/common.ts"
+  },
+  {
+    "from": "mocks/data/index.ts",
+    "to": "core/database/index.ts"
+  },
+  {
+    "from": "mocks/data/projects.ts",
+    "to": "core/database/projects.ts"
+  },
+  {
+    "from": "validation/schemas.ts",
+    "to": "core/validation/schemas.ts"
+  },
+  {
+    "from": "__tests__/features/common/hooks/useModal.test.ts",
+    "to": "tests/features/common/hooks/useModal.test.ts"
+  },
+  {
+    "from": "__tests__/features/projects/hooks/useProjects.test.ts",
+    "to": "tests/features/projects/hooks/useProjects.test.ts"
+  },
+  {
+    "from": "pages/NotFound/index.tsx",
+    "to": "misc/index.tsx"
+  },
+  {
+    "from": "pages/Maintenance/index.tsx",
+    "to": "misc/index.tsx"
+  },
+  {
+    "from": "errors/index.ts",
+    "to": "misc/index.ts"
+  }
+]

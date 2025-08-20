@@ -1,0 +1,154 @@
+/**
+ * TaskList Styles
+ * Using CSS Variables for consistent theming
+ */
+
+.task-list {
+  position: relative;
+  background-color: var(--color-bg-primary);
+  padding: var(--spacing-2) var(--spacing-4);
+  margin-left: var(--spacing-10);
+}
+
+/* Accent line */
+.task-list__accent {
+  position: absolute;
+  left: 0;
+  top: var(--spacing-2);
+  bottom: var(--spacing-2);
+  width: 2px;
+  background: linear-gradient(to bottom, var(--color-primary), var(--color-info));
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Task count section */
+.task-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-1);
+  padding-left: var(--spacing-2);
+}
+
+.task-list__count {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.task-list__count-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.task-list__progress-track {
+  width: 40px;
+  height: 4px;
+  background-color: var(--color-bg-muted);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.task-list__progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--color-primary), var(--color-status-success));
+  border-radius: var(--radius-full);
+  transition: width 300ms ease-out;
+  width: var(--task-progress, 0%);
+}
+
+/* Task items */
+.task-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: var(--spacing-6);
+}
+
+.task-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.task-list__item:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.task-list__item--completed:hover {
+  background-color: var(--color-bg-muted);
+}
+
+/* Custom checkbox */
+.task-list__checkbox-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.task-list__checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.task-list__checkbox-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-medium);
+  background-color: var(--color-bg-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  z-index: 1;
+}
+
+.task-list__checkbox:checked + .task-list__checkbox-label {
+  background: linear-gradient(135deg, var(--color-status-success), #059669);
+  border-color: var(--color-status-success);
+}
+
+.task-list__item:hover .task-list__checkbox-label {
+  border-color: var(--color-primary);
+}
+
+.task-list__checkbox-icon {
+  width: 10px;
+  height: 10px;
+  color: white;
+  stroke-width: 3;
+}
+
+/* Task name */
+.task-list__name {
+  flex: 1;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  user-select: none;
+  transition: var(--transition-fast);
+}
+
+.task-list__name--completed {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--color-border-medium);
+}
+
+.task-list__item:hover .task-list__name {
+  color: var(--color-text-primary);
+}
+
+/* Completion indicator */
+.task-list__complete-icon {
+  width: 12px;
+  height: 12px;
+  color: var(--color-status-success);
+}

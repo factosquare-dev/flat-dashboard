@@ -1,0 +1,54 @@
+/**
+ * GanttGrid Styles
+ * Using CSS Variables for dynamic positioning
+ */
+
+/* Grid cell styles */
+.gantt-grid__cell {
+  position: absolute;
+  border-right: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  background-color: var(--color-bg-primary);
+  left: calc(var(--cell-col) * var(--gantt-cell-width));
+  top: calc(var(--cell-row) * var(--gantt-cell-height));
+  width: var(--gantt-cell-width);
+  height: var(--gantt-cell-height);
+}
+
+.gantt-grid__cell--weekend {
+  background-color: var(--color-bg-secondary);
+}
+
+.gantt-grid__cell--today {
+  background-color: rgba(239, 68, 68, 0.05); /* red-50 */
+}
+
+.gantt-grid__cell--hovered {
+  background-color: rgba(59, 130, 246, 0.1); /* blue-100 */
+  border-color: rgba(59, 130, 246, 0.4); /* blue-400 */
+}
+
+/* Today line */
+.gantt-grid__today-line {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  background-color: var(--color-status-error);
+  z-index: 10;
+  left: calc(var(--today-index) * var(--gantt-cell-width) + var(--gantt-cell-width) / 2);
+  height: calc(var(--total-rows) * var(--gantt-cell-height));
+}
+
+/* Today label */
+.gantt-grid__today-label {
+  position: absolute;
+  top: -24px;
+  left: -32px;
+  background-color: var(--color-status-error);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}

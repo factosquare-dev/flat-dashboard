@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, X, User } from 'lucide-react';
-import { useUsers } from '@/hooks/useUsers';
+import { useUsers } from '@/shared/hooks/useUsers';
 import './ManagerSelector.css';
 
 interface ManagerSelectorProps {

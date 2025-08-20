@@ -1,13 +1,13 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { getFactories, type Factory } from '@/data/factories';
+import { getFactories, type Factory } from '@/core/database/factories';
 import BaseModal, { ModalFooter } from './common/BaseModal';
 import { Search } from 'lucide-react';
-import { FactoryType, FactoryTypeLabel, ModalSize } from '@/types/enums';
-import { MODAL_SIZES } from '@/utils/modalUtils';
+import { FactoryType, FactoryTypeLabel, ModalSize } from '@/shared/types/enums';
+import { MODAL_SIZES } from '@/shared/utils/modalUtils';
 import FactoryTypeBadge from './common/FactoryTypeBadge';
-import { useDebouncedSearch } from '@/hooks/common';
-import { useDragSelection } from '@/hooks/useDragSelection';
-import { cn } from '@/utils/cn';
+import { useDebouncedSearch } from '@/shared/hooks/common';
+import { useDragSelection } from '@/shared/hooks/useDragSelection';
+import { cn } from '@/shared/utils/cn';
 
 interface FactorySelectionModalProps {
   isOpen: boolean;

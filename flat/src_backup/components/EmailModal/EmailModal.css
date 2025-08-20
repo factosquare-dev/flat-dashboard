@@ -1,0 +1,102 @@
+/**
+ * EmailModal Styles
+ */
+
+/* Validation error messages */
+.email-modal__error {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  background-color: rgba(254, 202, 202, 0.3); /* red-50 */
+  border: 1px solid rgba(252, 165, 165, 1); /* red-200 */
+  border-radius: var(--radius-sm);
+  color: rgba(185, 28, 28, 1); /* red-700 */
+  font-size: var(--font-size-xs); /* modal-text-xs */
+}
+
+.email-modal__error-icon {
+  width: var(--icon-size-sm); /* modal-icon-sm */
+  height: var(--icon-size-sm);
+  flex-shrink: 0;
+}
+
+/* Template selector */
+.email-modal__template-selector {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.email-modal__template-option {
+  padding: var(--spacing-3);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.email-modal__template-option:last-child {
+  border-bottom: none;
+}
+
+.email-modal__template-option:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.email-modal__template-option--selected {
+  background-color: rgba(59, 130, 246, 0.1); /* blue-50 */
+  border-color: var(--color-primary);
+}
+
+/* Form fields */
+.email-modal__field {
+  margin-bottom: var(--spacing-4);
+}
+
+.email-modal__label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.email-modal__input {
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  transition: border-color 0.15s ease;
+}
+
+.email-modal__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.email-modal__input--error {
+  border-color: var(--color-status-error);
+}
+
+.email-modal__textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  resize: vertical;
+  transition: border-color 0.15s ease;
+}
+
+.email-modal__textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.email-modal__textarea--error {
+  border-color: var(--color-status-error);
+}

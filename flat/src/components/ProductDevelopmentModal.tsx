@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ProductDevelopmentForm } from '@/features/product-development/ProductDevelopmentForm';
+import { ProductDevelopmentForm } from '@/modules/products/ProductDevelopmentForm';
 import { X } from 'lucide-react';
 
 interface ProductDevelopmentModalProps {

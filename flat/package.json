@@ -15,7 +15,10 @@
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "restructure": "node scripts/restructure-main.cjs",
+    "restructure:dry": "node scripts/restructure-main.cjs --dry-run",
+    "restructure:force": "node scripts/restructure-main.cjs --force --organize"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.83.0",
@@ -52,6 +55,8 @@
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
+    "fs-extra": "^11.3.1",
+    "glob": "^11.0.3",
     "globals": "^16.0.0",
     "jsdom": "^24.0.0",
     "msw": "^2.1.2",

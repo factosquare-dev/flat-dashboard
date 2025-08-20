@@ -7,10 +7,10 @@ import App from './App.tsx'
 import './mocks/initialize'
 
 // Import reset utility for debugging and version check
-import './utils/resetMockData'
-import { checkAndUpdateDatabaseVersion } from './utils/resetMockData'
-import { cleanupDuplicateFactories } from './utils/cleanupDuplicateFactories'
-import { cleanupInvalidEntries } from './utils/cleanupDatabase'
+import './shared/utils/resetMockData'
+import { checkAndUpdateDatabaseVersion } from './shared/utils/resetMockData'
+import { cleanupDuplicateFactories } from './shared/utils/cleanupDuplicateFactories'
+import { cleanupInvalidEntries } from './shared/utils/cleanupDatabase'
 
 // Check database version on app start
 checkAndUpdateDatabaseVersion()

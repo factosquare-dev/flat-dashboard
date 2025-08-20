@@ -6,35 +6,31 @@ import type { Project } from '@/shared/types/project';
 import { ProductDevelopmentForm } from '@/modules/products/ProductDevelopmentForm';
 import { TaskCheckerToggle } from '@/modules/products/components/TaskCheckerToggle';
 import { ContentExcelTable } from '@/modules/products/components/ContentExcelTable';
+import { getProductTypeLabel, getProductLabel } from '@/shared/utils/productTypeUtils';
 import './ProjectDetailsView.css';
 
-// ProductType을 한글로 변환하는 함수
-const getProductTypeLabel = (type: ProductType | string): string => {
-  const labels: Record<string, string> = {
-    [ProductType.SKINCARE]: '스킨케어',
-    [ProductType.MAKEUP]: '메이크업',
-    [ProductType.HAIRCARE]: '헤어케어',
-    [ProductType.BODYCARE]: '바디케어',
-    [ProductType.PERFUME]: '향수',
-    [ProductType.SUPPLEMENT]: '건강기능식품',
-    [ProductType.DEVICE]: '미용기기',
-    [ProductType.OTHER]: '기타',
-  };
-  return labels[type] || type || '제품유형';
-};
 
 interface ProjectDetailsViewProps {
   projectId?: string;
+  selectedProjectIndex?: number;
+  onProjectSelect?: (index: number) => void;
+  hideHeader?: boolean;
+  onFormChange?: (hasChanges: boolean) => void;
 }
 
-const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) => {
+const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ 
+  projectId, 
+  selectedProjectIndex: externalSelectedIndex, 
+  onProjectSelect,
+  hideHeader = false,
+  onFormChange
+}) => {
   const [subProjects, setSubProjects] = useState<Project[]>([]);
-  const [selectedProjectIndex, setSelectedProjectIndex] = useState(0);
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [internalSelectedIndex, setInternalSelectedIndex] = useState(0);
+  const selectedProjectIndex = externalSelectedIndex !== undefined ? externalSelectedIndex : internalSelectedIndex;
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [showContentTable, setShowContentTable] = useState(false);
-  const itemsPerPage = 5; // 한 번에 최대 5개씩 표시
 
   // Load SUB projects for this master project
   useEffect(() => {
@@ -46,50 +42,22 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
       );
       
       setSubProjects(subs);
-      setSelectedProjectIndex(0);
-      setCurrentPageIndex(0);
+      if (externalSelectedIndex === undefined) {
+        setInternalSelectedIndex(0);
+      }
     }
   }, [projectId]);
 
-  // 중복된 제품유형에 번호 매기기
-  const getProductLabel = (project: Project, index: number): string => {
-    const baseLabel = getProductTypeLabel(project.productType || project.product?.productType);
-    const sameTypeProjects = subProjects.filter(
-      p => getProductTypeLabel(p.productType || p.product?.productType) === baseLabel
-    );
-    
-    if (sameTypeProjects.length > 1) {
-      const typeIndex = sameTypeProjects.findIndex(p => p.id === project.id);
-      return `${baseLabel} (${typeIndex + 1})`;
-    }
-    
-    return baseLabel;
-  };
 
   // Currently selected SUB project
   const selectedProject = subProjects[selectedProjectIndex];
   
-  // Pagination - show 5 projects at a time
-  const totalPages = Math.ceil(subProjects.length / itemsPerPage);
-  const currentProjects = subProjects.slice(
-    currentPageIndex * itemsPerPage,
-    (currentPageIndex + 1) * itemsPerPage
-  );
-
-  const handlePrevious = () => {
-    if (currentPageIndex > 0) {
-      setCurrentPageIndex(currentPageIndex - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentPageIndex < totalPages - 1) {
-      setCurrentPageIndex(currentPageIndex + 1);
-    }
-  };
-
   const handleSelectProject = (absoluteIndex: number) => {
-    setSelectedProjectIndex(absoluteIndex);
+    if (onProjectSelect) {
+      onProjectSelect(absoluteIndex);
+    } else {
+      setInternalSelectedIndex(absoluteIndex);
+    }
   };
 
   const handleSectionToggle = (section: string) => {
@@ -206,65 +174,26 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
 
   return (
     <div className="project-details-container mobile-overflow-fix">
-      {/* Product Type Selector - Show 5 at a time */}
-      <div className="flex items-center justify-center mb-2 lg:mb-4 px-1 w-full overflow-hidden">
-        <button
-          onClick={handlePrevious}
-          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Previous"
-          disabled={currentPageIndex === 0}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        
-        <div className="flex gap-1 lg:gap-2 mx-1 lg:mx-2 overflow-x-auto max-w-[calc(100vw-6rem)] lg:max-w-[calc(100vw-8rem)]">
-          {currentProjects.map((project, idx) => {
-            const absoluteIndex = currentPageIndex * itemsPerPage + idx;
-            return (
-              <div
-                key={project.id}
-                onClick={() => handleSelectProject(absoluteIndex)}
-                className={`px-2 lg:px-3 py-1 lg:py-1.5 border-2 rounded-lg font-medium cursor-pointer transition-colors text-xs lg:text-sm whitespace-nowrap ${
-                  selectedProjectIndex === absoluteIndex
-                    ? 'bg-blue-100 border-blue-500 text-blue-900'
-                    : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                {getProductLabel(project, absoluteIndex)}
-              </div>
-            );
-          })}
-        </div>
-        
-        <button
-          onClick={handleNext}
-          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Next"
-          disabled={currentPageIndex === totalPages - 1}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
 
-      {/* Compact Professional Detail Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mx-1 mb-2 lg:mb-4 overflow-hidden detail-card-landscape">
+      {/* Project Detail Card */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
         {selectedProject && (
-          <div className="p-4 landscape-compact">
-            {/* Compact Header with Product Type */}
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-700">상세 정보</h3>
+          <div className="p-6">
+            {/* Header with Product Type */}
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800">프로젝트 상세 정보</h2>
               <span className="px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-full">
-                {getProductLabel(selectedProject, selectedProjectIndex)}
+                {getProductLabel(subProjects, selectedProject, selectedProjectIndex)}
               </span>
             </div>
             
-            {/* Responsive Layout - Stack on small screens, side-by-side on landscape */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 lg:gap-x-6 gap-y-2 text-sm max-h-[50vh] lg:max-h-none overflow-y-auto lg:overflow-visible landscape-scroll">
+            {/* Project Information Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
               {/* Left Column */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-1 lg:gap-2">
-                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">기간</span>
-                  <span className="font-medium text-gray-900 text-xs lg:text-sm truncate">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-600 min-w-[80px] flex-shrink-0 font-medium">기간</span>
+                  <span className="font-medium text-gray-900">
                     {selectedProject.startDate ? (selectedProject.startDate instanceof Date ? selectedProject.startDate.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' }) : new Date(selectedProject.startDate).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })) : '-'}
                     ~
                     {selectedProject.endDate ? (selectedProject.endDate instanceof Date ? selectedProject.endDate.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' }) : new Date(selectedProject.endDate).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })) : '-'}
@@ -437,7 +366,11 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
             
             {/* 폼 컨테이너 */}
             <div className="relative bg-white border-2 border-blue-200 rounded-lg shadow-lg">
-              <ProductDevelopmentForm />
+              <ProductDevelopmentForm 
+                projectId={projectId}
+                selectedProjectIndex={selectedProjectIndex}
+                onFormChange={onFormChange}
+              />
             </div>
           </div>
         </div>

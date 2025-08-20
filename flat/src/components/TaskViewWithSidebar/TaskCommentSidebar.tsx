@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Edit2, Trash2, MoreVertical, Clock, User } from 'lucide-react';
-import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
-import type { Comment } from '@/types/comment';
-import type { Task } from '@/types/schedule';
+import { MockDatabaseImpl } from '@/core/database/MockDatabase';
+import type { Comment } from '@/shared/types/comment';
+import type { Task } from '@/shared/types/schedule';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 

@@ -1,0 +1,60 @@
+/* TaskItem CSS */
+
+/* Task container */
+.task-item {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 150ms ease-in-out;
+  height: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.task-item--hovered {
+  box-shadow: 0 0 0 2px #60a5fa, 0 0 0 4px white;
+  z-index: 20;
+}
+
+.task-item--completed {
+  opacity: 0.6;
+}
+
+/* Resize handles */
+.task-item__resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.5rem;
+  cursor: ew-resize;
+}
+
+.task-item__resize-handle:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.task-item__resize-handle--start {
+  left: 0;
+}
+
+.task-item__resize-handle--end {
+  right: 0;
+}
+
+/* Task content */
+.task-item__content {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}

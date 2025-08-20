@@ -1,0 +1,185 @@
+@import './styles/shared.css';
+
+/* Root styles moved to index.css */
+
+.app {
+  position: relative;
+}
+
+.status-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.health-indicator {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.health-indicator.healthy {
+  background-color: var(--color-status-success);
+  color: white;
+}
+
+.health-indicator.unhealthy {
+  background-color: var(--color-status-error);
+  color: white;
+}
+
+.health-indicator.unknown {
+  background-color: var(--color-text-muted);
+  color: white;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em var(--color-primary-transparent));
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em var(--color-info-transparent));
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+/* Card styles now handled in shared.css */
+
+.debug-actions {
+  margin: 2rem 0;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.health-check-btn {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.health-check-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.error-btn {
+  background-color: var(--color-status-error);
+  color: white;
+  border: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.error-btn:hover {
+  background-color: var(--color-error-dark);
+}
+
+.read-the-docs {
+  color: var(--color-text-muted);
+}
+
+/* Error Boundary Styles */
+.error-boundary {
+  padding: 2rem;
+  text-align: center;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-boundary-content {
+  max-width: 600px;
+  padding: var(--spacing-8);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  background-color: var(--color-error-light);
+  color: var(--color-error-dark);
+}
+
+.error-boundary-content h2 {
+  margin-top: 0;
+  color: var(--color-status-error);
+}
+
+.error-details {
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.error-details summary {
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.error-details pre {
+  background-color: var(--color-error-lighter);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-size: var(--font-size-xs);
+  margin: var(--spacing-2) 0;
+}
+
+.error-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.retry-button {
+  background-color: var(--color-status-error);
+  color: white;
+  border: none;
+  padding: var(--spacing-3) var(--spacing-6);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+}
+
+.retry-button:hover {
+  background-color: var(--color-error-dark);
+}
+
+.reload-button {
+  background-color: var(--color-text-muted);
+  color: white;
+  border: none;
+  padding: var(--spacing-3) var(--spacing-6);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+}
+
+.reload-button:hover {
+  background-color: var(--color-text-secondary);
+}

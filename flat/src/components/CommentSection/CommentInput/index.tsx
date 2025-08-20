@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { User } from '@/types/comment';
+import type { User } from '@/shared/types/comment';
 import { Send } from 'lucide-react';
-import { useMentionableUsers } from '@/hooks/useUsers';
+import { useMentionableUsers } from '@/shared/hooks/useUsers';
 
 interface CommentInputProps {
   currentUser: User;

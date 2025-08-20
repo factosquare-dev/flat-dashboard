@@ -1,8 +1,8 @@
 import React from 'react';
 import { Search, X, Building2 } from 'lucide-react';
-import type { Factory } from '@/data/factories';
+import type { Factory } from '@/core/database/factories';
 import './FactorySelector.css';
-import { FactoryId, extractIdString } from '@/components/types/branded';
+import { FactoryId, extractIdString } from '@/shared/types/branded';
 
 interface FactorySelectorProps {
   availableFactories?: Factory[];

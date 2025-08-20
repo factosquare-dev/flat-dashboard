@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
-import { TaskCreateModalService } from '@/services/taskCreateModal.service';
-import { FactoryId } from '@/types/branded';
+import { TaskCreateModalService } from '@/core/services/taskCreateModal.service';
+import { FactoryId } from '@/shared/types/branded';
 
 interface TaskFormFieldsProps {
   factoryId: string;

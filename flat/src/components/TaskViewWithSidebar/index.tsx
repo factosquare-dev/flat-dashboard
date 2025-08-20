@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import ScheduleTableView from '@/components/Schedule/components/ScheduleTableView';
-import CommentSection from '@/components/CommentSection';
+import ScheduleTableView from '@/modules/schedule/components/ScheduleTableView';
+import CommentSection from '@/shared/components/CommentSection';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { useProjectComments } from '@/hooks/useProjectComments';
-import { MockDatabaseImpl } from '@/mocks/database/MockDatabase';
-import type { User } from '@/types/user';
+import { useProjectComments } from '@/shared/hooks/useProjectComments';
+import { MockDatabaseImpl } from '@/core/database/MockDatabase';
+import type { User } from '@/shared/types/user';
 
 interface TaskViewWithSidebarProps {
   projectId?: string;

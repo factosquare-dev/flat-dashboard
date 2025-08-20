@@ -1,4 +1,4 @@
-import { FactoryId } from '@/types/branded';
+import { FactoryId } from '@/shared/types/branded';
 
 export interface WorkflowModalProps {
   isOpen: boolean;

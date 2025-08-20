@@ -5,10 +5,10 @@ import FactorySelector from './FactorySelector';
 import CustomerSelector from './CustomerSelector';
 import ManagerSelector from './ManagerSelector';
 import FileAttachment from './FileAttachment';
-import { useModalFormValidation } from '@/hooks/useModalFormValidation';
-import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
+import { useModalFormValidation } from '@/shared/hooks/useModalFormValidation';
+import { ModalSize, ButtonVariant, ButtonSize } from '@/shared/types/enums';
 import { Button } from '@/ui/Button';
-import { getModalSizeString } from '@/utils/modalUtils';
+import { getModalSizeString } from '@/shared/utils/modalUtils';
 import './EmailModal.css';
 
 interface EmailModalProps {

@@ -1,9 +1,9 @@
 import React, { useState, memo } from 'react';
-import type { Comment, CommentAuthor } from '@/types/comment';
+import type { Comment, CommentAuthor } from '@/shared/types/comment';
 import { MessageSquare, Edit2, Trash2, MoreVertical } from 'lucide-react';
-import CommentInput from '@/components/CommentSection/CommentInput';
-import EmojiReactions from '@/components/CommentSection/EmojiReactions';
-import { formatRelativeTime } from '@/utils/coreUtils';
+import CommentInput from '../CommentInput';
+import EmojiReactions from '../EmojiReactions';
+import { formatRelativeTime } from '@/shared/utils/coreUtils';
 
 interface CommentItemProps {
   comment: Comment;

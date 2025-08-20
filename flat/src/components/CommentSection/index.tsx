@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { useClickOutsideRef } from '@/hooks/useClickOutside';
-import type { Comment, CommentAuthor } from '@/types/comment';
+import { useClickOutsideRef } from '@/shared/hooks/useClickOutside';
+import type { Comment, CommentAuthor } from '@/shared/types/comment';
 import CommentItem from './CommentItem';
 import CommentInput from './CommentInput';
-import { LoadingState } from '@/components/loading/LoadingState';
+import { LoadingState } from '@/shared/components/LoadingState';
 
 interface CommentSectionProps {
   comments: Comment[];

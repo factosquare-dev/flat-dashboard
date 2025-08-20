@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckSquare } from 'lucide-react';
-import { useTaskCreation } from '@/hooks/useTasks';
+import { useTaskCreation } from '@/shared/hooks/useTasks';
 
 interface TaskSelectionProps {
   selectedFactory: string;
