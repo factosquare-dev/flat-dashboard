@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { mockDataService } from '@/services/mockDataService';
-import { ProjectType, ProductType } from '@/types/enums';
-import type { Project } from '@/types/project';
-import { ProductDevelopmentForm } from '@/features/product-development/ProductDevelopmentForm';
-import { TaskCheckerToggle } from '@/features/product-development/components/TaskCheckerToggle';
-import { ContentExcelTable } from '@/features/product-development/components/ContentExcelTable';
+import { mockDataService } from '@/core/services/mockDataService';
+import { ProjectType, ProductType } from '@/shared/types/enums';
+import type { Project } from '@/shared/types/project';
+import { ProductDevelopmentForm } from '@/modules/products/ProductDevelopmentForm';
+import { TaskCheckerToggle } from '@/modules/products/components/TaskCheckerToggle';
+import { ContentExcelTable } from '@/modules/products/components/ContentExcelTable';
+import './ProjectDetailsView.css';
 
 // ProductType을 한글로 변환하는 함수
 const getProductTypeLabel = (type: ProductType | string): string => {
@@ -204,26 +205,26 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
   }
 
   return (
-    <div className="w-full">
+    <div className="project-details-container mobile-overflow-fix">
       {/* Product Type Selector - Show 5 at a time */}
-      <div className="flex items-center justify-center mb-6 px-4">
+      <div className="flex items-center justify-center mb-2 lg:mb-4 px-1 w-full overflow-hidden">
         <button
           onClick={handlePrevious}
           className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Previous"
           disabled={currentPageIndex === 0}
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-5 h-5" />
         </button>
         
-        <div className="flex gap-3 mx-6">
+        <div className="flex gap-1 lg:gap-2 mx-1 lg:mx-2 overflow-x-auto max-w-[calc(100vw-6rem)] lg:max-w-[calc(100vw-8rem)]">
           {currentProjects.map((project, idx) => {
             const absoluteIndex = currentPageIndex * itemsPerPage + idx;
             return (
               <div
                 key={project.id}
                 onClick={() => handleSelectProject(absoluteIndex)}
-                className={`px-3 py-1.5 border-2 rounded-lg font-medium cursor-pointer transition-colors text-sm ${
+                className={`px-2 lg:px-3 py-1 lg:py-1.5 border-2 rounded-lg font-medium cursor-pointer transition-colors text-xs lg:text-sm whitespace-nowrap ${
                   selectedProjectIndex === absoluteIndex
                     ? 'bg-blue-100 border-blue-500 text-blue-900'
                     : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100'
@@ -241,14 +242,14 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
           aria-label="Next"
           disabled={currentPageIndex === totalPages - 1}
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
       {/* Compact Professional Detail Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mx-4 mb-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mx-1 mb-2 lg:mb-4 overflow-hidden detail-card-landscape">
         {selectedProject && (
-          <div className="p-4">
+          <div className="p-4 landscape-compact">
             {/* Compact Header with Product Type */}
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-700">상세 정보</h3>
@@ -257,50 +258,50 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
               </span>
             </div>
             
-            {/* Compact Two Column Layout */}
-            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+            {/* Responsive Layout - Stack on small screens, side-by-side on landscape */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 lg:gap-x-6 gap-y-2 text-sm max-h-[50vh] lg:max-h-none overflow-y-auto lg:overflow-visible landscape-scroll">
               {/* Left Column */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">기간</span>
-                  <span className="font-medium text-gray-900 text-sm">
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">기간</span>
+                  <span className="font-medium text-gray-900 text-xs lg:text-sm truncate">
                     {selectedProject.startDate ? (selectedProject.startDate instanceof Date ? selectedProject.startDate.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' }) : new Date(selectedProject.startDate).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })) : '-'}
                     ~
                     {selectedProject.endDate ? (selectedProject.endDate instanceof Date ? selectedProject.endDate.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' }) : new Date(selectedProject.endDate).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })) : '-'}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">수출국가</span>
-                  <span className={`font-medium text-sm ${selectedProject.exportCountry ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">수출국가</span>
+                  <span className={`font-medium text-xs lg:text-sm truncate ${selectedProject.exportCountry ? 'text-gray-900' : 'text-gray-400'}`}>
                     {selectedProject.exportCountry || '미정'}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">용량</span>
-                  <span className={`font-medium text-sm ${selectedProject.product?.capacity ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">용량</span>
+                  <span className={`font-medium text-xs lg:text-sm truncate ${selectedProject.product?.capacity ? 'text-gray-900' : 'text-gray-400'}`}>
                     {selectedProject.product?.capacity || '미정'}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">기능성</span>
-                  <span className={`font-medium text-sm ${selectedProject.product?.functionality ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">기능성</span>
+                  <span className={`font-medium text-xs lg:text-sm truncate ${selectedProject.product?.functionality ? 'text-gray-900' : 'text-gray-400'}`}>
                     {selectedProject.product?.functionality || '미정'}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">수량</span>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">수량</span>
                   <span className="px-2 py-0.5 bg-green-100 text-green-700 font-semibold rounded text-sm">
                     {selectedProject.quantity?.toLocaleString() || 0}개
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">포장</span>
-                  <span className={`font-medium text-sm ${selectedProject.packagingSpec ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">포장</span>
+                  <span className={`font-medium text-xs lg:text-sm truncate ${selectedProject.packagingSpec ? 'text-gray-900' : 'text-gray-400'}`}>
                     {selectedProject.packagingSpec || '미정'}
                   </span>
                 </div>
@@ -308,36 +309,36 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
               
               {/* Right Column */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">공장</span>
-                  <span className={`font-medium text-sm ${selectedProject.factories?.[0]?.name ? 'text-blue-600' : 'text-gray-400'}`}>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">공장</span>
+                  <span className={`font-medium text-xs lg:text-sm truncate ${selectedProject.factories?.[0]?.name ? 'text-blue-600' : 'text-gray-400'}`}>
                     {selectedProject.factories?.[0]?.name || '미정'}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">인증</span>
-                  <span className={`font-medium text-sm ${selectedProject.certification ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">인증</span>
+                  <span className={`font-medium text-xs lg:text-sm truncate ${selectedProject.certification ? 'text-gray-900' : 'text-gray-400'}`}>
                     {selectedProject.certification || '미정'}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">부자재</span>
-                  <span className={`font-medium text-sm ${selectedProject.subsidiaryMaterials ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">부자재</span>
+                  <span className={`font-medium text-xs lg:text-sm truncate ${selectedProject.subsidiaryMaterials ? 'text-gray-900' : 'text-gray-400'}`}>
                     {selectedProject.subsidiaryMaterials || '미정'}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">랩넘버</span>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">랩넘버</span>
                   <span className={`px-2 py-0.5 bg-purple-100 text-purple-700 font-mono font-semibold rounded text-xs ${!selectedProject.labNumber && 'opacity-50'}`}>
                     {selectedProject.labNumber || 'PENDING'}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">상태</span>
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">상태</span>
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 bg-blue-100 text-blue-700 font-semibold rounded text-sm">
                       {selectedProject.status || '진행중'}
@@ -348,9 +349,9 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm min-w-[60px]">담당자</span>
-                  <span className="font-medium text-gray-900 text-sm">
+                <div className="flex items-center gap-1 lg:gap-2">
+                  <span className="text-gray-600 text-xs lg:text-sm min-w-[40px] lg:min-w-[60px] flex-shrink-0">담당자</span>
+                  <span className="font-medium text-gray-900 text-xs lg:text-sm truncate">
                     {selectedProject.assignee || '미배정'}
                   </span>
                 </div>
@@ -361,11 +362,11 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-6 px-4">
-        <div className="flex justify-center gap-3">
+      <div className="mt-4 lg:mt-6 px-2 lg:px-4">
+        <div className="flex flex-wrap justify-center gap-2 lg:gap-3 button-group-responsive">
           <button 
             onClick={() => handleSectionToggle('request')}
-            className={`px-4 py-2 border text-sm font-medium rounded-lg transition-all ${
+            className={`px-3 lg:px-4 py-1.5 lg:py-2 border text-xs lg:text-sm font-medium rounded-lg transition-all ${
               showRequestForm 
                 ? 'bg-gray-700 text-white border-gray-700' 
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
@@ -375,7 +376,7 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
           </button>
           <button 
             onClick={() => handleSectionToggle('content')}
-            className={`px-4 py-2 border text-sm font-medium rounded-lg transition-all ${
+            className={`px-3 lg:px-4 py-1.5 lg:py-2 border text-xs lg:text-sm font-medium rounded-lg transition-all ${
               showContentTable 
                 ? 'bg-blue-600 text-white border-blue-600' 
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
@@ -385,7 +386,7 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
           </button>
           <button 
             onClick={() => handleSectionToggle('container')}
-            className={`px-4 py-2 border text-sm font-medium rounded-lg transition-all ${
+            className={`px-3 lg:px-4 py-1.5 lg:py-2 border text-xs lg:text-sm font-medium rounded-lg transition-all ${
               expandedSection === 'container' 
                 ? 'bg-green-600 text-white border-green-600' 
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
@@ -395,7 +396,7 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
           </button>
           <button 
             onClick={() => handleSectionToggle('design')}
-            className={`px-4 py-2 border text-sm font-medium rounded-lg transition-all ${
+            className={`px-3 lg:px-4 py-1.5 lg:py-2 border text-xs lg:text-sm font-medium rounded-lg transition-all ${
               expandedSection === 'design' 
                 ? 'bg-purple-600 text-white border-purple-600' 
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
@@ -405,7 +406,7 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({ projectId }) =>
           </button>
           <button 
             onClick={() => handleSectionToggle('certification')}
-            className={`px-4 py-2 border text-sm font-medium rounded-lg transition-all ${
+            className={`px-3 lg:px-4 py-1.5 lg:py-2 border text-xs lg:text-sm font-medium rounded-lg transition-all ${
               expandedSection === 'certification' 
                 ? 'bg-orange-600 text-white border-orange-600' 
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'

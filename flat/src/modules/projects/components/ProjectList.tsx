@@ -1,0 +1,176 @@
+import React, { useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import type { Project } from '@/shared/types/project';
+import { useDynamicLayout } from '@/modules/schedule/hooks/useDynamicLayout';
+import { useProjectListState } from './hooks/useProjectListState';
+import { useColumnVisibility } from '@/shared/hooks/useColumnVisibility';
+import { useColumnOrder } from '@/shared/hooks/useColumnOrder';
+import ProjectListLayout from './shared/ProjectListLayout';
+import ProjectTableSection from './ProjectTableSection';
+import ProjectModals from './ProjectModals';
+import { factories } from '@/core/database/factories';
+import { ViewMode } from '@/shared/types/enums';
+
+interface ProjectListProps {
+  onSelectProject: (project: Project) => void;
+  className?: string;
+}
+
+const ProjectList: React.FC<ProjectListProps> = React.memo(({ onSelectProject, className = '' }) => {
+  const [searchParams] = useSearchParams();
+  const viewMode = searchParams.get('view');
+  const isTaskView = viewMode === ViewMode.TASK;
+  
+  const { containerStyle } = useDynamicLayout();
+  const { hiddenColumns, toggleColumn, isColumnVisible, showAllColumns, hideAllColumns } = useColumnVisibility();
+  const { columns } = useColumnOrder();
+  const {
+    showEmailModal,
+    setShowEmailModal,
+    showProjectModal,
+    setShowProjectModal,
+    modalMode,
+    editingProject,
+    handleCreateProject,
+    handleEditProject,
+    handleDeleteProject,
+    handleDuplicateProject,
+    handleSaveProject,
+    handleRefresh,
+    handleSendEmail,
+    handleSearch,
+    projectsHook,
+    filtersHook
+  } = useProjectListState();
+
+  // Memoize filtered and sorted projects
+  const filteredProjects = useMemo(() => {
+    const filtered = filtersHook.getFilteredAndSortedProjects(projectsHook.projects);
+    console.log('[ProjectList] Projects before filter:', projectsHook.projects.length);
+    console.log('[ProjectList] Projects after filter:', filtered.length);
+    return filtered;
+  }, [filtersHook.getFilteredAndSortedProjects, projectsHook.projects]);
+
+  // Memoize layout props to prevent unnecessary re-renders
+  const layoutProps = useMemo(() => ({
+    containerStyle,
+    onRefresh: handleRefresh,
+    onSendEmail: handleSendEmail,
+    onSearch: handleSearch,
+    onCreateProject: handleCreateProject,
+    isTaskView,
+    selectedPriority: filtersHook.selectedPriority,
+    selectedServiceType: filtersHook.selectedServiceType,
+    statusFilters: filtersHook.statusFilters,
+    searchValue: filtersHook.searchValue,
+    dateRange: filtersHook.dateRange,
+    totalProjects: projectsHook.projects.length,
+    columns,
+    hiddenColumns,
+    onPriorityChange: filtersHook.setSelectedPriority,
+    onServiceTypeChange: filtersHook.setSelectedServiceType,
+    onStatusFilterToggle: filtersHook.handleStatusFilterToggle,
+    onDateRangeChange: filtersHook.setDateRange,
+    onToggleColumn: toggleColumn,
+    onShowAllColumns: showAllColumns,
+    onHideAllColumns: hideAllColumns,
+  }), [
+    containerStyle,
+    handleRefresh,
+    handleSendEmail,
+    handleSearch,
+    handleCreateProject,
+    isTaskView,
+    filtersHook.selectedPriority,
+    filtersHook.selectedServiceType,
+    filtersHook.statusFilters,
+    filtersHook.searchValue,
+    filtersHook.dateRange,
+    projectsHook.projects.length,
+    filtersHook.setSelectedPriority,
+    filtersHook.setSelectedServiceType,
+    filtersHook.handleStatusFilterToggle,
+    filtersHook.setDateRange,
+    columns,
+    hiddenColumns,
+    toggleColumn,
+    showAllColumns,
+    hideAllColumns,
+  ]);
+
+  // Memoize table section props
+  const tableSectionProps = useMemo(() => ({
+    projects: filteredProjects,
+    isLoading: projectsHook.isLoading,
+    hasMore: projectsHook.hasMore,
+    filters: filtersHook,
+    hiddenColumns,
+    onEdit: handleEditProject,
+    onDelete: handleDeleteProject,
+    onDuplicate: handleDuplicateProject,
+    onSelectProject,
+    onUpdateProject: projectsHook.updateProject,
+    loadMoreRef: projectsHook.loadMoreRef,
+  }), [
+    filteredProjects,
+    projectsHook.isLoading,
+    projectsHook.hasMore,
+    filtersHook,
+    hiddenColumns,
+    handleEditProject,
+    handleDeleteProject,
+    handleDuplicateProject,
+    onSelectProject,
+    projectsHook.updateProject,
+    projectsHook.loadMoreRef,
+  ]);
+
+  // Memoize modal close handlers
+  const handleCloseEmailModal = useCallback(() => {
+    setShowEmailModal(false);
+  }, []);
+
+  const handleCloseProjectModal = useCallback(() => {
+    setShowProjectModal(false);
+  }, []);
+
+  const handleSendEmailAndClose = useCallback(() => {
+    setShowEmailModal(false);
+  }, []);
+
+  // Memoize modal props
+  const modalProps = useMemo(() => ({
+    showEmailModal,
+    showProjectModal,
+    modalMode,
+    editingProject,
+    availableFactories: factories,
+    onCloseEmailModal: handleCloseEmailModal,
+    onCloseProjectModal: handleCloseProjectModal,
+    onSaveProject: handleSaveProject,
+    onSendEmail: handleSendEmailAndClose,
+  }), [
+    showEmailModal,
+    showProjectModal,
+    modalMode,
+    editingProject,
+    handleCloseEmailModal,
+    handleCloseProjectModal,
+    handleSaveProject,
+    handleSendEmailAndClose,
+  ]);
+
+  return (
+    <>
+      <ProjectListLayout {...layoutProps}>
+        <ProjectTableSection {...tableSectionProps} />
+      </ProjectListLayout>
+      
+      <ProjectModals {...modalProps} />
+    </>
+  );
+});
+
+ProjectList.displayName = 'ProjectList';
+
+export default ProjectList;
