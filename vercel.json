@@ -1,9 +1,8 @@
 {
   "framework": "vite",
-  "root": "flat",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
+  "buildCommand": "cd flat && npm run build",
+  "outputDirectory": "flat/dist",
+  "installCommand": "cd flat && npm install",
   "rewrites": [
     {
       "source": "/(.*)",
