@@ -6,7 +6,7 @@ import { Project, ProjectType, ProjectStatus } from '@/shared/types/project';
 import { Schedule, Task, TaskStatus, Participant, ParticipantRole, FactoryAssignment } from '@/shared/types/schedule';
 import { User, UserRole, InternalManagerType } from '@/shared/types/user';
 import { Factory, FactoryType } from '@/shared/types/factory';
-import { TaskType } from '@/shared/types/enums';
+import { TaskType, FactoryAssignmentRole } from '@/shared/types/enums';
 import { getTaskTemplatesByFactoryType, calculateTaskDates, getAllTaskTemplates, TaskTemplate } from './seeders/tasks/taskTemplates';
 import { getTaskStatus, calculateProgress } from './seedHelpers';
 
@@ -33,7 +33,7 @@ function assignFactoriesToTask(
         factoryId: factory.id,
         factoryName: factory.name,
         factoryType: factory.type,
-        role: 'sample',
+        role: FactoryAssignmentRole.SAMPLE,
         status: index === 0 ? TaskStatus.IN_PROGRESS : TaskStatus.PENDING,
         progress: index === 0 ? 50 : 0,
         startDate,
@@ -68,7 +68,7 @@ function assignFactoriesToTask(
         factoryId: targetFactory.id,
         factoryName: targetFactory.name,
         factoryType: targetFactory.type,
-        role: 'primary',
+        role: FactoryAssignmentRole.PRIMARY,
         status: taskStatus,
         progress: calculateProgress(taskStatus, startDate, endDate),
         startDate,

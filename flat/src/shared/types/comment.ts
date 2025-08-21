@@ -19,6 +19,14 @@ export interface EmojiReaction {
   }>;
 }
 
+export interface CommentAttachment {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  url?: string;
+}
+
 export interface Comment {
   id: string; // Comment IDs remain as strings for now
   projectId: ProjectId;
@@ -31,6 +39,7 @@ export interface Comment {
   replies?: Comment[];
   mentions?: CommentAuthor[];
   reactions?: EmojiReaction[];
+  attachments?: CommentAttachment[];
 }
 
 export interface CreateCommentInput {

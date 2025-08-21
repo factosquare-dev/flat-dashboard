@@ -5,6 +5,7 @@ import {
   FolderOpen,
   Users,
   Factory,
+  MessageCircle,
   ChevronDown,
   ChevronRight,
   Menu,

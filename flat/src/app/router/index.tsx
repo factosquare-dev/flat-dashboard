@@ -8,6 +8,9 @@ import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
 const Dashboard = lazy(() => import('@/modules/dashboard/index'));
 const Projects = lazy(() => import('@/modules/projects/ProjectsPage'));
 const MasterProjectDetail = lazy(() => import('@/modules/projects/MasterProjectDetail'));
+const SubProjectDetail = lazy(() => import('@/modules/projects/SubProjectDetail'));
+const IndependentProjectDetail = lazy(() => import('@/modules/projects/IndependentProjectDetail'));
+const Comments = lazy(() => import('@/pages/Comments'));
 const Users = lazy(() => import('@/modules/users/index'));
 const Factories = lazy(() => import('@/modules/factories/index'));
 const ProductTypes = lazy(() => import('@/modules/products/index'));
@@ -45,10 +48,34 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: 'projects/sub/:projectId',
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <SubProjectDetail />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'projects/independent/:projectId',
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <IndependentProjectDetail />
+          </Suspense>
+        ),
+      },
+      {
         path: 'samples',
         element: (
           <Suspense fallback={<LoadingScreen />}>
             <Projects />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'comments',
+        element: (
+          <Suspense fallback={<LoadingScreen />}>
+            <Comments />
           </Suspense>
         ),
       },

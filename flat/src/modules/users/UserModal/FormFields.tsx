@@ -1,7 +1,7 @@
 import React from 'react';
 import type { UserFormData, FormErrors } from './types';
 import { getRoleLabel, getDepartmentLabel, getPositionLabel } from './utils';
-import { UserRole } from '@/shared/types/enums';
+import { UserRole } from '@/shared/types/user';
 
 interface FormFieldsProps {
   formData: UserFormData;
@@ -43,7 +43,8 @@ export const FormFields: React.FC<FormFieldsProps> = ({
         >
           <option value="">역할을 선택하세요</option>
           <option value={UserRole.CUSTOMER}>{getRoleLabel(UserRole.CUSTOMER)}</option>
-          <option value={UserRole.MANAGER}>{getRoleLabel(UserRole.MANAGER)}</option>
+          <option value={UserRole.INTERNAL_MANAGER}>{getRoleLabel(UserRole.INTERNAL_MANAGER)}</option>
+          <option value={UserRole.EXTERNAL_MANAGER}>{getRoleLabel(UserRole.EXTERNAL_MANAGER)}</option>
           <option value={UserRole.ADMIN}>{getRoleLabel(UserRole.ADMIN)}</option>
         </select>
       </div>

@@ -64,3 +64,12 @@ export const FactoryTypeToIdField: Record<FactoryType, ProjectFactoryIdField> = 
   [FactoryType.CONTAINER]: ProjectFactoryIdField.CONTAINER_ID,
   [FactoryType.PACKAGING]: ProjectFactoryIdField.PACKAGING_ID,
 };
+
+// Factory Assignment Roles
+export enum FactoryAssignmentRole {
+  PRIMARY = 'primary',
+  SAMPLE = 'sample',
+  BACKUP = 'backup',
+  PRODUCTION = 'production',
+  TEST = 'test',
+}

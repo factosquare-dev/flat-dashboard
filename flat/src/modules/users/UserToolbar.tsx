@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import type { UserRole } from '@/store/slices/userSlice';
+import { UserRole as UserRoleEnum } from '@/shared/types/user';
 
 interface UserToolbarProps {
   selectedRole: UserRole;
@@ -10,9 +11,10 @@ interface UserToolbarProps {
 }
 
 const USER_ROLES: { value: UserRole; label: string }[] = [
-  { value: 'admin', label: '관리자' },
-  { value: 'manager', label: '매니저' },
-  { value: 'customer', label: '고객' },
+  { value: UserRoleEnum.ADMIN, label: '관리자' },
+  { value: UserRoleEnum.INTERNAL_MANAGER, label: '매니저' },
+  { value: UserRoleEnum.EXTERNAL_MANAGER, label: '공장 관계자' },
+  { value: UserRoleEnum.CUSTOMER, label: '고객' },
 ];
 
 const UserToolbar: React.FC<UserToolbarProps> = ({

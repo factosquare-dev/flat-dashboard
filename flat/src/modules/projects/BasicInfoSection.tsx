@@ -10,7 +10,6 @@ interface BasicInfoSectionProps {
 }
 
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, onChange }) => {
-  console.log('BasicInfoSection rendered with formData.managerId:', formData.managerId);
   return (
     <div className="space-y-6">
       {/* Vertical Form Layout - Based on GG.png */}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { 
   ProjectStatus, 
   ProjectStatusLabel,
@@ -26,7 +26,7 @@ interface StatusBadgeProps {
  * 
  * The Rule of Three: This pattern was repeated 3+ times across the codebase
  */
-const StatusBadge: React.FC<StatusBadgeProps> = ({
+const StatusBadge: React.FC<StatusBadgeProps> = memo(({
   status,
   type,
   size = 'md',
@@ -99,6 +99,8 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
       {getLabel()}
     </span>
   );
-};
+});
+
+StatusBadge.displayName = 'StatusBadge';
 
 export default StatusBadge;

@@ -1,9 +1,9 @@
 import React, { useState, memo } from 'react';
 import type { Comment, CommentAuthor } from '@/shared/types/comment';
-import { MessageSquare, Edit2, Trash2, MoreVertical } from 'lucide-react';
+import { MessageSquare, Edit2, Trash2, MoreVertical, Paperclip, Download } from 'lucide-react';
 import CommentInput from '../CommentInput';
 import EmojiReactions from '../EmojiReactions';
-import { formatRelativeTime } from '@/shared/utils/coreUtils';
+import { formatRelativeTime } from '@/shared/utils/formatters';
 
 interface CommentItemProps {
   comment: Comment;
@@ -12,7 +12,7 @@ interface CommentItemProps {
   onReply: (comment: Comment) => void;
   onEdit: (commentId: string, content: string) => void;
   onDelete: (commentId: string) => void;
-  onAddComment: (content: string, parentId?: string, mentions?: string[]) => void;
+  onAddComment: (content: string, parentId?: string, mentions?: string[], attachments?: File[]) => void;
   onCancelReply: () => void;
   onAddReaction?: (commentId: string, emoji: string) => void;
   replyToId?: string | null;
@@ -138,6 +138,32 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 <p className="text-sm text-gray-700 whitespace-pre-wrap">
                   {renderContent(comment.content)}
                 </p>
+                
+                {/* Attached files */}
+                {comment.attachments && comment.attachments.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {comment.attachments.map((file) => (
+                      <div key={file.id} className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-md text-xs">
+                        <Paperclip className="w-3 h-3 text-gray-500" />
+                        <span className="truncate max-w-[150px]">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            // Download file logic here
+                            if (file.url) {
+                              window.open(file.url, '_blank');
+                            }
+                          }}
+                          className="text-blue-500 hover:text-blue-700"
+                          title="다운로드"
+                        >
+                          <Download className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
                 {comment.updatedAt && (
                   <span className="text-xs text-gray-400">(수정됨)</span>
                 )}
@@ -194,7 +220,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 <div className="mt-3 ml-11">
                   <CommentInput
                     currentUser={currentUser}
-                    onSubmit={(content, mentions) => {
+                    onSubmit={(content, mentions, attachments) => {
                       // 답글의 답글은 원래 최상위 댓글의 답글로 처리 (2단계 유지)
                       let finalContent = content;
                       let finalMentions = mentions ?? [];
@@ -206,7 +232,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                       
                       // 원래 최상위 댓글의 ID를 parentId로 사용 (2단계 유지)
                       const topLevelParentId = reply.parentId || comment.id;
-                      onAddComment(finalContent, topLevelParentId, finalMentions);
+                      onAddComment(finalContent, topLevelParentId, finalMentions, attachments);
                     }}
                     onCancel={onCancelReply}
                     placeholder={`${reply.author.name}님에게 답글 작성...`}
@@ -224,7 +250,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         <div className="mt-3 ml-11">
           <CommentInput
             currentUser={currentUser}
-            onSubmit={(content, mentions) => {
+            onSubmit={(content, mentions, attachments) => {
               // 자동으로 원댓글 작성자를 멘션에 추가
               let finalContent = content;
               let finalMentions = mentions ?? [];
@@ -234,7 +260,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               }
               finalMentions = [...finalMentions, comment.author.id];
               
-              onAddComment(finalContent, comment.id, finalMentions);
+              onAddComment(finalContent, comment.id, finalMentions, attachments);
             }}
             onCancel={onCancelReply}
             placeholder={`${comment.author.name}님에게 답글 작성...`}

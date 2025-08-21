@@ -25,6 +25,7 @@ const CertificationSection: React.FC<CertificationSectionProps> = ({
               checked={certifications.includes(cert)}
               onChange={() => onCertificationToggle(cert)}
               className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              aria-label={`${cert} 인증 선택`}
             />
             <span className="text-sm">{cert}</span>
           </label>

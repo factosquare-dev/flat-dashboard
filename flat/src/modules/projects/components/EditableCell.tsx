@@ -1,8 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import type { Project } from '@/shared/types/project';
 import type { ProjectId } from '@/shared/types/branded';
-import { formatKoreanNumber, parseKoreanNumber } from '@/shared/utils/coreUtils';
-import { formatDate } from '@/shared/utils/unifiedDateUtils';
+import { formatKoreanNumber, parseKoreanNumber, formatDate } from '@/shared/utils/formatters';
 import { getFactoriesByType } from '@/shared/utils/factoryUtils';
 import { MockDatabaseImpl } from '@/core/database/MockDatabase';
 import { EditableCellType, FactoryType, ProjectField } from '@/shared/types/enums';

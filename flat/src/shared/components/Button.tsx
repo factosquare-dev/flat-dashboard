@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { ButtonVariant, Size } from '@/shared/types/enums';
 import { cn } from '@/shared/utils/cn';
@@ -11,14 +11,14 @@ const variantClassMap = {
   [ButtonVariant.DANGER]: 'button--danger',
   [ButtonVariant.SUCCESS]: 'button--success',
   [ButtonVariant.WARNING]: 'button--warning',
-};
+} as const;
 
 const sizeClassMap = {
   [Size.SM]: 'button--sm',
   [Size.MD]: 'button--md',
   [Size.LG]: 'button--lg',
   icon: 'button--icon',
-};
+} as const;
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -34,7 +34,7 @@ export interface ButtonProps
   'aria-describedby'?: string;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = memo(React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ 
     className, 
     variant = ButtonVariant.PRIMARY, 
@@ -88,7 +88,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </button>
     );
   }
-);
+));
 
 Button.displayName = 'Button';
 

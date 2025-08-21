@@ -30,6 +30,7 @@ export enum ApiStatus {
   ERROR = 'error',
   PENDING = 'pending',
   CANCELLED = 'cancelled',
+  TIMEOUT = 'timeout',
 }
 
 // Sort Direction

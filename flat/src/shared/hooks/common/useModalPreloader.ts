@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useCallback } from 'react';
+import { logger } from '@/shared/utils/logger';
 
 interface ModalPreloadConfig {
   modalType: string;
@@ -73,7 +74,7 @@ function preloadModal(modalType: keyof typeof modalImports): Promise<any> {
 
   const importFn = modalImports[modalType];
   if (!importFn) {
-    console.warn(`Modal type "${modalType}" not found in imports registry`);
+    logger.warn(`Modal type "${modalType}" not found in imports registry`);
     return Promise.resolve();
   }
 
@@ -84,7 +85,7 @@ function preloadModal(modalType: keyof typeof modalImports): Promise<any> {
       return module;
     })
     .catch((error) => {
-      console.error(`Failed to preload modal "${modalType}":`, error);
+      logger.error(`Failed to preload modal "${modalType}"`, { modalType, error });
       preloadPromises.delete(modalType);
       throw error;
     });
@@ -147,8 +148,8 @@ export function useModalPreloader(configs: ModalPreloadConfig[] = defaultPreload
     preloadHighPriority()
       .then(() => preloadMediumPriority())
       .then(() => preloadLowPriority())
-      .catch(error => {
-        console.error('Modal preloading failed:', error);
+      .catch(() => {
+        // Modal preloading failed silently
       });
   }, [configs]);
 

@@ -14,6 +14,7 @@ export {
   FactoryFieldToType,
   FactoryTypeToField,
   FactoryTypeToIdField,
+  FactoryAssignmentRole,
 } from './enums/factory';
 
 // Project related enums

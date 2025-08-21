@@ -11,7 +11,6 @@ export const useUsers = () => {
     try {
       return mockDataService.getUsers();
     } catch (error) {
-      console.error('Failed to load users from MockDB:', error);
       return [];
     }
   }, []);
@@ -31,7 +30,7 @@ export const useMentionableUsers = () => {
   
   const mentionableUsers = useMemo(() => {
     return users
-      .filter(user => user.role === UserRole.PRODUCT_MANAGER || user.role === UserRole.ADMIN)
+      .filter(user => user.role === UserRole.INTERNAL_MANAGER || user.role === UserRole.ADMIN)
       .map(user => ({
         id: user.id,
         name: user.name,
@@ -54,9 +53,9 @@ export const useManagers = () => {
   
   const managers = useMemo(() => {
     return users.filter(user => 
-      user.role === UserRole.PRODUCT_MANAGER || 
+      user.role === UserRole.INTERNAL_MANAGER || 
       user.role === UserRole.ADMIN ||
-      user.role === UserRole.FACTORY_MANAGER
+      user.role === UserRole.EXTERNAL_MANAGER
     );
   }, [users]);
 

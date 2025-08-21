@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { User } from '@/shared/types/comment';
-import { Send } from 'lucide-react';
+import { Send, Paperclip, X } from 'lucide-react';
 import { useMentionableUsers } from '@/shared/hooks/useUsers';
 
 interface CommentInputProps {
   currentUser: User;
-  onSubmit: (content: string, mentions?: string[]) => void;
+  onSubmit: (content: string, mentions?: string[], attachments?: File[]) => void;
   onCancel?: () => void;
   placeholder?: string;
   initialValue?: string;
@@ -32,7 +32,9 @@ const CommentInput: React.FC<CommentInputProps> = ({
   const [showMentions, setShowMentions] = useState(false);
   const [mentionSearch, setMentionSearch] = useState("");
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Get mentionable users from custom hook
   const { mentionableUsers: mockUsers } = useMentionableUsers();
@@ -94,8 +96,19 @@ const CommentInput: React.FC<CommentInputProps> = ({
     }
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setAttachedFiles(prev => [...prev, ...Array.from(files)]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = () => {
-    if (content.trim()) {
+    if (content.trim() || attachedFiles.length > 0) {
       // Extract mentions from content
       const mentionMatches = content.match(/@(\S+)/g);
       const mentions = mentionMatches?.map(match => {
@@ -104,8 +117,9 @@ const CommentInput: React.FC<CommentInputProps> = ({
         return user?.id;
       }).filter(Boolean) as string[] | undefined;
       
-      onSubmit(content.trim(), mentions);
+      onSubmit(content.trim(), mentions, attachedFiles.length > 0 ? attachedFiles : undefined);
       setContent('');
+      setAttachedFiles([]);
     }
   };
 
@@ -139,6 +153,24 @@ const CommentInput: React.FC<CommentInputProps> = ({
             className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none text-sm"
             rows={isEdit ? 2 : 1}
           />
+
+          {/* Attached files display */}
+          {attachedFiles.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {attachedFiles.map((file, index) => (
+                <div key={index} className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-md text-xs">
+                  <span className="truncate max-w-[150px]">{file.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    className="text-gray-500 hover:text-red-500"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           
           {/* Mention suggestions */}
           {showMentions && filteredUsers.length > 0 && (
@@ -166,31 +198,52 @@ const CommentInput: React.FC<CommentInputProps> = ({
             </div>
           )}
           
-          <div className="flex justify-end gap-2 mt-2">
-            {(onCancel || isEdit) && (
+          <div className="flex justify-between items-center mt-2">
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+                title="파일 첨부"
+              >
+                <Paperclip className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="flex gap-2">
+              {(onCancel || isEdit) && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCancel?.();
+                  }}
+                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  취소
+                </button>
+              )}
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onCancel?.();
+                  handleSubmit();
                 }}
-                className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                disabled={!content.trim() && attachedFiles.length === 0}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               >
-                취소
+                <Send className="w-3 h-3" />
+                {isEdit ? '수정' : '작성'}
               </button>
-            )}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSubmit();
-              }}
-              disabled={!content.trim()}
-              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-            >
-              <Send className="w-3 h-3" />
-              {isEdit ? '수정' : '작성'}
-            </button>
+            </div>
           </div>
         </div>
       </div>

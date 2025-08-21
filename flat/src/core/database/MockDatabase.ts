@@ -20,6 +20,9 @@ import { ProjectAggregationManager } from './managers/ProjectAggregationManager'
 import { CustomFieldManager } from './managers/CustomFieldManager';
 import { ProjectType } from '@/shared/types/enums';
 import type { Project } from '@/shared/types/project';
+import type { Comment, CommentAttachment } from '@/shared/types/comment';
+import type { User } from '@/shared/types/user';
+import type { Task } from '@/shared/types/schedule';
 
 export class MockDatabaseImpl {
   private static instance: MockDatabaseImpl;
@@ -467,14 +470,16 @@ export class MockDatabaseImpl {
   /**
    * Comment CRUD operations
    */
-  createComment(data: { content: string; projectId: string; userId: string; parentId?: string }): Comment | null {
+  createComment(data: { content: string; projectId: string; userId: string; parentId?: string; attachments?: CommentAttachment[] }): Comment | null {
     const user = this.getUserById(data.userId);
-    if (!user) return null;
+    if (!user) {
+      return null;
+    }
 
     const comment: Comment = {
       id: `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      projectId: data.projectId as any,
-      userId: data.userId as any,
+      projectId: data.projectId as Project['id'],
+      userId: data.userId as User['id'],
       author: {
         id: user.id,
         name: user.name,
@@ -484,7 +489,8 @@ export class MockDatabaseImpl {
       createdAt: new Date(),
       updatedAt: new Date(),
       parentId: data.parentId,
-      reactions: []
+      reactions: [],
+      attachments: data.attachments || []
     };
 
     this.db.comments.set(comment.id, comment);
@@ -494,11 +500,13 @@ export class MockDatabaseImpl {
 
   getCommentsByProjectId(projectId: string): Comment[] {
     const comments: Comment[] = [];
+    
     this.db.comments.forEach(comment => {
       if (comment.projectId === projectId) {
         comments.push(comment);
       }
     });
+    
     return comments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   }
 

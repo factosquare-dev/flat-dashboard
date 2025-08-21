@@ -8,7 +8,7 @@ import { LoadingState } from '@/shared/components/LoadingState';
 interface CommentSectionProps {
   comments: Comment[];
   currentUser: CommentAuthor;
-  onAddComment: (content: string, parentId?: string, mentions?: string[]) => void;
+  onAddComment: (content: string, parentId?: string, mentions?: string[], attachments?: File[]) => void;
   onDeleteComment: (commentId: string) => void;
   onEditComment: (commentId: string, content: string) => void;
   onAddReaction?: (commentId: string, emoji: string) => void;
@@ -81,8 +81,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     }
   };
 
-  const handleSubmit = (content: string, mentions?: string[], parentId?: string) => {
-    onAddComment(content, parentId, mentions);
+  const handleSubmit = (content: string, mentions?: string[], attachments?: File[], parentId?: string) => {
+    onAddComment(content, parentId, mentions, attachments);
     if (parentId) {
       setReplyToId(null);
     }
@@ -137,7 +137,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 onReply={handleReply}
                 onEdit={onEditComment}
                 onDelete={onDeleteComment}
-                onAddComment={(content, parentId, mentions) => handleSubmit(content, mentions, parentId)}
+                onAddComment={(content, parentId, mentions, attachments) => handleSubmit(content, mentions, attachments, parentId)}
                 onCancelReply={() => setReplyToId(null)}
                 onAddReaction={onAddReaction}
                 replyToId={replyToId}
@@ -154,7 +154,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       <div className="border-t border-gray-200 p-5 bg-gray-50">
         <CommentInput
           currentUser={currentUser}
-          onSubmit={(content, mentions) => handleSubmit(content, mentions)}
+          onSubmit={(content, mentions, attachments) => handleSubmit(content, mentions, attachments)}
           placeholder="댓글을 작성하세요..."
         />
       </div>

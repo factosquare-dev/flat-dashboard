@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import ProjectTableRow from '../ProjectTableRow/index';
 import { TableHeader } from './TableHeader';
+import { Plus } from 'lucide-react';
 import { useColumnOrder } from '@/shared/hooks/useColumnOrder';
 import { useColumnResize } from '@/shared/hooks/useColumnResize';
 import { useDragHandlers } from './hooks/useDragHandlers';
@@ -34,12 +35,11 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   // Column management
   const {
     columns,
-    moveColumn,
-    startDrag,
-    endDrag,
-    dragOver,
-    drop,
-    isDragging: isColumnDragging
+    handleDragStart: startDrag,
+    handleDragEnd: endDrag,
+    handleDragOver: dragOver,
+    handleDrop: drop,
+    draggedColumn: isColumnDragging
   } = useColumnOrder();
 
   // Column resizing
@@ -47,7 +47,7 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     getColumnWidth,
     handleMouseDown,
     isResizing
-  } = useColumnResize(columns);
+  } = useColumnResize();
 
   // Memo columns management
   const {
@@ -93,40 +93,15 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
   }, [editingMemoId, handleCancelEditMemo, editInputRef]);
 
   const renderHeaderCell = (column: any) => {
-    const isDraggable = column.id !== 'checkbox' && column.id !== 'options' && !isResizing;
-    const isResizable = column.id !== 'checkbox' && column.id !== 'options';
-    const width = getColumnWidth(column.id, column.width);
+    // Checkbox and options are handled separately, so skip them here
+    if (column.id === 'checkbox' || column.id === 'options') {
+      return null;
+    }
+
+    const isDraggable = !isResizing;
+    const isResizable = true;
+    const width = getColumnWidth(column.id, column.width) || column.width;
     const isMemoColumn = column.id.startsWith('memo-');
-
-    if (column.id === 'checkbox') {
-      return (
-        <th
-          key={column.id}
-          className="border-b px-3 py-2 bg-gray-50 w-10"
-          style={{ width, minWidth: width }}
-        >
-          <input
-            type="checkbox"
-            checked={isAllSelected}
-            indeterminate={isPartiallySelected}
-            onChange={(e) => onSelectAll(e.target.checked)}
-            className="rounded border-gray-300"
-          />
-        </th>
-      );
-    }
-
-    if (column.id === 'options') {
-      return (
-        <th
-          key={column.id}
-          className="border-b px-3 py-2 bg-gray-50 w-12"
-          style={{ width, minWidth: width }}
-        >
-          <span className="sr-only">Options</span>
-        </th>
-      );
-    }
 
     return (
       <TableHeader
@@ -141,7 +116,10 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
         sortField={sortField as string}
         sortDirection={sortDirection}
         editInputRef={editInputRef}
-        onDragStart={(e) => startDrag(e, column.id)}
+        onDragStart={(e) => {
+          e.dataTransfer.effectAllowed = 'move';
+          startDrag(column.id);
+        }}
         onDragOver={dragOver}
         onDrop={(e) => drop(e, column.id)}
         onSort={() => column.field && onSort(column.field)}
@@ -156,12 +134,59 @@ const DraggableProjectTable: React.FC<DraggableProjectTableProps> = ({
     );
   };
 
+  // Check if any columns are visible
+  const hasVisibleColumns = visibleColumns.length > 0;
+
   return (
     <div className="w-full overflow-x-auto">
       <table ref={tableRef} className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr className="group">
+            {/* Checkbox column - only show if there are visible columns */}
+            {hasVisibleColumns && (
+              <th
+                className="border-b px-3 py-2 bg-gray-50"
+                style={{ width: '100px', minWidth: '100px' }}
+              >
+                <input
+                  ref={(el) => {
+                    if (el) {
+                      el.indeterminate = isPartiallySelected;
+                    }
+                  }}
+                  type="checkbox"
+                  checked={isAllSelected}
+                  onChange={(e) => onSelectAll(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+              </th>
+            )}
+            
+            {/* Data columns - draggable and hideable */}
             {visibleColumns.map(renderHeaderCell)}
+            
+            {/* Add memo column - only show if there are visible columns */}
+            {hasVisibleColumns && (
+              <th className="border-b px-2 py-2 bg-gray-50 w-12">
+                <button
+                  onClick={handleAddMemoColumn}
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="메모 추가"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </th>
+            )}
+            
+            {/* Options column - only show if there are visible columns */}
+            {hasVisibleColumns && (
+              <th
+                className="border-b px-3 py-2 bg-gray-50 w-12"
+                style={{ width: '48px', minWidth: '48px' }}
+              >
+                <span className="sr-only">Options</span>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody 

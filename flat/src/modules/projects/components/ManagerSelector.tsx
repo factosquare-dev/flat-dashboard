@@ -20,7 +20,6 @@ interface SelectedManagers {
 type ManagerType = keyof SelectedManagers;
 
 const ManagerSelector: React.FC<ManagerSelectorProps> = ({ value, onChange }) => {
-  console.log('ManagerSelector rendered with value:', value);
   const isInitialized = useRef(false);
   const [managers, setManagers] = useState<SelectedManagers>({
     sales: [],

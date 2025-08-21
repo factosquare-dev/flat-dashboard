@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Comment } from '@/shared/types/comment';
+import type { Comment, CommentAttachment } from '@/shared/types/comment';
 import type { User } from '@/shared/types/user';
 import { ProjectModalService } from '@/core/services/projectModal.service';
 import { MockDatabaseImpl } from '@/core/database/MockDatabase';
@@ -19,17 +19,28 @@ export const useProjectComments = (projectId: string, currentUser: User) => {
   const handleAddComment = useCallback((
     content: string, 
     parentId?: string, 
-    mentions?: string[]
+    mentions?: string[],
+    attachments?: File[]
   ) => {
     // Use MockDB to create comment
     const dbUser = db.getCurrentUser();
     if (!dbUser) return;
 
+    // Convert File objects to CommentAttachment format
+    const commentAttachments: CommentAttachment[] | undefined = attachments?.map(file => ({
+      id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: URL.createObjectURL(file) // Create a temporary URL for the file
+    }));
+
     const newComment = db.createComment({
       content,
       projectId,
       userId: dbUser.id as string,
-      parentId
+      parentId,
+      attachments: commentAttachments
     });
 
     if (newComment) {

@@ -21,20 +21,6 @@ export const useProjectFilters = () => {
   }, [sortField, sortDirection]);
 
   const filterProjects = useCallback((projects: Project[]) => {
-    console.log('[filterProjects] Input projects:', projects.length);
-    console.log('[filterProjects] Selected priority:', selectedPriority, typeof selectedPriority);
-    console.log('[filterProjects] Status filters:', statusFilters);
-    
-    // Debug first project's priority
-    if (projects.length > 0) {
-      console.log('[filterProjects] First project priority:', projects[0].priority, typeof projects[0].priority);
-      console.log('[filterProjects] Sample SUB priorities:', 
-        projects.filter(p => p.type === 'SUB' || p.type === ProjectType.SUB)
-          .slice(0, 3)
-          .map(p => ({ name: p.name, priority: p.priority, type: typeof p.priority }))
-      );
-    }
-    
     const filtered = projects.filter(project => {
       const matchesStatus = statusFilters.includes(project.status);
       
@@ -106,7 +92,6 @@ export const useProjectFilters = () => {
       return result;
     });
     
-    console.log('[filterProjects] Output filtered:', filtered.length);
     return filtered;
   }, [statusFilters, selectedPriority, selectedServiceType, searchValue, dateRange]);
 

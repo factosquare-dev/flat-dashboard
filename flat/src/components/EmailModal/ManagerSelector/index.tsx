@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Search, X, User } from 'lucide-react';
 import { useUsers } from '@/shared/hooks/useUsers';
+import { UserRole, InternalManagerType } from '@/shared/types/user';
+import { InternalManagerTypeLabel } from '@/shared/types/userRole';
 import './ManagerSelector.css';
 
 interface ManagerSelectorProps {
@@ -15,9 +17,9 @@ const ManagerSelector: React.FC<ManagerSelectorProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const { users } = useUsers();
   
-  // Filter only managers (or all users if no role distinction)
+  // Filter only internal managers and admins
   const managers = users.filter(user => 
-    user.role === 'manager' || user.role === 'admin' || true // Show all users for now
+    user.role === UserRole.INTERNAL_MANAGER || user.role === UserRole.ADMIN
   );
 
   const handleManagerAdd = (managerId: string) => {
@@ -65,8 +67,13 @@ const ManagerSelector: React.FC<ManagerSelectorProps> = ({
               >
                 <div className="manager-selector__info">
                   <span className="manager-selector__name">{manager.name}</span>
-                  {manager.department && (
-                    <span className="manager-selector__department">{manager.department}</span>
+                  {manager.role === UserRole.INTERNAL_MANAGER && manager.internalManagerType && (
+                    <span className="manager-selector__department">
+                      {InternalManagerTypeLabel[manager.internalManagerType as InternalManagerType]}
+                    </span>
+                  )}
+                  {manager.role === UserRole.ADMIN && (
+                    <span className="manager-selector__department">관리자</span>
                   )}
                 </div>
                 {manager.email && (
@@ -88,8 +95,13 @@ const ManagerSelector: React.FC<ManagerSelectorProps> = ({
               return (
                 <div key={managerId} className="manager-selector__tag">
                   <span>{manager?.name || managerId}</span>
-                  {manager?.department && (
-                    <span className="manager-selector__tag-dept">({manager.department})</span>
+                  {manager?.role === UserRole.INTERNAL_MANAGER && manager?.internalManagerType && (
+                    <span className="manager-selector__tag-dept">
+                      ({InternalManagerTypeLabel[manager.internalManagerType as InternalManagerType]})
+                    </span>
+                  )}
+                  {manager?.role === UserRole.ADMIN && (
+                    <span className="manager-selector__tag-dept">(관리자)</span>
                   )}
                   <button
                     onClick={() => handleManagerRemove(managerId)}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TaskCheckerSection } from './TaskCheckerSection';
 import { TaskCheckerSectionAlt } from './TaskCheckerSectionAlt';
+import { getStorageItem, setStorageItem } from '@/shared/utils/storage';
 
 interface TaskCheckerToggleProps {
   projectId?: string;
@@ -8,14 +9,17 @@ interface TaskCheckerToggleProps {
 
 type LayoutMode = 'vertical' | 'horizontal';
 
+const STORAGE_KEY = 'taskCheckerLayout';
+const DEFAULT_LAYOUT_MODE: LayoutMode = 'vertical';
+
 export const TaskCheckerToggle: React.FC<TaskCheckerToggleProps> = ({ projectId }) => {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
-    const savedMode = localStorage.getItem('taskCheckerLayout');
-    return (savedMode as LayoutMode) || 'vertical';
+    const savedMode = getStorageItem<LayoutMode>(STORAGE_KEY);
+    return savedMode || DEFAULT_LAYOUT_MODE;
   });
 
   useEffect(() => {
-    localStorage.setItem('taskCheckerLayout', layoutMode);
+    setStorageItem(STORAGE_KEY, layoutMode);
   }, [layoutMode]);
 
   const toggleLayout = () => {

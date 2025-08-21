@@ -38,7 +38,8 @@ export const validateForm = (formData: UserFormData): FormErrors => {
 export const getRoleLabel = (role: UserRole): string => {
   switch (role) {
     case UserRoleEnum.ADMIN: return '관리자';
-    case UserRoleEnum.MANAGER: return '매니저';
+    case UserRoleEnum.INTERNAL_MANAGER: return '매니저';
+    case UserRoleEnum.EXTERNAL_MANAGER: return '공장 관계자';
     case UserRoleEnum.CUSTOMER: return '고객';
     default: return role;
   }
@@ -53,11 +54,12 @@ export const getPositionLabel = (role: UserRole): string => {
 };
 
 export const getDefaultDepartment = (role: UserRole): string => {
-  return role === UserRoleEnum.ADMIN || role === UserRoleEnum.MANAGER ? 'FLAT' : '';
+  return role === UserRoleEnum.ADMIN || role === UserRoleEnum.INTERNAL_MANAGER ? 'FLAT' : '';
 };
 
 export const getDefaultPosition = (role: UserRole): string => {
   if (role === UserRoleEnum.ADMIN) return '관리자';
-  if (role === UserRoleEnum.MANAGER) return '매니저';
+  if (role === UserRoleEnum.INTERNAL_MANAGER) return '매니저';
+  if (role === UserRoleEnum.EXTERNAL_MANAGER) return '담당자';
   return '';
 };

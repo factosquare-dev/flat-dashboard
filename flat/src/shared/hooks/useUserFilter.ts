@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { UserRole } from '@/store/slices/userSlice';
+import { UserRole as UserRoleEnum } from '@/shared/types/user';
 
 export interface UserData {
   id: string;
@@ -20,7 +21,7 @@ interface UseUserFilterReturn {
 }
 
 export const useUserFilter = (users: UserData[]): UseUserFilterReturn => {
-  const [selectedRole, setSelectedRole] = useState<UserRole>('admin');
+  const [selectedRole, setSelectedRole] = useState<UserRole>(UserRoleEnum.ADMIN);
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredUsers = useMemo(() => {

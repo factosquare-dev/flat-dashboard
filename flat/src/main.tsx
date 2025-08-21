@@ -19,15 +19,11 @@ checkAndUpdateDatabaseVersion()
 setTimeout(() => {
   // First clean up invalid entries
   const invalidCount = cleanupInvalidEntries();
-  if (invalidCount > 0) {
-    console.log(`[App] Cleaned ${invalidCount} invalid database entries`);
-  }
+  // Cleaned invalid database entries if needed
   
   // Then clean up duplicate factory IDs
-  cleanupDuplicateFactories().then(count => {
-    if (count > 0) {
-      console.log(`[App] Cleaned ${count} projects with duplicate factory IDs`);
-    }
+  cleanupDuplicateFactories().then(() => {
+    // Cleaned duplicate factory IDs if needed
   });
 }, 1000); // Delay to ensure MockDB is initialized
 

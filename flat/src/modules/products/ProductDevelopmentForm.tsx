@@ -6,6 +6,8 @@ import { ContentsSection } from './components/ContentsSection';
 import { ContainerSection } from './components/ContainerSection';
 import { CertificationSection } from './components/CertificationSection';
 import { TaskCheckerSection } from './components/TaskCheckerSection';
+import { logger } from '@/shared/utils/logger';
+import { useToast } from '@/shared/hooks/useToast';
 
 interface ProductDevelopmentFormData {
   // Basic Info
@@ -66,6 +68,8 @@ export const ProductDevelopmentForm: React.FC<ProductDevelopmentFormProps> = ({
   selectedProjectIndex, 
   onFormChange 
 }) => {
+  const { success, info } = useToast();
+  
   // 제품별 폼 데이터를 저장하는 Map
   const [formDataMap, setFormDataMap] = useState<Map<number, ProductDevelopmentFormData>>(new Map());
   const [hasChanges, setHasChanges] = useState(false);
@@ -93,15 +97,15 @@ export const ProductDevelopmentForm: React.FC<ProductDevelopmentFormProps> = ({
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', currentFormData);
+    logger.info('Product development form submitted', { formData: currentFormData });
     // TODO: API 호출 로직 추가
-    alert('제품 개발 의뢰서가 제출되었습니다.');
+    success('제품 개발 의뢰서가 제출되었습니다.');
   };
   
   const handleSaveDraft = () => {
-    console.log('Draft saved:', currentFormData);
+    logger.info('Product development draft saved', { formData: currentFormData });
     // TODO: 임시 저장 로직 추가
-    alert('임시 저장되었습니다.');
+    info('임시 저장되었습니다.');
   };
   
   return (

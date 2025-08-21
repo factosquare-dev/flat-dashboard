@@ -3,6 +3,7 @@ import { MoreVertical, User } from 'lucide-react';
 import { useClickOutside } from '@/shared/hooks/useClickOutside';
 import { cn } from '@/shared/utils/classNames';
 import type { UserRole } from '@/store/slices/userSlice';
+import { UserRole as UserRoleEnum } from '@/shared/types/user';
 import styles from './UserCard.module.css';
 
 export interface UserData {
@@ -44,11 +45,16 @@ const UserCard: React.FC<UserCardProps> = React.memo(({ user, onEdit, onDelete }
 
   const roleDisplay = useMemo(() => {
     switch (user.role) {
-      case 'admin':
+      case UserRoleEnum.ADMIN:
+      case 'admin': // backward compatibility
         return { text: '관리자', className: styles.roleAdmin };
-      case 'manager':
+      case UserRoleEnum.INTERNAL_MANAGER:
+      case 'manager': // backward compatibility
         return { text: '매니저', className: styles.roleManager };
-      case 'customer':
+      case UserRoleEnum.EXTERNAL_MANAGER:
+        return { text: '공장 관계자', className: styles.roleManager };
+      case UserRoleEnum.CUSTOMER:
+      case 'customer': // backward compatibility
         return { text: '고객', className: styles.roleCustomer };
       default:
         return { text: user.role, className: styles.roleDefault };

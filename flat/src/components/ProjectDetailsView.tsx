@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ProductDevelopmentForm } from '@/modules/products/ProductDevelopmentForm';
 import { TaskCheckerToggle } from '@/modules/products/components/TaskCheckerToggle';
 import { ContentExcelTable } from '@/modules/products/components/ContentExcelTable';
+import CommentSection from '@/components/CommentSection';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getProductLabel } from '@/shared/utils/productTypeUtils';
 import { useProjectDetailsView } from '@/modules/projects/hooks/useProjectDetailsView';
+import { useProjectComments } from '@/shared/hooks/useProjectComments';
+import { MockDatabaseImpl } from '@/core/database/MockDatabase';
+import { logger } from '@/shared/utils/logger';
 import './ProjectDetailsView.css';
 
 interface ProjectDetailsViewProps {
@@ -21,6 +26,8 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
   hideHeader = false,
   onFormChange
 }) => {
+  const [showComments, setShowComments] = useState(false);
+
   const {
     // Project data
     subProjects,
@@ -41,6 +48,59 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
     selectedProjectIndex: externalSelectedIndex,
     onProjectSelect
   });
+
+  // Get current user
+  const db = MockDatabaseImpl.getInstance();
+  const currentUser = React.useMemo(() => {
+    const dbUser = db.getCurrentUser();
+    if (dbUser) {
+      return {
+        id: dbUser.id as string,
+        name: dbUser.name,
+        avatar: dbUser.profileImage || ''
+      };
+    }
+    return {
+      id: 'user-1',
+      name: '현재 사용자',
+      avatar: ''
+    };
+  }, []);
+
+  // Get master project ID for consistent comments across master/sub projects
+  const getMasterProjectId = () => {
+    if (!selectedProject) {
+      logger.debug('getMasterProjectId: no selectedProject', { projectId });
+      return projectId;
+    }
+    // If it's a sub project, use the parent ID for comments
+    if (selectedProject.parentId) {
+      logger.debug('getMasterProjectId: sub project', { parentId: selectedProject.parentId });
+      return selectedProject.parentId;
+    }
+    // If it's a master project or independent, use the project ID
+    logger.debug('getMasterProjectId: master/independent project', { projectId });
+    return projectId;
+  };
+
+  // Use comment hooks
+  const {
+    comments,
+    handleAddComment,
+    handleEditComment,
+    handleDeleteComment,
+    reloadComments
+  } = useProjectComments(getMasterProjectId() || '', currentUser);
+
+  // Add reaction handler
+  const handleAddReaction = React.useCallback((commentId: string, emoji: string) => {
+    if (currentUser && currentUser.id) {
+      const success = db.addReaction(commentId, emoji, currentUser.id);
+      if (success) {
+        reloadComments();
+      }
+    }
+  }, [currentUser, reloadComments]);
 
   // Helper function to render section content using data from the hook
   const renderExpandedSectionContent = (section: string) => {
@@ -145,7 +205,9 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
   }
 
   return (
-    <div className="project-details-container mobile-overflow-fix">
+    <div className="relative flex h-full">
+      {/* Main Content */}
+      <div className={`flex-1 project-details-container mobile-overflow-fix transition-all duration-300 ${showComments ? 'mr-96' : ''}`}>
 
       {/* Project Detail Card */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
@@ -367,11 +429,43 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
         </div>
       </div>
 
-      {/* Task Checker Section with Layout Toggle */}
-      <div className="mt-6 px-4 w-full">
-        <TaskCheckerToggle projectId={projectId} />
+        {/* Task Checker Section with Layout Toggle */}
+        <div className="mt-6 px-4 w-full">
+          <TaskCheckerToggle projectId={projectId} />
+        </div>
       </div>
 
+      {/* Comment Sidebar - Right side with expand/collapse */}
+      <div
+        className={`fixed right-0 top-0 h-full bg-white border-l border-gray-200 shadow-lg transition-transform duration-300 z-30 ${
+          showComments ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{ width: '420px' }}
+      >
+        <div className="h-full flex flex-col">
+          <CommentSection
+            comments={comments}
+            currentUser={currentUser}
+            onAddComment={handleAddComment}
+            onDeleteComment={handleDeleteComment}
+            onEditComment={handleEditComment}
+            onAddReaction={handleAddReaction}
+          />
+        </div>
+      </div>
+
+      {/* Toggle Button - Always visible on the right */}
+      <button
+        onClick={() => setShowComments(!showComments)}
+        className={`fixed top-1/2 -translate-y-1/2 z-40 bg-white border border-gray-200 rounded-l-lg p-2 shadow-md hover:bg-gray-50 transition-all duration-300`}
+        style={{ right: showComments ? '420px' : '0' }}
+      >
+        {showComments ? (
+          <ChevronRight className="w-5 h-5 text-gray-600" />
+        ) : (
+          <ChevronLeft className="w-5 h-5 text-gray-600" />
+        )}
+      </button>
     </div>
   );
 };

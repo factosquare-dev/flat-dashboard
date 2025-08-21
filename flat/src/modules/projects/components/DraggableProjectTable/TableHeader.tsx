@@ -4,7 +4,7 @@ import type { Column } from '@/shared/hooks/useColumnOrder';
 
 interface TableHeaderProps {
   column: Column;
-  width: number;
+  width: string | number;
   isDraggable: boolean;
   isResizable: boolean;
   isMemoColumn: boolean;
@@ -63,8 +63,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         isDraggable ? 'cursor-move' : ''
       } ${column.sortable ? 'cursor-pointer hover:bg-gray-100' : ''}`}
       style={{ 
-        width, 
-        minWidth: width,
+        width: typeof width === 'number' ? `${width}px` : width, 
+        minWidth: typeof width === 'number' ? `${width}px` : width,
         position: 'relative'
       }}
       draggable={isDraggable}
@@ -153,7 +153,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       {isResizable && (
         <div
           className="resize-handle"
-          onMouseDown={onMouseDown}
+          onMouseDown={(e) => onMouseDown(e, column.id)}
         />
       )}
     </th>

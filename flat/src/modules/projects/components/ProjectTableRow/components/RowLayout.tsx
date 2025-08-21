@@ -96,18 +96,20 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <td className="pl-6 pr-2 py-2 w-14">
-        <SelectionCell
-          project={project}
-          isExpanded={isExpanded}
-          isSelected={isSelected}
-          onSelect={onSelect}
-          handleToggleTasks={handleToggleTasks || (() => {})}
-          handleMasterToggle={() => {}}
-          isChildOfMaster={isChildOfMaster}
-          level={level}
-        />
-      </td>
+      {columns.length > 0 && (
+        <td className="pl-4 pr-2 py-2" style={{ minWidth: '100px' }}>
+          <SelectionCell
+            project={project}
+            isExpanded={isExpanded}
+            isSelected={isSelected}
+            onSelect={onSelect}
+            handleToggleTasks={handleToggleTasks || (() => {})}
+            handleMasterToggle={() => {}}
+            isChildOfMaster={isChildOfMaster}
+            level={level}
+          />
+        </td>
+      )}
       
       {columns.map((column) => {
         const content = renderCell(column.id);
@@ -134,18 +136,22 @@ export const RowLayout: React.FC<RowLayoutProps> = ({
         }
       })}
       
-      {/* Add memo button column - empty cell */}
-      <td className="px-2 py-1.5 text-xs w-12"></td>
+      {/* Add memo button column - empty cell - only show if columns exist */}
+      {columns.length > 0 && (
+        <td className="px-2 py-1.5 text-xs w-12"></td>
+      )}
       
-      {/* Options column */}
-      <td className="px-4 py-2 text-sm w-12">
-        <button
-          onClick={handleOptions}
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
-        >
-          <MoreVertical className="w-4 h-4 text-gray-500" />
-        </button>
-      </td>
+      {/* Options column - only show if columns exist */}
+      {columns.length > 0 && (
+        <td className="px-4 py-2 text-sm w-12">
+          <button
+            onClick={handleOptions}
+            className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
+          >
+            <MoreVertical className="w-4 h-4 text-gray-500" />
+          </button>
+        </td>
+      )}
     </tr>
   );
 };

@@ -1,6 +1,7 @@
 import { logger } from '@/shared/utils/logger';
 import type { ApiResponse } from '@/core/api/requestHandlers';
 import { ApiErrorHandler } from '@/core/api/errorHandling';
+import { ApiStatus } from '@/shared/types/enums';
 import type { UploadOptions, UploadResponse } from './types';
 import { FileValidator } from './fileValidation';
 
@@ -89,7 +90,7 @@ export class SingleFileUploader {
             xhr.getAllResponseHeaders().split('\r\n').forEach(line => {
               const [key, value] = line.split(': ');
               if (key && value) {
-                (response.headers as any).set(key, value);
+                response.headers.set(key, value);
               }
             });
 
@@ -147,7 +148,7 @@ export class SingleFileUploader {
           reject(ApiErrorHandler.createError(
             'Upload timed out',
             undefined,
-            'timeout',
+            ApiStatus.TIMEOUT,
             undefined,
             requestId
           ));
@@ -159,7 +160,7 @@ export class SingleFileUploader {
           reject(ApiErrorHandler.createError(
             'Upload cancelled',
             undefined,
-            'cancelled',
+            ApiStatus.CANCELLED,
             undefined,
             requestId
           ));
