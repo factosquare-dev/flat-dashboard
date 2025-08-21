@@ -7,11 +7,5 @@
  * directly from the specific module.
  */
 
-export * from './date';
-
-// Legacy exports for backward compatibility
-export * from './date/parsing';
-export * from './date/formatting';
-export * from './date/operations';
-export * from './date/validation';
-export * from './date/gantt';
+// Export from date/index.ts which should aggregate all date utilities
+export * from './date/index';
