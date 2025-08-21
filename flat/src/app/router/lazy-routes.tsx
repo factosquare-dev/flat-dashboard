@@ -2,28 +2,28 @@ import { lazy } from 'react';
 import { createLazyRoute } from '@/shared/utils/lazy-loading';
 
 // Lazy load page components with proper error boundaries
-export const DashboardPage = createLazyRoute(() => import('../pages/Dashboard'));
-export const ProjectsPage = createLazyRoute(() => import('../pages/Projects'));
-export const CustomersPage = createLazyRoute(() => import('../pages/Customers'));
-export const UsersPage = createLazyRoute(() => import('../pages/Users'));
-export const FactoriesPage = createLazyRoute(() => import('../pages/Factories'));
-export const FactoryRegistrationPage = createLazyRoute(() => import('../pages/Factories/FactoryRegistration'));
-export const NotFoundPage = createLazyRoute(() => import('../pages/NotFound'));
+export const DashboardPage = createLazyRoute(() => import('@/modules/dashboard/index'));
+export const ProjectsPage = createLazyRoute(() => import('@/modules/projects/ProjectsPage'));
+export const CustomersPage = createLazyRoute(() => import('@/modules/customers/index'));
+export const UsersPage = createLazyRoute(() => import('@/modules/users/index'));
+export const FactoriesPage = createLazyRoute(() => import('@/modules/factories/index'));
+export const FactoryRegistrationPage = createLazyRoute(() => import('@/modules/factories/FactoryRegistration'));
+export const NotFoundPage = createLazyRoute(() => import('@/misc/NotFound'));
 
 // Heavy components that should be code-split
-export const LazyScheduleComponent = lazy(() => import('../components/Schedule'));
-export const LazyGanttChart = lazy(() => import('../components/GanttChart'));
-export const LazyProjectList = lazy(() => import('../components/ProjectList'));
-export const LazyCustomerModal = lazy(() => import('../components/CustomerModal'));
+export const LazyScheduleComponent = lazy(() => import('@/modules/schedule/ScheduleComponent'));
+export const LazyGanttChart = lazy(() => import('@/components/GanttChart'));
+export const LazyProjectList = lazy(() => import('@/modules/projects/components/ProjectList'));
+export const LazyCustomerModal = lazy(() => import('@/modules/customers/components/CustomerModal'));
 
 // Route preloading utilities
 export const preloadRoutes = {
-  dashboard: () => import('../pages/Dashboard'),
-  projects: () => import('../pages/Projects'), 
-  customers: () => import('../pages/Customers'),
-  users: () => import('../pages/Users'),
-  factories: () => import('../pages/Factories'),
-  factoryRegistration: () => import('../pages/Factories/FactoryRegistration'),
+  dashboard: () => import('@/modules/dashboard/index'),
+  projects: () => import('@/modules/projects/ProjectsPage'), 
+  customers: () => import('@/modules/customers/index'),
+  users: () => import('@/modules/users/index'),
+  factories: () => import('@/modules/factories/index'),
+  factoryRegistration: () => import('@/modules/factories/FactoryRegistration'),
 };
 
 // Preload commonly accessed routes
@@ -43,18 +43,18 @@ export const preloadCommonRoutes = () => {
 // Route-specific component splitting
 export const LazyRouteComponents = {
   // Dashboard specific components
-  DashboardStats: lazy(() => import('../components/Dashboard/DashboardStats')),
-  RecentProjects: lazy(() => import('../components/Dashboard/RecentProjects')),
+  DashboardStats: lazy(() => import('@/modules/dashboard/components/DashboardStats')),
+  RecentProjects: lazy(() => import('@/modules/dashboard/components/RecentProjects')),
   
   // Projects specific components  
-  ProjectFilters: lazy(() => import('../components/Projects/ProjectFilters')),
-  ProjectTable: lazy(() => import('../components/Projects/ProjectTable')),
+  ProjectFilters: lazy(() => import('@/modules/projects/components/ProjectFilters')),
+  ProjectTable: lazy(() => import('@/modules/projects/components/ProjectTable')),
   
   // Heavy modals and overlays
-  ProjectModal: lazy(() => import('../components/ProjectModal')),
-  UserModal: lazy(() => import('../components/UserModal')),
+  ProjectModal: lazy(() => import('@/modules/projects/components/ProjectModal')),
+  UserModal: lazy(() => import('@/modules/users/components/UserModal')),
   
   // Charts and visualization
-  ProjectChart: lazy(() => import('../components/Charts/ProjectChart')),
-  TimelineChart: lazy(() => import('../components/Charts/TimelineChart')),
+  ProjectChart: lazy(() => import('@/shared/components/Charts/ProjectChart')),
+  TimelineChart: lazy(() => import('@/shared/components/Charts/TimelineChart')),
 };

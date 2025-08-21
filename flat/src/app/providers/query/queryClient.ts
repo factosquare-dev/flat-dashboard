@@ -27,7 +27,7 @@ const defaultOptions = {
     refetchOnWindowFocus: false,
     
     // Refetch on reconnect
-    refetchOnReconnect: 'always',
+    refetchOnReconnect: 'always' as const,
   },
   mutations: {
     // Retry configuration for mutations

@@ -14,7 +14,7 @@ const Comments = lazy(() => import('@/pages/Comments'));
 const Users = lazy(() => import('@/modules/users/index'));
 const Factories = lazy(() => import('@/modules/factories/index'));
 const ProductTypes = lazy(() => import('@/modules/products/index'));
-const Maintenance = lazy(() => import('@/misc/index'));
+// const Maintenance = lazy(() => import('@/misc/Maintenance')); // Removed - no maintenance page
 const NotFound = lazy(() => import('@/misc/NotFound'));
 
 const router = createBrowserRouter([

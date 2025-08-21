@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect } from 'react';
-import { useStore } from '@/store';
-import { lightTheme, darkTheme } from '@/styles/themes';
+import { useThemeStore } from '@/core/store/themeStore';
+import { lightTheme, darkTheme } from '@/shared/styles/themes';
 import { Theme } from '@/shared/types/enums';
 
 type ThemeObject = typeof lightTheme;
@@ -23,7 +23,7 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { theme: themeMode, setTheme: setThemeMode } = useStore();
+  const { themeMode, setTheme: setThemeMode } = useThemeStore();
   
   const getSystemTheme = () => {
     if (typeof window !== 'undefined') {
@@ -57,26 +57,26 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     // Set CSS custom properties for theme colors
     Object.entries(theme.colors).forEach(([category, colors]) => {
-      if (typeof colors === 'object') {
+      if (typeof colors === 'object' && colors !== null) {
         Object.entries(colors).forEach(([shade, value]) => {
-          root.style.setProperty(`--color-${category}-${shade}`, value);
+          root.style.setProperty(`--color-${category}-${shade}`, value as string);
         });
       } else {
-        root.style.setProperty(`--color-${category}`, colors);
+        root.style.setProperty(`--color-${category}`, colors as string);
       }
     });
 
     // Set other theme properties
     Object.entries(theme.spacing).forEach(([key, value]) => {
-      root.style.setProperty(`--spacing-${key}`, value);
+      root.style.setProperty(`--spacing-${key}`, value as string);
     });
 
     Object.entries(theme.borderRadius).forEach(([key, value]) => {
-      root.style.setProperty(`--border-radius-${key}`, value);
+      root.style.setProperty(`--border-radius-${key}`, value as string);
     });
 
     Object.entries(theme.shadows).forEach(([key, value]) => {
-      root.style.setProperty(`--shadow-${key}`, value);
+      root.style.setProperty(`--shadow-${key}`, value as string);
     });
   }, [theme, isDark]);
 

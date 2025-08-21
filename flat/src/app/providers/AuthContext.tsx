@@ -11,8 +11,7 @@ import {
   saveRefreshToken,
   clearAuthTokens,
   saveTheme,
-  saveLocale,
-  STORAGE_KEYS
+  saveLocale
 } from '@/shared/utils/storageConversions';
 
 interface AuthContextValue {
@@ -49,7 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }
       } catch (error) {
-        logger.error('Auth initialization error', error, 'AuthContext');
+        logger.error('Auth initialization error', error as Error);
         // Clear invalid tokens
         clearAuthTokens();
       } finally {
@@ -86,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       setUser(typedUser);
     } catch (error) {
-      logger.error('Login error', error, 'AuthContext');
+      logger.error('Login error', error as Error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -122,12 +121,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     saveCurrentUserToStorage(updatedUser);
     
     // Store theme separately for easy access
-    if (preferences.theme) {
+    if (preferences?.theme) {
       saveTheme(preferences.theme);
     }
     
     // Store locale separately for easy access
-    if (preferences.locale) {
+    if (preferences?.locale) {
       saveLocale(preferences.locale);
     }
   };

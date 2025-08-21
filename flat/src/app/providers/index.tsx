@@ -17,8 +17,7 @@ interface RootProvidersProps {
 }
 
 export const RootProviders: React.FC<RootProvidersProps> = ({ 
-  children, 
-  queryClient 
+  children
 }) => {
   return (
     <QueryProvider>

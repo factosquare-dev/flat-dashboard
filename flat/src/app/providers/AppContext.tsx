@@ -7,7 +7,6 @@ interface AppContextValue {
   // Project management
   projects: Project[];
   projectsLoading: boolean;
-  projectsError: Error | null;
   refetchProjects: () => void;
   
   // Modal states
@@ -54,12 +53,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({
   onTaskDelete = () => {},
   onFactoryDelete = () => {},
 }) => {
+  const projectsData = useProjects();
   const { 
-    data: projects = [], 
-    isLoading: projectsLoading, 
-    error: projectsError,
-    refetch: refetchProjects 
-  } = useProjects();
+    projects = [], 
+    isLoading: projectsLoading,
+    refreshProjects: refetchProjects 
+  } = projectsData;
   
   const customerModal = useModalState();
   const taskModal = useModalState();
@@ -70,7 +69,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({
       // Project management
       projects,
       projectsLoading,
-      projectsError,
       refetchProjects,
       
       // Modal states
@@ -93,7 +91,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({
     [
       projects,
       projectsLoading,
-      projectsError,
       refetchProjects,
       customerModal,
       taskModal,

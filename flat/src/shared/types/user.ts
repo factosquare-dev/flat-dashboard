@@ -21,6 +21,13 @@ export enum InternalManagerType {
   RA = 'RA',
 }
 
+export interface UserPreferences {
+  theme?: 'light' | 'dark' | 'system';
+  locale?: 'ko' | 'en';
+  notifications?: boolean;
+  emailNotifications?: boolean;
+}
+
 export interface User {
   id: UserId;
   username: string;
@@ -39,4 +46,5 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   lastLoginAt?: Date;
+  preferences?: UserPreferences;               // User preferences
 }

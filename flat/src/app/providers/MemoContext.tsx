@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { MockDatabaseImpl } from '@/core/database/MockDatabase';
 import { CustomFieldEntity } from '@/shared/types/customField';
 import type { MemoColumn } from '@/shared/hooks/useMemoColumns';
-import { logger } from '@/shared/utils/logger';
 import { useToast } from '@/shared/hooks/useToast';
 
 const MAX_MEMO_COLUMNS = 10;
@@ -91,11 +90,8 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
 
   // Sync with database when memoColumns change
   useEffect(() => {
-    // Save to storage through MockDB
-    const dbImpl = db as MockDatabaseImpl & { storageManager?: any };
-    if (dbImpl.storageManager) {
-      dbImpl.storageManager.saveToStorage(db.getDatabase());
-    }
+    // Save to storage through MockDB's save method
+    db.save();
   }, [memoColumns, db]);
 
   const addMemoColumn = () => {
@@ -238,10 +234,7 @@ export const MemoProvider: React.FC<MemoProviderProps> = ({ children }) => {
     );
 
     // Save to storage
-    const dbImpl = db as MockDatabaseImpl & { storageManager?: any };
-    if (dbImpl.storageManager) {
-      dbImpl.storageManager.saveToStorage(db.getDatabase());
-    }
+    db.save();
   };
 
   const value: MemoContextType = {
