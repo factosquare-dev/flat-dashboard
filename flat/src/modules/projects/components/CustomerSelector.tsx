@@ -18,26 +18,44 @@ const CustomerSelector: React.FC<CustomerSelectorProps> = ({ value, onChange, re
 
   useEffect(() => {
     // Load customers from DB
-    const usersResult = db.getAll('users');
-    if (usersResult.success && usersResult.data) {
-      const users = usersResult.data as UserType[];
-      // Customer users are UserRole.CUSTOMER (external customers)
-      const customerUsers = users.filter(u => u.role === UserRole.CUSTOMER);
-      setCustomers(customerUsers);
+    const loadCustomers = () => {
+      try {
+        const usersResult = db.getAll('users');
+        if (usersResult.success && usersResult.data) {
+          const users = usersResult.data as UserType[];
+          // Customer users are UserRole.CUSTOMER (external customers)
+          const customerUsers = users.filter(u => u.role === UserRole.CUSTOMER);
+          
+          // If no customers found, try to get all users with company info
+          if (customerUsers.length === 0) {
+            // Fallback: get all users who have company info
+            const usersWithCompany = users.filter(u => u.company && u.company !== '');
+            setCustomers(usersWithCompany);
+          } else {
+            setCustomers(customerUsers);
+          }
 
-      // Set initial selected customer if value is provided
-      if (value) {
-        const customer = customerUsers.find(c => c.id === value);
-        if (customer) {
-          setSelectedOptions([{
-            id: customer.id,
-            name: customer.name,
-            company: customer.company
-          }]);
+          // Set initial selected customer if value is provided
+          if (value) {
+            const allAvailableUsers = customerUsers.length > 0 ? customerUsers : users.filter(u => u.company);
+            const customer = allAvailableUsers.find(c => c.id === value);
+            if (customer) {
+              setSelectedOptions([{
+                id: customer.id,
+                name: customer.name,
+                company: customer.company
+              }]);
+            }
+          }
         }
+      } catch (error) {
+        // If DB is not ready, retry after a short delay
+        setTimeout(loadCustomers, 100);
       }
-    }
-  }, [value]);
+    };
+    
+    loadCustomers();
+  }, [value, db]);
 
   // Convert customers to selector options
   const options: SelectorOption[] = customers.map(customer => ({

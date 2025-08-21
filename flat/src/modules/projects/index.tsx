@@ -49,8 +49,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
       if (success) {
         // Refresh comments by re-fetching from DB
         const updatedComments = db.getCommentsByProjectId(editData?.id || '');
-        // Need to update comments state - will add this functionality
-        console.log('Reaction added successfully');
+        // Reaction added successfully
       }
     }
   }, [editData?.id]);
@@ -82,15 +81,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave, ed
   } = useModalFormValidation(formData, {
     rules: validationRules,
     onSubmit: async (data) => {
-      console.log('[ProjectModal] Saving project with factories:', {
-        projectId: data.id,
-        manufacturer: data.manufacturer,
-        container: data.container,
-        packaging: data.packaging,
-        manufacturerId: data.manufacturerId,
-        containerId: data.containerId,
-        packagingId: data.packagingId
-      });
+      // Save project with factories
       await onSave(data);
       onClose();
     }

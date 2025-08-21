@@ -22,6 +22,23 @@ export interface BaseSelectorProps {
   className?: string;
 }
 
+// Korean initial consonant search helper
+const getKoreanInitials = (str: string): string => {
+  const initials = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+  let result = '';
+  
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i) - 44032;
+    if (code >= 0 && code <= 11171) {
+      result += initials[Math.floor(code / 588)];
+    } else {
+      result += str[i];
+    }
+  }
+  
+  return result;
+};
+
 export const BaseSelector: React.FC<BaseSelectorProps> = ({
   options,
   selectedOptions,
@@ -42,9 +59,27 @@ export const BaseSelector: React.FC<BaseSelectorProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter options based on search query
-  const filteredOptions = options.filter(option =>
-    option.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOptions = options.filter(option => {
+    const query = searchQuery.toLowerCase();
+    const queryInitials = getKoreanInitials(searchQuery);
+    
+    // Search in name
+    if (option.name.toLowerCase().includes(query)) return true;
+    // Korean initial search for name
+    if (getKoreanInitials(option.name).includes(queryInitials)) return true;
+    
+    // Search in company if it exists (for customer selector)
+    if (option.company) {
+      if (option.company.toLowerCase().includes(query)) return true;
+      // Korean initial search for company
+      if (getKoreanInitials(option.company).includes(queryInitials)) return true;
+    }
+    
+    // Search in any other searchable fields
+    if (option.searchableText && option.searchableText.toLowerCase().includes(query)) return true;
+    
+    return false;
+  });
 
   // Handle click outside
   useEffect(() => {
