@@ -9,7 +9,7 @@
   text-align: center;
   cursor: pointer;
   transition: border-color 0.15s ease;
-  padding: var(--spacing-6); /* modal-padding-md */
+  padding: var(--spacing-3); /* Reduced padding */
 }
 
 .file-attachment__upload-area:hover {

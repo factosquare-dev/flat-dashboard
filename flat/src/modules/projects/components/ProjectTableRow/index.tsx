@@ -1,0 +1,169 @@
+import React from 'react';
+import type { Project } from '@/shared/types/project';
+import type { ProjectId } from '@/shared/types/branded';
+import { useEditableCell } from '@/shared/hooks/useEditableCell';
+import type { Column } from '@/shared/hooks/useColumnOrder';
+import { useTaskManagement } from './useTaskManagement';
+import { renderTableCell } from './renderers/cellRenderer';
+import { RowLayout } from './components/RowLayout';
+import { ExpandableRow } from './components/ExpandableRow';
+import { MasterProjectRow } from './components/MasterProjectRow';
+import { ProjectType } from '@/shared/types/enums';
+
+interface ProjectTableRowProps {
+  project: Project;
+  columns: Column[];
+  index?: number;
+  isSelected: boolean;
+  onSelect: (checked: boolean) => void;
+  onRowClick: (project: Project) => void;
+  onUpdateField: (projectId: ProjectId, field: keyof Project, value: Project[keyof Project]) => void;
+  onShowOptionsMenu: (projectId: ProjectId, position: { top: number; left: number }, event?: React.MouseEvent) => void;
+  onMouseEnter?: () => void;
+  isDragging?: boolean;
+  onStartDrag?: (index: number) => void;
+  onDragStart?: (e: React.DragEvent, projectId: ProjectId) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent, project: Project) => void;
+  onToggleMaster?: (projectId: ProjectId) => void;
+}
+
+const ProjectTableRow: React.FC<ProjectTableRowProps> = React.memo(({
+  project,
+  columns,
+  index,
+  isSelected,
+  onSelect,
+  onRowClick,
+  onUpdateField,
+  onShowOptionsMenu,
+  onMouseEnter,
+  isDragging,
+  onStartDrag,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
+  onToggleMaster
+}) => {
+  const editableCell = useEditableCell();
+  const { isExpanded, tasks, handleToggleTasks, handleTaskToggle } = useTaskManagement({ project });
+  const [isDragOver, setIsDragOver] = React.useState(false);
+  
+  const handleMasterToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onToggleMaster) {
+      onToggleMaster(project.id);
+    }
+  };
+
+  const handleRowClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    
+    // Check if clicking on interactive elements or editable cells
+    const isInteractive = target.closest(
+      'button, input, select, textarea, a, ' +
+      '.js-inline-edit, .editable-cell, ' +
+      '.modal-input, .SearchBox, ' +
+      '[contenteditable="true"], ' +
+      '[role="combobox"], [role="listbox"], ' +
+      '.factory-cell, .date-picker, ' +
+      '.memo-cell, [data-memo-cell="true"]'
+    );
+    
+    // Also check if it's a td element with onclick handler
+    const isEditableCell = target.closest('td[onclick], td.cursor-pointer');
+    
+    if (!isInteractive && !isEditableCell) {
+      // Use the onRowClick prop to handle navigation properly
+      onRowClick(project);
+    }
+  };
+
+  const renderCell = (columnId: string) => {
+    const cellRenderProps = { 
+      project, 
+      editableCell, 
+      onUpdateField,
+      index,
+      isDragging,
+      onStartDrag,
+      onToggleTasks: handleToggleTasks 
+    };
+
+    return renderTableCell(columnId, cellRenderProps);
+  };
+
+  const handleDragOverRow = (e: React.DragEvent) => {
+    e.preventDefault();
+    console.log(`[DragDrop Row] 📍 OVER: ${project.name} (${project.type})`);
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    console.log(`[DragDrop Row] 👋 LEAVE: ${project.name}`);
+    setIsDragOver(false);
+  };
+
+  const handleDropRow = (e: React.DragEvent, targetProject: Project) => {
+    e.preventDefault();
+    console.log(`[DragDrop Row] 💧 DROP on: ${targetProject.name} (${targetProject.type})`);
+    setIsDragOver(false);
+    onDrop?.(e, targetProject);
+  };
+
+  // Render Master Project Row (children are handled by HierarchicalProjectTable)
+  if (project.type === ProjectType.MASTER) {
+    return (
+      <MasterProjectRow
+        project={project}
+        columns={columns}
+        isSelected={isSelected}
+        isExpanded={!!isExpanded}
+        onSelect={onSelect}
+        onToggleMaster={handleMasterToggle}
+        onShowOptionsMenu={onShowOptionsMenu}
+        renderCell={renderCell}
+        onRowClick={onRowClick}
+        onDragOver={onDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDropRow}
+      />
+    );
+  }
+
+  // Render regular row
+  return (
+    <>
+      <RowLayout
+        project={project}
+        columns={columns}
+        isSelected={isSelected}
+        isExpanded={isExpanded}
+        onSelect={onSelect}
+        onShowOptionsMenu={onShowOptionsMenu}
+        onRowClick={handleRowClick}
+        renderCell={renderCell}
+        isDragOver={isDragOver}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={handleDragOverRow}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDropRow}
+        handleToggleTasks={handleToggleTasks}
+      />
+      <ExpandableRow
+        isExpanded={isExpanded}
+        projectId={project.id}
+        tasks={tasks}
+        columns={columns}
+        onTaskToggle={handleTaskToggle}
+      />
+    </>
+  );
+});
+
+ProjectTableRow.displayName = 'ProjectTableRow';
+
+export default ProjectTableRow;

@@ -1,0 +1,23 @@
+import type { Schedule } from '@/shared/types/schedule';
+import { MockDatabaseImpl } from '@/core/database/MockDatabase';
+
+// Mock 데이터 저장소
+export const mockSchedules = new Map<string, Schedule>();
+
+// 초기 테스트 데이터 로드 - MockDB에서 가져오기
+export const initializeMockSchedules = () => {
+  try {
+    const db = MockDatabaseImpl.getInstance();
+    const database = db.getDatabase();
+    const schedules = Array.from(database.schedules.values());
+    
+    schedules.forEach(schedule => {
+      mockSchedules.set(schedule.id, schedule);
+    });
+  } catch (error) {
+    console.warn('[Schedule] Failed to load schedules from MockDB:', error);
+  }
+};
+
+// 초기화
+initializeMockSchedules();

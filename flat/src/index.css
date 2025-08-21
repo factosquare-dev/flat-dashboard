@@ -1,9 +1,9 @@
 /* Import unified theme system */
-@import './styles/tokens.css';
-@import './styles/theme.css';
-@import './styles/design-tokens.css';
-@import './styles/modal-system.css';
-@import './styles/utilities.css';
+@import './shared/styles/tokens.css';
+@import './shared/styles/theme.css';
+@import './shared/styles/design-tokens.css';
+@import './shared/styles/modal-system.css';
+@import './shared/styles/utilities.css';
 
 @tailwind base;
 @tailwind components;
@@ -136,8 +136,6 @@ body {
 #root {
   width: 100%;
   min-height: 100vh;
-  max-width: var(--container-max);
-  margin: 0 auto;
 }
 
 /* Responsive font sizing */

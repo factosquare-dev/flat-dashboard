@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckSquare } from 'lucide-react';
-import { mockDataService } from '@/services/mockDataService';
+import { useTaskCreation } from '@/shared/hooks/useTasks';
 
 interface TaskSelectionProps {
   selectedFactory: string;
@@ -17,6 +17,7 @@ export const TaskSelection: React.FC<TaskSelectionProps> = ({
   onTaskSelect,
   onToggleDropdown
 }) => {
+  const { getAllFactories, getTaskTypesForFactory } = useTaskCreation();
   return (
     <div className="modal-field-spacing">
       <div className="modal-field-label">
@@ -40,10 +41,10 @@ export const TaskSelection: React.FC<TaskSelectionProps> = ({
           <div className="modal-dropdown">
             {(() => {
               // selectedFactory가 ID인지 이름인지 확인하여 처리 - 유틸리티 함수 사용
-              const factories = mockDataService.getAllFactories();
+              const factories = getAllFactories();
               const factory = factories.find(f => f.id === selectedFactory) || factories.find(f => f.name === selectedFactory);
               const factoryId = factory?.id || selectedFactory;
-              const taskTypes = mockDataService.getTaskTypesForFactory(factoryId);
+              const taskTypes = getTaskTypesForFactory(factoryId);
               return taskTypes.map((task) => (
               <button
                 key={task}

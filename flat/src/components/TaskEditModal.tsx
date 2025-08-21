@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Calendar, Building2, CheckSquare } from 'lucide-react';
 import BaseModal, { ModalFooter } from './common/BaseModal';
-import { MODAL_SIZES } from '../utils/modalUtils';
-import { ButtonVariant } from '../types/enums';
+import { MODAL_SIZES } from '@/shared/utils/modalUtils';
+import { ButtonVariant } from '@/shared/types/enums';
 import { Button } from './ui/Button';
 
 interface Task {

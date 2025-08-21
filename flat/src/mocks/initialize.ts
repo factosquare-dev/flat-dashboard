@@ -3,9 +3,9 @@
  * This file ensures the mock database is initialized when imported
  */
 
-import { USE_MOCK_DATA } from '../config/mock';
-import { initializeServices } from './services';
-import { MockDatabaseImpl } from './database/MockDatabase';
+import { USE_MOCK_DATA } from '@/app/config/mock';
+import { initializeServices } from '@/core/services';
+import { MockDatabaseImpl } from '@/core/database/MockDatabase';
 
 // Force initialization of the mock system
 let initialized = false;

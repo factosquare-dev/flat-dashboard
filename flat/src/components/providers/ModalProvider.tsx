@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { useModalStore } from '@/stores/modalStore';
+import { useModalStore } from '@/core/store/modalStore';
 
 export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const modals = useModalStore((state) => state.modals);

@@ -7,19 +7,23 @@ import App from './App.tsx'
 import './mocks/initialize'
 
 // Import reset utility for debugging and version check
-import './utils/resetMockData'
-import { checkAndUpdateDatabaseVersion } from './utils/resetMockData'
-import { cleanupDuplicateFactories } from './utils/cleanupDuplicateFactories'
+import './shared/utils/resetMockData'
+import { checkAndUpdateDatabaseVersion } from './shared/utils/resetMockData'
+import { cleanupDuplicateFactories } from './shared/utils/cleanupDuplicateFactories'
+import { cleanupInvalidEntries } from './shared/utils/cleanupDatabase'
 
 // Check database version on app start
 checkAndUpdateDatabaseVersion()
 
-// Clean up duplicate factory IDs on app start
+// Clean up database on app start
 setTimeout(() => {
-  cleanupDuplicateFactories().then(count => {
-    if (count > 0) {
-      console.log(`[App] Cleaned ${count} projects with duplicate factory IDs`);
-    }
+  // First clean up invalid entries
+  const invalidCount = cleanupInvalidEntries();
+  // Cleaned invalid database entries if needed
+  
+  // Then clean up duplicate factory IDs
+  cleanupDuplicateFactories().then(() => {
+    // Cleaned duplicate factory IDs if needed
   });
 }, 1000); // Delay to ensure MockDB is initialized
 

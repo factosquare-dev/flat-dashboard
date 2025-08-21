@@ -1,15 +1,15 @@
 import React, { useReducer, useCallback, useState } from 'react';
-import BaseModal, { ModalFooter } from '../common/BaseModal';
+import BaseModal, { ModalFooter } from '@/common/BaseModal';
 import { FactorySelection } from './FactorySelection';
 import { TaskSelection } from './TaskSelection';
 import { DateSelection } from './DateSelection';
 import { workflowReducer } from './reducer';
 import { initialWorkflowState } from './constants';
 import { AlertCircle } from 'lucide-react';
-import { useModalFormValidation } from '@/hooks/useModalFormValidation';
-import { ModalSize, ButtonVariant, ButtonSize } from '@/types/enums';
-import { Button } from '../ui/Button';
-import { getModalSizeString } from '@/utils/modalUtils';
+import { useModalFormValidation } from '@/shared/hooks/useModalFormValidation';
+import { ModalSize, ButtonVariant, ButtonSize } from '@/shared/types/enums';
+import { Button } from '@/ui/Button';
+import { getModalSizeString } from '@/shared/utils/modalUtils';
 import type { WorkflowModalProps } from './types';
 import './WorkflowModal.css';
 
