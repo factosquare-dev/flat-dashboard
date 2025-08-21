@@ -49,6 +49,10 @@ export interface SortParams {
   order: 'asc' | 'desc';
 }
 
+// Re-export commonly used types from other modules
+export { Project, Customer } from './project';
+export { Task, Participant, Schedule } from './schedule';
+
 // Filter types
 export interface FilterParams {
   [key: string]: any;

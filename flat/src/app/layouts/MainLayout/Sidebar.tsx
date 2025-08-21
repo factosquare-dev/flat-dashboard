@@ -5,11 +5,8 @@ import {
   FolderOpen,
   Users,
   Factory,
-  MessageCircle,
   ChevronDown,
   ChevronRight,
-  Menu,
-  X,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -126,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           }}
         </NavLink>
         
-        {hasChildren && isExpanded && isOpen && (
+        {hasChildren && isExpanded && isOpen && item.children && (
           <div className="ml-8 space-y-1">
             {item.children.map(child => renderNavItem(child))}
           </div>

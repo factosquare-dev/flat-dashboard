@@ -200,9 +200,9 @@ export const statusColors = {
 
 // Priority color mappings
 export const priorityColors = {
-  [PROJECT_PRIORITY.HIGH]: theme.colors.priority.high,
-  [PROJECT_PRIORITY.MEDIUM]: theme.colors.priority.medium,
-  [PROJECT_PRIORITY.LOW]: theme.colors.priority.low,
+  [PROJECT_PRIORITY['high']]: theme.colors.priority.high,
+  [PROJECT_PRIORITY['medium']]: theme.colors.priority.medium,
+  [PROJECT_PRIORITY['low']]: theme.colors.priority.low,
 } as const;
 
 // Helper function to get CSS variable value
